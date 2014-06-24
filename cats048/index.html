@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Cats048</title>
+
+  <link href="style/main.css" rel="stylesheet" type="text/css">
+  <link rel="shortcut icon" href="http://www.catsinmyyard.com/wp-content/themes/twentyten-catsinmyyard/images/favicon.ico?v=1.1"> 
+  <link rel="apple-touch-icon" href="meta/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta property="og:title" content="Cats048" />
+    <meta property="og:description" content="A variation of the 2048 Game featuring the cats from CatsInMyYard.com" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://www.catsinmyyard.com/cats048/" />
+    <meta property="og:image" content="http://www.catsinmyyard.com/cats048/img/cats048.png" />
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+<body>
+  <div class="container">
+    <div class="heading">
+      <h1 class="title">Cats048</h1>
+      <div class="scores-container">
+        <div class="score-container">0</div>
+        <div class="best-container">0</div>
+      </div>
+    </div>
+
+    <div class="above-game">
+      <p class="game-intro"><strong><< back to <a href="http://www.catsinmyyard.com" title="Cats In My Yard">Cats in My Yard</a></strong></p>
+      <a class="restart-button">New Game</a>
+    </div>
+
+    <div class="game-container">
+      <div class="game-message">
+        <p></p>
+        <div class="lower">
+	        <a class="keep-playing-button">Keep going</a>
+          <a class="retry-button">Try again</a>
+        </div>
+      </div>
+
+      <div class="grid-container">
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+      </div>
+
+      <div class="tile-container">
+
+      </div>
+    </div>
+
+    <p class="game-explanation"><strong class="important">How to play:</strong> Use your <strong>arrow keys</strong> or swipe to move the tiles. When two tiles with the same cat touch, they <strong>merge into one!</strong></p>
+    <hr>
+    <h3>The Cats</h3>
+    <ul id="the-players">
+        <li><img src="img/funny-face.jpg" alt="Funny Face" />Funny Face</li>
+        <li><img src="img/honey-bouncy-bear.jpg" alt="Honey Bouncy Bear" />Honey Bouncy Bear</li>
+        <li><img src="img/sprungy.jpg" alt="Sprungy" />Sprungy</li>
+        <li><img src="img/bobcat.jpg" alt="Bobcat" />Bobcat</li>
+        <li><img src="img/sugar.jpg" alt="Sugar" />Sugar</li>
+        <li><img src="img/dash.jpg" alt="Dash" />Dash</li>
+        <li><img src="img/robert-f-cattedy.jpg" alt="Robert F. Cattedy" />Robert F. Cattedy</li>
+        <li><img src="img/dice.jpg" alt="Dice" />Dice</li>
+        <li><img src="img/ringo.jpg" alt="Ringo" />Ringo</li>
+        <li><img src="img/magic.jpg" alt="Magic" />Magic</li>
+        <li><img src="img/princess.jpg" alt="Princess" />Princess</li>
+        <li><img src="img/lady-marmalade.jpg" alt="Lady Marmalade" />Lady Marmalade</li>
+    </ul>
+    <p><small>Forked from <a href="http://gabrielecirulli.com" target="_blank">Gabriele Cirulli</a>'s <a href="http://gabrielecirulli.github.io/2048/" target="_blank">2048</a></small>.</p>
+  </div>
+
+  <script src="js/bind_polyfill.js"></script>
+  <script src="js/classlist_polyfill.js"></script>
+  <script src="js/animframe_polyfill.js"></script>
+  <script src="js/keyboard_input_manager.js"></script>
+  <script src="js/html_actuator.js"></script>
+  <script src="js/grid.js"></script>
+  <script src="js/tile.js"></script>
+  <script src="js/local_storage_manager.js"></script>
+  <script src="js/game_manager.js"></script>
+  <script src="js/application.js"></script>
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-36855632-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+</body>
+</html>

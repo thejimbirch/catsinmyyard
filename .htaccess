@@ -1,0 +1,21 @@
+
+<IfModule mod_suphp.c>
+	suPHP_ConfigPath /home/jimbirch/public_html/catsinmyyard.com//php.ini
+	<Files php.ini>
+		order allow,deny
+		deny from all
+	</Files>
+</IfModule>
+
+
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+
+# END WordPress

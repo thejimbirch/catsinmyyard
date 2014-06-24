@@ -1,0 +1,99 @@
+/*
+ Theme Name:   Wordpress Bootstrap Child
+ Theme URI:    http://www.catsinmmyyard.com/
+ Description:  Cats In My Yard Child Theme
+ Author:       Jim Birch
+ Author URI:   http://www.catsinmyyard.com
+ Template:     wordpress-bootstrap-master
+ Version:      1.0.0
+ Tags:         bootstrap
+ Text Domain:  twenty-fourteen-master
+*/
+
+@import url("../wordpress-bootstrap-master/style.css");
+
+@import url("http://fonts.googleapis.com/css?family=Oswald");
+@import url("http://fonts.googleapis.com/css?family=Open+Sans");
+
+/* =Theme customization starts here
+-------------------------------------------------------------- */
+#tinymce {
+    font-size: 16px;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+}
+
+p {
+    line-height: 1.5em;
+}
+
+a {
+    color: #e400f0;
+}
+
+a:hover {
+    text-decoration: none;
+    color: #f642ff;
+}
+
+a::-moz-focus-inner,
+button::-moz-focus-inner {
+    border: 0;
+    outline: none;
+}
+
+.meta a {
+    color: #666;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 3em;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    color: #FFF;
+}
+
+.h3 {
+    color: #BFBFBF;
+    font-size: 1.2em;
+    font-weight: bold;
+    line-height: 1.5em;
+    letter-spacing: 0;
+}
+
+#tinymce img {
+    width: 100% !important;
+    height: auto !important;
+}
+
+#tinymce .lead,
+#tinymce p:first-child {
+    font-size: 1.5em;
+}
+
+#tinymce img, 
+#tinymce iframe {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+#tinymce .wp-caption img,
+#tinymce .thumbnail img {
+    margin-bottom: 0;
+}
+
+.wp-caption-text {
+    background-color: #e400f0;
+    padding: .5em 1em;
+    color: #fff;
+}
+
+.wp-gallery-row img {
+    border-radius: 50%;
+}
+
+.wp-gallery-row .thumbnail {
+    border: none;
+    transition: none;
+}

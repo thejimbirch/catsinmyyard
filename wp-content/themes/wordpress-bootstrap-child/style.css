@@ -1,0 +1,389 @@
+/*
+ Theme Name:   Wordpress Bootstrap Child
+ Theme URI:    http://www.catsinmmyyard.com/
+ Description:  Cats In My Yard Child Theme
+ Author:       Jim Birch
+ Author URI:   http://www.catsinmyyard.com
+ Template:     wordpress-bootstrap-master
+ Version:      1.0.0
+ Tags:         bootstrap
+ Text Domain:  twenty-fourteen-master
+*/
+
+@import url("../wordpress-bootstrap-master/style.css");
+
+/* =Theme customization starts here
+-------------------------------------------------------------- */
+body {
+    padding-top: 122px;
+    font-size: 16px;
+    font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+}
+
+p {
+    line-height: 1.5em;
+}
+
+a {
+    color: #e400f0;
+}
+
+a:hover {
+    text-decoration: none;
+    color: #f642ff;
+}
+
+a::-moz-focus-inner,
+button::-moz-focus-inner {
+    border: 0;
+    outline: none;
+}
+
+.meta a {
+    color: #666;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 3em;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    color: #FFF;
+}
+
+h3, .h3 {
+    color: #BFBFBF;
+    font-size: 1.2em;
+    font-weight: bold;
+    line-height: 1.5em;
+    letter-spacing: 0;
+}
+
+#content {
+    padding-top: 0;
+}
+
+#main article img {
+    width: 100%;
+}
+
+#main article img.avatar {
+    width: auto;
+}
+
+article header {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 20%;
+    min-height: 420px;
+    margin-bottom: 2em;
+    -webkit-box-shadow:inset 0 1em 1em -1em rgba(0,0,0,.5), inset 0 -2em 4em -2em rgba(0,0,0,.8);
+    box-shadow:inset 0 1em 1em -1em rgba(0,0,0,.5), inset 0 -2em 4em -2em rgba(0,0,0,.8);
+    background: #fb83fa; /* Old browsers */
+    background: -moz-linear-gradient(top,  #fb83fa 0%, #e93cec 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fb83fa), color-stop(100%,#e93cec)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #fb83fa 0%,#e93cec 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #fb83fa 0%,#e93cec 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #fb83fa 0%,#e93cec 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #fb83fa 0%,#e93cec 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fb83fa', endColorstr='#e93cec',GradientType=0 ); /* IE6-9 */
+}
+
+article header h1 {
+    bottom: 0.5em;
+    position: absolute;
+    right: 2em;
+    text-align: right;
+    width: 40%;
+}
+
+article header h1 a {
+    display: block;
+    width: 100%;
+    color: #fff;
+    text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
+}
+
+article header h1 a:hover {
+    color: #fff;
+}
+
+.lead {
+    font-size: 1.5em;
+}
+
+#main article .post_content img, 
+#main article .post_content iframe {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+#main article .wp-caption img,
+#main article .thumbnail img {
+    margin-bottom: 0;
+}
+
+.wp-caption-text {
+    background-color: #e400f0;
+    padding: .5em 1em;
+    color: #fff;
+}
+
+.wp-gallery-row img {
+    border-radius: 50%;
+}
+
+.wp-gallery-row .thumbnail {
+    border: none;
+    transition: none;
+}
+
+.label {
+    background-color: #ededed;
+    margin-bottom: .5em;
+}
+
+/* Header */
+
+.navbar > .container .navbar-brand {
+    margin-left: 0;
+}
+
+.navbar-header a.navbar-brand {
+    border: 0;
+    font: 0/0 a;
+    text-shadow: none;
+    color: transparent;
+    background: url(http://www.catsinmyyard.com/wp-content/themes/wordpress-bootstrap-child/library/img/Cats-In-My-Yard-150.png);
+    background-size: contain;
+    width: 112px;
+    height: 112px;;
+}
+
+.navbar .h2 {
+    color: #e400f0;
+    font-size: 2.5em;
+    display: block;
+    margin: .2em;
+}
+
+.navbar-default .navbar-nav > li > a {
+    font-weight: bold;
+}
+
+.social-icons {
+    list-style-type: none;
+    padding-left: 0;
+    float: right;
+    margin-top: 12px;
+}
+.social-icons li {
+    float: left;
+    padding-left: .5em;
+}
+.social-icons li.facebook {
+    padding-left: 0;
+}
+
+.search-container {
+    margin-top: 1em;
+}
+
+#searchform {
+    padding: 0;
+    width: 186px;
+    margin-left: 12px;
+}
+
+@media (min-width: 0) and (max-width: 600px) {
+    body {
+        padding-top: 89px;
+    }
+    article header {
+        margin-bottom: 1em;
+    }
+    article header h1 {
+        font-size: 2em;
+        width: 75%;
+        text-align:left; 
+    }
+    .meta .meta-post-date {
+        display: none;
+    }
+    .meta .meta-filed-under {
+        display: none;
+    }
+    .meta-share {
+        display: none;
+    }
+    .navbar .h2 {
+        font-size: 1.6em;
+    }
+    .navbar-header a.navbar-brand {
+        width: 86px;
+        height: 86px;
+    }
+}
+
+@media (max-width: 769px) {
+    .navbar > .container .navbar-brand {
+        margin-right: 20px;
+    }
+    .navbar .h2.hidden-header {
+        display: none;
+    }
+    .search-container {
+        margin-top: 0;
+    }
+    #searchform {
+        margin-left: 0;
+        border-bottom: none;
+    }
+}
+
+@media (min-width: 768px) {
+    .navbar .h2 {
+        display: none;
+    }
+    .navbar .h2.hidden-header {
+        display: block;
+        font-size: 2em;
+    }
+    .social-icons {
+        float:right;
+        margin-top: 8px;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 1025px) {
+    .really_simple_share .really_simple_share_facebook_like,
+    .really_simple_share .really_simple_share_twitter,
+    .really_simple_share .really_simple_share_google1 {
+        padding-left: 0;
+    }
+    .really_simple_share_google1 {
+        margin-top: 3px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+    .search-container {
+        margin-top: .8em;
+    }
+    .navbar .h2.hidden-header {
+        font-size: 3em;
+    }
+}
+
+@media (min-width: 1200px) {
+    .navbar .h2.hidden-header {
+        font-size: 3em;
+    }
+}
+
+.navbar-fixed-top {
+    z-index: 10000;
+}
+
+.nivo-lightbox-theme-default.nivo-lightbox-overlay {
+    background: none repeat scroll 0 0 rgba(255, 255, 255, 0.8);
+}
+
+.nivo-lightbox-theme-default .nivo-lightbox-next {
+    background-image: url("library/img/next@2x.png");
+}
+
+.nivo-lightbox-theme-default .nivo-lightbox-prev {
+    background-image: url("library/img/prev@2x.png");
+}
+
+.nivo-lightbox-theme-default .nivo-lightbox-close {
+    background-image: url("library/img/close@2x.png");
+    background-size: 32px 32px;
+    background-position: center center;
+    opacity: 0.8;
+}
+
+.nivo-lightbox-theme-default .nivo-lightbox-close {
+    height: 32px;
+    width: 32px;
+}
+
+.nivo-lightbox-close {
+    position: absolute;
+    right: 5%;
+    top: 5%;
+}
+
+.nivo-lightbox-theme-default .nivo-lightbox-prev:hover,
+.nivo-lightbox-theme-default .nivo-lightbox-next:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.pagination {
+    float: right;
+}
+
+.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus {
+    background-color: #e400f0;
+    border-color: #e400f0;
+}
+
+footer {
+    background: #F8F8F8;
+    padding-bottom: 3em;
+}
+
+footer .widgettitle {
+    display: none;
+}
+
+footer ul {
+    padding-top: 2em;
+    margin-bottom: 0;
+}
+
+footer p {
+    padding-top: 1em;
+    margin-bottom: 0;
+}
+
+footer ul {
+    list-style: none;
+    float: right;
+}
+
+footer ul li {
+    float: left;
+    margin-left: 1em;
+}
+
+footer ul li:first-child {
+    margin-left: 0;
+}
+
+footer .widget.col-sm-4.widget_meta,
+footer .col-sm-12 {
+    width: 100%;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.form-control:focus {
+    border-color: #e400f0;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(228, 0, 240, 0.6);
+    outline: 0 none;
+}
+
+.form-submit input[type="submit"],
+.form-submit input[type="submit"]:hover,
+.form-submit input[type="submit"]:focus,
+.form-submit input[type="submit"]:active,
+.form-submit input.active[type="submit"],
+.open .dropdown-toggle.form-submit input[type="submit"] {
+    background-color: #E400F0;
+    border: 1px solid #E400F0;
+}

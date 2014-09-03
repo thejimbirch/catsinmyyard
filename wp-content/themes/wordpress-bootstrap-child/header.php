@@ -13,6 +13,18 @@
         <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 	<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
         <?php wp_head(); ?>
+        <?php if ( has_post_thumbnail() && is_single() ) { ?>
+            <?php $url = wp_get_attachment_url( get_post_thumbnail_id($post->ID) ); ?>
+                <meta property="og:image" content="<?php echo $url; ?>" />
+            <?php } elseif ( has_post_thumbnail() && is_front_page() ) { ?>
+                <meta property="og:image" content="http://www.catsinmyyard.com/wp-content/uploads/2014/06/pho.jpg" />
+                <meta property="og:image" content="http://www.catsinmyyard.com/wp-content/themes/wordpress-bootstrap-child/library/img/Cats-In-My-Yard-Logo-1024.png" />
+                <meta property="og:image" content="http://catsinmyyard.com/wp-content/uploads/2010/06/Cats-In-My-Yard-1024x651.jpg" />
+            <?php } else { ?>
+                <meta property="og:image" content="http://www.catsinmyyard.com/wp-content/uploads/2014/06/pho.jpg" />
+                <meta property="og:image" content="http://www.catsinmyyard.com/wp-content/themes/wordpress-bootstrap-child/library/img/Cats-In-My-Yard-Logo-1024.png" />
+                <meta property="og:image" content="http://catsinmyyard.com/wp-content/uploads/2010/06/Cats-In-My-Yard-1024x651.jpg" />
+        <?php }?>
         <script src="//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
         <script>
           WebFont.load({
@@ -24,7 +36,7 @@
     </head>
     <body <?php body_class(); ?>>
         <header role="banner">
-            <div class="navbar navbar-default navbar-fixed-top">
+            <div class="navbar navbar-default">
 		<div class="container">
                     <div class="row">
                         <div class="navbar-header col-sm-2">

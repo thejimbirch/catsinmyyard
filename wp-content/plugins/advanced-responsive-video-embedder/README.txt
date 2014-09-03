@@ -4,11 +4,11 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: video, responsive, embed, video-embedder, iframe, minimal, lightweight, simplicity, shortcodes, Youtube, Blip, Dailymotion, Videojug, Collegehumor, Veoh, Break, Movieweb, Snotr, Gametrailers, Vimeo, Viddler, Funnyordie, Myspace, Liveleak, Metacafe, Myvideo, Yahoo Screen, Spike
 Requires at least: 3.3.1
 Tested up to: 3.9
-Stable tag: 4.5.1
+Stable tag: trunk
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Easy responsive video embeds via URL (like WordPress) or Shortcodes. Normal, Lazyload or Thumbnails that open a Colorbox your choice!  
+Easy responsive video embeds via URL (like WordPress) or Shortcodes. Normal, Lazyload or Thumbnails that open a Colorbox - Your choice!  
 
 == Description ==
 
@@ -19,9 +19,9 @@ It lets you embed videos from many providers with full responsive sizes via URL 
 The Plugin has a set of customization options to embed the video exactly as you like, this includes custom URL parameters. Defaults to make the videos as unobtrusive as possible and keep your visitors on your site are already included.
 
 * [Features](http://nextgenthemes.com/plugins/advanced-responsive-video-embedder/)
-* [Quick introduction with demonstration](http://nextgenthemes.com/plugins/advanced-responsive-video-embedder/quick-introduction-and-demo)
+* [Quick introduction with demonstration](http://nextgenthemes.com/plugins/advanced-responsive-video-embedder/quick-introduction-and-demonstration/)
 * [Documentation](http://nextgenthemes.com/plugins/advanced-responsive-video-embedder/documentation) (For advanced usage)
-* **[How to report a problem](http://nextgenthemes.com/plugins/advanced-responsive-video-embedder/reporting-issues-for-advanced-responsive-video-embedder/)**
+* [How to report a problem](http://nextgenthemes.com/plugins/advanced-responsive-video-embedder/reporting-issues-for-advanced-responsive-video-embedder/)
 
 = Supported video sites: =
 
@@ -106,8 +106,37 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 
 1. In action
 2. Options page
-
 == Changelog ==
+
+= 5.0.1 Beta =
+* Fix: Options var error
+
+= 5.0.0 Beta =
+* Fix: Max-width options should now work in all circumstances
+* Improved: Various CSS improvements
+* Improved: Changed play overlay image to a Google+ style image 
+
+= 4.9.0 Beta =
+* Improved: All Javascript is loaded from files now and they are only loaded when there are embeds on the page. This improves page load times on pages with no embeds.
+* Fix: Removed autohide=1 from default YouTube Parameters since it causes a YouTube bug in the HTML5 player.
+
+= 4.8.0 =
+* Updated: Spanish translation now 80% complete. Thanks Xarkitu!
+* Improved: Do not load admin dialog when doing AJAX
+
+= 4.7.0 =
+* Fix: Iframe code detection
+
+= 4.6.0 =
+* Improvement: PHP required version lowered to 5.2.4
+
+= 4.5.4 =
+* Fix: Save of custom URL parameters
+* New: CHANGES.md file for github updater
+
+= 4.5.3 =
+* Fix: Fatal PHP Error on activation.
+* Fix: Readme spellings.
 
 = 4.5.0 =
 * Fix: Minor options page spelling and field association fixes.
@@ -115,8 +144,8 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 * New: 4players.de support.
 * New: Added parameter input to the shortcode dialog.
 * Improved: Default options are no longer stored in the database.
-* Improved: Transparency fade animation thumbnail hover.
-* Improved: No more ungly URL hash (#arve-load-video) after clicking links.
+* Improved: Transparency fade animation on thumbnail hover.
+* Improved: No more ugly URL hash (#arve-load-video) after clicking links.
 * Improved: Dropped IE 8 support for Lazyload mode.
 * Improved: Lots of code improvements.
 

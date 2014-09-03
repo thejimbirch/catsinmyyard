@@ -1,33 +1,4 @@
-<?php /*
-
-*******************************************************************************
-
-Copyright (C) 2013 Nicolas Jonas ( This entire thing )
-Copyright (C) 2013 Sutherland Boswell ( some code in the 'get_thumbnail' method is based on https://github.com/suth/video-thumbnails/tree/master/php/providers )
-Copyright (C) 2013 Tom Mc Farlin and WP Plugin Boilerplate Contributors ( Used as base for this plugin )
-
-This file is part of Advanced Responsive Video Embedder.
-
-Advanced Responsive Video Embedder is free software: you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Advanced Responsive Video Embedder is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-Advanced Responsive Video Embedder.  If not, see
-<http://www.gnu.org/licenses/>.
-
-_  _ ____ _  _ ___ ____ ____ _  _ ___ _  _ ____ _  _ ____ ____  ____ ____ _  _ 
-|\ | |___  \/   |  | __ |___ |\ |  |  |__| |___ |\/| |___ [__   |    |  | |\/| 
-| \| |___ _/\_  |  |__] |___ | \|  |  |  | |___ |  | |___ ___] .|___ |__| |  | 
-
-*******************************************************************************/
-
+<?php
 /**
  * Plugin Name.
  *
@@ -35,16 +6,13 @@ _  _ ____ _  _ ___ ____ ____ _  _ ___ _  _ ____ _  _ ____ ____  ____ ____ _  _
  * @author    Nicolas Jonas
  * @license   GPL-3.0
  * @link      http://nextgenthemes.com
- * @copyright 2013 Nicolas Jonas
+ * @copyright Copyright (c) 2014 Nicolas Jonas, Copyright (c) 2014 Tom Mc Farlin and WP Plugin Boilerplate Contributors (Used as base for this plugin), Copyright (c) 2014 Sutherland Boswell (some code in the 'get_thumbnail' method is based on https://github.com/suth/video-thumbnails/tree/master/php/providers)
+ * _  _ ____ _  _ ___ ____ ____ _  _ ___ _  _ ____ _  _ ____ ____  ____ ____ _  _  
+ * |\ | |___  \/   |  | __ |___ |\ |  |  |__| |___ |\/| |___ [__   |    |  | |\/| 
+ * | \| |___ _/\_  |  |__] |___ | \|  |  |  | |___ |  | |___ ___] .|___ |__| |  | 
  */
 
 /**
- * Plugin class. This class should ideally be used to work with the
- * public-facing side of the WordPress site.
- *
- * If you're interested in introducing administrative or dashboard
- * functionality, then refer to `class-plugin-name-admin.php`
- *
  * @package Advanced_Responsive_Video_Embedder
  * @author  Nicolas Jonas
  */
@@ -56,7 +24,7 @@ class Advanced_Responsive_Video_Embedder {
 	 * @since   2.6.0
 	 * @var     string
 	 */
-	const VERSION = '4.5.1';
+	const VERSION = '5.0.1';
 
 	/**
 	 * Unique identifier for your plugin.
@@ -127,10 +95,9 @@ class Advanced_Responsive_Video_Embedder {
 
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ), 0 );
 
 		add_action( 'wp_head', array( $this, 'print_styles' ) );
-		add_action( 'wp_footer', array( $this, 'print_javascript' ) );
 
 		add_filter( 'widget_text', 'do_shortcode' );
 		#add_filter( 'oembed_providers', array( $this, 'remove_wp_default_oembeds' ), 99 );
@@ -317,13 +284,6 @@ class Advanced_Responsive_Video_Embedder {
 	private static function single_activate() {
 
 		add_option( 'arve_install_date', current_time( 'timestamp' ) );
-		
-		# TODO Remove later
-		#$options = get_option( 'arve_options' );
-		$options = $this->options;
-		$options['params']['vimeo']['html5'] = 1;
-
-		update_option( 'arve_options', $options );
 	}
 
 	/**
@@ -361,10 +321,11 @@ class Advanced_Responsive_Video_Embedder {
 	/**
 	 * Register and enqueues public-facing JavaScript files.
 	 *
-	 * @since    1.0.0
+	 * @since    4.9.0
 	 */
-	public function enqueue_scripts() {
-		wp_enqueue_script( $this->plugin_slug . '-plugin-colorbox-setup', plugins_url( 'assets/js/colorbox-setup.js', __FILE__ ), array( 'jquery', 'colorbox' ), self::VERSION, true );
+	public function register_scripts() {
+		wp_register_script( $this->plugin_slug . '-plugin-colorbox-setup', plugins_url( 'assets/js/colorbox-setup.js', __FILE__ ), array( 'jquery', 'colorbox' ), self::VERSION, true );
+		wp_register_script( $this->plugin_slug . '-plugin-lazyload',       plugins_url( 'assets/js/lazyload.js', __FILE__ ),       array(),                       self::VERSION, true );
 		#wp_enqueue_script( 'screenfull', plugins_url( 'assets/js/screenfull.min.js', __FILE__ ), array(), self::VERSION );
 	}
 
@@ -424,19 +385,19 @@ class Advanced_Responsive_Video_Embedder {
 			),
 			'params' => array(
 				#'archiveorg'      => '',
-				'blip'            => array(),
+				'blip'            => '',
 				#'break'           => '',
 				#'collegehumor'    => '',
 				#'comedycentral'   => '',
-				'dailymotion'     => array( 'logo' => '0', 'hideInfos' => '1', 'related' => '0', 'forcedQuality' => 'hq' ),
-				'dailymotionlist' => array( 'logo' => '0', 'hideInfos' => '1', 'related' => '0', 'forcedQuality' => 'hq' ),
+				'dailymotion'     => 'logo=0  hideInfos=1  related=0  forcedQuality=hd  ',
+				'dailymotionlist' => 'logo=0  hideInfos=1  related=0  forcedQuality=hd  ',
 				#'flickr'          => '',
 				#'funnyordie'      => '',
 				#'gametrailers'    => '',
-				'iframe'          => array(),
+				'iframe'          => '',
 				#'ign'             => '',
 				#'kickstarter'     => '',
-				'liveleak'        => array( 'wmode' => 'transparent' ),
+				'liveleak'        => 'wmode=transparent  ',
 				#'metacafe'        => '',
 				#'movieweb'        => '',
 				#'myspace'         => '',
@@ -444,29 +405,15 @@ class Advanced_Responsive_Video_Embedder {
 				#'snotr'           => '',
 				#'spike'           => '',
 				#'ted'             => '',
-				'ustream'         => array( 'v' => '3', 'wmode' => 'transparent' ),
-				'veoh'            => array( 'player' => 'videodetailsembedded', 'id' => 'anonymous' ),
-				'vevo'            => array(
-					'playlist'       => 'false',
-					'playerType'     => 'embedded',
-					#'playerId'       => '62FF0A5C-0D9E-4AC1-AF04-1D9E97EE3961',
-					'env'            => '0',
-					#'cultureName'    => 'en-US',
-					#'cultureIsRTL'   => 'False',
-				),
-				'viddler'         => array( 'f' => '1', 'disablebranding' => '1', 'wmode' => 'transparent' ),
-				'vine'            => array(), //* audio=1 supported
+				'ustream'         => 'v=3  wmode=transparent  ',
+				'veoh'            => 'player=videodetailsembedded  id=anonymous  ',
+				'vevo'            => 'playlist=false  playerType=embedded  env=0  ', // playerId=62FF0A5C-0D9E-4AC1-AF04-1D9E97EE3961
+				'viddler'         => 'f=1  disablebranding=1  wmode=transparent  ',
+				'vine'            => '', //* audio=1 supported
 				#'videojug'        => '',
-				'vimeo'           => array ( 'html5' => '1', 'title' => '0', 'byline' => '0', 'portrait' => '0' ),
+				'vimeo'           => 'html5=1  title=0  byline=0  portrait=0  ',
 				#'yahoo'           => '',
-				'youtube'         => array(
-					#'theme'          => 'dark',
-					'autohide'       => '1',
-					'iv_load_policy' => '3',
-					'modestbranding' => '1',
-					'rel'            => '0',
-					'wmode'          => 'transparent',
-				),
+				'youtube'         => 'iv_load_policy=3  modestbranding=1  rel=0  wmode=transparent  ',
 			)
 		);
 
@@ -476,7 +423,23 @@ class Advanced_Responsive_Video_Embedder {
 
 		$options               = wp_parse_args( $options,               $defaults );
 		$options['shortcodes'] = wp_parse_args( $options['shortcodes'], $defaults['shortcodes'] );
-		$options['params']     = wp_parse_args( $options['params'],     $defaults['params'] );
+
+		//* Convert array from old versions TODO remove later
+		foreach( $options['params'] as $provider => $params ) {
+
+			if ( is_array( $params ) ) {
+
+				$params_str = '';
+
+				foreach ( $params as $key => $var ) {
+					$params_str .= (string) "{$key}={$var}  ";
+				}
+
+				$options['params'][ $provider ] = $params_str;
+			}
+		}
+
+		$options['params'] = wp_parse_args( $options['params'], $defaults['params'] );
 
 		#update_option( 'arve_options', $options );
 		$this->options = $options;
@@ -835,6 +798,15 @@ class Advanced_Responsive_Video_Embedder {
 				break;
 		}
 
+		if ( 'lazyload' == $mode ) {
+
+			wp_enqueue_script( $this->plugin_slug . '-plugin-lazyload' );
+
+		} elseif ( 'thumbnail' == $mode ) {
+
+			wp_enqueue_script( $this->plugin_slug . '-plugin-colorbox-setup' );
+		}
+
 		switch ( $maxwidth ) {
 			case '':
 				if ( $options['video_maxwidth'] > 0 )
@@ -1072,11 +1044,16 @@ class Advanced_Responsive_Video_Embedder {
 			}
 		}
 
-		//* Take parameters from Options as defaults and maybe merge custom parameters from shortcode in. If there are no options we assume the provider not supports any params and do nothing.
+		//* Take parameters from Options as defaults and maybe merge custom parameters from shortcode in. 
+		//* If there are no options we assume the provider not supports any params and do nothing.
 		if ( ! empty( $options['params'][ $provider ] ) ) {
-			$parameters = $this->parse_parameters( $parameters );
-			$params  = wp_parse_args( $parameters, $options['params'][$provider] );
-			$urlcode = add_query_arg( $params, $urlcode );
+
+			$parameters        = $this->parse_parameters( $parameters );
+			$option_parameters = $this->parse_parameters( $options['params'][ $provider ] );
+
+			$parameters = wp_parse_args( $parameters, $option_parameters );
+
+			$urlcode = add_query_arg( $parameters, $urlcode );
 		}
 
 		switch ( $provider ) {
@@ -1182,9 +1159,9 @@ class Advanced_Responsive_Video_Embedder {
 			$style = $this->get_wrapper_style( false, $maxwidth );
 
 			$output .= sprintf(
-				'<div class="%s"%s><div class="arve-embed-container"%s>%s</div></div>',
+				'<div class="%s" itemscope itemtype="http://schema.org/VideoObject"%s><div class="arve-embed-container" %s>%s</div></div>',
 				esc_attr( "arve-wrapper arve-normal-wrapper arve-$provider-wrapper $align" ),
-				( $style ) ? sprintf( ' style="%s"', esc_attr( trim( $style ) ) ) : '',
+				( $style )        ? sprintf( ' style="%s"', esc_attr( trim( $style ) ) ) : '',
 				( $aspect_ratio ) ? sprintf( ' style="padding-bottom: %d%%"', $aspect_ratio ) : '',
 				$normal_embed
 			);
@@ -1219,9 +1196,9 @@ class Advanced_Responsive_Video_Embedder {
 			$style = $this->get_wrapper_style( $thumbnail, $maxwidth );
 
 			$output .= sprintf(
-				'<div class="%s"%s><div class="arve-embed-container"%s>%s</div></div>',
+				'<div class="%s" itemscope itemtype="http://schema.org/VideoObject"%s><div class="arve-embed-container"%s>%s</div></div>',
 				esc_attr( "arve-wrapper arve-normal-wrapper arve-$provider-wrapper $align" ),
-				( $style ) ? sprintf( ' style="%s"', esc_attr( trim( $style ) ) ) : '',
+				( $style )        ? sprintf( ' style="%s"', esc_attr( trim( $style ) ) ) : '',
 				( $aspect_ratio ) ? sprintf( ' style="padding-bottom: %d%%"', $aspect_ratio ) : '',
 				$inner
 			);
@@ -1260,9 +1237,9 @@ class Advanced_Responsive_Video_Embedder {
 			$style = $this->get_wrapper_style( $thumbnail, false );
 
 			$output .= sprintf(
-				'<div class="%s"%s><div class="arve-embed-container"%s>%s</div></div>',
-				esc_attr( "arve-wrapper arve-thumb-wrapper arve-$provider-wrapper $align" ),
-				( $style ) ? sprintf( ' style="%s"', esc_attr( trim( $style ) ) ) : '',
+				'<div class="%s" itemscope itemtype="http://schema.org/VideoObject"%s><div class="arve-embed-container"%s>%s</div></div>',
+				esc_attr( "arve-wrapper arve-thumb-wrapper arve-{$provider}-wrapper {$align}" ),
+				( $style )        ? sprintf( ' style="%s"', esc_attr( trim( $style ) ) ) : '',
 				( $aspect_ratio ) ? sprintf( ' style="padding-bottom: %d%%"', $aspect_ratio ) : '',
 				$inner
 			);
@@ -1312,23 +1289,23 @@ class Advanced_Responsive_Video_Embedder {
 	 */
 	public function get_wrapper_style( $thumbnail, $maxwidth = false ) {
 
-		$style = false;
-
-		#$options = get_option('arve_options');
+		$style   = false;
 		$options = $this->options;
 
-		if ( $thumbnail) {
+		if ( $thumbnail ) {
 			$bg_url = $thumbnail;
 		}
 		elseif ( $options['custom_thumb_image'] ) {
 			$bg_url = $options['custom_thumb_image'];
 		}
 
-		if ( isset( $bg_url ) )
+		if ( isset( $bg_url ) ) {
 			$style .= sprintf( 'background-image: url(%s); ', esc_url( $bg_url ) );
+		}
 
-		if ( $maxwidth )
+		if ( $maxwidth ) {
 			$style .= "max-width: {$maxwidth}px; ";
+		}
 
 		return $style;
 	}
@@ -1386,54 +1363,21 @@ class Advanced_Responsive_Video_Embedder {
 	 */
 	public function print_styles() {
 
-		#$options  = get_option('arve_options');
-		$options = $this->options;
+		$css = sprintf( '.arve-thumb-wrapper { max-width: %dpx; }', $this->options['thumb_width'] );
 
-		$css = sprintf( '.arve-thumb-wrapper { width: %spx; }', (int) $options['thumb_width'] );
-
-		if ( (int) $options["video_maxwidth"] > 0 ) {
-			$css .= sprintf( '.arve-normal-wrapper { width: %dpx; }', $options["video_maxwidth"] );
+		if ( (int) $this->options["video_maxwidth"] > 0 ) {
+			$css .= sprintf( '.arve-normal-wrapper { max-width: %dpx; }', $this->options['video_maxwidth'] );
 		}
 
 		//* Fallback if no width is set neither with options nor with shortcode (inline CSS)
 		$css .= sprintf(
 			'.arve-normal-wrapper.alignleft, ' .
 			'.arve-normal-wrapper.alignright, ' . 
-			'.arve-normal-wrapper.aligncenter { width: %spx; }', 
-			(int) $options['align_width']
+			'.arve-normal-wrapper.aligncenter { max-width: %dpx; }', 
+			$this->options['align_width']
 		);
 
 		echo '<style type="text/css">' . $css . "</style>\n";
-	}
-
-	/**
-	 * Print variable CSS
-	 *
-	 * @since    2.6.0
-	 */
-	public function print_javascript() {
-
-?><script type="text/javascript">
-
-window.onload = function() {
-
-	"use_strict";
-
-    var arve_iframe_btns = document.getElementsByClassName( "arve-iframe-btn" );
-
-    for ( var i=0; i < arve_iframe_btns.length; i++ ) {
-
-    	arve_iframe_btns[i].onclick = function() {
-
-			var target = document.getElementById( this.getAttribute( "data-target" ) );
-			target.setAttribute( "src", target.getAttribute( "data-src" ) );
-			target.className = "arve-inner";
-			this.className += " arve-hidden";
-    	};
-    };
-};
-</script>
-<?php
 	}
 
 	public function get_thumbnail( $provider, $id ) {

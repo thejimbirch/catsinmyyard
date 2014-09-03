@@ -18,7 +18,13 @@ if ( post_password_required() ) {
 }
 ?>
 
-<div id="comments" class="comments-area">
+<button type="button" class="btn comment-button" data-toggle="collapse" data-target="#comments-<?php the_ID(); ?>">Comments <?php comments_number( '', '[1]', '[%]' ); ?></button>
+
+<!--<button type="button" class="btn comments-count">
+	<?php comments_number( '', 'One Comment', '% Comments' ); ?>
+</button>-->
+
+<div id="comments-<?php the_ID(); ?>" class="comments-area collapse">
 
 	<?php if ( have_comments() ) : ?>
 

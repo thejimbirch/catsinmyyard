@@ -15,7 +15,7 @@
 /* =Theme customization starts here
 -------------------------------------------------------------- */
 body {
-    padding-top: 122px;
+    padding-top: 0;
     font-size: 16px;
     font-family: 'Open Sans', Helvetica, Arial, sans-serif;
 }
@@ -68,54 +68,29 @@ h3, .h3 {
     width: 100%;
 }
 
+#main article .comments-area img {
+    width: auto;
+    max-width: 100%
+    height: auto;
+}
+
 #main article img.avatar {
     width: auto;
 }
 
-article header {
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    height: 20%;
-    min-height: 420px;
-    margin-bottom: 2em;
-    -webkit-box-shadow:inset 0 1em 1em -1em rgba(0,0,0,.5), inset 0 -2em 4em -2em rgba(0,0,0,.8);
-    box-shadow:inset 0 1em 1em -1em rgba(0,0,0,.5), inset 0 -2em 4em -2em rgba(0,0,0,.8);
-    background: #fb83fa; /* Old browsers */
-    background: -moz-linear-gradient(top,  #fb83fa 0%, #e93cec 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fb83fa), color-stop(100%,#e93cec)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #fb83fa 0%,#e93cec 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #fb83fa 0%,#e93cec 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #fb83fa 0%,#e93cec 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  #fb83fa 0%,#e93cec 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fb83fa', endColorstr='#e93cec',GradientType=0 ); /* IE6-9 */
-}
-
-article header h1 {
-    bottom: 0.5em;
-    position: absolute;
-    right: 2em;
-    text-align: right;
-    width: 40%;
-}
-
 article header h1 a {
     display: block;
-    width: 100%;
-    color: #fff;
-    text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
 }
 
-article header h1 a:hover {
-    color: #fff;
+.meta {
+    margin-top: 24px;
 }
 
 .lead {
     font-size: 1.5em;
 }
 
-#main article .post_content img, 
-#main article .post_content iframe {
+#main article .post_content img {
     margin-top: 1em;
     margin-bottom: 1em;
 }
@@ -125,10 +100,31 @@ article header h1 a:hover {
     margin-bottom: 0;
 }
 
+#main article .gallery-item .thumbnail img {
+    margin-top: 0;
+}
+
 .wp-caption-text {
     background-color: #e400f0;
     padding: .5em 1em;
     color: #fff;
+}
+
+.gallery .wp-caption-text {
+    min-height: 62px;
+}
+
+.wp-caption-text a {
+    color: #fff;
+}
+
+.comment-button,
+.comments-count {
+    margin-bottom: 20px;
+}
+
+.comments-count {
+    background: #fff;
 }
 
 .wp-gallery-row img {
@@ -143,6 +139,7 @@ article header h1 a:hover {
 .label {
     background-color: #ededed;
     margin-bottom: .5em;
+    white-space: normal;
 }
 
 /* Header */
@@ -199,7 +196,7 @@ article header h1 a:hover {
 
 @media (min-width: 0) and (max-width: 600px) {
     body {
-        padding-top: 89px;
+        padding-top: 0;
     }
     article header {
         margin-bottom: 1em;
@@ -386,4 +383,29 @@ footer .col-sm-12 {
 .open .dropdown-toggle.form-submit input[type="submit"] {
     background-color: #E400F0;
     border: 1px solid #E400F0;
+}
+
+/* Gallery Reset */
+
+.gallery-item {
+    margin-top: 0 !important;
+    margin-right: 3% !important;
+    margin-top: 0 !important;
+    width: 30% !important;
+}
+
+.gallery-item img {
+    border: none !important;
+} 
+
+.gallery-item img {
+    border-radius: 50%;
+}
+
+.thumbnail {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 0;
+    padding: 0;
 }

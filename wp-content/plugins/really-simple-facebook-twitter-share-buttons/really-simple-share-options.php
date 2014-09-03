@@ -34,6 +34,8 @@ function really_simple_share_options () {
 		'bitcoin'=>'Bitcoin',
 		'litecoin'=>'Litecoin',
 		'specificfeeds'=>'SpecificFeeds',
+		'specificfeeds_follow'=>'Email & RSS (follow)',
+		'frype' => 'Draugiem.lv (frype.com)',
 	);	
 
 	$show_in = array(
@@ -46,6 +48,8 @@ function really_simple_share_options () {
 		'authors'=>'Author archives',
 		'search'=>'Search results',
 	);
+
+  $custom_post_types = get_post_types(array('_builtin'=>false));
 
   $checkboxes = array(
     'disable_default_styles',
@@ -81,6 +85,9 @@ function really_simple_share_options () {
 			foreach (array_keys($show_in) as $item) {
 				$option['show_in'][$item] = (isset($_POST['really_simple_share_show_'.$item]) and $_POST['really_simple_share_show_'.$item]=='on') ? true : false;
 			}
+			foreach (array_keys($custom_post_types) as $item) {
+				$option['show_in_custom'][$item] = (isset($_POST['really_simple_share_show_custom_'.$item]) and $_POST['really_simple_share_show_custom_'.$item]=='on') ? true : false;
+			}
 			$option['sort']                 = esc_html($_POST['really_simple_share_'.'sort']);
 			$option['position']             = esc_html($_POST['really_simple_share_'.'position']);
 			$option['layout']               = esc_html($_POST['really_simple_share_'.'layout']);
@@ -103,6 +110,7 @@ function really_simple_share_options () {
 			$option['litecoin_wallet']     = esc_html($_POST['really_simple_share_'.'litecoin_wallet']);
 			$option['flattr_uid']          = esc_html($_POST['really_simple_share_'.'flattr_uid']);
 			$option['specificfeeds_link']  = esc_html($_POST['really_simple_share_'.'specificfeeds_link']);
+			$option['specificfeeds_follow_text']  = esc_html($_POST['really_simple_share_'.'specificfeeds_follow_text']);
 			$option['tipy_uid']            = esc_html($_POST['really_simple_share_'.'tipy_uid']);
 			$option['twitter_text']        = esc_html($_POST['really_simple_share_'.'twitter_text']);
 			$option['twitter_follow']      = esc_html($_POST['really_simple_share_'.'twitter_follow']);
@@ -138,7 +146,7 @@ function really_simple_share_options () {
 	$sel_pinterest_hover_hide  = ($option['pinterest_hover']=='hide' ) ? 'selected="selected"' : '';
 	
   foreach ($checkboxes as $val) {
-  	$$val = ($option[$val]) ? 'checked="checked"' : '';
+  	$$val = (isset($option[$val]) && $option[$val]) ? 'checked="checked"' : '';
   }
   
 	
@@ -207,26 +215,26 @@ function really_simple_share_options () {
         $li_style = '';
 				switch ($name) {
 					case 'facebook_like': 
-						$options = 'Facebook app ID:
+						$options = 'App ID:
 							<input type="text" name="really_simple_share_facebook_like_appid" value="'.stripslashes($option['facebook_like_appid']).'" style="width:120px; margin:0; padding:0;" />';
 						break;
 					case 'email': 
-						$options = __('Button text').':
+						$options = __('Text', 'really-simple-share').':
 							<input type="text" name="really_simple_share_email_label" value="'.stripslashes($option['email_label']).'" size="25" style="width:160px; margin:0; padding:0;" />';
 						break;
 					case 'facebook_share': 
-						$options = __('Button text').':
+						$options = __('Text', 'really-simple-share').':
 							<input type="text" name="really_simple_share_facebook_share_text" value="'.stripslashes($option['facebook_share_text']).'" style="width:160px; margin:0; padding:0;" />';
 						break;
 					case 'facebook_share_new': 
-						$options = __('Show counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_facebook_share_new_count" '.$facebook_share_new_count.' />';
+						$options = __('Counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_facebook_share_new_count" '.$facebook_share_new_count.' />';
 						break;
 					case 'print': 
-						$options = __('Button text').':
+						$options = __('Text', 'really-simple-share').':
 							<input type="text" name="really_simple_share_print_label" value="'.stripslashes($option['print_label']).'" size="25" style="width:160px; margin:0; padding:0;" />';
 						break;
 					case 'rss': 
-						$options = __('Button text').':
+						$options = __('Text', 'really-simple-share').':
 							<input type="text" name="really_simple_share_rss_text" value="'.stripslashes($option['rss_text']).'" style="width:160px; margin:0; padding:0;" />';
 						break;
 					case 'bitcoin': 
@@ -243,19 +251,19 @@ function really_simple_share_options () {
 							<span class="description">'.__("(mandatory)", 'really-simple-share' ).'</span>';
 						break;
 					case 'google1': 
-						$options = __('Show counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_google1_count" '.$google1_count.' />';
+						$options = __('Counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_google1_count" '.$google1_count.' />';
 						break;
 					case 'google_share': 
-						$options = __('Show counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_google_share_count" '.$google_share_count.' />';
+						$options = __('Counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_google_share_count" '.$google_share_count.' />';
 						break;
 					case 'linkedin': 
-						$options = __('Show counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_linkedin_count" '.$linkedin_count.' />';
+						$options = __('Counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_linkedin_count" '.$linkedin_count.' />';
 						break;
 					case 'pinterest': 
-						$options = __('Show counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_pinterest_count" '.$pinterest_count.' />';
+						$options = __('Counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_pinterest_count" '.$pinterest_count.' />';
 						break;
 					case 'buffer': 
-						$options = __('Show counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_buffer_count" '.$buffer_count.' />';
+						$options = __('Counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_buffer_count" '.$buffer_count.' />';
 						break;
 					case 'specificfeeds': 
 						$options = __('SF link', 'really-simple-share').': 
@@ -266,17 +274,22 @@ function really_simple_share_options () {
               <a href="http://www.specificfeeds.com/rss" target="_blank">several other benefits</a>. Enter above the pop-up link you received after setting up your feed on 
               <a href="http://www.specificfeeds.com/rss" target="_blank">SpecificFeeds.com/rss</a>', 'really-simple-share' ).'</div>';
             break;
+					case 'specificfeeds_follow': 
+						$options = __('Text', 'really-simple-share').':
+							<input type="text" name="really_simple_share_specificfeeds_follow_text" value="'.stripslashes($option['specificfeeds_follow_text']).'" style="width:160px; margin:0; padding:0;" />';
+						break;
 					case 'tipy': 
 						$options = __('Tipy site id', 'really-simple-share').': 
 							<input type="text" name="really_simple_share_tipy_uid" value="'.stripslashes($option['tipy_uid']).'" style="width:80px; margin:0; padding:0;" />
 							<span class="description">('.__("mandatory", 'really-simple-share' ).')</span>';
 						break;
 					case 'twitter': 
-						$options = __('Show counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_twitter_count" '.$twitter_count.' />';
+						$options = __('Counter', 'really-simple-share').': <input type="checkbox" name="really_simple_share_twitter_count" '.$twitter_count.' />';
 						break;
 					case 'youtube': 
+            $youtube_channel = (isset($option['youtube_channel'])) ? stripslashes($option['youtube_channel']) : '';
 						$options = __('Channel name').':
-							<input type="text" name="really_simple_share_youtube_channel" value="'.stripslashes($option['youtube_channel']).'" style="width:120px; margin:0; padding:0;" />';
+							<input type="text" name="really_simple_share_youtube_channel" value="'.$youtube_channel.'" style="width:120px; margin:0; padding:0;" />';
 						break;
 				}
 				$button_status = ($checked) ? 'active' : 'inactive';
@@ -472,9 +485,28 @@ function really_simple_share_options () {
 				<span class="description">'.__("Optional text shown inline before the buttons, e.g. 'Share this:'", 'really-simple-share' ).'</span>
 				',
 			)
-		)
-		.really_simple_share_box_content(__('Advanced options', 'really-simple-share'), 
+		);
+    
+    $show_in_custom_types = '';
+    if (count($custom_post_types)>0) {
+			foreach ($custom_post_types as $name => $text) {
+				$checked = ($option['show_in_custom'][$name]) ? 'checked="checked"' : '';
+				$show_in_custom_types .= '<div style="width:250px; float:left;">
+						<input type="checkbox" name="really_simple_share_show_custom_'.$name.'" '.$checked.' /> '
+						. __($text, 'really-simple-share' ).' &nbsp;&nbsp;</div>';
+			}
+    }
+    if ($show_in_custom_types == '') {
+      $show_in_custom_types .= __('No custom type found', 'really-simple-share' );
+    } else {
+      $show_in_custom_types .= '<div style="clear:both;"><span class="description">'.__('Note: some of these post types are never displayed on the public site', 'really-simple-share' ).'</span></div>';
+    }    
+    
+    $out .= really_simple_share_box_content(__('Advanced options', 'really-simple-share'), 
 			array(
+				__('Show share buttons in custom post types', 'really-simple-share')=>
+          $show_in_custom_types
+        ,
 				__('Load scripts at the bottom of the body', 'really-simple-share')=>'
 					<input type="checkbox" name="really_simple_share_scripts_at_bottom" '.$scripts_at_bottom.' />
 					<span class="description">'.__("Checking it should increase the page loading speed. Warning: this requires the theme to have the wp_footer() hook in the appropriate place; if unsure, leave it unchecked", 'really-simple-share' ).'</span>

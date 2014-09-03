@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 require_once('WP_OAuth.php');
 
-if (!class_exists('jd_TwitterOAuth')) {
+if ( !class_exists( 'jd_TwitterOAuth' ) ) {
 
 /**
  * Twitter WPOAuth class
@@ -162,8 +162,8 @@ class jd_TwitterOAuth {
   function handleMediaRequest($url, $args = array()) {
 		/* Load tmhOAuth for Media uploads only when needed: https://github.com/themattharris/tmhOAuth */
 		if ( !class_exists( 'tmhOAuth' ) ) {
-			require_once('tmhOAuth/tmhOAuth.php');
-			require_once('tmhOAuth/tmhUtilities.php');
+			require_once( plugin_dir_path(__FILE__).'tmhOAuth/tmhOAuth.php' );
+			require_once( plugin_dir_path(__FILE__).'tmhOAuth/tmhUtilities.php' );
 		}  
 		$auth = $args['auth'];
 		if ( !$auth ) {
@@ -183,7 +183,7 @@ class jd_TwitterOAuth {
 		}		
 		$connect = array( 'consumer_key'=>$ack, 'consumer_secret'=>$acs, 'user_token'=>$ot, 'user_secret'=>$ots );
 		$tmhOAuth = new tmhOAuth( $connect );
-		$attachment = wpt_post_attachment($args['id']);
+		$attachment = wpt_post_attachment( $args['id'] );
 		// if install is at root, can query src path. Otherwise, need to take full image.
 		$at_root = ( wp_make_link_relative( home_url() ) == home_url() || wp_make_link_relative( home_url() ) == '/' ) ? true : false ;
 		if ( $at_root ) {	
@@ -208,6 +208,7 @@ class jd_TwitterOAuth {
              $url,
              array(
 				'media[]'  => "@{$image};type={$mime_type};filename={$image}",
+				//'media[]' => file_get_contents($image),
 				'status'   => $args['status'],
              ),
              true, // use auth
@@ -236,11 +237,11 @@ class jd_TwitterOAuth {
   function WPOAuthRequest($url, $args = array(), $method = NULL) {
   
     //Handle media requests using tmhOAuth library.
-    if ($method == 'MEDIA') {
-		return $this->handleMediaRequest($url,$args);		
+    if ( $method == 'MEDIA' ) {
+		return $this->handleMediaRequest( $url,$args );		
     }    
   
-    if (empty($method)) $method = empty($args) ? "GET" : "POST";
+    if ( empty( $method ) ) $method = empty($args) ? "GET" : "POST";
     $req = WPOAuthRequest::from_consumer_and_token($this->consumer, $this->token, $method, $url, $args);
     $req->sign_request($this->sha1_method, $this->consumer, $this->token);
     

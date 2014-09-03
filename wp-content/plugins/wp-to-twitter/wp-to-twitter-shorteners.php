@@ -77,8 +77,8 @@ if ( !function_exists( 'jd_shorten_link' ) ) { // prep work for future plug-in r
 					$bitlyapi = trim ( get_option( 'bitlyapi' ) );
 					$bitlylogin = trim ( strtolower( get_option( 'bitlylogin' ) ) );				
 					$decoded = jd_remote_json( "https://api-ssl.bitly.com/v3/shorten?longUrl=".$encoded."&login=".$bitlylogin."&apiKey=".$bitlyapi."&format=json" );
-					if ($decoded) {
-						if ($decoded['status_code'] != 200) {
+					if ( $decoded && isset( $decoded['status_code'] ) ) {
+						if ( $decoded['status_code'] != 200 ) {
 							$shrink = $decoded;
 							$error = $decoded['status_txt'];
 						} else {
@@ -124,7 +124,7 @@ if ( !function_exists( 'jd_shorten_link' ) ) { // prep work for future plug-in r
 					$api_url = sprintf( get_option('yourlsurl') . '?username=%s&password=%s&url=%s&format=json&action=shorturl&keyword=%s',
 						$yourlslogin, $yourlsapi, $encoded, $keyword_format );
 					$json = jd_remote_json( $api_url, false );
-					if ($json) {
+					if ( $json ) {
 						$shrink = $json->shorturl;
 					} else {
 						$shrink = false;
@@ -138,14 +138,19 @@ if ( !function_exists( 'jd_shorten_link' ) ) { // prep work for future plug-in r
 					} else {
 						$decoded = jd_remote_json( "http://su.pr/api/shorten?longUrl=".$encoded );
 					}
-					if ($decoded['statusCode'] == 'OK') {
-						$page = str_replace("&","&#38;", urldecode($url));
-						$shrink = $decoded['results'][$page]['shortUrl'];
-						$error = $decoded['errorMessage'];
+					if ( $decoded && isset( $decoded['statusCode'] ) ) {
+						if ( $decoded['statusCode'] == 'OK') {
+							$page = str_replace("&","&#38;", urldecode($url));
+							$shrink = $decoded['results'][$page]['shortUrl'];
+							$error = $decoded['errorMessage'];
+						} else {
+							$shrink = false;
+							$error = $decoded['errorMessage'];
+						}
 					} else {
 						$shrink = false;
-						$error = $decoded['errorMessage'];
-					}	
+						$error = __( 'Su.pr query returned invalid data.','wp-to-twitter' );
+					}					
 					if ( !is_valid_url($shrink) ) { $shrink = false; }
 					break;
 				case 8:
@@ -182,12 +187,12 @@ if ( !function_exists( 'jd_shorten_link' ) ) { // prep work for future plug-in r
 					}
 					//\jotURL
 					$decoded = jd_fetch_url("https://api.joturl.com/a/v1/shorten?url=" . $encoded . "&login=" . $joturllogin . "&key=" . $joturlapi . "&format=plain");
-					if ($decoded !== false) {
+					if ( $decoded !== false ) {
 					   $shrink = $decoded;
 					   //jotURL, added: 2013-04-10
 					   $joturl_shorturl_params = trim( get_option('joturl_shorturl_params') );
-					   if ($joturl_shorturl_params != '') {
-						  if (strpos($shrink, "%3F") === FALSE && strpos($shrink, "?") === FALSE) {
+					   if ( $joturl_shorturl_params != '' ) {
+						  if ( strpos( $shrink, "%3F" ) === FALSE && strpos( $shrink, "?" ) === FALSE ) {
 							 $ct = "?";
 						  } else {
 							 $ct = "&";

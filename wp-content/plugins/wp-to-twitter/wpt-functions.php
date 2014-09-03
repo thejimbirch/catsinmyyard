@@ -60,7 +60,7 @@ function is_valid_url( $url ) {
 // Fetch a remote page. Input url, return content
 function jd_fetch_url( $url, $method='GET', $body='', $headers='', $return='body' ) {
 	$request = new WP_Http;
-	$result = $request->request( $url , array( 'method'=>$method, 'body'=>$body, 'headers'=>$headers, 'sslverify'=>false, 'user-agent'=>'WP to Twitter/http://www.joedolson.com/articles/wp-to-twitter/' ) );
+	$result = $request->request( $url , array( 'method'=>$method, 'body'=>$body, 'headers'=>$headers, 'sslverify'=>false, 'user-agent'=>'WP to Twitter/http://www.joedolson.com/wp-to-twitter/' ) );
 	// Success?
 	if ( !is_wp_error( $result ) && isset( $result['body'] ) ) {
 		if ( $result['response']['code'] == 200 ) {
@@ -233,7 +233,7 @@ function wpt_date_compare( $early,$late ) {
 * @param type $post_ID The post ID
 * @return An Attachment ID.
 */
-function wpt_post_attachment($post_ID) {
+function wpt_post_attachment( $post_ID ) {
 	if ( has_post_thumbnail( $post_ID ) ) {
 		$attachment = get_post_thumbnail_id( $post_ID );
 		return $attachment;
@@ -260,8 +260,13 @@ global $current_user, $wpt_version;
 get_currentuserinfo();
 	$request = '';
 	// send fields for WP to Twitter
-	$license = ( get_option('wpt_license_key') != '' )?get_option('wpt_license_key'):'none'; 
-	$license = "License Key: ".$license; 
+	$license = ( get_option('wpt_license_key') != '' ) ? get_option('wpt_license_key') : 'none'; 
+	if ( $license != '' ) {
+		$valid = ( get_option( 'wpt_license_valid' ) == 'true' ) ? ' (valid)' : ' (invalid)' ;
+	} else {
+		$valid = '';
+	}
+	$license = "License Key: ".$license.$valid; 
 	
 	$version = $wpt_version;
 	$wtt_twitter_username = get_option('wtt_twitter_username');
@@ -275,20 +280,12 @@ get_currentuserinfo();
 	$php_version = phpversion();
 
 	// theme data
-	if ( function_exists( 'wp_get_theme' ) ) {
 	$theme = wp_get_theme();
-		$theme_name = $theme->Name;
-		$theme_uri = $theme->ThemeURI;
-		$theme_parent = $theme->Template;
-		$theme_version = $theme->Version;	
-	} else {
-	$theme_path = get_stylesheet_directory().'/style.css';
-	$theme = get_theme_data($theme_path);
-		$theme_name = $theme['Name'];
-		$theme_uri = $theme['ThemeURI'];
-		$theme_parent = $theme['Template'];
-		$theme_version = $theme['Version'];
-	}
+	$theme_name = $theme->Name;
+	$theme_uri = $theme->ThemeURI;
+	$theme_parent = $theme->Template;
+	$theme_version = $theme->Version;	
+
 	// plugin data
 	$plugins = get_plugins();
 	$plugins_string = '';
@@ -337,12 +334,18 @@ $plugins_string
 		$nonce=$_REQUEST['_wpnonce'];
 		if (! wp_verify_nonce($nonce,'wp-to-twitter-nonce') ) die("Security check failed");	
 		$request = ( !empty($_POST['support_request']) )?stripslashes($_POST['support_request']):false;
-		$has_donated = ( $_POST['has_donated'] == 'on')?"Donor":"No donation";
-		$has_read_faq = ( $_POST['has_read_faq'] == 'on')?"Read FAQ":false;
+		$has_donated = ( isset( $_POST['has_donated'] ) ) ? "Donor" : "No donation";
+		$has_read_faq = ( isset( $_POST['has_read_faq'] ) ) ? "Read FAQ" : false;
 		if ( function_exists( 'wpt_pro_exists' ) && wpt_pro_exists() == true ) { $pro = " PRO"; } else { $pro = ''; }
 		$subject = "WP to Twitter$pro support request. $has_donated";
 		$message = $request ."\n\n". $data;
-		$from = "From: \"$current_user->display_name\" <$current_user->user_email>\r\n";
+		// Get the site domain and get rid of www. from pluggable.php
+		$sitename = strtolower( $_SERVER['SERVER_NAME'] );
+		if ( substr( $sitename, 0, 4 ) == 'www.' ) {
+				$sitename = substr( $sitename, 4 );
+		}
+		$from_email = 'wordpress@' . $sitename;		
+		$from = "From: \"$current_user->display_name\" <$from_email>\r\nReply-to: \"$current_user->display_name\" <$current_user->user_email>\r\n";
 
 		if ( !$has_read_faq ) {
 			echo "<div class='message error'><p>".__('Please read the FAQ and other Help documents before making a support request.','wp-to-twitter')."</p></div>";
@@ -351,14 +354,14 @@ $plugins_string
 		} else {
 			$sent = wp_mail( "plugins@joedolson.com",$subject,$message,$from );
 			if ( $sent ) {
-				if ( $has_donated == 'Donor' || $has_purchased == 'Purchaser' ) {
+				if ( $has_donated == 'Donor' ) {
 					echo "<div class='message updated'><p>".sprintf(__('Thank you for supporting the continuing development of this plug-in! I\'ll get back to you as soon as I can. Please ensure that you can receive email at <code>%s</code>.','wp-to-twitter'),$current_user->user_email)."</p></div>";		
 				} else {
 					echo "<div class='message updated'><p>".sprintf(__("Thanks for using WP to Twitter. Please ensure that you can receive email at <code>%s</code>.",'wp-to-twitter'),$current_user->user_email)."</p></div>";				
 				}
 			} else {
-				echo "<div class='message error'><p>".__( "Sorry! I couldn't send that message. Here's the text of your message:", 'wp-to-twitter' )."</p><pre>$request</pre></div>";
-			}
+				echo "<div class='message error'><p>".__( "Sorry! I couldn't send that message. Here's the text of your request:", 'my-calendar' )."</p><p>".sprintf( __('<a href="%s">Contact me here</a>, instead</p>','wp-to-twitter'), 'https://www.joedolson.com/contact/')."<pre>$request</pre></div>";
+			}	
 		}
 	}
 	if ( function_exists( 'wpt_pro_exists' ) && wpt_pro_exists() == true ) { $checked="checked='checked'"; } else { $checked=''; }
@@ -389,7 +392,7 @@ $plugins_string
 		<code>".__('Reply to:','wp-to-twitter')." \"$current_user->display_name\" &lt;$current_user->user_email&gt;</code>
 		</p>
 		<p>
-		<input type='checkbox' name='has_read_faq' id='has_read_faq' value='on' required='required' aria-required='true' /> <label for='has_read_faq'>".sprintf(__('I have read <a href="%1$s">the FAQ for this plug-in</a> <span>(required)</span>','wp-to-twitter'),'http://www.joedolson.com/articles/wp-to-twitter/support-2/')."
+		<input type='checkbox' name='has_read_faq' id='has_read_faq' value='on' required='required' aria-required='true' /> <label for='has_read_faq'>".sprintf(__('I have read <a href="%1$s">the FAQ for this plug-in</a> <span>(required)</span>','wp-to-twitter'),'http://www.joedolson.com/wp-to-twitter/support-2/')."
         </p>
         <p>
         <input type='checkbox' name='has_donated' id='has_donated' value='on' $checked /> <label for='has_donated'>".sprintf(__('I have <a href="%1$s">made a donation to help support this plug-in</a>','wp-to-twitter'),'http://www.joedolson.com/donate.php')."</label>

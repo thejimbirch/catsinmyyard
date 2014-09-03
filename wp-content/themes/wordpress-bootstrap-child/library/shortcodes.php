@@ -1,49 +1,5 @@
 <?php
-
 // shortcodes
-
-
-
-
-function modify_attachment_link( $markup, $id, $size, $permalink ) {
-    global $post;
-    if ( ! $permalink ) {
-        $markup = str_replace( '<a href', '<a data-gallery class="'. $size .'attachment-' . $size . '" href', $markup );
-    }
-    return $markup;
-}
-add_filter( 'wp_get_attachment_link', 'modify_attachment_link', 10, 4 );
-
-// Gallery shortcode
-
-// remove the standard shortcode
-remove_shortcode('gallery', 'gallery_shortcode');
-add_shortcode('gallery', 'gallery_shortcode_tbs');
-
-function gallery_shortcode_tbs($attr) {
-	global $post, $wp_locale;
-
-	$output = "";
-
-	$args = array( 'post_type' => 'attachment', 'numberposts' => -1, 'post_status' => null, 'post_parent' => $post->ID ); 
-	$attachments = get_posts($args);
-	if ($attachments) {
-		$output = '<div class="row wp-gallery-row">';
-		foreach ( $attachments as $attachment ) {
-                    
-			$output .= '<div class="col-sm-3">';
-                        $att_title = apply_filters( 'the_title' , $attachment->post_title );
-                        $output .= wp_get_attachment_link( $attachment->ID , '400-square', false );
-			$output .= '</div>';
-		}
-		$output .= '</div>';
-	}
-
-	return $output;
-}
-
-
-
 // Buttons
 function buttons( $atts, $content = null ) {
 	extract( shortcode_atts( array(

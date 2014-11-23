@@ -3,8 +3,8 @@ Contributors: dfactory
 Donate link: http://www.dfactory.eu/
 Tags: gallery, images, lightbox, links, photos, template, theme, photo, image, picture, slideshow, modal, overlay, YouTube, Vimeo, video, videos
 Requires at least: 3.3
-Tested up to: 3.9.2
-Stable tag: 1.4.7
+Tested up to: 4.0
+Stable tag: 1.4.8
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -63,6 +63,10 @@ No questions yet.
 2. screenshot-2.jpg
 
 == Changelog ==
+
+= 1.4.8 =
+* Tweak: Nivo Lightbox updated to 1.2
+* Tweak: Confirmed WP 4.0 compatibility
 
 = 1.4.7 =
 * New: Option to modify native WP gallery links image size
@@ -168,6 +172,6 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.4.7 =
-* New: Option to modify native WP gallery links image size
-* New: Option to donate this plugin :)
+= 1.4.8 =
+* Tweak: Nivo Lightbox updated to 1.2
+* Tweak: Confirmed WP 4.0 compatibility

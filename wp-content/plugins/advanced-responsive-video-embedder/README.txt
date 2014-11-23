@@ -3,7 +3,7 @@ Contributors: nico23
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UNDSCARF3ZPBC
 Tags: video, responsive, embed, video-embedder, iframe, minimal, lightweight, simplicity, shortcodes, Youtube, Blip, Dailymotion, Videojug, Collegehumor, Veoh, Break, Movieweb, Snotr, Gametrailers, Vimeo, Viddler, Funnyordie, Myspace, Liveleak, Metacafe, Myvideo, Yahoo Screen, Spike
 Requires at least: 3.3.1
-Tested up to: 3.9
+Tested up to: 4.0
 Stable tag: trunk
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -107,6 +107,12 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 1. In action
 2. Options page
 == Changelog ==
+
+= 5.1.0 =
+* New: Vimeo HTTPS support (works automatically if your site is HTTPS)
+
+= 5.0.2 Beta =
+* Improved: Marked as working with WP 4.0
 
 = 5.0.1 Beta =
 * Fix: Options var error

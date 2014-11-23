@@ -192,7 +192,7 @@ function really_simple_share_options () {
 
 	
 	<div class="wrap">
-	<h2>'.__( 'Really simple Facebook and Twitter share buttons', 'really-simple-share').'</h2>
+	<h2>'.__( 'Really Simple Share', 'really-simple-share').'</h2>
 	<div id="poststuff">
 
 	<div id="poststuff_left">

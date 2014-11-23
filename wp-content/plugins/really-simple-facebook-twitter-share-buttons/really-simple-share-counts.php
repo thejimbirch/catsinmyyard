@@ -35,7 +35,7 @@ function really_simple_share_counts () {
     .really_simple_share_counts { width: 55%; }
 	</style>
   <div class="wrap">
-	<h2>'.__( 'Really simple Facebook and Twitter share buttons', 'really-simple-share').'
+	<h2>'.__( 'Really Simple Share', 'really-simple-share').'
     - '.__( 'Post/Page Counts', 'really-simple-share').'
   </h2>
 	<div id="poststuff">

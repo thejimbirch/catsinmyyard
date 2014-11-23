@@ -1,3 +1,7 @@
 [20-Apr-2014 14:26:44] PHP Fatal error:  Call to undefined function  get_header() in /home3/jimbirch/public_html/catsinmyyard.com/wp-content/themes/wordpress-bootstrap-master/image.php on line 9
 [07-May-2014 01:17:52] PHP Fatal error:  Call to undefined function  get_header() in /home3/jimbirch/public_html/catsinmyyard.com/wp-content/themes/wordpress-bootstrap-master/image.php on line 9
 [30-May-2014 07:55:44] PHP Fatal error:  Call to undefined function  get_header() in /home3/jimbirch/public_html/catsinmyyard.com/wp-content/themes/wordpress-bootstrap-master/image.php on line 9
+[10-Jul-2014 18:49:01] PHP Fatal error:  Call to undefined function  get_header() in /home3/jimbirch/public_html/catsinmyyard.com/wp-content/themes/wordpress-bootstrap-master/image.php on line 9
+[11-Jul-2014 01:12:20] PHP Fatal error:  Call to undefined function  get_header() in /home3/jimbirch/public_html/catsinmyyard.com/wp-content/themes/wordpress-bootstrap-master/image.php on line 9
+[19-Aug-2014 13:30:22] PHP Fatal error:  Call to undefined function  get_header() in /home3/jimbirch/public_html/catsinmyyard.com/wp-content/themes/wordpress-bootstrap-master/image.php on line 9
+[25-Oct-2014 08:51:04] PHP Fatal error:  Call to undefined function  get_header() in /home3/jimbirch/public_html/catsinmyyard.com/wp-content/themes/wordpress-bootstrap-master/image.php on line 9

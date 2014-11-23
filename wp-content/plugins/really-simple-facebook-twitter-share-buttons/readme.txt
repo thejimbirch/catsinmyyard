@@ -1,12 +1,12 @@
-=== Really simple Facebook Twitter share buttons ===
+=== Really Simple Share ===
 Contributors: whiletrue
 Donate link: http://www.whiletrue.it/
 Tags: facebook, twitter, facebook share, twitter share, facebook share button, twitter share button, linkedin, google +1, +1, google share, google plus share, pinterest, google buzz, buzz, digg, flattr, stumbleupon, hyves, links, post, page, mail, email, reddit, tipy, tumblr, buffer, pinzout, shortcode, youtube, print, rss, bitcoin, litecoin, specificfeeds, draugiem, frype
 Requires at least: 2.9+
-Tested up to: 3.9.1
-Stable tag: 3.2
+Tested up to: 4.0
+Stable tag: 3.2.3
 
-Puts Facebook, Twitter, LinkedIn, Google "+1", Pinterest, Tumblr and other social share buttons of your choice above or below your posts.
+Puts Facebook, Twitter, LinkedIn, Google "+1", Pinterest, Tumblr and other social share buttons of your choice above or below your posts. Previously known as "Really simple Facebook Twitter share buttons".
 
 == Description ==
 This plugin shows Facebook, Twitter, LinkedIn, Google "+1", Pinterest and other popular social share buttons above or below your posts.
@@ -55,7 +55,7 @@ To do so e.g. on a page: open the WordPress backend, go to Pages, click on the P
 
 = Reference =
 
-For more info on this plugin: [www.whiletrue.it](http://www.whiletrue.it/really-simple-facebook-twitter-share-buttons-for-wordpress/ "www.whiletrue.it")
+For more info on this plugin: [www.whiletrue.it](http://www.whiletrue.it/really-simple-share-wordpress-plugin/ "www.whiletrue.it")
 
 Do you like this plugin? Give a chance to our other works:
 
@@ -112,6 +112,12 @@ The PinIt counter only appear if the post has been shared at least once. Also, t
 
 
 == Changelog ==
+
+= 3.2.3 =
+* Changed: Plugin renamed to Really Simple Share
+
+= 3.2.2 =
+* Changed: Facebook SDK path update
 
 = 3.2 =
 * Added: Initial support for Custom Post Types
@@ -173,16 +179,12 @@ The PinIt counter only appear if the post has been shared at least once. Also, t
 
 = 2.14.4 =
 * Added: Large button option, available for some social networks (e.g. google+ and twitter)
-* Changed: Code cleaning
-* Changed: Updated FAQ
-* Changed: Plugin tested up WordPress 3.6
-* Fixed: Smartphone usability improvements on settings screen
-* Fixed: XHTML validation fix
-
-= 2.13.2 =
 * Added: Reset to Default values button
 * Changed: Settings page style cleaning for the new MP6 Admin Theme
 * Changed: Code cleaning
+* Changed: Updated FAQ
+* Fixed: Smartphone usability improvements on settings screen
+* Fixed: XHTML validation fix
 
 = 2.12 =
 * Added: Google share button
@@ -221,12 +223,10 @@ The PinIt counter only appear if the post has been shared at least once. Also, t
 = 2.8.2 =
 * Added: Facebook app ID setting for the Facebook Like button (recommended)
 * Added: Facebook Like button Html5 code (recommended if your theme supports it)
-* Fixed: Flattr button height issue while showing in box size
-* Fixed: Facebook Like button Html5 code locale and action (like/recommend)
-
-= 2.7 =
 * Added: support for translations
 * Added: Italian translation
+* Fixed: Flattr button height issue while showing in box size
+* Fixed: Facebook Like button Html5 code locale and action (like/recommend)
 
 = 2.6.3 =
 * Added: Pinzout button
@@ -301,9 +301,10 @@ The PinIt counter only appear if the post has been shared at least once. Also, t
 * Added: Wordpress link customization (default permalink and shortlink available)
 * Added: Email button label
 * Added: Class "robots-nocontent" and "snap_nopreview" given to the element surrounding the buttons
-* Added: Some code cleaning
+* Changed: Code cleaning
 
 = 1.8.4 =
+* Added: Flattr share button
 * Added: Tipy button
 * Added: Linkedin button counter customization
 * Added: Separate stylesheet, with an option to disable it
@@ -311,22 +312,15 @@ The PinIt counter only appear if the post has been shared at least once. Also, t
 * Fixed: Twitter share button title cleaning (thanks Harald)
 * Fixed: Removed the standard "Tweet" text from the link inside the Twitter button, to avoid its occasional presence in the summaries (thanks David)
 
-= 1.7.3 =
-* Added: Flattr share button
-* Fixed: Flattr share button title cleaning (thanks Harald)
-* Fixed: Flattr share button js api loading, tags loading and text linking 
-* Fixed: Flattr share button warning for posts without tags
-
 = 1.6.3 =
 * Added: Google +1 share button
 * Added: possibility to hide the Twitter button counter 
 * Added: Box layout available for compatible buttons
+* Added: possibility to use the "really_simple_share_publish" PHP function to publish the buttons inside the PHP code, for themes and other plugins
 * Changed: admin page restyle
+* Changed: single permalink and title loading, for better performance
 * Fixed: Facebook Like button url encoded (thanks Radek Maciaszek)
 
-= 1.5.0 =
-* Added: possibility to use the "really_simple_share_publish" PHP function to publish the buttons inside the PHP code, for themes and other plugins
-* Changed: single permalink and title loading, for better performance
 
 = 1.4.16 =
 * Added: "Show in Search results" option
@@ -336,22 +330,16 @@ The PinIt counter only appear if the post has been shared at least once. Also, t
 * Added: "really_simple_share_disable" custom field, if set to "yes" hides share buttons inside post content
 * Added: [really_simple_share] shortcode, shows active share buttons inside post content
 * Added: Hyves (the leading Duch social network) button
-* Added: Facebook Like text customization (like/recommend)
-* Added: Facebook Like button new "Send" option (currently via FBML)
+* Added: Facebook Like text customization (like/recommend) and "Send" option
 * Added: Facebook Like and Twitter button width customization via the options menu 
 * Added: Possibility to position the buttons above and below the post content
 * Changed: Avoid multiple external JavaScript files loading when possible, for better performance
 * Changed: Settings display improvement
-* Changed: admin css improvements
-* Changed: removed redundant <br /> element
 * Changed: [really_simple_share] shortcode works even when "really_simple_share_disable" is used (thanks to Chestel!)
-* Fixed: more vertical space (for the current Facebook Like button)
 * Fixed: Digg button JS removed from the <head> section
 * Fixed: Email share button image absolute path
 * Fixed: PHP Notices
-* Fixed: css improvements
-* Fixed: Twitter title button
-* Fixed: Twitter button fixed-width style for WPtouch compatibility
+* Fixed: Twitter title button and fixed-width style for WPtouch compatibility
 * Fixed: Excerpt/Content and JavaScript loading
 * Fixed: Show in Search results
 
@@ -385,4 +373,3 @@ Users having version 3.1.7 should upgrade due to a bugfix on shown buttons
 
 = 1.0.0 =
 Initial release
-

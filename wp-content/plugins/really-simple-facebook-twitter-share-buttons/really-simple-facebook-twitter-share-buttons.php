@@ -1,10 +1,10 @@
 <?php
 /*
-Plugin Name: Really simple Facebook Twitter share buttons
+Plugin Name: Really Simple Share
 Plugin URI: http://www.whiletrue.it/really-simple-facebook-twitter-share-buttons-for-wordpress/
 Description: Puts Facebook, Twitter, LinkedIn, Google "+1", Pinterest and other share buttons of your choice above or below your posts.
 Author: WhileTrue
-Version: 3.2
+Version: 3.2.3
 Author URI: http://www.whiletrue.it
 */
 
@@ -128,14 +128,14 @@ function really_simple_share_facebook_like_html5_bottom_scripts () {
 
 	$app_id = (is_numeric($really_simple_share_option['facebook_like_appid'])) ? '&appId='.$really_simple_share_option['facebook_like_appid'] : '';
 	$out = '
-		<div id="fb-root"></div>
-		<script>(function(d, s, id) {
-		  var js, fjs = d.getElementsByTagName(s)[0];
-		  if (d.getElementById(id)) return;
-		  js = d.createElement(s); js.id = id;
-		  js.src = "//connect.facebook.net/'.$really_simple_share_option['locale'].'/all.js#xfbml=1'.$app_id.'&version=v2.0";
-		  fjs.parentNode.insertBefore(js, fjs);
-		}(document, \'script\', \'facebook-jssdk\'));</script>';
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/'.$really_simple_share_option['locale'].'/sdk.js#xfbml=1'.$app_id.'&version=v2.0";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, \'script\', \'facebook-jssdk\'));</script>';
 	echo $out;
 }
 
@@ -769,7 +769,7 @@ function really_simple_share_get_options_default () {
     'bitcoin', 'litecoin', 'specificfeeds', 'frype'));
 	$option['position'] = 'below';
 	$option['show_in'] = array('posts'=>true, 'pages'=>true, 'home_page'=>true, 'tags'=>true, 'categories'=>true, 'dates'=>true, 'authors'=>true, 'search'=>true);
-  $option['show_in_custom'] = array();
+	$option['show_in_custom'] = array();
 	$option['layout'] = 'button';
 	$option['locale'] = 'en_US';
 	$option['above_prepend_above']  = '';

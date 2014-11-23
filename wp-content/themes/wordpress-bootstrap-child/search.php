@@ -3,23 +3,15 @@
     <div id="main" class="clearfix" role="main">
         <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
                 <article id="post-<?php the_ID(); ?>" <?php post_class('clearfix'); ?> role="article">
-                    <?php
-                    $post_thumbnail_id = get_post_thumbnail_id();
-                    $featured_src = wp_get_attachment_image_src($post_thumbnail_id, 'wpbs-featured');
-                    ?>
-                    <header <?php if (has_post_thumbnail( $post->ID ) ): ?>style="background: #E400F0 url(<?php echo $featured_src[0]; ?>) no-repeat;background-size:cover;"<?php endif; ?>>
-                        <h1><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h1>
-                    </header>
                     <div class="container">
                         <div class="row">
                             <section class="col-md-6 col-sm-9 col-md-push-4 col-sm-push-3 post_content">
+                                <header><h1><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h1></header>
                                 <?php the_content(__("Read more &raquo;", "wpbootstrap")); ?>
                             </section>
                             <aside class="col-md-3 col-lg-offset-1 col-md-pull-6 col-sm-pull-9 post_sidebar">
                                 <div class="meta">
-                                    <div class="h3 meta-post-date"><?php _e("Posted", "wpbootstrap"); ?><time datetime="<?php echo the_time('Y-m-j'); ?>" pubdate> <?php the_time('M j, Y'); ?></time></div>
-                                    <p class="meta-post-date"><?php _e("by ", "wpbootstrap"); ?><?php the_author_posts_link(); ?></p>
-                                    <div class="h3 meta-filed-under"><?php _e("Filed under", "wpbootstrap"); ?></div>
+                                    <div class="h3 meta-post-date"><time datetime="<?php echo the_time('Y-m-j'); ?>" pubdate> <?php the_time('M j, Y'); ?></time></div>
                                     <p class="meta-filed-under"><?php the_category('<br />'); ?></p>
                                     <p class="meta-filed-under"><?php the_tags('<span class="label">', '</span><br /><span class="label">', '</span>'); ?></p>
                                 </div>

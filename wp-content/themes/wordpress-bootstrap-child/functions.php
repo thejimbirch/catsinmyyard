@@ -40,3 +40,36 @@ function modify_attachment_link( $markup, $id, $size, $permalink ) {
     return $markup;
 }
 add_filter( 'wp_get_attachment_link', 'modify_attachment_link', 10, 4 );
+
+// Add Custom Post Type
+add_action('init', 'cptui_register_my_cpt_resource');
+function cptui_register_my_cpt_resource() {
+register_post_type('resource', array(
+'label' => 'Resources',
+'description' => '',
+'public' => true,
+'show_ui' => true,
+'show_in_menu' => true,
+'capability_type' => 'post',
+'map_meta_cap' => true,
+'hierarchical' => false,
+'rewrite' => array('slug' => 'resource', 'with_front' => true),
+'query_var' => true,
+'supports' => array('title','editor','excerpt','trackbacks','custom-fields','comments','revisions','thumbnail','author','page-attributes','post-formats'),
+'labels' => array (
+  'name' => 'Resources',
+  'singular_name' => 'Resource',
+  'menu_name' => 'Resources',
+  'add_new' => 'Add Resource',
+  'add_new_item' => 'Add New Resource',
+  'edit' => 'Edit',
+  'edit_item' => 'Edit Resource',
+  'new_item' => 'New Resource',
+  'view' => 'View Resource',
+  'view_item' => 'View Resource',
+  'search_items' => 'Search Resources',
+  'not_found' => 'No Resources Found',
+  'not_found_in_trash' => 'No Resources Found in Trash',
+  'parent' => 'Parent Resource',
+)
+) ); }

@@ -6,12 +6,12 @@
 <!--[if (gte IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html <?php language_attributes(); ?> class="no-js"><!--<![endif]-->
     <head>
         <meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<title><?php wp_title( '|', true, 'right' ); ?></title>	
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<!--[if lt IE 9]><script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script><![endif]-->
-        <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-	<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
+    	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    	<title><?php wp_title( '|', true, 'right' ); ?></title>	
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    	<!--[if lt IE 9]><script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script><![endif]-->
+            <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+    	<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
         <?php wp_head(); ?>
         <?php if ( has_post_thumbnail() && is_single() ) { ?>
             <?php $url = wp_get_attachment_url( get_post_thumbnail_id($post->ID) ); ?>
@@ -47,11 +47,11 @@
                             </button>
                         </div>
                         <div class="collapse navbar-collapse navbar-responsive-collapse">
-                            <div class="col-sm-4">
+                            <div class="col-sm-8">
                                 <span class="h2 hidden-header"><a href="<?php echo home_url(); ?>" title="Cats In My Yard"><?php bloginfo('name'); ?></a></span>
                                 <?php wp_bootstrap_main_nav(); // Adjust using Menus in Wordpress Admin ?>
                             </div>
-                            <div class="col-sm-6 search-container">
+                            <div class="col-sm-2 search-container">
                                 <form action="https://www.paypal.com/cgi-bin/webscr" method="post" style="text-align:right;">
                                 <input type="hidden" name="cmd" value="_s-xclick">
                                 <input type="hidden" name="hosted_button_id" value="T6HGC3AKK5PAL">
@@ -65,17 +65,6 @@
                                         </div>
                                     </form>
                                 <?php //} ?>
-                                <ul class="social-icons">
-                                    <li class="facebook"><a title="Cats In My Yard on Facebook" href="https://www.facebook.com/catsinmyyard"><img alt="Cats In My Yard on Facebook" src="/wp-content/social/facebook.png"></a></li>
-                                    <li><a title="Cats In My Yard on Google+" href="https://plus.google.com/104427961235013051576"><img alt="Cats In My Yard on Google+" src="/wp-content/social/google-plus.png"></a></li>
-                                    <li><a title="Cats In My Yard on Instagram" href="http://instagram.com/catsinmyyard"><img alt="Cats In My Yard on Instagram" src="/wp-content/social/instagram.png"></a></li>
-                                    <li><a title="Cats In My Yard on Pinterest" href="https://pinterest.com/catsinmyyard/"><img alt="Cats In My Yard on Pinterest" src="/wp-content/social/pinterest.png"></a></li>
-                                    <li><a title="Cats In My Yard on Twitter" href="https://twitter.com/catsinmyyard"><img alt="Cats In My Yard on Twitter" src="/wp-content/social/twitter.png"></a></li>
-                                    <li><a title="Cats In My Yard on Youtube" href="http://www.youtube.com/catsinmyyard"><img alt="Cats In My Yard on Youtube" src="/wp-content/social/youtube.png"></a></li>
-                                    <li><a title="Vansassa on Flickr" href="http://www.flickr.com/vansassa"><img alt="Vansassa on Flickr" src="/wp-content/social/flickr.png"></a></li>
-                                    <li><a title="Subscribe by RSS" href="/feed"><img alt="Subscribe by RSS" src="/wp-content/social/rss.png"></a></li>
-                                    <li><a title="Subscribe by Email" href="http://feedburner.google.com/fb/a/mailverify?uri=CatsInMyYard&amp;loc=en_US"><img alt="Subscribe by Email" src="/wp-content/social/email.png"></a></li>
-                                </ul>
                             </div>
                         </div>
                     </div><!-- end row -->

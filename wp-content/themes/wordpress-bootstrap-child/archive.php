@@ -1,13 +1,23 @@
 <?php get_header(); ?>
 <div id="content" class="clearfix">
     <div id="main" class="clearfix" role="main">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-10 col-sm-offset-2">
+                    <h1 class="page-title"><?php single_cat_title(); ?></h1>
+                </div>
+            </div>
+        </div>
         <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
                 <article id="post-<?php the_ID(); ?>" <?php post_class('clearfix'); ?> role="article">
                     <div class="container">
                         <div class="row">
-                            <section class="col-sm-7 col-sm-offset-2 post_content">
-                                <header><h1><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h1></header>
-                                <?php the_content(__("Read more &raquo;", "wpbootstrap")); ?>
+                            <aside class="col-xs-2 col-md-offset-2 post_sidebar">
+                                <a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_post_thumbnail(); ?></a>
+                            </aside>
+                            <section class="col-xs-10 col-md-8 post_content">
+                                <header><h2><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h2></header>
+                                <?php the_excerpt(); ?>
                             </section>
                         </div>
                     </div>
@@ -29,7 +39,7 @@
                         </div>
                     </div>
                 </div>
-        <?php else : ?>
+            <?php else : ?>
             <article id="post-not-found">
                 <div class="container">
                     <div class="row">

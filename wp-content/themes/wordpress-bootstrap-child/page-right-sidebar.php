@@ -1,3 +1,9 @@
+<?php
+/*
+Template Name: Right Sidebar Page
+*/
+?>
+
 <?php get_header(); ?>
 <div id="content" class="clearfix">
     <div id="main" class="clearfix" role="main">
@@ -9,6 +15,9 @@
                                 <header><h1><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h1></header>
                                 <?php the_content(__("Read more &raquo;", "wpbootstrap")); ?>
                             </section>
+                            <aside class="col-sm-3 post_sidebar">
+                                <?php get_sidebar(); // sidebar 1 ?>
+                            </aside>
                         </div>
                     </div>
                 </article>

@@ -18,6 +18,7 @@ body {
     padding-top: 0;
     font-size: 16px;
     font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+    color: #111;
 }
 
 p {
@@ -49,15 +50,19 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: -2px;
-    color: #FFF;
+    color: #111;
 }
 
-h3, .h3 {
+h3, .h3, h4, .h4 {
     color: #BFBFBF;
     font-size: 1.2em;
     font-weight: bold;
     line-height: 1.5em;
     letter-spacing: 0;
+}
+
+.page-title {
+    margin-bottom: .5em;
 }
 
 #content {
@@ -76,6 +81,10 @@ h3, .h3 {
 
 #main article img.avatar {
     width: auto;
+}
+
+article header h2 {
+    margin-top: 0;
 }
 
 article header h1 a {
@@ -338,8 +347,10 @@ footer .widgettitle {
 }
 
 footer ul {
-    padding-top: 2em;
+    padding-top: 1em;
     margin-bottom: 0;
+    list-style: none;
+    float: right;
 }
 
 footer p {
@@ -347,14 +358,9 @@ footer p {
     margin-bottom: 0;
 }
 
-footer ul {
-    list-style: none;
-    float: right;
-}
-
 footer ul li {
     float: left;
-    margin-left: 1em;
+    margin-left: 0;
 }
 
 footer ul li:first-child {
@@ -408,4 +414,20 @@ footer .col-sm-12 {
     border-radius: 0;
     margin-bottom: 0;
     padding: 0;
+}
+
+.instagram-pics {
+    margin:0;
+    padding:0;
+    list-style: none;
+}
+
+.instagram-pics li {
+    width: 33%;
+    height: auto;
+    float: left;
+}
+
+.instagram-pics li:last-child {
+    margin-bottom: 20px;
 }

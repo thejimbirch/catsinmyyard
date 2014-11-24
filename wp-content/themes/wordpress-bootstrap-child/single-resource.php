@@ -3,12 +3,25 @@
     <div id="main" class="clearfix" role="main">
         <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
                 <article id="post-<?php the_ID(); ?>" <?php post_class('clearfix'); ?> role="article">
+                    <?php
+                    $post_thumbnail_id = get_post_thumbnail_id();
+                    $featured_src = wp_get_attachment_image_src($post_thumbnail_id, 'wpbs-featured');
+                    ?>
                     <div class="container">
                         <div class="row">
-                            <section class="col-sm-7 col-sm-offset-2 post_content">
+                            <section class="col-md-6 col-sm-9 col-md-push-4 col-sm-push-3 post_content">
                                 <header><h1><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h1></header>
                                 <?php the_content(__("Read more &raquo;", "wpbootstrap")); ?>
                             </section>
+                            <aside class="col-md-3 col-lg-offset-1 col-md-pull-6 col-sm-pull-9 post_sidebar">
+                                <div class="h3 meta-share">Share</div>
+                                <?php echo really_simple_share_publish(); ?>
+                            </aside>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-md-offset-4 col-sm-offset-3">
+                                <?php $withcomments = "1"; comments_template(); // Get wp-comments.php template ?>
+                            </div>
                         </div>
                     </div>
                 </article>

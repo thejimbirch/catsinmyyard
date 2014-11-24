@@ -73,3 +73,31 @@ register_post_type('resource', array(
   'parent' => 'Parent Resource',
 )
 ) ); }
+
+// Add Custom Post Type Taxonomy
+add_action('init', 'cptui_register_my_taxes_resource_type');
+function cptui_register_my_taxes_resource_type() {
+register_taxonomy( 'resource-type',array (
+  0 => 'resource',
+),
+array( 'hierarchical' => true,
+  'label' => 'Resource Types',
+  'show_ui' => true,
+  'query_var' => true,
+  'show_admin_column' => true,
+  'labels' => array (
+  'search_items' => 'Resource Type',
+  'popular_items' => 'Popular Resource Types',
+  'all_items' => 'All Resource Types',
+  'parent_item' => 'Parent Types',
+  'parent_item_colon' => 'Parent Type:',
+  'edit_item' => 'Edit Resource Type',
+  'update_item' => 'Update Resource Type',
+  'add_new_item' => 'Add New Resource Type',
+  'new_item_name' => 'New Resource Type',
+  'separate_items_with_commas' => 'Separate types with commas',
+  'add_or_remove_items' => 'Add or Remove Resource Types',
+  'choose_from_most_used' => 'Choose from most used Resource Types',
+)
+) ); 
+}

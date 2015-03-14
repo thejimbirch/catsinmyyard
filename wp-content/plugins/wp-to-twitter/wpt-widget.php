@@ -23,7 +23,7 @@ function wpt_get_twitter_feed( $atts, $content ) {
 	extract( shortcode_atts( array(
 		'id'       => false,
 		'num'      => 10,
-		'duration' => 3600,
+		'duration' => 1800,
 		'replies'  => 0,
 		'rts'      => 1,
 		'links'    => 1,
@@ -534,9 +534,9 @@ function WPT_getTweets( $count = 20, $username = false, $options = false ) {
 	$config['token']        = get_option( 'oauth_token' );
 	$config['token_secret'] = get_option( 'oauth_token_secret' );
 	$config['screenname']   = get_option( 'wtt_twitter_username' );
-	$config['cache_expire'] = intval( apply_filters( 'wpt_cache_expire', 3600 ) );
+	$config['cache_expire'] = intval( apply_filters( 'wpt_cache_expire', 1800 ) );
 	if ( $config['cache_expire'] < 1 ) {
-		$config['cache_expire'] = 3600;
+		$config['cache_expire'] = 1800;
 	}
 	$config['directory'] = plugin_dir_path( __FILE__ );
 

@@ -56,6 +56,7 @@ function really_simple_share_options () {
     'disable_excerpts',
     'use_shortlink',
     'scripts_at_bottom',
+    'performance_mode',
     'facebook_like_html5',
     'facebook_like_send',
     'pinterest_multi_image',
@@ -510,6 +511,10 @@ function really_simple_share_options () {
 				__('Load scripts at the bottom of the body', 'really-simple-share')=>'
 					<input type="checkbox" name="really_simple_share_scripts_at_bottom" '.$scripts_at_bottom.' />
 					<span class="description">'.__("Checking it should increase the page loading speed. Warning: this requires the theme to have the wp_footer() hook in the appropriate place; if unsure, leave it unchecked", 'really-simple-share' ).'</span>
+				',
+				__('Performance mode', 'really-simple-share')=>'
+					<input type="checkbox" name="really_simple_share_performance_mode" '.$performance_mode.' />
+					<span class="description">'.__("Checking it should increase the page loading speed by skipping JS and CSS code on pages without active share buttons. Warning: this DISABLES the \"shortcode\" and \"template function\" features; if unsure, leave it unchecked", 'really-simple-share' ).'</span>
 				',
 				__('Disable default styles', 'really-simple-share')=>'
 					<input type="checkbox" name="really_simple_share_disable_default_styles" '.$disable_default_styles.' />

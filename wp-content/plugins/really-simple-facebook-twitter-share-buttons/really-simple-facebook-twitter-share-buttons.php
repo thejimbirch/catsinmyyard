@@ -3,8 +3,8 @@
 Plugin Name: Really Simple Share
 Plugin URI: http://www.whiletrue.it/really-simple-facebook-twitter-share-buttons-for-wordpress/
 Description: Puts Facebook, Twitter, LinkedIn, Google "+1", Pinterest and other share buttons of your choice above or below your posts.
-Author: WhileTrue
-Version: 3.2.3
+Author: Dabelon, tanaylakhani
+Version: 4.0
 Author URI: http://www.whiletrue.it
 */
 
@@ -61,6 +61,11 @@ if (!$really_simple_share_option['disable_excerpts']) {
 // PUBLIC FUNCTIONS
 
 function really_simple_share_scripts () {
+  // IF PERFORMANCE MODE IS ACTIVE, CHECK SKIP BUTTONS
+  if (really_simple_share_skip_buttons(true)) {
+		return '';
+  }
+
 	really_simple_share_adjust_locale();
 	
 	global $really_simple_share_option;
@@ -122,6 +127,11 @@ function really_simple_share_scripts () {
 
 
 function really_simple_share_facebook_like_html5_bottom_scripts () {
+  // IF PERFORMANCE MODE IS ACTIVE, CHECK SKIP BUTTONS
+  if (really_simple_share_skip_buttons(true)) {
+		return '';
+  }
+
 	really_simple_share_adjust_locale();
 
 	global $really_simple_share_option;
@@ -151,6 +161,11 @@ function really_simple_share_init ($force=false) {
     }
 	}
 
+  // IF PERFORMANCE MODE IS ACTIVE, CHECK SKIP BUTTONS
+  if (really_simple_share_skip_buttons(true)) {
+		return '';
+  }
+  
 	global $really_simple_share_option;
 
 	if ($really_simple_share_option['active_buttons']['linkedin']) {
@@ -178,7 +193,12 @@ function really_simple_share_init ($force=false) {
 
 
 function really_simple_share_style () {
-	$myStyleUrl  = plugin_dir_url (__FILE__).'style.css';
+  // IF PERFORMANCE MODE IS ACTIVE, CHECK SKIP BUTTONS
+  if (really_simple_share_skip_buttons(true)) {
+		return '';
+  }
+
+ 	$myStyleUrl  = plugin_dir_url (__FILE__).'style.css';
 	$myStyleFile = plugin_dir_path(__FILE__).'style.css';
 	if ( file_exists($myStyleFile) ) {
 	    wp_register_style('really_simple_share_style', $myStyleUrl);
@@ -215,6 +235,54 @@ function really_simple_share_excerpt ($content) {
 }
 
 
+// FUNCTION USED TO CHECK IF I NEED TO SKIP THE SHARE BUTTONS IN THE GIVEN CONTEXT
+function really_simple_share_skip_buttons ($check_performance_mode = false) {
+	global $really_simple_share_option;
+	$option = $really_simple_share_option;
+  
+  if ($check_performance_mode) {
+    // ONLY CHECK SKIP IF PERFORMANCE MODE IS ACTIVE
+    if (isset($option['performance_mode']) && $option['performance_mode'] === false) {
+      return false;
+    }
+  }
+
+	$post_type = get_post_type();
+  if (in_array($post_type, get_post_types(array('_builtin'=>false)))) {
+		if (!$option['show_in_custom'][$post_type]) { return true; }
+    return false;
+  } else if (is_single()) {
+		if (!$option['show_in']['posts']) { return true; }
+    return false;
+	} else if (is_singular() and !is_front_page()) {
+		if (!$option['show_in']['pages']) {	return true; }
+    return false;
+	} else if (is_home() or is_front_page()) {
+		if (!$option['show_in']['home_page']) {	return true; }
+    return false;
+	} else if (is_tag()) {
+		if (!$option['show_in']['tags']) { return true; }
+    return false;
+	} else if (is_category()) {
+		if (!$option['show_in']['categories']) { return true; }
+    return false;
+	} else if (is_date()) {
+		if (!$option['show_in']['dates']) { return true; }
+    return false;
+	} else if (is_author()) {
+		//IF DISABLED INSIDE PAGES
+		if (!$option['show_in']['authors']) { return true; }
+    return false;
+	} else if (is_search()) {
+		if (!$option['show_in']['search']) { return true; }
+    return false;
+	} else {
+		// IF NONE OF PREVIOUS, IS DISABLED
+		return true;
+	}
+}
+
+
 function really_simple_share ($content, $filter, $link='', $title='', $author='', $force_button='') {
 	static $last_execution = '';
 
@@ -247,6 +315,11 @@ function really_simple_share ($content, $filter, $link='', $title='', $author=''
 	$option = $really_simple_share_option;
 
 	if ($filter!='shortcode') {
+    if (really_simple_share_skip_buttons()) {
+			return $content;
+    }
+    /*
+    // OLD STYLE CHECK
 		$post_type = get_post_type();
     if (in_array($post_type, get_post_types(array('_builtin'=>false)))) {
 			if (!$option['show_in_custom'][$post_type]) { return $content; }
@@ -271,6 +344,7 @@ function really_simple_share ($content, $filter, $link='', $title='', $author=''
 			// IF NONE OF PREVIOUS, IS DISABLED
 			return $content;
 		}
+    */
 	}
 	$first_shown = false; // NO PADDING FOR THE FIRST BUTTON
 	
@@ -779,7 +853,8 @@ function really_simple_share_get_options_default () {
 	$option['disable_default_styles'] = false;
 	$option['disable_excerpts'] = false;
 	$option['use_shortlink'] = false;
-	$option['scripts_at_bottom'] = false;
+	$option['scripts_at_bottom'] = true;
+	$option['performance_mode'] = false;
 
 	$option['facebook_like_appid'] = '';
 	$option['facebook_like_html5'] = true;

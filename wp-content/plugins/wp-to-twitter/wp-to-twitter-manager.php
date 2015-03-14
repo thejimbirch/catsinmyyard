@@ -327,7 +327,6 @@ function wpt_update_settings() {
 	}
 	?>
 	<div class="wrap" id="wp-to-twitter">
-	<?php wpt_commments_removed(); ?>
 	<?php if ( $message ) { ?>
 		<div id="message" class="updated fade"><p><?php echo $message; ?></p></div>
 	<?php
@@ -872,7 +871,7 @@ function wpt_sidebar() {
 						$support_url = admin_url( 'options-general.php?page=wp-to-twitter/wp-to-twitter.php' );
 					} ?>
 					<a href="<?php echo $support_url; ?>#get-support"><?php _e( "Get Support", 'wp-to-twitter' ); ?></a> &bull;
-					<a href="https://www.joedolson.com/wp-content/uploads/wp-tweets-pro-users-guide-1.6.0.pdf"><?php _e( 'Read the Manual', 'wp-to-twitter' ); ?></a>
+					<a href="https://www.joedolson.com/wp-content/uploads/wp-tweets-pro-users-guide-1.7.2.pdf"><?php _e( 'Read the Manual', 'wp-to-twitter' ); ?></a>
 					<?php if ( get_option( 'jd_donations' ) != 1 && ! function_exists( 'wpt_pro_exists' ) ) { ?>
 						<p><?php _e( '<a href="http://www.joedolson.com/donate.php">Make a donation today!</a><br />Every donation matters - donate $5, $20, or $100 today!', 'wp-to-twitter' ); ?></p>
 						<div class='donations'>
@@ -894,6 +893,7 @@ function wpt_sidebar() {
 				</div>
 			</div>
 		</div>
+		
 		<?php if ( ! function_exists( 'wpt_pro_exists' ) ) { ?>
 			<div class="ui-sortable meta-box-sortables">
 				<div class="postbox">
@@ -905,13 +905,14 @@ function wpt_sidebar() {
 						<strong><a
 								href="http://www.joedolson.com/wp-tweets-pro/"><?php _e( 'Upgrade to <strong>WP Tweets PRO</strong>!', 'wp-to-twitter' ); ?></a></strong>
 
-						<p><?php _e( 'Bonuses in the PRO upgrade:', 'wp-to-twitter' ); ?></p>
+						<p><strong><?php _e( "What's in the premium add-on?", 'wp-to-twitter' ); ?></strong></p>
 						<ul>
-							<li><?php _e( 'Authors can post to their own Twitter accounts', 'wp-to-twitter' ); ?></li>
-							<li><?php _e( 'Delay Tweets minutes or hours after you publish', 'wp-to-twitter' ); ?></li>
-							<li><?php _e( 'Automatically schedule Tweets to post again later', 'wp-to-twitter' ); ?></li>
+							<li><?php _e( 'Post to multiple Twitter accounts', 'wp-to-twitter' ); ?></li>
+							<li><?php _e( 'Delay Tweets until after publishing', 'wp-to-twitter' ); ?></li>
+							<li><?php _e( 'Automatically schedule Tweets to post again', 'wp-to-twitter' ); ?></li>
 							<li><?php _e( 'Send Tweets for approved comments', 'wp-to-twitter' ); ?></li>
 							<li><?php _e( 'Filter Tweets by category, tag, or custom taxonomy', 'wp-to-twitter' ); ?></li>
+							<li><?php _e( 'Upload post images to Twitter', 'wp-to-twitter' ); ?></li>
 						</ul>
 
 					</div>
@@ -923,6 +924,18 @@ function wpt_sidebar() {
 				wpt_notes();
 			}
 		} ?>
+		
+		<div class="ui-sortable meta-box-sortables">
+			<div class="postbox">
+				<div class="handlediv"><span class="screen-reader-text">Click to toggle</span></div>
+				<h3 class='hndle'><?php _e( 'Twitter Time Check', 'wp-to-twitter' ); ?></h3>
+
+				<div class="inside server">
+						<?php wpt_do_server_check(); ?>
+				</div>
+			</div>
+		</div>
+		
 		<div class="ui-sortable meta-box-sortables">
 			<div class="postbox">
 				<div class="handlediv"><span class="screen-reader-text">Click to toggle</span></div>
@@ -948,10 +961,76 @@ function wpt_sidebar() {
 							<li><?php _e( "<code>#reference#</code>: Used only in co-tweeting. @reference to main account when posted to author account, @reference to author account in post to main account.", 'wp-to-twitter' ); ?></li>
 						<?php } ?>
 					</ul>
-					<p><?php _e( "You can also create custom shortcodes to access WordPress custom fields. Use doubled square brackets surrounding the name of your custom field to add the value of that custom field to your status update. Example: <code>[[custom_field]]</code></p>", 'wp-to-twitter' ); ?>
+					<p>
+					<?php 
+						_e( "Create custom shortcodes and access WordPress custom fields by using square brackets and the name of your custom field.", 'wp-to-twitter' );
+					?>
+					<br />
+					<?php
+						_e( "<strong>Example:</strong> <code>[[custom_field]]</code>", 'wp-to-twitter' ); 
+					?>
+					</p>
 				</div>
 			</div>
 		</div>
 	</div>
 <?php
+}
+
+function wpt_do_server_check( $test = false ) {
+	$wpt_server_string = get_option( 'wpt_server_string' );
+	if ( !$wpt_server_string || isset( $_GET['refresh_wpt_server_string'] ) || $test == true ) {
+		$server_time = date( DATE_COOKIE );
+		$response    = wp_remote_get( "https://twitter.com/", array( 'timeout' => 30, 'redirection' => 1 ) );
+		
+		if ( is_wp_error( $response ) ) {
+			$warning = '';
+			$error   = $response->errors;
+			if ( is_array( $error ) ) {
+				$warning = "<ul>";
+				foreach ( $error as $k => $e ) {
+					foreach ( $e as $v ) {
+						$warning .= "<li>" . $v . "</li>";
+					}
+				}
+				$warning .= "</ul>";
+			}
+			$errors = "<li>" . $ssl . $warning . "</li>";
+		} else {
+			$date   = date( DATE_COOKIE, strtotime( $response['headers']['date'] ) );
+			$errors = '';
+		}
+
+		if ( ! is_wp_error( $response ) ) {
+			if ( abs( strtotime( $server_time ) - strtotime( $response['headers']['date'] ) ) > 300 ) {
+				$diff = __( 'Your time stamps are more than 5 minutes apart. Your server could lose its connection with Twitter.', 'wp-to-twitter' );
+			} else {
+				$diff = __( 'Your time stamp matches the Twitter server time', 'wp-to-twitter' );
+			}
+			$diff = "<li>$diff</li>";
+		} else {
+			$diff = "<li>" . __( 'WP to Twitter could not contact Twitter\'s remote server.', 'wp-to-twitter' ) . "</li>";
+		}
+
+		$timezone = '<li>' . __( 'Your server timezone:', 'wp-to-twitter' ) . ' ' . date_default_timezone_get() . '</li>';
+
+		$search = array( 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' );
+		$replace = array( 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun' );
+		
+		$server_time = str_replace( $search, $replace, $server_time );
+		$date = str_replace( $search, $replace, $date );
+		
+		$wpt_server_string =
+			"<ul>
+				<li>" . __( 'Your server time:', 'wp-to-twitter' ) . '<br /><code>' . $server_time . '</code>' . "</li>" . 
+				"<li>" . __( 'Twitter\'s server time: ', 'wp-to-twitter' ) . '<br /><code>' . $date . '</code>' . "</li>
+				$timezone
+				$diff
+				$errors
+			</ul>";
+		update_option( 'wpt_server_string', $wpt_server_string );
+	}
+	echo $wpt_server_string;
+	$admin_url = ( is_plugin_active( 'wp-tweets-pro/wpt-pro-functions.php?refresh_wpt_server_string=true' ) ) ? admin_url( 'admin.php?page=wp-tweets-pro' ) : admin_url( 'options-general.php?page=wp-to-twitter/wp-to-twitter.php&amp;refresh_wpt_server_string=true' );
+	echo "<p><a href='" . $admin_url . "'>" . __( 'Test again', 'wp-to-twitter' ) . "</a></p>";
 }

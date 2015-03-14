@@ -3,8 +3,8 @@ Contributors: dfactory
 Donate link: http://www.dfactory.eu/
 Tags: gallery, images, lightbox, links, photos, template, theme, photo, image, picture, slideshow, modal, overlay, YouTube, Vimeo, video, videos
 Requires at least: 3.3
-Tested up to: 4.0
-Stable tag: 1.4.8
+Tested up to: 4.1
+Stable tag: 1.4.10
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -38,6 +38,7 @@ For more information, check out plugin page at [dFactory](http://www.dfactory.eu
 * Estonian - by Hugo Amtmann
 * French - by [Li-An](http://www.echodesplugins.li-an.fr/)
 * German - by [Andreas Reitberger](http://wdbase.de)
+* Hungarian - by [Zsolt Boda](http://cmfrt.net/)
 * Japanese - by stranger-jp
 * Persian - by [Ali Mirzaei](http://alimir.ir/)
 * Polish - by Bartosz Arendt
@@ -63,6 +64,13 @@ No questions yet.
 2. screenshot-2.jpg
 
 == Changelog ==
+
+= 1.4.10 =
+* Tweak: Image Lightbox updated
+
+= 1.4.9 =
+* New: Hungarian translation, thanks to [Zsolt Boda](http://cmfrt.net/)
+* Tweak: Remove direct http calls from Javascript to improve https protocol compatibility
 
 = 1.4.8 =
 * Tweak: Nivo Lightbox updated to 1.2
@@ -172,6 +180,5 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.4.8 =
-* Tweak: Nivo Lightbox updated to 1.2
-* Tweak: Confirmed WP 4.0 compatibility
+= 1.4.10 =
+* Tweak: Image Lightbox updated

@@ -1,12 +1,12 @@
 === Really Simple Share ===
-Contributors: whiletrue
+Contributors: Dabelon, whiletrue, tanaylakhani
 Donate link: http://www.whiletrue.it/
 Tags: facebook, twitter, facebook share, twitter share, facebook share button, twitter share button, linkedin, google +1, +1, google share, google plus share, pinterest, google buzz, buzz, digg, flattr, stumbleupon, hyves, links, post, page, mail, email, reddit, tipy, tumblr, buffer, pinzout, shortcode, youtube, print, rss, bitcoin, litecoin, specificfeeds, draugiem, frype
 Requires at least: 2.9+
-Tested up to: 4.0
-Stable tag: 3.2.3
+Tested up to: 4.1
+Stable tag: 4.0
 
-Puts Facebook, Twitter, LinkedIn, Google "+1", Pinterest, Tumblr and other social share buttons of your choice above or below your posts. Previously known as "Really simple Facebook Twitter share buttons".
+Puts Facebook, Twitter, LinkedIn, Google "+1", Pinterest, Tumblr and other social share buttons of your choice above or below your posts.
 
 == Description ==
 This plugin shows Facebook, Twitter, LinkedIn, Google "+1", Pinterest and other popular social share buttons above or below your posts.
@@ -49,12 +49,14 @@ To do so e.g. on a page: open the WordPress backend, go to Pages, click on the P
 
 = News =
 
-*New* in version 3.2:
+*New* in version 3.3:
 
-* Initial support for Custom Post Types
+* Initial support for Performance Mode
 
 = Reference =
 
+Previously known as "Really simple Facebook Twitter share buttons".
+ 
 For more info on this plugin: [www.whiletrue.it](http://www.whiletrue.it/really-simple-share-wordpress-plugin/ "www.whiletrue.it")
 
 Do you like this plugin? Give a chance to our other works:
@@ -112,6 +114,15 @@ The PinIt counter only appear if the post has been shared at least once. Also, t
 
 
 == Changelog ==
+
+= 3.3.1 =
+* Fixed: Performance Mode bugfix
+
+= 3.3 =
+* Added: Initial support for Performance Mode
+
+= 3.2.4 =
+* Plugin tested up WordPress 4.1
 
 = 3.2.3 =
 * Changed: Plugin renamed to Really Simple Share
@@ -367,6 +378,9 @@ Initial release
 
 
 == Upgrade Notice ==
+
+= 3.3.1 =
+Users having version 3.3 should upgrade due to a bugfix on Performance Mode
 
 = 3.1.8 =
 Users having version 3.1.7 should upgrade due to a bugfix on shown buttons

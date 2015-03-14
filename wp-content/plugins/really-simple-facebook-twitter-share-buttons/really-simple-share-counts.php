@@ -10,6 +10,10 @@ function really_simple_share_counts () {
 
   // INITIALIZE ALL SCRIPTS
 	global $really_simple_share_option;
+  
+  // DISABLE PERFORMANCE MODE LOCALLY, TO ENABLE STATS
+  $really_simple_share_option['performance_mode'] = false;
+  
   really_simple_share_init(true);
   really_simple_share_scripts();
   if (($really_simple_share_option['active_buttons']['facebook_like'] and $really_simple_share_option['facebook_like_html5'])

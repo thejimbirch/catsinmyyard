@@ -17,7 +17,7 @@ class WPT_TwitterFeed {
 		'token'        => '',
 		'token_secret' => '',
 		'screenname'   => false,
-		'cache_expire' => 3600
+		'cache_expire' => 1800
 	);
 
 	public $st_last_error = false;

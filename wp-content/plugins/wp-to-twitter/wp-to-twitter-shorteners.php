@@ -242,39 +242,8 @@ if ( ! function_exists( 'jd_shorten_link' ) ) { // prep work for future plug-in 
 	function wpt_store_url( $post_ID, $url ) {
 		if ( function_exists( 'jd_shorten_link' ) ) {
 			$shortener = get_option( 'jd_shortener' );
-			switch ( $shortener ) {
-				case 0:
-				case 1:
-				case 4:
-					$ext = '_wp';
-					break;
-				case 2:
-					$ext = '_bitly';
-					break;
-				case 3:
-					$ext = '_url';
-					break;
-				case 5:
-				case 6:
-					$ext = '_yourls';
-					break;
-				case 7:
-					$ext = '_supr';
-					break;
-				case 8:
-					$ext = '_goo';
-					break;
-				case 9:
-					$ext = '_tfl';
-					break;
-				case 10:
-					$ext = '_joturl';
-					break;
-				default:
-					$ext = '_ind';
-			}
-			if ( get_post_meta( $post_ID, "_wp_jd$ext", true ) != $url ) {
-				update_post_meta( $post_ID, "_wp_jd$ext", $url );
+			if ( get_post_meta( $post_ID, '_wpt_short_url', true ) != $url ) {
+				update_post_meta( $post_ID, '_wpt_short_url', $url );
 			}
 			switch ( $shortener ) {
 				case 0:

@@ -1,12 +1,12 @@
 === WP to Twitter ===
 Contributors: joedolson
-Donate link: http://www.joedolson.com/donate.php
+Donate link: http://www.joedolson.com/donate/
 Tags: twitter, microblogging, su.pr, bitly, yourls, redirect, shortener, post, links
 Requires at least: 3.7.0
-Tested up to: 4.0
+Tested up to: 4.1
 License: GPLv2 or later
 Text Domain: wp-to-twitter
-Stable tag: 2.9.6
+Stable tag: 2.9.8
 
 Posts a Twitter update when you update your WordPress blog or add a link, with your chosen URL shortening service.
 
@@ -20,7 +20,7 @@ Yep. That's the basic functionality. But it's not the only thing you can do:
 * Recent Tweets Widget: Display recent Tweets. Fetch Tweets from your own or any other account.
 * Tweet Search Widget: Display the Tweets resulting from a search.
  
-[Upgrade to WP Tweets Pro](http://www.joedolson.com/wp-tweets-pro/) for Tweet scheduling, automatic re-tweeting, and more!
+[Upgrade to WP Tweets Pro](http://www.joedolson.com/wp-tweets-pro/) and schedule Tweets, set up automatic reposts, upload images and more!
 
 WP to Twitter uses a customizable Tweet template for Tweets sent when updating or editing posts and pages or custom post types. You can customize your Tweet for each post, using custom template tags to generate the Tweet. 
 
@@ -42,6 +42,7 @@ Upgrade to [WP Tweets Pro](http://www.joedolson.com/wp-tweets-pro/) for extra fe
 * Co-Tweet to site and author Twitter accounts
 * Preview and Tweet comments
 * Filter Tweets by taxonomy (categories, tags, or custom taxonomies)
+* Upload images to Twitter
 * [...and more!](http://www.joedolson.com/wp-tweets-pro/)
 
 Want to stay up to date on WP to Twitter? [Follow me on Twitter!](https://twitter.com/joedolson)
@@ -59,21 +60,36 @@ Translating my plug-ins is always appreciated. Visit <a href="http://translate.j
 
 = Future =
 
-* Use apply_filters( 'wpt_tweet_sentence', $tweet, $post_ID ) to pass custom taxonomy Tweet formats
+* Use apply_filters( 'wpt_tweet_sentence', $tweet, $post_ID ) to pass custom taxonomy Tweet formats - Pending WordPress support for taxonomy meta.
 * Add regex filter to detect URLs typed into Tweet fields for counting/shortening purposes. [todo]
-* Replacement for incoming data that's already encoded? (e.g. &apos;)
+
+= 3.0.0 =
+
+* Handles case where post type identification could throw PHP warning if no post types were chosen to be Tweeted.
+* Eliminated outdated compatibility function. 
+* Eliminated old update notices.
+* General code cleanup.
+* Code documentation.
+* Updated media uploading to use Uploads endpoint, replacing deprecated update_with_media endpoint. [WP Tweets PRO]
+* Simplifed short URL storage
+* Decreased widget cache life from 1 hour to 30 minutes.
+* Added fallback Normalizer class for cases when extension is not installed.
+* Added notes for the 100 HTTP code return error.
+* Moved Twitter server time check out of basic set-up & set up to only run on demand.
+* Minor design changes.
 
 = 2.9.8 =
+
+* Feature: Upload images from remote servers (WP Tweets PRO)
+* Updated User's Guide.
+
+= 2.9.7 =
 
 * New filter: wpt_allow_reposts to filter whether a specific post should schedule retweets (WP Tweets PRO).
 * Alter image selection criteria to use first uploaded image as the default instead of the last uploaded image (WP Tweets PRO)
 * Pass media data into Tweet Now AJAX function (WP Tweets PRO);
 * Fixed issue with 400 error for "Tweet Now" button for unauthenticated logged-in users (WP Tweets PRO)
 * Add filter to disable use of featured image for uploading (wpt_use_featured_image; returns boolean) (WP Tweets PRO)
-* 
-
-= 2.9.7 =
-
 * Bug fix: In translated context, successful Tweet notices picked up wrong notice class.
 * Extensive code cleanup and reformatting.
 
@@ -1058,7 +1074,7 @@ Right here: [WP to Twitter FAQ](http://www.joedolson.com/wp-to-twitter/support-2
 
 = How can I help you make WP to Twitter a better plug-in? =
 
-Writing and maintaining a plug-in is a lot of work. You can help me by providing detailed support requests (which saves me time), or by providing financial support, either via my [plug-in donations page](https://www.joedolson.com/donate/) or by [upgrading to WP Tweets Pro](https://www.joedolson.com/wp-tweets-pro/). Believe me, any small donation really makes a difference!
+Writing and maintaining a plug-in is a lot of work. You can help me by providing detailed support requests (which saves me time), or by providing financial support, either via my [plug-in donations page](https://www.joedolson.com/donate/) or by [upgrading to WP Tweets Pro](https://www.joedolson.com/wp-tweets-pro/). Believe me, your donation really makes a difference!
 
 == Screenshots ==
 
@@ -1071,4 +1087,4 @@ Writing and maintaining a plug-in is a lot of work. You can help me by providing
 
 == Upgrade Notice ==
 
-* 2.9.7 - Changes to fix bugs for WP Tweets PRO users.
+* 3.0.0 - Changes storage format for short URL post meta. Upgrade cycle may take a while to process all posts.

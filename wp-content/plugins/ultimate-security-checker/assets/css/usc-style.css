@@ -1,0 +1,17 @@
+h3.nav-tab-wrapper {
+  margin-bottom: 0;
+}
+
+.stab {
+  background: #fff;
+  padding: 20px;
+}
+
+.usc-tabs .nav-tab-active {
+  background: #fff;
+  border-bottom: 1px solid #fff;
+}
+
+.danger-found pre {
+  white-space: normal;
+}

@@ -1,0 +1,110 @@
+#toplevel_page_s3bubble-amazon-s3-backup-s3bubblebackup .wp-menu-image img {
+	padding-top: 4px;
+}
+#toplevel_page_s3bubble-amazon-s3-backup-s3bubblebackup .wp-menu-name {
+	font-size: 13px;
+}
+#s3bubble-backup-backingup {
+	display: none;
+}
+/* tables */
+table#tablesorter-demo {
+	margin: 10px 0 0 0;
+}
+table#options * {
+	font-size: small;
+}
+/* tables */
+table.tablesorter {
+	font-family: arial;
+	background-color: #CDCDCD;
+	margin: 0px 0pt 15px;
+	font-size: 8pt;
+	width: 100%;
+	text-align: left;
+	border-spacing: 1px;
+	border-color: #eee;
+}
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+	background-color: #e6EEEE;
+	border: 1px solid #FFF;
+	font-size: 8pt;
+	padding: 4px;
+}
+table.tablesorter thead tr .header {
+	background-image: url(../images/bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+}
+table.tablesorter tbody td {
+	color: #3D3D3D;
+	padding: 4px;
+	background-color: #FFF;
+	vertical-align: middle;
+}
+table.tablesorter tbody tr {
+	border-bottom: 1px solid #eee;
+}
+
+table.tablesorter tbody tr.odd td {
+	/* background-color:#F0F0F6; */
+}
+table.tablesorter thead tr .headerSortUp {
+	background-image: url(../images/asc.gif);
+}
+table.tablesorter thead tr .headerSortDown {
+	background-image: url(../images/desc.gif);
+}
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+	background-color: #8dbdd8;
+}
+
+.s3bubble-checks-p {
+	font-size: 12px;
+	font-style: italic;
+}
+
+.s3bubble-checks-list {
+	font-size: 12px;
+}
+
+.s3bubble-checks-list li {
+	font-size: 12px;
+	border-bottom: 1px solid #eee;
+	width: 98%;
+	padding: 5px 1% 5px 1%;
+	margin: 0px;
+}
+
+.s3bubble-checks-list li.highlight-yes {
+	background: #1abc9c;
+	color: white;
+}
+
+.s3bubble-checks-list li.highlight-no {
+	background: #e74c3c;
+	color: white;
+}
+
+.s3bubble-checks-list li i {
+	float: right;
+}
+#database-time-info-inner {
+	width: 98%;
+	float: left;
+	background: #1abc9c;
+	color: white;
+	padding: 1%;
+	margin: 10px 0px;
+	font-style: italic;
+}
+#filesystem-time-info-inner {
+	width: 98%;
+	float: left;
+	background: #1abc9c;
+	color: white;
+	padding: 1%;
+	margin: 10px 0px;
+	font-style: italic;
+}

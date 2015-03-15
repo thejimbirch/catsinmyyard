@@ -110,25 +110,25 @@ get_header(); ?>
 					
 					// Start to display EXIF and IPTC data of digital photograph
 					       if ( $imgmeta['image_meta']['created_timestamp'] ) { 
-					           echo __("Date Taken","wpbootstrap") . ": " . date("d-M-Y H:i:s", $imgmeta['image_meta']['created_timestamp'])."<br />"; }
+					           echo __("Date Taken", "bonestheme") . ": " . date("d-M-Y H:i:s", $imgmeta['image_meta']['created_timestamp'])."<br />"; }
 					       if ( $imgmeta['image_meta']['copyright'] ) { 
-					           echo __("Copyright","wpbootstrap") . ": " . $imgmeta['image_meta']['copyright']."<br />"; }
+					           echo __("Copyright", "bonestheme") . ": " . $imgmeta['image_meta']['copyright']."<br />"; }
 					       if ( $imgmeta['image_meta']['credit'] ) { 
-					           echo __("Credit","wpbootstrap") . ": " . $imgmeta['image_meta']['credit']."<br />"; }
+					           echo __("Credit", "bonestheme") . ": " . $imgmeta['image_meta']['credit']."<br />"; }
 					       if ( $imgmeta['image_meta']['title'] ) { 
-					           echo __("Title","wpbootstrap") . ": " . $imgmeta['image_meta']['title']."<br />"; }
+					           echo __("Title", "bonestheme") . ": " . $imgmeta['image_meta']['title']."<br />"; }
 					       if ( $imgmeta['image_meta']['caption'] ) { 
-					           echo __("Caption","wpbootstrap") . ": " . $imgmeta['image_meta']['caption']."<br />"; }
+					           echo __("Caption", "bonestheme") . ": " . $imgmeta['image_meta']['caption']."<br />"; }
 					       if ( $imgmeta['image_meta']['camera'] ) { 
-					           echo __("Camera","wpbootstrap") . ": " . $imgmeta['image_meta']['camera']."<br />"; }
+					           echo __("Camera", "bonestheme") . ": " . $imgmeta['image_meta']['camera']."<br />"; }
 					       if ( $imgmeta['image_meta']['focal_length'] ) { 
-					           echo __("Focal Length","wpbootstrap") . ": " . $imgmeta['image_meta']['focal_length']."mm<br />"; }
+					           echo __("Focal Length", "bonestheme") . ": " . $imgmeta['image_meta']['focal_length']."mm<br />"; }
 					       if ( $imgmeta['image_meta']['aperture'] ) { 
-					           echo __("Aperture","wpbootstrap") . ": f/" . $imgmeta['image_meta']['aperture']."<br />"; }
+					           echo __("Aperture", "bonestheme") . ": f/" . $imgmeta['image_meta']['aperture']."<br />"; }
 					       if ( $imgmeta['image_meta']['iso'] ) { 
-					           echo __("ISO","wpbootstrap") . ": " . $imgmeta['image_meta']['iso']."<br />"; }
+					           echo __("ISO", "bonestheme") . ": " . $imgmeta['image_meta']['iso']."<br />"; }
 					       if ( $pshutter ) { 
-					           echo __("Shutter Speed","wpbootstrap") . ": " . $pshutter . "<br />"; }
+					           echo __("Shutter Speed", "bonestheme") . ": " . $pshutter . "<br />"; }
 					   ?>
 					</div>
 					

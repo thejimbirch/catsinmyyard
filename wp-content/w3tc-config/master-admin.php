@@ -4,7 +4,7 @@ return array(
 	'version' => '0.9.4.1',
 	'browsercache.configuration_sealed' => false,
 	'cdn.configuration_sealed' => false,
-	'common.install' => 1426351088,
+	'common.install' => 1426356144,
 	'common.visible_by_master_only' => true,
 	'dbcache.configuration_sealed' => false,
 	'minify.configuration_sealed' => false,

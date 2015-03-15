@@ -4,14 +4,15 @@ Plugin Name: Block Bad Queries (BBQ)
 Plugin URI: http://perishablepress.com/block-bad-queries/
 Description: Automatically protects WordPress against malicious URL requests.
 Tags: security, protect, firewall, php, eval, malicious, url, request, blacklist
-Author URI: http://monzilla.biz/
+Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests.
 Author: Jeff Starr
+Author URI: http://monzilla.biz/
 Contributors: specialk, aldolat, WpBlogHost, James Wilkes, juliobox
 Donate link: http://m0n.co/donate
-Requires at least: 3.7
-Tested up to: 4.0
+Requires at least: 3.8
+Tested up to: 4.1
 Stable tag: trunk
-Version: 20140922
+Version: 20150314
 License: GPLv2 or later
 
 Block Bad Queries (BBQ) helps protect WordPress against malicious URL requests. 
@@ -29,10 +30,16 @@ Block Bad Queries (BBQ) helps protect WordPress against malicious URL requests.
 * Based on the [5G/6G Blacklist](http://perishablepress.com/6g-beta/)
 * Scans all incoming traffic and blocks bad requests
 * Works silently behind the scenes to protect your site
+* New! Customize blocked strings via [Whitelist/Blacklist plugins](http://perishablepress.com/bbq-whitelist-blacklist/)
 
 == Installation ==
 
 To protect your site using this lightweight plugin, unzip and upload the "/block-bad-queries/" folder and contents to your plugin directory and activate via the WP Admin. No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests. Once active, this plugin will silently and effectively close any connections for these sorts of injection-type attacks.
+
+**Notes**
+
+* To allow strings otherwise blocked by BBQ, check out the [BBQ Whitelist plugin](http://perishablepress.com/bbq-whitelist-blacklist/)
+* To block strings otherwise allowed by BBQ, check out the [BBQ Blacklist plugin](http://perishablepress.com/bbq-whitelist-blacklist/)
 
 == Upgrade Notice ==
 
@@ -43,6 +50,12 @@ To upgrade BBQ, remove old version and replace with new version. Nothing else ne
 No screenshots available - code only.
 
 == Changelog ==
+
+**2015/03/14**
+
+* introduce bbq_core()
+* tested on latest WP
+* tightened up code
 
 **2014/09/22**
 
@@ -122,6 +135,11 @@ To ask a question, visit the [BBQ homepage](http://perishablepress.com/block-bad
 
 == Donations ==
 
-I created this plugin with love for the WP community. To show support, consider purchasing one of my books: [The Tao of WordPress](http://wp-tao.com/), [Digging into WordPress](http://digwp.com/), or [.htaccess made easy](http://htaccessbook.com/).
+I created this plugin with love for the WP community. To show support, you can [make a donation](http://m0n.co/donate) or purchase one of my books: 
+
+* [The Tao of WordPress](http://wp-tao.com/)
+* [Digging into WordPress](http://digwp.com/)
+* [.htaccess made easy](http://htaccessbook.com/)
+* [WordPress Themes In Depth](http://wp-tao.com/wordpress-themes-book/)
 
 Links, tweets and likes also appreciated. Thanks! :)

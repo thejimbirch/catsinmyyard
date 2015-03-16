@@ -29,16 +29,12 @@
             <div class="container">
                 <div class="row">
                     <div class="col-sm-12">
-                        <?php if (function_exists('page_navi')) { // if expirimental feature is active ?>
-                            <?php page_navi(); // use the page navi function ?>
-                                <?php } else { // if it is disabled, display regular wp prev & next links ?>
-                            <nav class="wp-prev-next">
-                                <ul class="pager">
-                                    <li class="previous"><?php next_posts_link(_e('&laquo; Older Entries', "wpbootstrap")) ?></li>
-                                    <li class="next"><?php previous_posts_link(_e('Newer Entries &raquo;', "wpbootstrap")) ?></li>
-                                </ul>
-                            </nav>
-                        <?php } ?>
+                        <div type="button" class="btn btn-default btn-sm pull-left" style="margin-bottom:20px;max-width:300px;white-space:normal;">
+                          <?php previous_post('< %', 'Previous: ', 'yes'); ?>
+                        </div>
+                        <div type="button" class="btn btn-default btn-sm pull-right" style="margin-bottom:20px;max-width:300px;white-space:normal;">
+                          <?php next_post('% > ', 'Next: ', 'yes'); ?>
+                        </div>
                         </div>
                     </div>
                 </div>

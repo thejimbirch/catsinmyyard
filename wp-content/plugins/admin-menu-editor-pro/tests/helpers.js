@@ -46,7 +46,7 @@ var ameTest = {
 	activateHelper: function(name) {
 		casper.thenOpen(ameTestConfig.siteUrl + '?ame-activate-helper=' + name,
 			function() {
-				casper.test.info('Helper "' + name + '" loaded');
+				casper.log('Helper "' + name + '" loaded', 'info');
 			}
 		);
 	},
@@ -54,7 +54,7 @@ var ameTest = {
 	deactivateHelper: function(name) {
 		casper.thenOpen(ameTestConfig.siteUrl + '?ame-deactivate-helper=' + name,
 			function() {
-				casper.test.info('Helper "' + name + '" unloaded');
+				casper.log('Helper "' + name + '" unloaded', 'info');
 			}
 		);
 	},
@@ -66,6 +66,29 @@ var ameTest = {
 	resetPluginConfiguration: function() {
 		this.activateHelper('reset-configuration');
 		this.deactivateHelper('reset-configuration');
+	},
+
+	thenQuickSetup: function(helpers) {
+		//Reset plugin configuration, activate helpers, log in and open the menu editor.
+		//Doing all of that in one request is noticeably faster than using the individual helper functions.
+		helpers = helpers || [];
+		var params = {
+			'ame-quick-test-setup': '1',
+			'username': ameTestConfig.adminUsername,
+			'password': ameTestConfig.adminPassword,
+			'activate-helpers': helpers.join(',')
+		};
+
+		casper.thenOpen(ameTestConfig.siteUrl + '?' + this.buildQueryString(params));
+	},
+
+	buildQueryString: function(obj) {
+		var str = [];
+		for(var p in obj)
+			if (obj.hasOwnProperty(p)) {
+				str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+			}
+		return str.join("&");
 	},
 
 	/**

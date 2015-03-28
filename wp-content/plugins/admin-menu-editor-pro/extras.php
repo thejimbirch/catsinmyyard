@@ -13,9 +13,6 @@ class wsMenuEditorExtras {
 
 	protected $export_settings;
 	
-	private $slug = 'admin-menu-editor-pro';
-	private $secret = '1kuh432KwnufZ891432uhg32';
-
 	private $disable_virtual_caps = false;
 
 	private $username_cache = array();
@@ -38,7 +35,7 @@ class wsMenuEditorExtras {
 		add_filter('custom_admin_submenu', array($this, 'apply_admin_menu_filters'), 10, 2);
 
 		//Add some extra shortcodes of our own
-		$shortcode_callback = array(&$this, 'handle_shortcode');
+		$shortcode_callback = array($this, 'handle_shortcode');
 		$info_shortcodes = array(
 			'wp-wpurl',    //WordPress address (URI), as returned by get_bloginfo()
 			'wp-siteurl',  //Blog address (URI)
@@ -55,7 +52,7 @@ class wsMenuEditorExtras {
 		//Output the menu-modification JS after the menu has been generated.
 		//'admin_notices' is, AFAIK, the action that fires the soonest after menu
 		//output has been completed, so we use that.
-		add_action('admin_notices', array(&$this, 'fix_flagged_menus'));
+		add_action('admin_notices', array($this, 'fix_flagged_menus'));
 
 		//Import/export settings
 		$this->export_settings = array(
@@ -65,22 +62,19 @@ class wsMenuEditorExtras {
 		);
 		
 		//Insert the import and export dialog HTML into the editor's page
-		add_action('admin_menu_editor-footer', array(&$this, 'menu_editor_footer'));
+		add_action('admin_menu_editor-footer', array($this, 'menu_editor_footer'));
 		//Handle menu downloads and uploads
-		add_action('admin_menu_editor-header', array(&$this, 'menu_editor_header'));
+		add_action('admin_menu_editor-header', array($this, 'menu_editor_header'));
 		//Handle export requests
-		add_action( 'wp_ajax_export_custom_menu', array(&$this,'ajax_export_custom_menu') );
+		add_action( 'wp_ajax_export_custom_menu', array($this,'ajax_export_custom_menu') );
 		//Add the "Import" and "Export" buttons
-		add_action('admin_menu_editor-sidebar', array(&$this, 'add_extra_buttons'));
+		add_action('admin_menu_editor-sidebar', array($this, 'add_extra_buttons'));
 		
-		add_filter('admin_menu_editor-self_page_title', array(&$this, 'pro_page_title'));
-		add_filter('admin_menu_editor-self_menu_title', array(&$this, 'pro_menu_title'));
+		add_filter('admin_menu_editor-self_page_title', array($this, 'pro_page_title'), 10, 0);
+		add_filter('admin_menu_editor-self_menu_title', array($this, 'pro_menu_title'), 10, 0);
 		
-		//Tack on some extra validation data when querying our custom update API
-		//add_filter('custom_plugins_api_options', array(&$this, 'custom_api_options'), 10, 3);
-
 		//Let other components know we're Pro.
-		add_filter('admin_menu_editor_is_pro', array(&$this, 'is_pro_version'));
+		add_filter('admin_menu_editor_is_pro', array($this, 'is_pro_version'), 10, 0);
 
 		//Add menu item drop zones to the top-level and sub-menu containers.
 		add_action('admin_menu_editor-container', array($this, 'output_menu_dropzone'), 10, 1);
@@ -93,7 +87,7 @@ class wsMenuEditorExtras {
 		 */
 
 		//Allow usernames to be used in capability checks. Syntax : "user:user_login"
-		add_filter('user_has_cap', array(&$this, 'hook_user_has_cap'), 10, 3);
+		add_filter('user_has_cap', array($this, 'hook_user_has_cap'), 10, 3);
 
 		//Enable advanced capability operations (OR, AND, NOT) for internal use.
 		add_filter('admin_menu_editor-current_user_can', array($this, 'grant_computed_caps_to_current_user'), 10, 2);
@@ -118,9 +112,9 @@ class wsMenuEditorExtras {
 		add_action('wp_ajax_ame_output_menu_color_css', array($this,'ajax_output_menu_color_css') );
 
 		//License management
-		add_filter('wslm_license_ui_title-admin-menu-editor-pro', array($this, 'license_ui_title'));
+		add_filter('wslm_license_ui_title-admin-menu-editor-pro', array($this, 'license_ui_title'), 10, 0);
 		add_action('wslm_license_ui_logo-admin-menu-editor-pro', array($this, 'license_ui_logo'));
-		add_action('wslm_license_ui_details-admin-menu-editor-pro', array($this, 'license_ui_upgrade_link'), 10, 2);
+		add_action('wslm_license_ui_details-admin-menu-editor-pro', array($this, 'license_ui_upgrade_link'), 10, 3);
 	}
 	
   /**
@@ -149,7 +143,7 @@ class wsMenuEditorExtras {
    * @param string $code 
    * @return string Shortcode will be replaced with this value
    */
-	function handle_shortcode($atts, $content = null, $code = ''){
+	function handle_shortcode($atts, /** @noinspection PhpUnusedParameterInspection */ $content = null, $code = ''){
 		//The shortcode tag can be either $code or the zeroth member of the $atts array.
 		if ( empty($code) ){
 			$code = isset($atts[0]) ? $atts[0] : '';
@@ -292,7 +286,7 @@ class wsMenuEditorExtras {
 				$item['menu_title'],
 				$item['access_level'],
 				$slug,
-				array(&$this, 'display_framed_page')
+				array($this, 'display_framed_page')
 			);
 			
 			//Change the slug to our newly created page.
@@ -326,7 +320,7 @@ class wsMenuEditorExtras {
 				$item['menu_title'],
 				$item['access_level'],
 				$slug,
-				array(&$this, 'display_framed_page')
+				array($this, 'display_framed_page')
 			);
 			
 			$item['file'] = $slug;
@@ -355,7 +349,7 @@ class wsMenuEditorExtras {
 			return;
 		}
 		
-		$heading = !empty($item['page_title'])?$item['page_title']:$item['menu_title']; 
+		$heading = !empty($item['page_title'])?$item['page_title']:$item['menu_title'];
 		?>
 		<div class="wrap">
 		<h2><?php echo $heading; ?></h2>
@@ -372,12 +366,30 @@ class wsMenuEditorExtras {
 			var $ = jQuery;
 			var footer = $('#footer, #wpfooter');
 			var frame = $('#ws-framed-page');
-			frame.height( footer.offset().top - frame.offset().top - footer.outerHeight() );
+			var containerPadding = parseInt(frame.closest('#wpbody-content').css('padding-bottom'), 10) || 0;
+
+			//Automagically calculate a frame height that fills the entire page without creating a vertical scrollbar.
+			var maxHeight = footer.offset().top - frame.offset().top;
+			var minHeight = maxHeight - containerPadding;
+
+			var empiricalFudgeFactor = 29; //Based on the default admin theme in WP 4.1 (without the test helper output).
+			var initialHeight = maxHeight - empiricalFudgeFactor;
+
+			frame.height(initialHeight);
+
+			setTimeout(function() {
+				//Check if there's a scroll bar and reduce the height just enough to get rid of it.
+				//Sometimes it's not possible to avoid scrolling because another part of the page is too tall,
+				//so we have a minimum height limit.
+				var scrollDelta = $(document).height() - $(window).height();
+				if (scrollDelta > 0) {
+					frame.height(Math.max(initialHeight - scrollDelta, minHeight));
+				}
+			}, 1)
 		}
 		
 		jQuery(function(){
 			wsResizeFrame();
-			setTimeout(wsResizeFrame, 1000);
 		});
 		</script>		
 		<?php
@@ -411,7 +423,7 @@ class wsMenuEditorExtras {
 	<form id="import_menu_form" action="<?php echo esc_attr(admin_url('options-general.php?page=menu_editor&noheader=1')); ?>" method="post">
 		<input type="hidden" name="action" value="upload_menu">
 		
-		<div class="ws_dialog_panel">
+		<div class="ws_dialog_panel" id="ws_import_panel">
 			<div id="import_progress_notice">
 				<img src="<?php echo plugins_url('images/spinner.gif', __FILE__); ?>" alt="wait">
 				Uploading file...
@@ -431,6 +443,23 @@ class wsMenuEditorExtras {
 				
 				<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo intval($this->export_settings['max_file_size']); ?>"> 
 				<input type="file" name="menu" id="import_file_selector" size="35">
+			</div>
+		</div>
+
+		<div id="ws_import_error" style="display: none">
+			<div class="ws_dialog_subpanel">
+				<strong>Error:</strong><br>
+				<span id="ws_import_error_message">N/A</span>
+			</div>
+
+			<div class="ws_dialog_subpanel">
+				<strong>HTTP code:</strong><br>
+				<span id="ws_import_error_http_code">N/A</span>
+			</div>
+
+			<div class="ws_dialog_subpanel">
+				<label for="ws_import_error_response"><strong>Server response:</strong></label><br>
+				<textarea id="ws_import_error_response" rows="8"></textarea>
 			</div>
 		</div>
 		
@@ -475,9 +504,16 @@ wsEditorData.importMenuNonce = "<?php echo esc_js(wp_create_nonce('import_custom
 		
 		//Prepare the export record.
 		$export = $this->get_exported_menu();
-		$export['total']++;               //Export counter. Could be used to make download URLs unique.
-		$export['menu'] = $_POST['data']; //Save the menu structure. Note the lack of validation.
-		
+		$export['total']++; //Export counter. Could be used to make download URLs unique.
+
+		//Compress menu data to make export files smaller.
+		$menu_data = wp_unslash($_POST['data']); //WordPress simulates magic quotes, so we must strip slashes.
+		$menu = ameMenu::load_json($menu_data);
+		$menu_data = ameMenu::to_json(ameMenu::compress($menu));
+
+		//Save the menu structure.
+		$export['menu'] = $menu_data;
+
 		//Include the blog's domain name in the export filename to make it easier to 
 		//distinguish between multiple export files.
 		$siteurl = get_bloginfo('url');
@@ -491,9 +527,9 @@ wsEditorData.importMenuNonce = "<?php echo esc_js(wp_create_nonce('import_custom
 		);
 		
 		//Store the modified export record. The plugin will need it when the user 
-		//actually tries to download the menu. 
+		//actually tries to download the menu.
 		$this->set_exported_menu($export);
-		
+
 		$download_url = sprintf(
 			'options-general.php?page=menu_editor&noheader=1&action=download_menu&export_num=%d',
 			$export['total']
@@ -538,6 +574,8 @@ wsEditorData.importMenuNonce = "<?php echo esc_js(wp_create_nonce('import_custom
      * @return bool
      */
 	function set_exported_menu($export){
+		//Caution: update_metadata expects slashed data.
+		$export = wp_slash($export);
 		$user = wp_get_current_user();
 		return update_metadata('user', $user->ID, 'custom_menu_export', $export);
 	}
@@ -708,7 +746,7 @@ wsEditorData.importMenuNonce = "<?php echo esc_js(wp_create_nonce('import_custom
 		<?php
 	}
 	
-	function hook_user_has_cap($allcaps, $caps, $args){
+	function hook_user_has_cap($allcaps, /** @noinspection PhpUnusedParameterInspection */ $caps, $args){
 		//Add "user:user_login" to the user's capabilities. This makes it possible to restrict
 		//menu access on a per-user basis.
 		
@@ -834,18 +872,19 @@ wsEditorData.importMenuNonce = "<?php echo esc_js(wp_create_nonce('import_custom
 			if ( is_null($has_access) ) {
 				//Allow the user if at least one of their roles is allowed,
 				//or disallow if all their roles are forbidden.
+				$roles = $this->wp_menu_editor->get_user_roles($user);
 				$log[] = sprintf(
 					'- Current user\'s role: %s',
-					!empty($user->roles) ? implode(', ', $user->roles) : 'N/A (not logged in?)'
+					!empty($roles) ? implode(', ', $roles) : 'N/A (not logged in?)'
 				);
-				if ( empty($user->roles) ) {
+				if ( empty($roles) ) {
 					$log[] = sprintf(
 						'- Current user\'s capabilities: %s',
 						implode(', ', array_keys(array_filter($user->allcaps)))
 					);
 				}
 
-				foreach ($user->roles as $role_id) {
+				foreach ($roles as $role_id) {
 					if ( isset($grants['role:' . $role_id]) ) {
 						$role_has_access = $grants['role:' . $role_id];
 						$log[] = sprintf(
@@ -912,7 +951,7 @@ wsEditorData.importMenuNonce = "<?php echo esc_js(wp_create_nonce('import_custom
 	 * @param array $args The capability passed to current_user_can, the current user's ID, and other args.
 	 * @return array Filtered list of capabilities.
 	 */
-	function grant_virtual_caps_to_user($capabilities, $required_caps, $args){
+	function grant_virtual_caps_to_user($capabilities, /** @noinspection PhpUnusedParameterInspection */ $required_caps, $args){
 		$wp_menu_editor = $this->wp_menu_editor;
 
 		if ( $this->disable_virtual_caps ) {
@@ -941,8 +980,9 @@ wsEditorData.importMenuNonce = "<?php echo esc_js(wp_create_nonce('import_custom
 			if ( isset($user->user_login) ) {
 				$grant_keys[] = 'user:' . $user->user_login;
 			}
-			if ( isset($user->roles) && !empty($user->roles) ) {
-				foreach($user->roles as $role_id) {
+			$roles = $this->wp_menu_editor->get_user_roles($user);
+			if ( !empty($roles) ) {
+				foreach($roles as $role_id) {
 					$grant_keys[] = 'role:' . $role_id;
 				}
 			}
@@ -972,7 +1012,7 @@ wsEditorData.importMenuNonce = "<?php echo esc_js(wp_create_nonce('import_custom
 	 * @param string $role_id Role name/slug.
 	 * @return array Filtered capability list.
 	 */
-	function grant_virtual_caps_to_role($capabilities, $required_cap, $role_id){
+	function grant_virtual_caps_to_role($capabilities, /** @noinspection PhpUnusedParameterInspection */ $required_cap, $role_id){
 		$wp_menu_editor = $this->wp_menu_editor;
 
 		if ( $this->disable_virtual_caps ) {
@@ -1062,55 +1102,25 @@ wsEditorData.importMenuNonce = "<?php echo esc_js(wp_create_nonce('import_custom
 		);
 	}
 
-	function pro_page_title($default_title){
+	function pro_page_title(){
 		return 'Menu Editor Pro';
 	}
 	
-	function pro_menu_title($default_title){
+	function pro_menu_title(){
 		return 'Menu Editor Pro';
 	}
 
-	/**
-	 * Add extra verification args to custom update API requests.
-	 * 
-	 * When checking for updates, send along the blog URL and a hash of that URL + a secret key.
-	 * The API endpoint can use this info to verify that the request really came from a valid
-	 * installation of the "Pro" version of the plugin. 
-	 * 
-	 * Admittedly, it would be easy to spoof. Better than nothing nevertheless ;)
-	 * 
-	 * @param array $options
-	 * @param string $api
-	 * @param string $resource
-	 * @return array
-	 */
-	function custom_api_options($options, $api = '', $resource = ''){
-		if ( isset($options['slug']) && ($options['slug'] == $this->slug) ){
-			$extra_args = array(
-				'blogurl' => get_bloginfo('url'),
-				'secret_hash' => sha1(get_bloginfo('url') . '|' . $this->secret),
-			);
-			$options['query_args'] = array_merge(
-				$options['query_args'],
-				$extra_args
-			);
-		}
-		
-		return $options;
-	}
-	
   /**
    * Callback for the 'admin_menu_editor_is_pro' hook. Always returns True to indicate that
    * the Pro version extras are installed.
    *
-   * @param bool $value
    * @return bool True
    */
-	function is_pro_version($value){
+	function is_pro_version(){
 		return true;
 	}
 
-	function license_ui_title($title) {
+	function license_ui_title() {
 		$title = 'Admin Menu Editor Pro License';
 		return $title;
 	}
@@ -1122,12 +1132,24 @@ wsEditorData.importMenuNonce = "<?php echo esc_js(wp_create_nonce('import_custom
 		);
 	}
 
-	public function license_ui_upgrade_link($currentKey = null, $currentToken = null) {
+	/**
+	 * @param string|null $currentKey
+	 * @param string|null $currentToken
+	 * @param Wslm_ProductLicense $currentLicense
+	 */
+	public function license_ui_upgrade_link($currentKey = null, $currentToken = null, $currentLicense = null) {
 		if ( empty($currentKey) && empty($currentToken) ) {
 			return;
 		}
 
 		$upgradeLink = 'http://adminmenueditor.com/upgrade-license/';
+		$upgradeText = 'Upgrade or renew license';
+
+		if ( $currentLicense && ($currentLicense->getStatus() === 'expired') ) {
+			$upgradeLink = 'http://adminmenueditor.com/renew-license/';
+			$upgradeText = 'Renew license';
+		}
+
 		if ( !empty($currentKey) ) {
 			$upgradeLink = add_query_arg('license_key', $currentKey, $upgradeLink);
 		}
@@ -1139,7 +1161,7 @@ wsEditorData.importMenuNonce = "<?php echo esc_js(wp_create_nonce('import_custom
 			   target="_blank"
 			   title="Opens in a new window"
 			>
-				Upgrade or renew license
+				<?php echo $upgradeText; ?>
 				<img src="<?php echo esc_attr($externalIcon); ?>" alt="External link icon" width="10" height="10">
 			</a>
 		</p><?php

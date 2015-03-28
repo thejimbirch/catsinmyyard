@@ -215,16 +215,16 @@ function wtt_connect_oauth( $auth = false ) {
 						<li>' . __( 'Your Application Description can be anything.', 'wp-to-twitter' ) . '</li>
 						<li>' . __( 'The WebSite and Callback URL should be ', 'wp-to-twitter' ) . '<strong>' . get_bloginfo( 'url' ) . '</strong></li>
 						</ul>
-					<p><em>' . __( 'Agree to the Developer Rules of the Road and continue.', 'wp-to-twitter' ) . '</em></p>
+					<p><em>' . __( 'Agree to the Twitter Developer Agreement and continue.', 'wp-to-twitter' ) . '</em></p>
 					<h4>' . __( '2. Switch to the "Permissions" tab in Twitter apps', 'wp-to-twitter' ) . '</h4>
 						<ul>
 						<li>' . __( 'Select "Read and Write" for the Application Type', 'wp-to-twitter' ) . '</li>
 						<li>' . __( 'Update the application settings', 'wp-to-twitter' ) . '</li>
 						</ul>
-					<h4>' . __( '3. Switch to the API Keys tab and regenerate your API keys, then create your access token.', 'wp-to-twitter' ) . '</h4>
+					<h4>' . __( '3. Switch to the Keys and Access Tokens tab and regenerate your consumer key and secret, then create your access token.', 'wp-to-twitter' ) . '</h4>
 						<ul>
-						<li>' . __( 'Copy your API key and API secret from the top section.', 'wp-to-twitter' ) . '</li>
-						<li>' . __( 'Copy your Access token and Access token secret from the bottom section.', 'wp-to-twitter' ) . '</li>
+						<li>' . __( 'Copy your API key and API secret from the "Application Settings" section.', 'wp-to-twitter' ) . '</li>
+						<li>' . __( 'Copy your Access token and Access token secret from the "Your Access Token" section.', 'wp-to-twitter' ) . '</li>
 						</ul>
 			' . $form . '
 				<fieldset class="options">						
@@ -239,7 +239,7 @@ function wtt_connect_oauth( $auth = false ) {
 					</p>
 					</div>
 					<h4>' . __( '4. Copy and paste your Access Token and Access Token Secret into the fields below', 'wp-to-twitter' ) . '</h4>
-					<p>' . __( 'If the Access level for your Access Token is not "<em>Read and write</em>", you must return to step 2 and generate a new Access Token.', 'wp-to-twitter' ) . '</p>
+					<p>' . __( 'If the Access Level for your Access Token is not "<em>Read and write</em>", you must return to step 2 and generate a new Access Token.', 'wp-to-twitter' ) . '</p>
 					<div class="tokens">
 					<p>
 						<label for="wtt_oauth_token">' . __( 'Access Token', 'wp-to-twitter' ) . '</label>
@@ -281,8 +281,8 @@ function wtt_connect_oauth( $auth = false ) {
 					<fieldset class="options">
 					<ul>
 						<li><strong class="auth_label">' . __( 'Twitter Username ', 'wp-to-twitter' ) . '</strong> <code class="auth_code">' . $uname . '</code></li>
-						<li><strong class="auth_label">' . __( 'Consumer Key ', 'wp-to-twitter' ) . '</strong> <code class="auth_code">' . $ack . '</code></li>
-						<li><strong class="auth_label">' . __( 'Consumer Secret ', 'wp-to-twitter' ) . '</strong> <code class="auth_code">' . $acs . '</code></li>
+						<li><strong class="auth_label">' . __( 'API Key ', 'wp-to-twitter' ) . '</strong> <code class="auth_code">' . $ack . '</code></li>
+						<li><strong class="auth_label">' . __( 'API Secret ', 'wp-to-twitter' ) . '</strong> <code class="auth_code">' . $acs . '</code></li>
 						<li><strong class="auth_label">' . __( 'Access Token ', 'wp-to-twitter' ) . '</strong> <code class="auth_code">' . $ot . '</code></li>
 						<li><strong class="auth_label">' . __( 'Access Token Secret ', 'wp-to-twitter' ) . '</strong> <code class="auth_code">' . $ots . '</code></li>
 					</ul>

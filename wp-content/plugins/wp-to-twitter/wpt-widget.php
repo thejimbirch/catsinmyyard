@@ -202,8 +202,8 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 	 * @return array Settings to save or bool false to cancel saving
 	 */
 	function update( $new_instance, $old_instance ) {
-		/** Force the transient to refresh */
-		delete_transient( 'wpt_tdf_cache_expire' );
+		/** Force the cache to refresh */
+		update_option( 'wpt_delete_cache', 'true' );
 		$new_instance['title'] = strip_tags( $new_instance['title'] );
 
 		return $new_instance;
@@ -385,8 +385,8 @@ class WPT_Search_Tweets_Widget extends WP_Widget {
 	 * @return array Settings to save or bool false to cancel saving
 	 */
 	function update( $new_instance, $old_instance ) {
-		/** Force the transient to refresh */
-		delete_transient( 'wpt_tdf_cache_expire' );
+		/** Force the cache to refresh */
+		update_option( 'wpt_delete_cache', 'true' );		
 		$new_instance['title'] = strip_tags( $new_instance['title'] );
 
 		return $new_instance;

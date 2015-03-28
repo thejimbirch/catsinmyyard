@@ -193,7 +193,7 @@ function jd_truncate_tweet( $tweet, $post, $post_ID, $retweet = false, $ref = fa
 							$new_value = mb_substr( $old_value, 0, - ( $trim ), $encoding );
 							// trim rest of last word
 							$last_space = strrpos( $new_value, ' ' );
-							$new_value  = mb_substr( $new_value, 0, $last_space, $encoding );
+							$new_value  = apply_filters( 'wpt_filter_truncated_value', mb_substr( $new_value, 0, $last_space, $encoding ), $key );
 						}
 						$post_tweet = str_ireplace( $old_value, $new_value, $post_tweet );
 						// put URL back before checking length

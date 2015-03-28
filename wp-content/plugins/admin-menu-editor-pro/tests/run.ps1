@@ -18,7 +18,7 @@ if ( ($fileExists -ne $true) -and ($fileExistsInCasperTests -eq $true) ) {
 }
 
 # Invoke the test runner.
-casperjs test --includes="config.js,helpers.js" $file
+casperjs test --includes="config.js,helpers.js,lodash.js" $file
 
 # Switch back to the previous directory.
 Pop-Location

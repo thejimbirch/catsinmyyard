@@ -33,7 +33,14 @@ class WPT_TwitterFeed {
 	//I'd prefer to put username before count, but for backwards compatibility it's not really viable. :(
 	function getTweets( $count = 20, $screenname = false, $options = false ) {
 		if ( $count > 20 ) {
-			$count = 20;
+			/**
+			 * Filters the max feed count. Default is 20, but you can change it.
+			 *
+			 * @param integer 20 - Default value
+			 * @param integer $count - Widget variable
+			 * @return integer
+			 */
+			$count = apply_filters( 'wpt_feed_max_count', 20, $count );
 		}
 		if ( $count < 1 ) {
 			$count = 1;
@@ -96,8 +103,24 @@ class WPT_TwitterFeed {
 		}
 	}
 
+	private function delete_cache( $file ) {
+		$is_writable = wpt_is_writable( $file );
+		if ( $is_writable ) {
+			unlink( $file );
+		} else {
+			delete_transient( 'wpt_cache' );
+		}
+	}	
+	
 	private function checkValidCache( $screenname, $options ) {
+		$delete_cache = get_option( 'wpt_delete_cache' );
 		$file = $this->getCacheLocation();
+		
+		if ( $delete_cache == 'true' ) {
+			update_option( 'wpt_delete_cache', 'false' );
+			$this->delete_cache( $file );
+		}
+		
 		if ( is_file( $file ) ) {
 			$cache = file_get_contents( $file );
 			$cache = @json_decode( $cache, true );

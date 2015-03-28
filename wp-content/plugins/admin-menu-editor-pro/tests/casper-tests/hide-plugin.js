@@ -2,14 +2,10 @@
  Test setting the "Who can access this plugin" setting to "Only the current user" and "Hide plugin entry".
  */
 casper.start();
-
-ameTest.deactivateAllHelpers();
-ameTest.resetPluginConfiguration();
-
 casper.test.comment('Set "Who can access this plugin" to "Only the current user".');
 casper.test.comment('Enable "Hide the plugin entry on the "Plugins" page from other users".');
-ameTest.thenLoginAsAdmin();
-ameTest.thenOpenMenuEditor();
+
+ameTest.thenQuickSetup();
 
 //Click the "Settings" button.
 casper.then(function() {

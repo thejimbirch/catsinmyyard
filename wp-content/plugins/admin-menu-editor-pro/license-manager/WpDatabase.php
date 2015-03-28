@@ -17,4 +17,12 @@ class Wslm_WpDatabase extends Wslm_Database {
 		}
 		return $this->wpdb->get_results($query, ARRAY_A);
 	}
+
+	public function query($query, $parameters = array()) {
+		if ( !empty($parameters) ) {
+			$query = str_replace('?', '%s', $query);
+			$query = $this->wpdb->prepare($query, $parameters);
+		}
+		return $this->wpdb->query($query);
+	}
 }

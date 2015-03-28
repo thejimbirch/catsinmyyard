@@ -29,7 +29,7 @@ if ( ! function_exists( 'jd_shorten_link' ) ) { // prep work for future plug-in 
 						if ( $testmode != 'link' ) {
 							$post        = get_post( $post_ID );
 							$post_author = $post->post_author;
-							$campaign    = get_the_author_meta( 'user_login', $post_author );
+							$campaign    = urlencode( get_the_author_meta( 'user_login', $post_author ) );
 						} else {
 							$campaign    = '';
 						}
@@ -37,8 +37,8 @@ if ( ! function_exists( 'jd_shorten_link' ) ) { // prep work for future plug-in 
 				} else {
 					$campaign = get_option( 'twitter-analytics-campaign' );
 				}
-				$medium = apply_filters( 'wpt_utm_medium', 'twitter' );
-				$source = apply_filters( 'wpt_utm_source', 'twitter' );
+				$medium = urlencode( trim( apply_filters( 'wpt_utm_medium', 'twitter' ) ) );
+				$source = urlencode( trim( apply_filters( 'wpt_utm_source', 'twitter' ) ) );
 				$url = add_query_arg( array( 'utm_campaign'=>$campaign, 'utm_medium'=>$medium, 'utm_source'=>$source ), $url );
 			}
 			$url     = urldecode( trim( $url ) ); // prevent double-encoding

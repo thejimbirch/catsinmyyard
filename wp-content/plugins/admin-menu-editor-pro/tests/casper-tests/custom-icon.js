@@ -1,11 +1,7 @@
 casper.start();
 casper.test.comment('Set a custom icon for one of the built-in menus.');
 
-ameTest.deactivateAllHelpers();
-ameTest.resetPluginConfiguration();
-
-ameTest.thenLoginAsAdmin();
-ameTest.thenOpenMenuEditor();
+ameTest.thenQuickSetup();
 
 casper.then(function() {
 	ameTest.loadDefaultMenu();

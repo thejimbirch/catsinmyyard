@@ -1,7 +1,8 @@
 casper.start();
 casper.test.comment('Log into WordPress and check that "Settings -> Menu Editor Pro" exists.');
 
-ameTest.thenLoginAsAdmin();
+ameTest.thenQuickSetup(['check-compression']);
+
 casper.then(function() {
 	casper.test.assert(ameTest.isLoggedIn(), 'User logged in successfully');
 });

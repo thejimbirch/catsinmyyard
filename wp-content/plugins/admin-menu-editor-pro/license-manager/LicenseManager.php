@@ -259,7 +259,7 @@ class Wslm_LicenseManagerClient {
 		} else {
 			$error = $result->asWpError();
 			if ( isset($result->response->license) ) {
-				$error->add_data('license', $this->createLicenseObject($result->response->license));
+				$error->add_data($this->createLicenseObject($result->response->license), 'license');
 			}
 			return $error;
 		}
@@ -486,7 +486,7 @@ class Wslm_LicenseManagerApi {
 	public function request($method, $endpoint, $params = array()) {
 		$url = $this->getApiUrl($endpoint);
 		$method = strtoupper($method);
-		$args = array('method' => $method,);
+		$args = array('method' => $method, 'timeout' => 30);
 
 		if ( !empty($params) ) {
 			if ( ($method === 'POST') || ($method === 'PUT') ) {

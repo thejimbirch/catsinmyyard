@@ -3,8 +3,8 @@ Contributors: whiteshadow
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A6P9S6CE3SRSW
 Tags: admin, dashboard, menu, security, wpmu
 Requires at least: 3.8
-Tested up to: 4.0
-Stable tag: 1.95
+Tested up to: 4.2-alpha
+Stable tag: 1.97
 
 Lets you directly edit the WordPress admin menu. You can re-order, hide or rename existing menus, add custom menus and more.
 
@@ -79,6 +79,28 @@ Here are some usage tips and other things that can be good to know when using th
 == Changelog ==
 
 [Get the latest version here.](http://adminmenueditor.com/updates/)
+
+= 1.97 =
+* Reduced export file size by about 50%. Slightly reduced database space usage.
+* Trying to delete a non-custom menu item will now trigger a warning dialog that offers to hide the item instead. In general, it's impossible to permanently delete menus created by WordPress itself or other plugins (without editing their source code, that is).
+* Improved the algorithm used to calculate iframe height. Now it's less likely that pages set to "Open in: Frame" will have an unnecessary scrollbar.
+* Added a workaround for a bug in W3 Total Cache 0.9.4.1 that could cause menu permissions to stop working properly when the CDN or New Relic modules were activated.
+* Fixed a plugin conflict where certain menu items didn't show up in the editor because the plugin that created them used a very low priority.
+* Signigicantly improved sanitization of menu properties. 
+* Renamed the "Choose Icon" button to "Media Library".
+* Minor compatibility improvements.
+* Tested up to WordPress 4.2-alpha.
+
+= 1.96 =
+* Added a "Copy permissions" button. It lets you copy all menu permissions from one role to another.
+* Fixed a bug that allowed Administrators to bypass custom permissions for the "Appearance -> Customize" menu item.
+* Fixed a regression in the menu highlighting algorithm.
+* Fixed an "array to string conversion" notice caused by passing array data in the query string. 
+* Fixed menu scrolling occasionally not working when the user moved an item from one menu to another, much larger menu (e.g. having 20+ submenu items).
+* Fixed a bug where moving a submenu item from a plugin menu that doesn't have a hook callback (i.e. an unusable menu serving as a placeholder) to a different menu would corrupt the menu item URL.
+* Added more detailed error reporting for situations when uploading a menu fails due to a server-side error.
+* Switching between tabs in the "License" pop-up no longer requires JavaScript. In rare cases, JS-based tab switching could stop working due to bugs in other plugins.
+* Fixed a few minor bugs in the "License" pop-up.
 
 = 1.95 =
 * The plugin now automatically removes consecutive submenu separators on display. This fixes an issue with multiple separators "bunching up" when the menus that they would usually separate are invisible due to role permissions.

@@ -5,10 +5,7 @@ as the first part of the <title> element (i.e. the window title) in the admin pa
 casper.start();
 casper.test.comment('Change the window title of some admin pages.');
 
-ameTest.deactivateAllHelpers();
-ameTest.activateHelper('dummy-menus');
-ameTest.thenLoginAsAdmin();
-ameTest.thenOpenMenuEditor();
+ameTest.thenQuickSetup(['dummy-menus']);
 
 casper.then(function() {
 	ameTest.loadDefaultMenu();

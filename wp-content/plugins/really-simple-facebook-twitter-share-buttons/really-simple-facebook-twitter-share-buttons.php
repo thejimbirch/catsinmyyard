@@ -4,8 +4,8 @@ Plugin Name: Really Simple Share
 Plugin URI: http://www.whiletrue.it/really-simple-facebook-twitter-share-buttons-for-wordpress/
 Description: Puts Facebook, Twitter, LinkedIn, Google "+1", Pinterest and other share buttons of your choice above or below your posts.
 Author: Dabelon, tanaylakhani
-Version: 4.0
-Author URI: http://www.whiletrue.it
+Version: 4.1
+Author URI: http://www.readygraph.com
 */
 
 /*
@@ -208,8 +208,65 @@ function really_simple_share_style () {
 
 
 function really_simple_share_menu () {
-	add_options_page('Really simple share Options', 'Really simple share', 'manage_options', 'really_simple_share_options', 'really_simple_share_options');
-	add_options_page('Really simple share Counts', 'Really simple counts', 'manage_options', 'really_simple_share_counts',  'really_simple_share_counts');
+	if( file_exists(plugin_dir_path( __FILE__ ).'/readygraph-extension.php')) {
+	global $menu_slug;
+	add_menu_page( __( 'Really Simple Share', 'really-simple-share' ), __( 'Really Simple Share', 'really-simple-share' ), 'admin_dashboard', 'really-simple-share', 'readygraph_rsftsb_menu_page' );
+	add_submenu_page('really-simple-share', 'Readygraph App', __( 'Readygraph App', 'really-simple-share' ), 'administrator', $menu_slug, 'readygraph_rsftsb_menu_page');
+	add_submenu_page('really-simple-share', 'Share Options', __( 'Share Options', 'really-simple-share' ), 'administrator', 'really-simple-share-options', 'really_simple_share_options');
+	add_submenu_page('really-simple-share', 'Share Counts', __( 'Share Counts', 'really-simple-share' ), 'administrator', 'really-simple-share-counts', 'really_simple_share_counts');
+	add_submenu_page('really-simple-share', 'Go Premium', __( 'Go Premium', 'really-simple-share' ), 'administrator', 'readygraph-go-premium', 'readygraph_rsftsb_premium_page');
+	}
+	else {
+	add_menu_page( __( 'Really Simple Share', 'really-simple-share' ), __( 'Really Simple Share', 'really-simple-share' ), 'admin_dashboard', 'really-simple-share', 'really_simple_share_options' );
+	add_submenu_page('really-simple-share', 'Share Options', __( 'Share Options', 'really-simple-share' ), 'administrator', 'really-simple-share-options', 'really_simple_share_options');
+	add_submenu_page('really-simple-share', 'Share Counts', __( 'Share Counts', 'really-simple-share' ), 'administrator', 'really-simple-share-counts', 'really_simple_share_counts');
+
+	}
+}
+
+function readygraph_rsftsb_premium_page(){
+	include('extension/readygraph/go-premium.php');
+}
+function readygraph_rsftsb_menu_page(){
+	global $wpdb;
+	$current_page = isset($_GET['ac']) ? $_GET['ac'] : '';
+	switch($current_page)
+	{
+		case 'signup-popup':
+			include('extension/readygraph/signup-popup.php');
+			break;
+		case 'invite-screen':
+			include('extension/readygraph/invite-screen.php');
+			break;
+		case 'social-feed':
+			include('extension/readygraph/social-feed.php');
+			break;
+		case 'site-profile':
+			include('extension/readygraph/site-profile.php');
+			break;
+		case 'customize-emails':
+			include('extension/readygraph/customize-emails.php');
+			break;
+		case 'deactivate-readygraph':
+			include('extension/readygraph/deactivate-readygraph.php');
+			break;
+		case 'welcome-email':
+			include('extension/readygraph/welcome-email.php');
+			break;
+		case 'retention-email':
+			include('extension/readygraph/retention-email.php');
+			break;
+		case 'invitation-email':
+			include('extension/readygraph/invitation-email.php');
+			break;	
+		case 'faq':
+			include('extension/readygraph/faq.php');
+			break;
+		default:
+			include('extension/readygraph/admin.php');
+			break;
+	}
+
 }
 
 
@@ -643,7 +700,7 @@ function really_simple_share ($content, $filter, $link='', $title='', $author=''
           .'<span class="super">'.__('Subscribe', 'really-simple-share').':</span> <img src="http://www.specificfeeds.com/theme/classic/img/sf_20.png" alt="SpecificFeeds" title="SpecificFeeds" /></a>';
     } else if ($name == 'specificfeeds_follow') {
       $button_text = ($option['specificfeeds_follow_text']) ? $option['specificfeeds_follow_text'] : 'Follow';
-      $out .= '<a href="http://www.specificfeeds.com/follow" target="_blank">'
+      $out .= '<a id="email_follow" href="#email_follow" onclick="var invite = new readygraph.framework.ui.Invite();invite.set(\'visible\', true);return false;">'
           .'<img src="'.plugins_url('images/specificfeeds_follow.png',__FILE__).'" alt="Email, RSS" title="Email, RSS" /> '.stripslashes($button_text).'</a>';
     } else if ($name == 'frype') {
       // GENERATE DIFFERENT IDS FOR BUTTONS IN THE SAME PAGE
@@ -885,4 +942,54 @@ function really_simple_share_get_options_default () {
 	$option['twitter_follow'] = '';
 	$option['twitter_via'] = '';
 	return $option;
+}
+
+function rsftsb_install() {
+	add_option('readygraph_tutorial', 'true');
+	add_option('readygraph_connect_anonymous', 'false');
+	add_option('rg_rsftsb_plugin_do_activation_redirect', true);
+}
+if( file_exists(plugin_dir_path( __FILE__ ).'/readygraph-extension.php' )) {
+include "readygraph-extension.php";
+}
+else {
+
+}
+register_activation_hook(__FILE__, 'rsftsb_install');
+
+function rsftsb_rrmdir($dir) {
+  if (is_dir($dir)) {
+    $objects = scandir($dir);
+    foreach ($objects as $object) {
+      if ($object != "." && $object != "..") {
+        if (filetype($dir."/".$object) == "dir") 
+           rsftsb_rrmdir($dir."/".$object); 
+        else unlink   ($dir."/".$object);
+      }
+    }
+    reset($objects);
+    rmdir($dir);
+  }
+  $del_url = plugin_dir_path( __FILE__ );
+  unlink($del_url.'/readygraph-extension.php');
+ $setting_url="admin.php?page=really_simple_share_options";
+  echo'<script> window.location="'.admin_url($setting_url).'"; </script> ';
+}
+function rsftsb_delete_rg_options() {
+delete_option('readygraph_access_token');
+delete_option('readygraph_application_id');
+delete_option('readygraph_refresh_token');
+delete_option('readygraph_email');
+delete_option('readygraph_settings');
+delete_option('readygraph_delay');
+delete_option('readygraph_enable_sidebar');
+delete_option('readygraph_auto_select_all');
+delete_option('readygraph_enable_notification');
+delete_option('readygraph_enable_branding');
+delete_option('readygraph_send_blog_updates');
+delete_option('readygraph_send_real_time_post_updates');
+delete_option('readygraph_popup_template');
+delete_option('readygraph_upgrade_notice');
+delete_option('readygraph_connect_anonymous');
+delete_option('readygraph_connect_anonymous_app_secret');
 }

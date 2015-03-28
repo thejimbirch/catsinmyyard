@@ -15,4 +15,10 @@ class Wslm_PdoDatabase extends Wslm_Database {
 		$statement->execute($parameters);
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
+
+	public function query($query, $parameters = array()) {
+		$statement = $this->pdo->prepare($query);
+		$statement->execute($parameters);
+		return $statement->rowCount();
+	}
 }

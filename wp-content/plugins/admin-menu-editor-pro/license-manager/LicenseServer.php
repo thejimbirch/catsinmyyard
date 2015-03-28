@@ -286,7 +286,8 @@ class Wslm_LicenseServer {
 			$license['sites'] = $this->loadLicenseSites($license['license_id']);
 			$license = new Wslm_ProductLicense($license);
 
-			$license['renewal_url'] = 'http://adminmenueditor.com/upgrade-license/'; //TODO: Put this in a config of some sort instead.
+			$license['renewal_url'] = 'http://adminmenueditor.com/renew-license/'; //TODO: Put this in a config of some sort instead.
+			$license['upgrade_url'] = 'http://adminmenueditor.com/upgrade-license/';
 		} else {
 			$license = null;
 		}
@@ -334,6 +335,16 @@ class Wslm_LicenseServer {
 		}
 		$data = array_intersect_key($data, array_filter($visibleFields));
 		return $data;
+	}
+
+	/**
+	 * Record that a specific site just checked for updates.
+	 *
+	 * @param string $token Unique site token.
+	 */
+	public function logUpdateCheck($token) {
+		$query = "UPDATE {$this->tablePrefix}tokens SET last_update_check = NOW() WHERE token = ?";
+		$this->db->query($query, array($token));
 	}
 
 	protected function actionLicenseSite($productSlug, $licenseKey) {
@@ -386,10 +397,19 @@ class Wslm_LicenseServer {
 				$license['license_id']
 			));
 			if ( intval($licensedSiteCount) >= intval($license['max_sites']) ) {
+				$upgradeUrl = $license->get('upgrade_url');
 				$this->outputError(
 					'max_sites_reached',
-					"You have already reached the maximum number of sites allowed by your license.",
-					400
+					sprintf(
+						'You have reached the maximum number of sites allowed by your license. '
+						. 'To activate it on another site, you need to either %1$supgrade the license%2$s '
+						. 'or remove it from one of your existing sites in the <span class="%3$s">"Manage Sites"</span> tab.',
+						$upgradeUrl ? '<a href="' . esc_attr($upgradeUrl) . '" target="_blank">' : '',
+						$upgradeUrl ? '</a>' : '',
+						'ame-open-tab-manage-sites'
+					),
+					400,
+					$this->prepareLicenseForOutput($license, false)
 				);
 				return;
 			}
@@ -498,11 +518,13 @@ class Wslm_LicenseServer {
 		}
 	}
 
-	protected function outputError($code, $message, $httpStatus = null) {
+	protected function outputError($code, $message, $httpStatus = null, $licenseData = null) {
 		$httpStatus = (isset($httpStatus) && is_numeric($httpStatus)) ? $httpStatus : 500;
-		$this->outputResponse(array(
-			'error' => array('code' => $code, 'message' => $message),
-		), $httpStatus);
+		$response = array('error' => array('code' => $code, 'message' => $message),);
+		if ( isset($licenseData) ) {
+			$response['license'] = $licenseData;
+		}
+		$this->outputResponse($response, $httpStatus);
 	}
 
 	private function outputResponse($body, $httpStatus = 200) {

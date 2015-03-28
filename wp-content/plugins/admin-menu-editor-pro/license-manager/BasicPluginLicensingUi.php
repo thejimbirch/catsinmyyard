@@ -12,6 +12,7 @@ class Wslm_BasicPluginLicensingUI {
 	 */
 	private $triedLicense = null;
 	private $currentTab = 'current-license';
+	private $tabs = array();
 
 	/** @var bool Whether to display the site token (if any) in the licensing window. */
 	protected $tokenDisplayEnabled = false;
@@ -20,6 +21,17 @@ class Wslm_BasicPluginLicensingUI {
 		$this->licenseManager = $licenseManager;
 		$this->pluginFile = $pluginFile;
 		$this->slug = $this->licenseManager->getProductSlug();
+
+		$this->tabs = array(
+			'current-license' => array(
+				'caption' => 'Current License',
+				'callback' => array($this, 'tabCurrentLicense'),
+			),
+			'manage-sites' => array(
+				'caption' => 'Manage Sites',
+				'callback' => array($this, 'tabManageSites'),
+			),
+		);
 
 		$basename = plugin_basename($this->pluginFile);
 		add_filter(
@@ -94,18 +106,27 @@ class Wslm_BasicPluginLicensingUI {
 
 		$this->triedLicenseKey = isset($_POST['license_key']) ? trim(strval($_POST['license_key'])) : $this->licenseManager->getLicenseKey();
 
+		if ( isset($_REQUEST['tab']) && is_string($_REQUEST['tab']) && array_key_exists($_REQUEST['tab'], $this->tabs) ) {
+			$this->currentTab = $_REQUEST['tab'];
+		}
+
 		$this->printHeader();
 		$this->dispatchAction($action);
 		$this->printLogo();
 		$this->printTabList();
 		?>
 		<div class="wrap" id="wslm-section-holder">
-			<div id="section-current-license" class="wslm-section">
-				<?php $this->tabCurrentLicense(); ?>
-			</div>
-			<div id="section-manage-sites" class="wslm-section hidden">
-				<?php $this->tabManageSites(); ?>
-			</div>
+			<?php
+			foreach($this->tabs as $id => $tab) {
+				printf(
+					'<div id="section-%1$s" class="wslm-section%2$s">',
+					esc_attr($id),
+					($this->currentTab !== $id) ? ' hidden' : ''
+				);
+				call_user_func($tab['callback']);
+				echo '</div>';
+			}
+			?>
 		</div> <!-- #wslm-section-holder -->
 		<?php
 
@@ -200,17 +221,29 @@ class Wslm_BasicPluginLicensingUI {
 		}
 	}
 
+	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function tabCurrentLicense() {
 		//Display license information
 		$currentLicense = $this->licenseManager->getLicense();
 		echo '<h3>Current License</h3>';
-		if ( $currentLicense->isValid() ) {
-			$this->printLicenseDetails(
-				'Valid License',
-				'This site is currently licensed and qualifies for automatic upgrades &amp; support for this product.
-				If you no longer wish to use this product on this site you can remove the license.',
-				$currentLicense
-			)
+
+		if ( $currentLicense->isValid() || ($currentLicense->getStatus() === 'expired') ) {
+			if ( $currentLicense->getStatus() === 'expired' ) {
+				$this->printLicenseDetails(
+					'Expired Key',
+					'This site is currently licensed. However, your license key has expired and is no longer eligible
+					 for updates and support. Please consider renewing your license.',
+					$currentLicense
+				);
+			} else {
+				$this->printLicenseDetails(
+					'Valid License',
+					'This site is currently licensed and qualifies for automatic upgrades &amp; support for this product.
+				     If you no longer wish to use this product on this site you can remove the license.',
+					$currentLicense
+				);
+			}
+
 			?>
 			<form method="post" action="<?php echo esc_attr($this->getLicensingPageUrl()); ?>">
 				<input type="hidden" name="license_action" value="unlicense_this_site" />
@@ -275,13 +308,14 @@ class Wslm_BasicPluginLicensingUI {
 			<?php
 		}
 
-		do_action('wslm_license_ui_details-' . $this->slug, $currentKey, $currentToken);
+		do_action('wslm_license_ui_details-' . $this->slug, $currentKey, $currentToken, $currentLicense);
 
 		if ( !empty($message) ) {
 			echo '<p>', $message, '</p>';
 		}
 	}
 
+	/** @noinspection PhpUnusedPrivateMethodInspection */
 	private function tabManageSites() {
 		if ( isset($this->triedLicense, $this->triedLicense->sites) ) {
 
@@ -423,17 +457,19 @@ class Wslm_BasicPluginLicensingUI {
 	}
 
 	private function printTabList() {
-		//Tabs
-		$tabs = array(
-			'current-license' => 'Current License',
-			'manage-sites' => 'Manage Sites',
-		);
 		?>
 		<div id="plugin-information-header">
 			<ul id="sidemenu">
 				<?php
-				foreach($tabs as $name => $caption) {
-					printf('<li><a name="%s" href="#">%s</a></li>', esc_attr($name), $caption);
+				$baseTabUrl = remove_query_arg('tab');
+				foreach($this->tabs as $name => $tab) {
+					printf(
+						'<li><a name="%s" href="%s"%s>%s</a></li>',
+						esc_attr($name),
+						add_query_arg('tab', $name, $baseTabUrl),
+						($name === $this->currentTab) ? ' class="current"' : '',
+						$tab['caption']
+					);
 				}
 				?>
 			</ul>
@@ -475,7 +511,7 @@ class Wslm_BasicPluginLicensingUI {
 		$messages = array(
 			'no_license_yet' => "License is not set yet. Please enter your license key to enable automatic updates.",
 			'expired' => sprintf(
-				'The license associated with this site has expired. You can still use the plugin, but you will need to %1$srenew your license%2$s to receive updates.',
+				'Your license key has expired. You can continue using the plugin, but you\'ll need to %1$srenew your license%2$s to receive updates and bug fixes.',
 				$renewalUrl ? '<a href="' . esc_attr($renewalUrl) . '">' : '',
 				$renewalUrl ? '</a>' : ''
 			),

@@ -1,14 +1,22 @@
-=== Really Simple Share ===
-Contributors: Dabelon, whiletrue, tanaylakhani
-Donate link: http://www.whiletrue.it/
+﻿=== Really Simple Share ===
+Contributors: Dabelon, tanaylakhani
+Donate link: http://www.plugins.readygraph.com/donate/
 Tags: facebook, twitter, facebook share, twitter share, facebook share button, twitter share button, linkedin, google +1, +1, google share, google plus share, pinterest, google buzz, buzz, digg, flattr, stumbleupon, hyves, links, post, page, mail, email, reddit, tipy, tumblr, buffer, pinzout, shortcode, youtube, print, rss, bitcoin, litecoin, specificfeeds, draugiem, frype
 Requires at least: 2.9+
 Tested up to: 4.1
-Stable tag: 4.0
+Stable tag: 4.1
 
-Puts Facebook, Twitter, LinkedIn, Google "+1", Pinterest, Tumblr and other social share buttons of your choice above or below your posts.
+Puts Facebook, Twitter, LinkedIn, Google, Pinterest, and more share buttons above/below your posts. And automate social user growth with ReadyGraph.
 
 == Description ==
+Check official website for live demo http://plugins.readygraph.com/really-simple-share/
+
+* [Live demo](http://plugins.readygraph.com/really-simple-share/)
+
+* [More Description](http://plugins.readygraph.com/really-simple-share/)
+
+* [Suggestion/comments](http://plugins.readygraph.com/really-simple-share/)
+
 This plugin shows Facebook, Twitter, LinkedIn, Google "+1", Pinterest and other popular social share buttons above or below your posts.
 Easy customization of active buttons and position in the Settings menu.
 
@@ -16,10 +24,19 @@ In contrast to several other sharing plugin, this one aims to use only original 
 There is no other service in the middle, you are not required to register or get a key to use it. Enjoy!
 
 Facebook Like, Twitter and Google +1 social share buttons are loaded by default. 
-Other buttons, including Digg, Facebook Share, Flattr, LinkedIn, Pinterest, Bitcoin, Litecoin, Stumbleupon, Youtube, Hyves, Print, Email, RSS, Reddit, Tipy, Tumblr, Buffer, Pinzout, SpecificFeeds, Draugiem.lv (Frype.com) can be added through the `Settings->Really simple share` menu.
+Other buttons, including Digg, Facebook Share, Flattr, LinkedIn, Pinterest, Bitcoin, Litecoin, Stumbleupon, Youtube, Hyves, Print, Email, RSS, Reddit, Tipy, Tumblr, Buffer, Pinzout, SpecificFeeds, Draugiem.lv (Frype.com) can be added through the `Settings->Really simple share` menu. Follow by email is powered by ReadyGraph which provides an option for users to provide their email address without leaving your site, and sends email digests to users when you update your site content.
 
 Please be careful when selecting the `Show buttons in these pages` options : it can interact badly with other slide/fade/carousel/sidebar active plugins.
 
+ 
+This plugin has integrated [ReadyGraph](http://readygraph.com/), an optional set of features to automate the growth of your userbase.  It helps you achieve the three goals of any web marketer: maximize conversion of site visitors to register for your email list, maximize viral referrals for your site, and maximize return visits to your site.  To accomplish this, we have integrated a key set of growth features with this plugin:
+
+* Intelligent signup popup with email or one-click Facebook login
+* Full viral referral flow
+* Automated end user re-engagement emails including welcome emails, weekly digest, friend joined alert and more (all email campaigns are optional and configurable)
+* Enhanced email deliverabilty
+* Cloud-based analytics and data storage
+* Settings that allow you to turn on and off all ReadyGraph features.
 = Shortcode =
 
 If you want to place the active buttons only in selected posts, use the [really_simple_share] shortcode.
@@ -47,6 +64,48 @@ If you want to hide the share buttons inside selected posts, set a "really_simpl
 
 To do so e.g. on a page: open the WordPress backend, go to Pages, click on the Page title to enter the Page edit screen. Then you can add the custom field, [as explained here](http://www.carriedils.com/how-to-create-custom-fields-in-wordpress/ "How to Create Custom Fields in WordPress").
 
+= ReadyGraph App =
+
+ReadyGraph is a system that automates the growth of your site’s userbase. It is optimized to deliver audience growth and motivate users to consistently revisit your site.
+
+= Optimized Signup Form =
+
+ReadyGraph’s signup form with intelligent pop-up functionality and one-click login is designed to maximize signups to your email list.  You can configure when the popup appears so as to maximize the likelihood that the user is engaged enough to register for your list.
+
+= Viral Friend Invites =
+
+ReadyGraph adds a friend invite process to your site’s signup flow.  We then power the entire viral loop by sending email and Facebook invitations that encourage your visitors’ friends to signup for your site.
+
+= Automated Re-engagement Emails =
+
+ReadyGraph’s automated email system encourages visitors to return to your site.   Users receive optimized emails such as a welcome email, re-engagement email, regular digest with new content from your blog, and social emails.  All emails are configurable including the ability to turn on and off individual campaigns.  We handle all sending to maximize deliverability.
+
+= Analytics =
+
+Track daily-new subscribers, daily invites, total traffic, and other key metrics that quantify growth and user engagement.  ReadyGraph safely stores user data in the cloud so you can access data from anywhere.
+
+= Newsfeed =
+
+ReadyGraph’s newsfeed is an optional overlay on your site where your users can engage with others in your community and recommend your content or products to each other.  It is like having a social network that engages users embedded on your site. Users can leave comments, ‘like’ comments left by other subscribers and ‘follow’ other subscribers.  Subscribers will receive automated email updates based on these actions.
+
+= Content Voting and Ranking =
+
+ReadyGraph allows your subscribers to vote on your latest content. The top content from our network of sites is then ranked on UserBase.com by the number of votes that it has received in the past 7 days.
+
+= Want To Grow Even Faster? =
+
+Try [ReadyGraph premium](https://readygraph.com/accounts/payment/) for free to get these advanced features:
+
+1.	Monthly Promotion to 10,000 New Users
+2.	Unlimited New Blog Post Emails
+3.	Unlimited Viral Email Invites
+4.	Unlimited Facebook Invites
+5.	Many more premium features added all the time
+
+[Get it here!](https://readygraph.com/accounts/payment/)
+
+If you have questions or concerns contact us anytime at [info@readygraph.com](mailto:info@readygraph.com)
+
 = News =
 
 *New* in version 3.3:
@@ -56,19 +115,16 @@ To do so e.g. on a page: open the WordPress backend, go to Pages, click on the P
 = Reference =
 
 Previously known as "Really simple Facebook Twitter share buttons".
- 
-For more info on this plugin: [www.whiletrue.it](http://www.whiletrue.it/really-simple-share-wordpress-plugin/ "www.whiletrue.it")
 
-Do you like this plugin? Give a chance to our other works:
-
-* [Most and Least Read Posts](http://www.whiletrue.it/most-and-least-read-posts-widget-for-wordpress/ "Most and Least Read Posts")
-* [Tilted Tag Cloud Widget](http://www.whiletrue.it/tilted-tag-cloud-widget-per-wordpress/ "Tilted Tag Cloud Widget")
-* [Reading Time](http://www.whiletrue.it/reading-time-for-wordpress/ "Reading Time")
+This plugin is based on previous work by Giuliano Polverari - [WhileTrue.it](WhileTrue.it)
 
 == Installation ==
+Installation Instruction and Configuration can also be found at [Installation Instruction and Configuration](http://plugins.readygraph.com/really-simple-share/installation/)
+
 Best is to install directly from WordPress. If manual installation is required, please make sure to put all of the plugin files in a folder named `really-simple-facebook-twitter-share-buttons` (not two nested folders) in the plugin directory, then activate the plugin through the `Plugins` menu in WordPress.
 
 == Frequently Asked Questions ==
+For detailed FAQ and other support visit [http://plugins.readygraph.com/really-simple-share/faq/](http://plugins.readygraph.com/really-simple-share/faq/)
 
 = The settings page seems corrupted, some buttons labels are missing. How to solve it? =
 
@@ -114,6 +170,10 @@ The PinIt counter only appear if the post has been shared at least once. Also, t
 
 
 == Changelog ==
+
+= 4.1 =
+* Added ReadyGraph as an extension
+* Moved configuration option page to a separate tab
 
 = 3.3.1 =
 * Fixed: Performance Mode bugfix
@@ -378,6 +438,10 @@ Initial release
 
 
 == Upgrade Notice ==
+
+= 4.1 =
+* Added ReadyGraph as an extension
+* Moved configuration option page to a separate tab
 
 = 3.3.1 =
 Users having version 3.3 should upgrade due to a bugfix on Performance Mode

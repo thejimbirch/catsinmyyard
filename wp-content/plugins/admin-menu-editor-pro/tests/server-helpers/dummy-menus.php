@@ -63,8 +63,41 @@ add_action('admin_menu', function() {
 		'dummy-menu-with-no-items',
 		'amt_output_page'
 	);
+
+	//A top-level menu with no hook callback!
+	add_menu_page(
+		'No Hook',
+		'No Hook',
+		'read',
+		'dummy-menu-with-no-hook',
+		null,
+		'dashicons-dismiss'
+	);
+
+	add_submenu_page(
+		'dummy-menu-with-no-hook',
+		'NH Submenu #1',
+		'NH Submenu #1',
+		'read',
+		'dummy-nh-submenu-1',
+		function() {
+			amt_output_page('nh-submenu-1-content');
+		}
+	);
+
+	add_submenu_page(
+		'dummy-menu-with-no-hook',
+		'NH Submenu #2',
+		'NH Submenu #2',
+		'read',
+		'dummy-nh-submenu-2',
+		'amt_output_page'
+	);
 });
 
-function amt_output_page() {
-	echo 'This is a dummy page.';
+function amt_output_page($content_id = 'ame-test-page-content') {
+	printf(
+		'<span id="%s">This is a dummy page.</span>',
+		htmlentities($content_id)
+	);
 }

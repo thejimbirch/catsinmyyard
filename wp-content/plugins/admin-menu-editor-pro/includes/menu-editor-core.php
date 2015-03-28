@@ -77,6 +77,11 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 	private $get = array();
 	private $originalPost = array();
 
+	/**
+	 * @var array A cache of user role names indexed by user ID. E.g. [123 => array("administrator", "foo")]
+	 */
+	private $cached_user_roles = array();
+
 	function init(){
 		$this->sitewide_options = true;
 
@@ -119,7 +124,9 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 		$this->settings_link = 'options-general.php?page=menu_editor';
 		
 		$this->magic_hooks = true;
-		$this->magic_hook_priority = 99999;
+		//Run our hooks last (almost). Priority is less than PHP_INT_MAX mostly for defensive programming purposes.
+		//Old PHP versions have known bugs related to large array keys, and WP might have undiscovered edge cases.
+		$this->magic_hook_priority = PHP_INT_MAX - 10;
 		
 		//AJAXify screen options
 		add_action('wp_ajax_ws_ame_save_screen_options', array($this,'ajax_save_screen_options'));
@@ -147,6 +154,14 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 
 		//Tell first-time users where they can find the plugin settings page.
 		add_action('all_admin_notices', array($this, 'display_plugin_menu_notice'));
+
+		//Workaround for buggy plugins that unintentionally remove user roles.
+		/** @see WPMenuEditor::get_user_roles */
+		add_action('set_current_user', array($this, 'update_current_user_cache'), 1, 0); //Run before most plugins.
+		add_action('updated_user_meta', array($this, 'clear_user_role_cache'), 10, 2);
+		add_action('deleted_user_meta', array($this, 'clear_user_role_cache'), 10, 2);
+		//There's also a "set_user_role" hook, but it's only called by WP_User::set_role and not WP_User::add_role.
+		//It's also redundant - WP_User::set_role updates user meta, so the above hooks already cover it.
 	}
 	
 	function init_finish() {
@@ -301,6 +316,7 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 					$message .= '<p><strong>Admin Menu Editor security log</strong></p>';
 					$message .= $this->get_formatted_security_log();
 				}
+				do_action('admin_page_access_denied');
 				wp_die($message);
 			} else {
 				$this->log_security_note('ALLOW access.');
@@ -535,7 +551,7 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 		$users[$current_user->get('user_login')] = array(
 			'user_login' => $current_user->get('user_login'),
 			'id' => $current_user->ID,
-			'roles' => array_values($current_user->roles),
+			'roles' => array_values($this->get_user_roles($current_user)),
 			'capabilities' => $this->castValuesToBool($current_user->caps),
 			'is_super_admin' => is_multisite() && is_super_admin(),
 		);
@@ -1076,9 +1092,6 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 		$new_submenu = array();
 		$this->title_lookups = array();
 		
-		//Sort the menu by position
-		uasort($tree, 'ameMenuItem::compare_position');
-
 		//Prepare the top menu
 		$first_nonseparator_found = false;
 		foreach ($tree as $topmenu){
@@ -1107,8 +1120,6 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 			$has_submenu_icons = false;
 			if( !empty($topmenu['items']) ){
 				$items = $topmenu['items'];
-				//Sort by position
-				uasort($items, 'ameMenuItem::compare_position');
 
 				foreach ($items as $item) {
 					//Skip missing and hidden items
@@ -1125,6 +1136,9 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 					//Keep track of which menus have items with icons.
 					$has_submenu_icons = $has_submenu_icons || !empty($item['has_submenu_icon']);
 				}
+
+				//Sort by position
+				uasort($new_items, 'ameMenuItem::compare_position');
 			}
 
 			//The ame-has-submenu-icons class lets us change the appearance of all submenu items at once,
@@ -1136,6 +1150,9 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 			$topmenu['items'] = $new_items;
 			$new_tree[] = $topmenu;
 		}
+
+		//Sort the menu by position
+		uasort($new_tree, 'ameMenuItem::compare_position');
 
 		//Use only the highest-priority capability for each URL.
 		foreach($this->page_access_lookup as $url => $capabilities) {
@@ -1481,6 +1498,9 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 
 					return;
 				}
+
+				//Sanitize menu item properties.
+				$menu['tree'] = ameMenu::sanitize($menu['tree']);
 
 				//Save the custom menu
 				$this->set_custom_menu($menu);
@@ -2006,11 +2026,17 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 				}
 			}
 
+			//Special case: In WP 4.0+ the URL of the "Customize" menu changes often due to a "return" query parameter
+			//that contains the current page URL. To reliably recognize this item, we should ignore that parameter.
+			if ( $this->endsWith($item_url['path'], 'customize.php') ) {
+				unset($item_url['params']['return']);
+			}
+
 			//The current URL must match all query parameters of the item URL.
-			$different_params = array_diff_assoc($item_url['params'], $current_url['params']);
+			$different_params = $this->arrayDiffAssocRecursive($item_url['params'], $current_url['params']);
 
 			//The current URL must have as few extra parameters as possible.
-			$extra_params = array_diff_assoc($current_url['params'], $item_url['params']);
+			$extra_params = $this->arrayDiffAssocRecursive($current_url['params'], $item_url['params']);
 
 			if ( $is_close_match && (count($different_params) == 0) && (count($extra_params) < $best_extra_params) ) {
 				$best_item = $item;
@@ -2062,6 +2088,44 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 		$parsed['params'] = $params;
 
 		return $parsed;
+	}
+
+	/**
+	 * Get the difference of two arrays.
+	 *
+	 * This methods works like array_diff_assoc(), except it also supports nested arrays by comparing them recursively.
+	 *
+	 * @param array $array1 The base array.
+	 * @param array $array2 The array to compare to.
+	 * @return array An associative array of values from $array1 that are not present in $array2.
+	 */
+	private function arrayDiffAssocRecursive($array1, $array2) {
+		$difference = array();
+
+		foreach($array1 as $key => $value) {
+			if ( !array_key_exists($key, $array2) ) {
+				$difference[$key] = $value;
+				continue;
+			}
+
+			$otherValue = $array2[$key];
+			if ( is_array($value) !== is_array($otherValue) ) {
+				//If only one of the two values is an array then they can't be equal.
+				$difference[$key] = $value;
+			} elseif ( is_array($value) ) {
+				//Compare array values recursively.
+				$subDiff = $this->arrayDiffAssocRecursive($value, $otherValue);
+				if( !empty($subDiff) ) {
+					$difference[$key] = $subDiff;
+				}
+
+			//Like the original array_diff_assoc(), we compare the values as strings.
+			} elseif ( (string)$value !== (string)$array2[$key] ) {
+				$difference[$key] = $value;
+			}
+		}
+
+		return $difference;
 	}
 
 	/**
@@ -2433,6 +2497,73 @@ class WPMenuEditor extends MenuEd_ShadowPluginFramework {
 		if ( ($priority !== false) && (has_filter('plugins_url', 'domain_mapping_post_content') !== false) ) {
 			remove_filter('plugins_url', 'domain_mapping_plugins_uri', $priority);
 		}
+	}
+
+	/**
+	 * Get the names of the roles that a user belongs to.
+	 *
+	 * "Why not just read the $user->roles array directly?", you may ask. Because some popular plugins have a really
+	 * nasty bug where they inadvertently remove entries from that array. Specifically, they retrieve the first user
+	 * role like this:
+	 *
+	 * $roleName = array_shift($currentUser->roles);
+	 *
+	 * What some plugin developers fail to realize is that, in addition to returning the first entry, array_shift()
+	 * also *removes* it from the array. As a result, $user->roles is now missing one of the user's roles. This bug
+	 * doesn't cause major problems only because most plugins check capabilities and don't care about roles as such.
+	 * AME needs to know to determine menu permissions for different roles.
+	 *
+	 * Known buggy plugins:
+	 * - W3 Total Cache 0.9.4.1
+	 *
+	 * The current workaround is to cache the role list before it can get corrupted by other plugins. This approach
+	 * has its own risks (cache invalidation is hard), but it should be reasonably safe assuming that everyone uses
+	 * only standard WP APIs to modify user roles (e.g. @see WP_User::add_role ).
+	 *
+	 * @param WP_User $user
+	 * @return array
+	 */
+	public function get_user_roles($user) {
+		if ( empty($user) ) {
+			return array();
+		}
+		if ( !$user->exists() ) {
+			return $user->roles;
+		}
+
+		if ( !isset($this->cached_user_roles[$user->ID]) ) {
+			//Note: In rare cases, WP_User::$roles can be false. For AME it's more convenient to have an empty list.
+			$this->cached_user_roles[$user->ID] = !empty($user->roles) ? $user->roles : array();
+		}
+		return $this->cached_user_roles[$user->ID];
+	}
+
+	/**
+	 * The current user has changed; cache their roles.
+	 */
+	public function update_current_user_cache() {
+		$user = wp_get_current_user();
+		if ( empty($user) || !$user->exists() ) {
+			return;
+		}
+
+		$this->cached_user_roles[$user->ID] = $user->roles;
+	}
+
+	/**
+	 * User metadata was updated or deleted; invalidate the role cache.
+	 *
+	 * Not all metadata updates are related to role changes, but filtering them is non-trivial (meta keys change)
+	 * and not really necessary for our purposes.
+	 *
+	 * @param int|array $unused_meta_id
+	 * @param int $user_id
+	 */
+	public function clear_user_role_cache(/** @noinspection PhpUnusedParameterInspection */$unused_meta_id, $user_id) {
+		if ( empty($user_id) || !is_numeric($user_id) ) {
+			return;
+		}
+		unset($this->cached_user_roles[$user_id]);
 	}
 
 	/**

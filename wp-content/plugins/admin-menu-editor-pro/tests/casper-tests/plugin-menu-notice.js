@@ -2,7 +2,6 @@
  Test the admin notice that explains how to access the menu editor page.
  */
 casper.start();
-
 casper.test.comment('Make sure the "go here to access the plugin" notice message shows up as expected');
 
 ameTest.deactivateAllHelpers();

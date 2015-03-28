@@ -3,8 +3,8 @@ Contributors: bestwebsoft
 Donate link: https://www.2checkout.com/checkout/purchase?sid=1430388&quantity=1&product_id=94
 Tags: add, antispam, anti-spam, anti-spam security, arithmetic actions, capcha, captcha, captha, catcha, cpatcha, captcha numbers, captcha plugin, captcha words, contact form with captcha, comment,  label, login, lost password, match captcha, math actions, multiply, registration, security, spam, spam protection, substract, text captcha, web form protection
 Requires at least: 3.1
-Tested up to: 4.1
-Stable tag: 4.0.9
+Tested up to: 4.1.1
+Stable tag: 4.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,13 +50,13 @@ There is also a premium version of the plugin <a href="http://bestwebsoft.com/pr
 * Catalan (ca) (thanks to <a href="mailto:psiete@gmail.com">Psiete</a>)
 * Chinese (zh_CN) (thanks to <a href="mailto:newbiesup@gmail.com">Newbiesup</a>, www.wpsites.org)
 * Taiwan (zh_TW) (thanks to <a href="mailto:hh3stuff@gmail.com">Henry H</a>)
-* Croatian (hr) (thanks to <a href="mailto:daniel@geogat.com">Daniel</a>)
+* Croatian (hr) (thanks to <a href="mailto:daniel@croteh.com">Daniel</a>)
 * Czech (cs_CZ) (thanks to <a href="mailto:crysman@seznam.cz">Crysman</a>)
 * Danish (da_DK) (thanks to Byrial Ole Jensed)
 * Dutch (nl_NL) (thanks to <a href="mailto:byrial@vip.cybercity.dk">Bart Duineveld</a>)
 * Estonian (et) (thanks to Ahto Tanner)
 * Greek (el) (thanks to Aris, www.paraxeno.net)
-* Farsi/Persian (fa_IR) (thanks to <a href="mailto:mostafaasadi73@gmail.com">Mostafa Asadi</a>, www.ma73.ir)
+* Farsi/Persian (fa_IR) (thanks to <a href="mailto:mostafaasadi73@gmail.com">Mostafa Asadi</a>, www.ma73.ir, <a href="mailto:Morteza.Gholami@Yahoo.Com">Morteza Gholami</a>)
 * Finnish (fi) (thanks to Mikko Sederholm)
 * French (fr_FR) (thanks to Martel Benjamin, <a href="mailto:lcapronnier@yahoo.com">Capronnier luc</a>)
 * German (de_DE) (thanks to Thomas Hartung, <a href="mailto:lothar.schiborr@web.de">Lothar Schiborr</a>)
@@ -181,6 +181,10 @@ Please make sure that the problem hasn't been discussed yet on our forum (<a hre
 6. Contact form with Captcha.
 
 == Changelog ==
+
+= V4.1.0 - 20.03.2015 =
+* Update : The Croatian, French and Farsi languages file are updated.
+* Update: Error display with the comments form was changed.
 
 = V4.0.9 - 18.02.2015 =
 * NEW: We added the ability to change error messages.
@@ -503,6 +507,9 @@ Please make sure that the problem hasn't been discussed yet on our forum (<a hre
 * Select functionality of mathematical actions and level of their difficulty are implemented.
 
 == Upgrade Notice ==
+
+= V4.1.0 =
+The Croatian, French and Farsi languages file are updated. Error display with the comments form was changed.
 
 = V4.0.9 =
 We added the ability to change error messages.

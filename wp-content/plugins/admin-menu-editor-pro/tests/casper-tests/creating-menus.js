@@ -1,10 +1,9 @@
 /* Test the ability to create custom menus and menu items. */
 casper.start();
 casper.test.comment('Add a new menu after "Appearance", then click it.');
-ameTest.thenLoginAsAdmin();
-ameTest.deactivateAllHelpers();
 
-ameTest.thenOpenMenuEditor();
+ameTest.thenQuickSetup(['check-compression']);
+
 casper.then(function() {
 	ameTest.loadDefaultMenu();
 });

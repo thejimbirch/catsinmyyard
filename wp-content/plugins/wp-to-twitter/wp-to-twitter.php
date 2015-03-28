@@ -3,7 +3,7 @@
 Plugin Name: WP to Twitter
 Plugin URI: http://www.joedolson.com/wp-to-twitter/
 Description: Posts a Tweet when you update your WordPress blog or post a link, using your URL shortening service. Rich in features for customizing and promoting your Tweets.
-Version: 3.0.0
+Version: 3.0.1
 Author: Joseph Dolson
 Author URI: http://www.joedolson.com/
 */
@@ -27,7 +27,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
 
-apply_filters( 'debug', 'WP to Twitter Init' );
 global $wp_version;
 $wp_content_url = content_url();
 $wp_content_dir = str_replace( '/plugins/wp-to-twitter', '', plugin_dir_path( __FILE__ ) );
@@ -55,7 +54,7 @@ require_once( plugin_dir_path( __FILE__ ) . '/wpt-feed.php' );
 require_once( plugin_dir_path( __FILE__ ) . '/wpt-widget.php' );
 
 global $wpt_version;
-$wpt_version = "3.0.0";
+$wpt_version = "3.0.1";
 load_plugin_textdomain( 'wp-to-twitter', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 
 // check for OAuth configuration
@@ -196,10 +195,17 @@ function wptotwitter_activate() {
 		$administrator->add_cap( 'wpt_tweet_now' );
 	}
 	
-	$upgrade = version_compare( $prev_version, "2.9.8", "<" );
+	$upgrade = version_compare( $prev_version, "2.9.8", "<=" );
 	if ( $upgrade ) {
 		// migrate stored short URL fields.
-		wpt_migrate_url_meta();
+		$count_posts = wp_count_posts();
+		$published_posts = $count_posts->publish;
+		if ( $published_posts > 2 ) {
+			// if more than 1000 posts, don't run this during update process.
+			update_option( 'wpt_needs_migration', 'true' );
+		} else {		
+			wpt_migrate_url_meta();
+		}
 	}
 	
 	update_option( 'wp_to_twitter_version', $wpt_version );
@@ -220,35 +226,35 @@ function wpt_migrate_url_meta() {
 		)
 	);
 	foreach ( $posts as $post ) {
-		$id = $post->ID;
+		$post_id = $post->ID;
 		$short = '';
 		if ( $short == "" ) {
 			$short = get_post_meta( $post_id, '_wp_jd_goo', true );
-			delete_post_meta( $id, '_wp_jd_goo' );
+			delete_post_meta( $post_id, '_wp_jd_goo' );
 		}
 		if ( $short == "" ) {
 			$short = get_post_meta( $post_id, '_wp_jd_supr', true );
-			delete_post_meta( $id, '_wp_jd_supr' );
+			delete_post_meta( $post_id, '_wp_jd_supr' );
 		}
 		if ( $short == "" ) {
 			$short = get_post_meta( $post_id, '_wp_jd_wp', true );
-			delete_post_meta( $id, '_wp_jd_wp' );
+			delete_post_meta( $post_id, '_wp_jd_wp' );
 		}
 		if ( $short == "" ) {
 			$short = get_post_meta( $post_id, '_wp_jd_ind', true );
-			delete_post_meta( $id, '_wp_jd_ind' );
+			delete_post_meta( $post_id, '_wp_jd_ind' );
 		}
 		if ( $short == "" ) {
 			$short = get_post_meta( $post_id, '_wp_jd_yourls', true );
-			delete_post_meta( $id, '_wp_jd_yourls' );
+			delete_post_meta( $post_id, '_wp_jd_yourls' );
 		}
 		if ( $short == "" ) {
 			$short = get_post_meta( $post_id, '_wp_jd_url', true );
-			delete_post_meta( $id, '_wp_jd_url' );
+			delete_post_meta( $post_id, '_wp_jd_url' );
 		}
 		if ( $short == "" ) {
 			$short = get_post_meta( $post_id, '_wp_jd_joturl', true );
-			delete_post_meta( $id, '_wp_jd_joturl' );
+			delete_post_meta( $post_id, '_wp_jd_joturl' );
 		}
 		if ( $short == "" ) {
 			// don't delete target link
@@ -256,10 +262,11 @@ function wpt_migrate_url_meta() {
 		}
 		if ( $short == "" ) {
 			$short = get_post_meta( $post_id, '_wp_jd_clig', true );
-			delete_post_meta( $id, '_wp_jd_clig' );
+			delete_post_meta( $post_id, '_wp_jd_clig' );
 		}
-		update_post_meta( $id, '_wpt_short_url', $short );
+		update_post_meta( $post_id, '_wpt_short_url', $short );
 	}
+	delete_option( 'wpt_needs_migration' );
 }
 
 // Function checks for an alternate URL to be Tweeted. Contribution by Bill Berry.	
@@ -709,6 +716,7 @@ function jd_twit( $post_ID, $type = 'instant' ) {
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE || wp_is_post_revision( $post_ID ) ) {
 		return $post_ID;
 	}
+	
 	wpt_check_version();
 	$jd_tweet_this = get_post_meta( $post_ID, '_jd_tweet_this', true );
 	$newpost       = $oldpost = $is_inline_edit = false;
@@ -723,12 +731,12 @@ function jd_twit( $post_ID, $type = 'instant' ) {
 		}
 	}
 	if ( get_option( 'jd_tweet_default' ) == 0 ) {
-		$test = ( $jd_tweet_this != 'no' ) ? true : false;
+		$default = ( $jd_tweet_this != 'no' ) ? true : false;
 	} else {
-		$test = ( $jd_tweet_this == 'yes' ) ? true : false;
+		$default = ( $jd_tweet_this == 'yes' ) ? true : false;
 	}
 	wpt_mail( "1: JD Tweet This Value: #$post_ID", "Tweet this: $jd_tweet_this /" . get_option( 'jd_tweet_default' ) . " / $type" ); // DEBUG
-	if ( $test ) { // test switch: depend on default settings.
+	if ( $default ) { // default switch: depend on default settings.
 		$post_info = jd_post_info( $post_ID );
 		$media     = wpt_post_with_media( $post_ID, $post_info );
 		if ( function_exists( 'wpt_pro_exists' ) && wpt_pro_exists() == true ) {
@@ -1075,7 +1083,7 @@ function jd_add_twitter_inner_box( $post ) {
 			$jd_tweet_this = 'no';
 		}
 		if ( isset( $_REQUEST['message'] ) && $_REQUEST['message'] != 10 ) { // don't display when draft is updated or if no message
-			if ( ! ( ( $_REQUEST['message'] == 1 ) && ( $status == 'publish' && $options[ $type ]['post-edited-update'] != 1 ) ) ) {
+			if ( ! ( ( $_REQUEST['message'] == 1 ) && ( $status == 'publish' && $options[ $type ]['post-edited-update'] != 1 ) ) && $jd_tweet_this != 'no' ) {
 				$log   = wpt_log( 'wpt_status_message', $post_id );
 				$class = ( $log != __( 'Tweet sent successfully.', 'wp-to-twitter' ) ) ? 'error' : 'updated';
 				if ( $log != '' ) {
@@ -1183,16 +1191,18 @@ function jd_add_twitter_inner_box( $post ) {
 				$pro_active  = '';
 			}
 			?>
-			<ul class='tabs'>
-				<li><a href='#authors'<?php echo $pro_active; ?>>Tweet to</a></li>
-				<li><a href='#custom'>Options</a></li>
-				<li><a href='#notes'<?php echo $free_active; ?>>Notes</a></li>
+			<ul class='tabs' role="tablist">
+				<?php if ( get_option( 'jd_individual_twitter_users' ) == 1 ) { ?>
+					<li><a href='#authors'<?php echo $pro_active; ?> aria-controls="authors" role="tab" id="tab_authors"><?php _e( 'Tweet to', 'wp-to-twitter' ); ?></a></li>
+				<?php } ?>
+				<li><a href='#custom' aria-controls="custom" role="tab" id="tab_custom"><?php _e( 'Options', 'wp-to-twitter' ); ?></a></li>
+				<li><a href='#notes'<?php echo $free_active; ?> aria-controls="notes" role="tab" id="tab_notes"><?php _e( 'Notes', 'wp-to-twitter' ); ?></a></li>
 			</ul>
 			<?php
 			/* WPT PRO OPTIONS */
 			if ( current_user_can( 'edit_others_posts' ) ) {
-				echo "<div class='wptab' id='authors'>";
 				if ( get_option( 'jd_individual_twitter_users' ) == 1 ) {
+					echo "<div class='wptab' id='authors' aria-labelledby='tab_authors' role='tabpanel'>";
 					$selected = ( get_post_meta( $post_id, '_wpt_authorized_users', true ) ) ? get_post_meta( $post_id, '_wpt_authorized_users', true ) : array();
 					if ( function_exists( 'wpt_authorized_users' ) ) {
 						echo wpt_authorized_users( $selected );
@@ -1206,11 +1216,11 @@ function jd_add_twitter_inner_box( $post ) {
 						}
 						echo "</p>";
 					}
-				}
-				echo "</div>";
+					echo "</div>";
+				}				
 			}
 			?>
-				<div class='wptab' id='custom'><?php
+				<div class='wptab' id='custom' aria-labelledby='tab_custom' role='tabpanel'><?php
 				if ( function_exists( 'wpt_pro_exists' ) && wpt_pro_exists() == true && ( current_user_can( 'wpt_twitter_custom' ) || current_user_can( 'manage_options' ) ) ) {
 					wpt_schedule_values( $post_id );
 					do_action( 'wpt_custom_tab', $post_id, 'visible' );
@@ -1223,7 +1233,7 @@ function jd_add_twitter_inner_box( $post ) {
 			/* WPT PRO */
 			if ( ! current_user_can( 'wpt_twitter_custom' ) && ! current_user_can( 'manage_options' ) ) {
 				?>
-				<div class='wptab' id='custom'>
+				<div class='wptab' id='custom' aria-labelledby='tab_custom' role='tabpanel'>
 					<p><?php _e( 'Access to customizing WP to Twitter values is not allowed for your user role.', 'wp-to-twitter' ); ?></p>
 					<?php
 					if ( function_exists( 'wpt_pro_exists' ) && wpt_pro_exists() == true ) {
@@ -1235,7 +1245,7 @@ function jd_add_twitter_inner_box( $post ) {
 			}
 			if ( current_user_can( 'wpt_twitter_custom' ) || current_user_can( 'manage_options' ) ) {
 				?>
-				<div class='wptab' id='notes'>
+				<div class='wptab' id='notes' aria-labelledby='tab_notes' role='tabpanel'>
 					<p>
 						<?php _e( "Tweets must be less than 140 characters; Twitter counts URLs as 22 or 23 characters. Template Tags: <code>#url#</code>, <code>#title#</code>, <code>#post#</code>, <code>#category#</code>, <code>#date#</code>, <code>#modified#</code>, <code>#author#</code>, <code>#account#</code>, <code>#tags#</code>, or <code>#blog#</code>.", 'wp-to-twitter' );
 						do_action( 'wpt_notes_tab', $post_id );
@@ -1671,7 +1681,7 @@ if ( get_option( 'jd_twit_blogroll' ) == '1' ) {
 	add_action( 'add_link', 'jd_twit_link' );
 }
 
-add_action( 'save_post', 'wpt_twit', 16 );
+add_action( 'save_post', 'wpt_twit', 15 );
 add_action( 'save_post', 'post_jd_twitter', 10 );
 
 /**
@@ -1714,6 +1724,7 @@ function wpt_twit( $id ) {
 	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE || wp_is_post_revision( $id ) || ! wpt_in_post_type( $id ) ) {
 		return;
 	}
+
 	$post = get_post( $id );
 	if ( $post->post_status != 'publish' ) {
 		return;
@@ -1804,6 +1815,25 @@ function wpt_promotion_notice() {
 		$upgrade = "http://www.joedolson.com/wp-tweets-pro/";
 		$dismiss = admin_url( 'options-general.php?page=wp-to-twitter/wp-to-twitter.php&dismiss=promotion' );
 		echo "<div class='updated fade'><p>" . sprintf( __( "I hope you've enjoyed <strong>WP to Twitter</strong>! Take a look at <a href='%s'>upgrading to WP Tweets PRO</a> for advanced Tweeting with WordPress! <a href='%s'>Dismiss</a>", 'wp-to-twitter' ), $upgrade, $dismiss ) . "</p></div>";
+	}
+}
+
+add_action( 'admin_notices', 'wpt_migration_notice' );
+/**
+ * Display migration notice if WPT was unable to auto migrate.
+ */
+function wpt_migration_notice() {
+	if ( current_user_can( 'activate_plugins' ) && get_option( 'wpt_needs_migration' ) == 'true' ) {
+		$dismiss = ( is_plugin_active( 'wp-tweets-pro/wpt-pro-functions.php' ) ) ? admin_url( 'admin.php?page=wp-tweets-pro&action=migration' ) : admin_url( 'options-general.php?page=wp-to-twitter/wp-to-twitter.php&action=migration' );
+		echo "<div class='updated fade'><p>" . sprintf( __( "WP to Twitter needs to perform a database update. This may take a few minutes. <a href='%s'>Update Database</a>", 'wp-to-twitter' ), $dismiss ) . "</p></div>";
+	}
+}
+
+function wpt_manual_migrate() {
+	if ( isset( $_GET['action'] ) && $_GET['action'] == 'migration' ) {
+		echo "<p>" . __( 'Processing data migration...', 'wp-to-twitter' ) . "</p>";
+		wpt_migrate_url_meta();
+		echo "<p>" . __( 'Data migration complete.', 'wp-to-twitter' ) . "</p>";
 	}
 }
 

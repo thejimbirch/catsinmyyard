@@ -1,8 +1,6 @@
 casper.start();
 
-ameTest.deactivateAllHelpers();
-ameTest.thenLoginAsAdmin();
-ameTest.thenOpenMenuEditor();
+ameTest.thenQuickSetup();
 
 casper.then(function() {
 	casper.test.comment('Change the background color of the "Posts" menu.');

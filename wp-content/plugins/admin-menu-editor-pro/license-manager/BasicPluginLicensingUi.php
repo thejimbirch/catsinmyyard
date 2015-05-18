@@ -427,7 +427,7 @@ class Wslm_BasicPluginLicensingUI {
 					'wslm-basic-ui',
 					plugins_url('/ui.css', __FILE__),
 					array(),
-					'20140407'
+					'20150409'
 				);
 				wp_enqueue_script('jquery');
 
@@ -466,7 +466,7 @@ class Wslm_BasicPluginLicensingUI {
 					printf(
 						'<li><a name="%s" href="%s"%s>%s</a></li>',
 						esc_attr($name),
-						add_query_arg('tab', $name, $baseTabUrl),
+						esc_attr(add_query_arg('tab', $name, $baseTabUrl)),
 						($name === $this->currentTab) ? ' class="current"' : '',
 						$tab['caption']
 					);

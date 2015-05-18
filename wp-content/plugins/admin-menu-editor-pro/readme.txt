@@ -3,8 +3,8 @@ Contributors: whiteshadow
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A6P9S6CE3SRSW
 Tags: admin, dashboard, menu, security, wpmu
 Requires at least: 3.8
-Tested up to: 4.2-alpha
-Stable tag: 1.97
+Tested up to: 4.2
+Stable tag: 1.98
 
 Lets you directly edit the WordPress admin menu. You can re-order, hide or rename existing menus, add custom menus and more.
 
@@ -80,13 +80,17 @@ Here are some usage tips and other things that can be good to know when using th
 
 [Get the latest version here.](http://adminmenueditor.com/updates/)
 
+= 1.98 =
+* Tested up to WordPress 4.2.
+* Fixed a tab layout issue in the license information screen.
+
 = 1.97 =
 * Reduced export file size by about 50%. Slightly reduced database space usage.
 * Trying to delete a non-custom menu item will now trigger a warning dialog that offers to hide the item instead. In general, it's impossible to permanently delete menus created by WordPress itself or other plugins (without editing their source code, that is).
 * Improved the algorithm used to calculate iframe height. Now it's less likely that pages set to "Open in: Frame" will have an unnecessary scrollbar.
 * Added a workaround for a bug in W3 Total Cache 0.9.4.1 that could cause menu permissions to stop working properly when the CDN or New Relic modules were activated.
 * Fixed a plugin conflict where certain menu items didn't show up in the editor because the plugin that created them used a very low priority.
-* Signigicantly improved sanitization of menu properties. 
+* Significantly improved sanitization of menu properties. 
 * Renamed the "Choose Icon" button to "Media Library".
 * Minor compatibility improvements.
 * Tested up to WordPress 4.2-alpha.

@@ -1,0 +1,10 @@
+live:
+    scheme: ftp
+    host: ftp.caffeinatedrecordings.com
+    port: 21
+    user: jimbirch
+    pass: 123iliketea
+    check: true
+    path:
+        local: 
+        remote: www/catsinmyyard.com

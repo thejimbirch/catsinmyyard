@@ -2,7 +2,7 @@
 Contributors: scottsweb, codeforthepeople
 Tags: instagram, widget, photos, photography, hipster, sidebar, widgets, simple
 Requires at least: 3.0
-Tested up to: 4.0
+Tested up to: 4.2.2
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,8 @@ The widget is built with the following philosophy:
 * Provide no styles/css - it is up to you to style the widget to your theme and taste
 * Cache where possible - filters are provided to adjust cache timings
 * Require little setup - avoid oAuth for example
-* Work standalone and as a drop in to the [null theme framework](https://github.com/scottsweb/null)
+
+[a plugin by Scott Evans](http://scott.ee/ "WordPress designer and developer")
 
 == Installation ==
 
@@ -38,7 +39,7 @@ To use within the [null theme framework](https://github.com/scottsweb/null) or [
 
 = Hooks & Filters =
 
-The plugin has two filters. The first allows you adjust that cache time for retrieving the images from Instagram:
+The plugin has five filters. The first allows you adjust that cache time for retrieving the images from Instagram:
 
 `add_filter('null_instagram_cache_time', 'my_cache_time');
 
@@ -51,10 +52,24 @@ The second allows you to filter video results from the widget:
 
 `add_filter('wpiw_images_only', '__return_true');`
 
+The rest allow you to add custom classes to each list item, link or image:
+
+`add_filter( 'wpiw_item_class', 'my_instagram_class' );
+add_filter( 'wpiw_a_class', 'my_instagram_class' );
+add_filter( 'wpiw_img_class', 'my_instagram_class' );
+
+function my_instagram_class( $classes ) {
+	$classes = "instagram-image";
+	return $classes;
+}
+`
+
 In version 1.3 you also have two new hooks for adding custom output before and after the widget:
 
 `wpiw_before_widget`
 `wpiw_after_widget`
+
+In version 1.4 and above you can also customise the image loop completely by creating a `parts/wp-instagram-widget.php` file in your theme.
 
 == Screenshots ==
 
@@ -62,6 +77,12 @@ In version 1.3 you also have two new hooks for adding custom output before and a
 2. Instagram widget in the theme customiser
 
 == Changelog ==
+
+= 1.4 =
+* Remove null framework support
+* Introduce class filters
+* Only set a transient if images are returned
+* Optional template part for complete output control
 
 = 1.3.1 =
 * Force lowercase usernames

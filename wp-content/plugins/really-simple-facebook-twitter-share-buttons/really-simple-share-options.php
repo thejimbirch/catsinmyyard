@@ -34,7 +34,8 @@ function really_simple_share_options () {
 		'bitcoin'=>'Bitcoin',
 		'litecoin'=>'Litecoin',
 		'specificfeeds'=>'SpecificFeeds',
-		'specificfeeds_follow'=>'Email & RSS (follow)',
+		'specificfeeds_follow'=>'Email* & RSS (follow)',
+		'readygraph_infolinks'=>'Related Tags',
 		'frype' => 'Draugiem.lv (frype.com)',
 	);	
 
@@ -204,7 +205,7 @@ function really_simple_share_options () {
 		<h3>'.__("General options").'</h3>
 		<div class="inside">
 			<table>
-			<tr><td style="width:130px;" colspan="2">'.__("Share buttons", 'really-simple-share' ).':<br />
+			<tr><td style="width:130px;" colspan="2">'.__("Widget Settings", 'really-simple-share' ).':<br />
 				<span class="description">'.__("Check to activate, Drag&Drop to sort, Adjust width in pixels", 'really-simple-share' ).'</span><br /><br />';
 		
 			$out .= '<ul id="sortable">';
@@ -271,13 +272,21 @@ function really_simple_share_options () {
 							<input type="text" name="really_simple_share_specificfeeds_link" value="'.stripslashes($option['specificfeeds_link']).'" style="width:100px; margin:0; padding:0;" />
 							<span class="description">('.__("mandatory", 'really-simple-share' ).')</span>';
 						$li_style = 'style="height:75px;"';
-            $options2 = '<div style="clear:both; background-color: #ccc; font-size:10px;">'.__('SpecificFeeds allows your visitors to receive messages from your Blog/RSS Feed by email. It\'s 100% free and also has
+						$options2 = '<div style="clear:both; background-color: #ccc; font-size:10px;">'.__('SpecificFeeds allows your visitors to receive messages from your Blog/RSS Feed by email. It\'s 100% free and also has
               <a href="http://www.specificfeeds.com/rss" target="_blank">several other benefits</a>. Enter above the pop-up link you received after setting up your feed on 
               <a href="http://www.specificfeeds.com/rss" target="_blank">SpecificFeeds.com/rss</a>', 'really-simple-share' ).'</div>';
             break;
 					case 'specificfeeds_follow': 
 						$options = __('Text', 'really-simple-share').':
 							<input type="text" name="really_simple_share_specificfeeds_follow_text" value="'.stripslashes($option['specificfeeds_follow_text']).'" style="width:160px; margin:0; padding:0;" />';
+							$li_style = 'style="height:75px;"';
+            $options2 = '<div style="clear:both; background-color: #ccc; font-size:10px;">'.__('*Email follow is powered by ReadyGraph. It allows your visitors to receive messages from your site.  Visitors don\'t have to leave your site to signup, and they can invite friends as well.  Optionally you can <a href="http://readygraph.com/" target="_blank">create your free account</a> here for full analytics and other features.  (<a href="http://readygraph.com/tos/" target="_blank">Terms</a> 
+<a href="http://readygraph.com/privacy/" target="_blank">Privacy</a>)', 'really-simple-share' ).'</div>';
+						break;
+					case 'readygraph_infolinks':
+						$li_style = 'style="height:57px;"'; 
+						$options2 = '<div style="clear:both; background-color: #ccc; font-size:10px;">'.__('Related Tags powered by
+Infolinks/ReadyGraph.  Connect account and collect revenue here if your site qualifies.  (<a href="http://readygraph.com/tos/" target="_blank">Terms</a> | <a href="http://readygraph.com/privacy/" target="_blank">Privacy</a> | <a href="mailto:info@readygraph.com" target="_blank">Questions?</a>)', 'really-simple-share' ).'</div>';
 						break;
 					case 'tipy': 
 						$options = __('Tipy site id', 'really-simple-share').': 
@@ -606,11 +615,7 @@ function really_simple_share_options () {
 	</div>
 	
 	<div id="poststuff_right">'
-		.really_simple_share_box_content('PremiumPress Shopping Cart', '
-			<a target="_blank" href="https://secure.avangate.com/order/product.php?PRODS=2929632&amp;QTY=1&amp;AFFILIATE=26764&amp;AFFSRC=really_simple_share_plugin">
-				<img border="0" src="http://shopperpress.com/inc/images/banners/180x150.png" style="display: block; margin-left: auto; margin-right: auto;">
-			</a>
-		')
+		
 		.really_simple_share_box_content(__('Additional info', 'really-simple-share'), '
 			<b>Selective use</b><br />
 			If you want to place the active buttons only in selected posts, put the [really_simple_share] shortcode inside the post text.<br /><br />
@@ -621,15 +626,10 @@ function really_simple_share_options () {
 			Most of the actual plugin features were requested by users and developed for the sake of doing it.<br /><br />
 			If you want to be sure this passion lasts centuries, please consider donating some cents!<br /><br />
 			<div style="text-align: center;">
-			<form method="post" action="https://www.paypal.com/cgi-bin/webscr">
-			<input value="_s-xclick" name="cmd" type="hidden">
-			<input value="-----BEGIN PKCS7-----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-----END PKCS7----- " name="encrypted" type="hidden"> 
-			<input alt="PayPal - The safer, easier way to pay online!" name="submit" border="0" src="https://www.paypalobjects.com/WEBSCR-640-20110306-1/en_US/i/btn/btn_donateCC_LG.gif" type="image"> 
-			<img height="1" width="1" src="https://www.paypalobjects.com/WEBSCR-640-20110306-1/it_IT/i/scr/pixel.gif" border="0"> 
-			</form>
+			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"><input name="cmd" type="hidden" value="_s-xclick" /><input name="hosted_button_id" type="hidden" value="996W9HS5JSWN4" /><input alt="PayPal - The safer, easier way to pay online!" name="submit" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" type="image" /><img src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" alt="" width="1" height="1" border="0" /></form>
 			</div>
 		')
-		.really_simple_share_box_content('News by WhileTrue', really_simple_share_feed())
+		/*.really_simple_share_box_content('News by WhileTrue', really_simple_share_feed())*/
 	.'</div>
 
 	</div>

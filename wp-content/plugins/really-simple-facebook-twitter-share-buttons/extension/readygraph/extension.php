@@ -106,11 +106,10 @@ function add_readygraph_plugin_warning() {
   }
 }
 }
-if(!function_exists('readygraph_client_script_head')) {
-function readygraph_client_script_head() {
-	global $readygraph_email_subscribe;
-	if (get_option('readygraph_access_token', '') != '') {
-	if (get_option('readygraph_enable_branding', '') == 'false') {
+if(!function_exists('readygraph_rsftsb_client_script_head')) {
+function readygraph_rsftsb_client_script_head() {
+	
+if (get_option('readygraph_enable_branding', '') == 'false') {
 	?>
 <style>
 /* FOR INLINE WIDGET */
@@ -130,7 +129,7 @@ script.onload = function(e) {
   settings['applicationId'] = '<?php echo get_option('readygraph_application_id', '') ?>';
   settings['overrideFacebookSDK'] = true;
   settings['platform'] = 'others';
-  settings['enableLoginWall'] = <?php echo get_option('readygraph_enable_popup', 'false') ?>;
+  settings['enableLoginWall'] = false<?php //echo get_option('readygraph_enable_popup', 'false') ?>;
   settings['enableSidebar'] = <?php echo get_option('readygraph_enable_sidebar', 'false') ?>;
 	settings['inviteFlowDelay'] = <?php echo get_option('readygraph_delay', '5000') ?>;
 	settings['enableNotification'] = <?php echo get_option('readygraph_enable_notification', 'false') ?>;
@@ -162,6 +161,6 @@ h.appendChild(script);
 </script>
 	<?php
 	}
-}
+
 }
 ?>

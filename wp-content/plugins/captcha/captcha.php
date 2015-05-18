@@ -1,10 +1,10 @@
 <?php
 /*
-Plugin Name: Captcha
+Plugin Name: Captcha by BestWebSoft
 Plugin URI: http://bestwebsoft.com/products/
 Description: Plugin Captcha intended to prove that the visitor is a human being and not a spam robot. Plugin asks the visitor to answer a math question.
 Author: BestWebSoft
-Version: 4.1.0
+Version: 4.1.1
 Author URI: http://bestwebsoft.com/
 License: GPLv2 or later
 */
@@ -1264,7 +1264,7 @@ if ( ! function_exists ( 'cptch_plugin_banner' ) ) {
 		global $hook_suffix;	
 		if ( 'plugins.php' == $hook_suffix ) {   
 			global $cptch_plugin_info;
-			bws_plugin_banner( $cptch_plugin_info, 'cptch', 'captcha', '345f1af66a47b233cd05bc55b2382ff0', '75', plugins_url( 'images/banner.png', __FILE__ ) ); 
+			bws_plugin_banner( $cptch_plugin_info, 'cptch', 'captcha', '345f1af66a47b233cd05bc55b2382ff0', '75', 'http://ps.w.org/captcha/assets/icon-128x128.png' ); 
 		}
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Block Bad Queries (BBQ)
-Plugin URI: http://perishablepress.com/block-bad-queries/
+Plugin URI: https://perishablepress.com/block-bad-queries/
 Description: Automatically protects WordPress against malicious URL requests.
 Tags: security, protect, firewall, php, eval, malicious, url, request, blacklist
 Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests.
@@ -9,10 +9,10 @@ Author: Jeff Starr
 Author URI: http://monzilla.biz/
 Contributors: specialk, aldolat, WpBlogHost, James Wilkes, juliobox
 Donate link: http://m0n.co/donate
-Requires at least: 3.8
-Tested up to: 4.1
+Requires at least: 3.9
+Tested up to: 4.2
 Stable tag: trunk
-Version: 20150314
+Version: 20150507
 License: GPLv2 or later
 */
 

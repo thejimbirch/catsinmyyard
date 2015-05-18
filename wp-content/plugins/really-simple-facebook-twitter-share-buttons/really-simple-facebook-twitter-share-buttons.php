@@ -4,7 +4,7 @@ Plugin Name: Really Simple Share
 Plugin URI: http://www.whiletrue.it/really-simple-facebook-twitter-share-buttons-for-wordpress/
 Description: Puts Facebook, Twitter, LinkedIn, Google "+1", Pinterest and other share buttons of your choice above or below your posts.
 Author: Dabelon, tanaylakhani
-Version: 4.1
+Version: 4.2.0
 Author URI: http://www.readygraph.com
 */
 
@@ -182,6 +182,10 @@ function really_simple_share_init ($force=false) {
 	if ($really_simple_share_option['active_buttons']['frype']) {
 		wp_enqueue_script('really_simple_share_frype', 'https://www.draugiem.lv/api/api.js', array(), false);
 	}
+	// Readygraph Related Tags LIB HAS TO BE IN THE HEADER
+	if ($really_simple_share_option['active_buttons']['readygraph_infolinks']) {
+		//wp_enqueue_script('really_simple_share_frype', 'https://www.draugiem.lv/api/api.js', array(), false);
+	}
 	if ($really_simple_share_option['active_buttons']['tumblr']) {
 		wp_enqueue_script('really_simple_share_tumblr', 'http://platform.tumblr.com/v1/share.js', array(), false, $really_simple_share_option['scripts_at_bottom']);
 	}
@@ -261,6 +265,9 @@ function readygraph_rsftsb_menu_page(){
 			break;	
 		case 'faq':
 			include('extension/readygraph/faq.php');
+			break;
+		case 'monetization-settings':
+			include('extension/readygraph/monetization.php');
 			break;
 		default:
 			include('extension/readygraph/admin.php');
@@ -702,6 +709,8 @@ function really_simple_share ($content, $filter, $link='', $title='', $author=''
       $button_text = ($option['specificfeeds_follow_text']) ? $option['specificfeeds_follow_text'] : 'Follow';
       $out .= '<a id="email_follow" href="#email_follow" onclick="var invite = new readygraph.framework.ui.Invite();invite.set(\'visible\', true);return false;">'
           .'<img src="'.plugins_url('images/specificfeeds_follow.png',__FILE__).'" alt="Email, RSS" title="Email, RSS" /> '.stripslashes($button_text).'</a>';
+    } else if ($name == 'readygraph_infolinks') {
+		
     } else if ($name == 'frype') {
       // GENERATE DIFFERENT IDS FOR BUTTONS IN THE SAME PAGE
       $random_id = rand(1,100000);
@@ -856,6 +865,10 @@ function really_simple_share_get_options_stored () {
   	$option['specificfeeds_follow_text'] = 'Follow';
 		$option['sort'] = 'specificfeeds_follow,'.$option['sort'];
 	}	
+	if (isset($option['sort']) && $option['sort'] != '' && strpos($option['sort'], 'readygraph_infolinks')===false) {
+		// Versions below 3.1.5 compatibility
+		$option['sort'] .= ',readygraph_infolinks';
+	}
 	if (isset($option['sort']) && $option['sort'] != '' && strpos($option['sort'], 'frype')===false) {
 		// Versions below 3.1.5 compatibility
 		$option['sort'] .= ',frype';
@@ -883,7 +896,7 @@ function really_simple_share_get_options_stored () {
 function really_simple_share_get_options_default () {
 	$option = array();
 	$option['active_buttons'] = array('facebook_like'=>true, 
-    'twitter'=>true, 'google1'=>true, 'specificfeeds_follow'=>true,
+    'twitter'=>true, 'google1'=>true, 'specificfeeds_follow'=>true,'readygraph_infolinks'=>true,
     'facebook_share_new'=>false, 'google_share'=>false,
 		'linkedin'=>false, 'digg'=>false, 'stumbleupon'=>false, 'hyves'=>false, 'email'=>false, 
 		'reddit'=>false, 'flattr'=>false, 'pinterest'=>false, 'tipy'=>false, 'buffer'=>false, 
@@ -893,11 +906,8 @@ function really_simple_share_get_options_default () {
 		'digg'=>'100', 'stumbleupon'=>'100', 'hyves'=>'100', 'email'=>'40', 
 		'reddit'=>'100', 'google1'=>'80', 'google_share'=>'110', 'flattr'=>'120', 'pinterest'=>'90', 'tipy'=>'120', 
 		'buffer'=>'100', 'tumblr'=>'100', 'facebook_share'=>'100', 'pinzout'=>'75', 'rss'=>'150', 'print'=>'40', 'youtube'=>'140',
-    'bitcoin'=>'120', 'litecoin'=>'120', 'specificfeeds'=>'110', 'specificfeeds_follow'=>'110', 'frype'=>'110');
-	$option['sort'] = implode(',',array('facebook_like', 'twitter', 'google1', 'specificfeeds_follow', 'facebook_share_new', 'google_share', 
-    'linkedin', 'pinterest', 'digg', 'stumbleupon', 'hyves', 'email', 
-		'reddit', 'flattr', 'tipy', 'buffer', 'tumblr', 'facebook_share', 'pinzout', 'rss', 'print', 'youtube',
-    'bitcoin', 'litecoin', 'specificfeeds', 'frype'));
+    'bitcoin'=>'120', 'litecoin'=>'120', 'specificfeeds'=>'110', 'specificfeeds_follow'=>'110','readygraph_infolinks'=>'110', 'frype'=>'110');
+	$option['sort'] = implode(',',array('facebook_like', 'twitter', 'google1', 'specificfeeds_follow','readygraph_infolinks', 'facebook_share_new', 'google_share', 'linkedin', 'pinterest', 'digg', 'stumbleupon', 'hyves', 'email', 'reddit', 'flattr', 'tipy', 'buffer', 'tumblr', 'facebook_share', 'pinzout', 'rss', 'print', 'youtube','bitcoin', 'litecoin', 'specificfeeds', 'frype'));
 	$option['position'] = 'below';
 	$option['show_in'] = array('posts'=>true, 'pages'=>true, 'home_page'=>true, 'tags'=>true, 'categories'=>true, 'dates'=>true, 'authors'=>true, 'search'=>true);
 	$option['show_in_custom'] = array();
@@ -948,6 +958,7 @@ function rsftsb_install() {
 	add_option('readygraph_tutorial', 'true');
 	add_option('readygraph_connect_anonymous', 'false');
 	add_option('rg_rsftsb_plugin_do_activation_redirect', true);
+	add_option('readygraph_related_tags_install', "true");
 }
 if( file_exists(plugin_dir_path( __FILE__ ).'/readygraph-extension.php' )) {
 include "readygraph-extension.php";

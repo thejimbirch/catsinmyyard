@@ -265,7 +265,7 @@ function wtt_connect_oauth( $auth = false ) {
 		$nonce = ( ! $auth ) ? wp_nonce_field( 'wp-to-twitter-nonce', '_wpnonce', true, false ) . wp_referer_field( false ) . '</form>' : '';
 		if ( ! $auth ) {
 			$submit = '
-					<input type="submit" name="submit" class="button-primary" value="' . __( 'Disconnect Your WordPress and Twitter Account', 'wp-to-twitter' ) . '" />
+					<input type="submit" name="submit" class="button-primary" value="' . __( 'Disconnect your WordPress and Twitter Account', 'wp-to-twitter' ) . '" />
 					<input type="hidden" name="oauth_settings" value="wtt_twitter_disconnect" class="hidden" />
 				';
 		} else {

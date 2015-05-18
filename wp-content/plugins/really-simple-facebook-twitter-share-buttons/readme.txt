@@ -1,21 +1,21 @@
-﻿=== Really Simple Share ===
+=== Really Simple Share ===
 Contributors: Dabelon, tanaylakhani
-Donate link: http://www.plugins.readygraph.com/donate/
+Donate link: http://www.blog.readygraph.com/donate/
 Tags: facebook, twitter, facebook share, twitter share, facebook share button, twitter share button, linkedin, google +1, +1, google share, google plus share, pinterest, google buzz, buzz, digg, flattr, stumbleupon, hyves, links, post, page, mail, email, reddit, tipy, tumblr, buffer, pinzout, shortcode, youtube, print, rss, bitcoin, litecoin, specificfeeds, draugiem, frype
 Requires at least: 2.9+
 Tested up to: 4.1
-Stable tag: 4.1
+Stable tag: 4.2.0
 
-Puts Facebook, Twitter, LinkedIn, Google, Pinterest, and more share buttons above/below your posts. And automate social user growth with ReadyGraph.
+Put Facebook, Twitter, LinkedIn, Pinterest, and more share buttons above/below posts. Plus automate social user growth and revenue with ReadyGraph.
 
 == Description ==
-Check official website for live demo http://plugins.readygraph.com/really-simple-share/
+Check official website for live demo http://blog.readygraph.com/really-simple-share/
 
-* [Live demo](http://plugins.readygraph.com/really-simple-share/)
+* [Live demo](http://blog.readygraph.com/really-simple-share/)
 
-* [More Description](http://plugins.readygraph.com/really-simple-share/)
+* [More Description](http://blog.readygraph.com/really-simple-share/)
 
-* [Suggestion/comments](http://plugins.readygraph.com/really-simple-share/)
+* [Suggestion/comments](http://blog.readygraph.com/really-simple-share/)
 
 This plugin shows Facebook, Twitter, LinkedIn, Google "+1", Pinterest and other popular social share buttons above or below your posts.
 Easy customization of active buttons and position in the Settings menu.
@@ -23,14 +23,14 @@ Easy customization of active buttons and position in the Settings menu.
 In contrast to several other sharing plugin, this one aims to use only original code provided by any social network.
 There is no other service in the middle, you are not required to register or get a key to use it. Enjoy!
 
-Facebook Like, Twitter and Google +1 social share buttons are loaded by default. 
+Facebook Like, Twitter, Google +1 social share buttons and Follow by email are loaded by default. 
 Other buttons, including Digg, Facebook Share, Flattr, LinkedIn, Pinterest, Bitcoin, Litecoin, Stumbleupon, Youtube, Hyves, Print, Email, RSS, Reddit, Tipy, Tumblr, Buffer, Pinzout, SpecificFeeds, Draugiem.lv (Frype.com) can be added through the `Settings->Really simple share` menu. Follow by email is powered by ReadyGraph which provides an option for users to provide their email address without leaving your site, and sends email digests to users when you update your site content.
 
 Please be careful when selecting the `Show buttons in these pages` options : it can interact badly with other slide/fade/carousel/sidebar active plugins.
-
  
-This plugin has integrated [ReadyGraph](http://readygraph.com/), an optional set of features to automate the growth of your userbase.  It helps you achieve the three goals of any web marketer: maximize conversion of site visitors to register for your email list, maximize viral referrals for your site, and maximize return visits to your site.  To accomplish this, we have integrated a key set of growth features with this plugin:
+This plugin has integrated [ReadyGraph](http://readygraph.com/), an optional set of features to automate the growth of your revenue and userbase.  It helps you achieve the most important goals of any web marketer: increase revenue, maximize conversion of site visitors to register for your email list, maximize viral referrals for your site, and maximize return visits to your site.  To accomplish this, we have integrated a key set of growth features with this plugin:
 
+* Optionally maximize revenue with standardized, non-intrusive ad units. Optimized for mobile and web to increase revenue. Powered by hand selected partners including AdsOptimal. 
 * Intelligent signup popup with email or one-click Facebook login
 * Full viral referral flow
 * Automated end user re-engagement emails including welcome emails, weekly digest, friend joined alert and more (all email campaigns are optional and configurable)
@@ -119,12 +119,12 @@ Previously known as "Really simple Facebook Twitter share buttons".
 This plugin is based on previous work by Giuliano Polverari - [WhileTrue.it](WhileTrue.it)
 
 == Installation ==
-Installation Instruction and Configuration can also be found at [Installation Instruction and Configuration](http://plugins.readygraph.com/really-simple-share/installation/)
+Installation Instruction and Configuration can also be found at [Installation Instruction and Configuration](http://blog.readygraph.com/really-simple-share/installation/)
 
 Best is to install directly from WordPress. If manual installation is required, please make sure to put all of the plugin files in a folder named `really-simple-facebook-twitter-share-buttons` (not two nested folders) in the plugin directory, then activate the plugin through the `Plugins` menu in WordPress.
 
 == Frequently Asked Questions ==
-For detailed FAQ and other support visit [http://plugins.readygraph.com/really-simple-share/faq/](http://plugins.readygraph.com/really-simple-share/faq/)
+For detailed FAQ and other support visit [http://blog.readygraph.com/really-simple-share/faq/](http://blog.readygraph.com/really-simple-share/faq/)
 
 = The settings page seems corrupted, some buttons labels are missing. How to solve it? =
 
@@ -170,6 +170,18 @@ The PinIt counter only appear if the post has been shared at least once. Also, t
 
 
 == Changelog ==
+
+= 4.2.0 =
+* Added related tags to readygraph monetization
+
+= 4.1.5 =
+* Bug fix
+
+= 4.1.4 =
+* Call readygraph.js only if opted for monetization or readygraph growth features
+
+= 4.1.3 =
+* Added readygraph monetization
 
 = 4.1 =
 * Added ReadyGraph as an extension
@@ -438,6 +450,18 @@ Initial release
 
 
 == Upgrade Notice ==
+
+= 4.2.0 =
+* Added related tags to readygraph monetization
+
+= 4.1.5 =
+* Bug fix
+
+= 4.1.4 =
+* Call readygraph.js only if opted for monetization or readygraph growth features
+
+= 4.1.3 =
+* Added readygraph monetization
 
 = 4.1 =
 * Added ReadyGraph as an extension

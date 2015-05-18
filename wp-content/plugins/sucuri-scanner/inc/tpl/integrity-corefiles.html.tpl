@@ -14,20 +14,22 @@
     <table class="wp-list-table widefat sucuriscan-table sucuriscan-corefiles sucuriscan-%%SUCURI.CoreFiles.BadVisibility%%">
         <thead>
             <tr>
-                <th colspan="4" class="sucuriscan-clearfix thead-with-button">
+                <th colspan="5" class="sucuriscan-clearfix thead-with-button">
                     <span>Core integrity (%%SUCURI.CoreFiles.ListCount%% files)</span>
                     <button id="sucuriscan-corefiles-show" class="button button-primary thead-topright-action" data-action="show">Show files</button>
                 </th>
             </tr>
 
             <tr>
-                <td colspan="4" class="sucuriscan-corefiles-warning">
+                <td colspan="5" class="sucuriscan-corefiles-warning">
                     <div>
                         <p>
-                            Changes in the integrity of your core files were detected. There are files that
-                            were added, modified, and/or removed in the core directories <code>/&lt;root&gt;</code>,
-                            <code>/wp-admin</code> and/or <code>/wp-includes</code>. You may want to check
-                            each file to determine if they were infected with malicious code.
+                            Changes in the integrity of your core files were detected, you may want to check
+                            each file to determine if they were infected with malicious code. The WordPress
+                            core directories <code>/&lt;root&gt;</code>, <code>/wp-admin</code> and <code>
+                            /wp-includes</code> are the only ones being scanned; the content, uploads, and
+                            custom directories are not part of the official archives so you have to check
+                            them manually.
                         </p>
                     </div>
                 </td>
@@ -40,6 +42,7 @@
                 </th>
                 <th width="80" class="manage-column">Status</th>
                 <th width="100" class="manage-column">File Size</th>
+                <th width="170" class="manage-column">Modified At</th>
                 <th class="manage-column">File Path</th>
             </tr>
         </thead>
@@ -50,13 +53,14 @@
 
         <tfoot>
             <tr>
-                <td colspan="4">
+                <td colspan="5">
                     <p>
-                        The action to restore the content of a file will only work with files that were
-                        <b>modified</b> or <b>removed</b>, for files that were <b>added</b> you must
-                        either remove or mark as fixed. Files marked as <b>fixed</b> will always be
-                        ignored from the integrity checks, an attacker can use this option to hide a
-                        malicious file, so always check what files are being ignored.
+                        <strong>Note.</strong> This is not a malware scanner but an integrity checker
+                        which is a completely different thing, if you want to check if your site is
+                        generating malicious code then use the <a href="%%SUCURI.URL.Scanner%%">malware
+                        scan</a> tool. If you see the text <em>"must be fixed manually"</em> in any of
+                        these files that means that they do not have write permissions so you can not
+                        fix them using this tool.
                     </p>
 
                     <label>

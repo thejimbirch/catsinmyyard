@@ -73,17 +73,18 @@ rsftsb_rrmdir($dir);
 	    <div class="wrap1" style="min-height: 600px;">
 
       <div id="icon-plugins" class="icon32"></div>
-      <h2>We've enhanced <?php echo $main_plugin_title ?> with ReadyGraph's User Growth Engine</h2>
+      <h2>Earn Revenue with <?php echo $main_plugin_title ?>'s with ReadyGraph Growth Engine</h2>
       
       <p style="display:none;color:red;" id="error"></p>
       <div class="register-left">
 	<div class="alert" style="margin: 0px auto; padding: 15px; text-align: center;">
 			<h3>Activate ReadyGraph to get more traffic to your site</h3>
 <!--		<h3 style="margin-top: 0px; font-weight: 300;"><?php //echo $main_plugin_title ?>, Now with ReadyGraph</h3> -->
-		<p style="padding: 50px 0px 30px 0px;"><a class="btn btn-primary connect" href="javascript:void(0);" style="font-size: 15px; line-height: 40px; padding: 0 30px;">Connect ReadyGraph</a></p>
+		<p style="padding: 50px 0px 30px 0px;"><a class="btn btn-primary connect" href="javascript:void(0);" style="font-size: 15px; line-height: 40px; padding: 0 30px;">Start Earning Revenue<br><span style="font-size: 10px;">Connect ReadyGraph</span></a></p>
 		<!--<p style="padding: 0px 0px;"><a class="btn btn-default skip" href="javascript:void(0);" style="font-size: 10px; line-height: 20px; padding: 0 30px;">Skip ReadyGraph</a></p>-->
-		<p>Readygraph adds more ways to connect to your users. </p>
+		<p>Readygraph maximizes your Growth and Revenue</p>
 		<p style="text-align: left; padding: 0 20px;">
+			- Monetize mobile and web traffic with optimized, non-intrusive ad units<br> 
 			- Get more traffic<br>
 			- Send automatic email digests of all your site posts<br>
 			- Get better deliverablility<br>
@@ -169,6 +170,7 @@ If you have questions or concerns contact us anytime at <a href="mailto:info@rea
     <ul>
 		<li><a href="<?php $current_url = explode("&", $_SERVER['REQUEST_URI']); echo $current_url[0];?>&ac=site-profile">Site Profile</a></li>
 		<li><a href="<?php $current_url = explode("?", $_SERVER['REQUEST_URI']); echo $current_url[0];?>?page=readygraph-app&ac=feature-settings">Feature Settings</a></li>
+		<li><a href="<?php $current_url = explode("?", $_SERVER['REQUEST_URI']); echo $current_url[0];?>?page=readygraph-app&ac=monetization-settings">Monetization Settings</a></li>
 	</ul>
   </li>
 </ul>

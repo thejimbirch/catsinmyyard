@@ -4,7 +4,18 @@
   $plugin_slug = basename(dirname(__FILE__));
   $menu_slug = 'readygraph-app';
   $main_plugin_title = 'Really Simple Share';
-
+	add_action( 'wp_ajax_rsftsb-myajax-submit', 'rsftsb_myajax_submit' );
+function rsftsb_myajax_submit() {
+	global $wpdb;
+	$monetize = $_POST['readygraph_monetize'];
+	if ($monetize == "true"){
+	update_option('readygraph_enable_monetize',"true");
+	}
+	else{
+	update_option('readygraph_enable_monetize',"false");
+	}
+	wp_die();
+}
   // ReadyGraph Engine Hooker
   //
   include_once('extension/readygraph/extension.php');
@@ -21,7 +32,21 @@
   
 
   add_action('admin_notices', 'add_readygraph_plugin_warning');
-  add_action('wp_footer', 'readygraph_client_script_head');
+if(get_option('readygraph_application_id') && strlen(get_option('readygraph_application_id')) > 0){
+if (get_option('readygraph_enable_monetize', '') == "true" || strlen(get_option('readygraph_access_token','')) > 0) {
+  add_action('wp_footer', 'readygraph_rsftsb_client_script_head');
+}
+if (!get_option('readygraph_related_tags')){
+  $app_id = get_option('readygraph_application_id');
+  delete_option('readygraph_related_tags_install');
+  $url = 'https://readygraph.com/api/v1/wp-monetize/';
+  $response = wp_remote_post($url, array( 'body' => array('app_id' => $app_id, 'related_tags' => 'true')));
+  if ( is_wp_error( $response ) ) {
+	} else {
+  update_option('readygraph_related_tags', "true");
+  }
+}
+}
   add_action('admin_init', 'on_plugin_activated_readygraph_rsftsb_redirect');
 	add_option('readygraph_rsftsb_connect_notice','true');
 
@@ -67,6 +92,9 @@ function rsftsb_post_updated_send_email( $post_id ) {
 	// If this is just a revision, don't send the email.
 	if ( wp_is_post_revision( $post_id ) )
 		return;
+	if (!get_option('readygraph_access_token')){
+		return;
+	}
 	if(get_option('readygraph_application_id') && strlen(get_option('readygraph_application_id')) > 0 && get_option('readygraph_send_blog_updates') == "true"){
 
 	$post_title = get_the_title( $post_id );

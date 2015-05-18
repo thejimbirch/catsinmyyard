@@ -11,8 +11,8 @@ jQuery(document).ready(function ($) {
             $('.wpt-settings .wptab').not(target).hide();
             $(target).show().attr( 'tabindex', '-1' ).focus();
         });
-    }
-    ;
+    };
+	
     var permissions = $('.wpt-permissions .wptab').length;
     $('.wpt-permissions .tabs a[href="#' + firstPerm + '"]').addClass('active').attr( 'aria-selected', 'true' );
     if (permissions > 1) {
@@ -25,6 +25,5 @@ jQuery(document).ready(function ($) {
             $('.wpt-permissions .wptab').not(target).hide();
             $(target).show().attr( 'tabindex', '-1' ).focus();
         });
-    }
-    ;
+    };
 });

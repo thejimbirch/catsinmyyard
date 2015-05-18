@@ -3,7 +3,7 @@ Contributors: nico23
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UNDSCARF3ZPBC
 Tags: video, responsive, embed, video-embedder, iframe, minimal, lightweight, simplicity, shortcodes, Youtube, Blip, Dailymotion, Videojug, Collegehumor, Veoh, Break, Movieweb, Snotr, Gametrailers, Vimeo, Viddler, Funnyordie, Myspace, Liveleak, Metacafe, Myvideo, Yahoo Screen, Spike
 Requires at least: 3.3.2
-Tested up to: 4.1
+Tested up to: 4.2.2
 Stable tag: trunk
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -107,6 +107,19 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 2. Options page
 
 == Changelog ==
+
+= 5.4.1 =
+* Fix: 'dashboard blank' issue.
+
+= 5.3.6 =
+* Fix: Admin message not dismissable.
+
+= 5.3.5 =
+* Fix: Support for `https://youtu.be` URLs
+* New: Added message to invide people to test testing the upcoming [Pro Addon](https://nextgenthemes.com/downloads/advanced-responsive-video-embedder-pro/). It will be free for 50 testers and people who had the plugin installed before the release of the Addon.
+
+= 5.3.4 Beta =
+* Fix: Myvideo.de videos with old 8 digit IDs. 
 
 = 5.3.3 Beta =
 * Fix: Workarround for a currently ongoing YouTube issue causing YouTube embeds to fail with erros on mobile devives. This was not a 'bug' caused by this plugin btw.

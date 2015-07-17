@@ -12,7 +12,7 @@ Donate link: http://m0n.co/donate
 Requires at least: 3.9
 Tested up to: 4.2
 Stable tag: trunk
-Version: 20150507
+Version: 20150624
 License: GPLv2 or later
 
 Block Bad Queries (BBQ) helps protect WordPress against malicious URL requests. 
@@ -31,6 +31,10 @@ Block Bad Queries (BBQ) helps protect WordPress against malicious URL requests.
 * Scans all incoming traffic and blocks bad requests
 * Works silently behind the scenes to protect your site
 * New! Customize blocked strings via [Whitelist/Blacklist plugins](https://perishablepress.com/bbq-whitelist-blacklist/)
+
+**New Pro Version**
+
+For advanced protection with some sweet features, check out [BBQ Pro](https://plugin-planet.com/bbq-pro/).
 
 == Installation ==
 
@@ -52,6 +56,13 @@ To upgrade BBQ, remove old version and replace with new version. Nothing else ne
 No screenshots available - code only.
 
 == Changelog ==
+
+**2015/06/24**
+
+* Replaced "UNION\+SELECT" with "UNION.*SELECT"
+* Added "wp-config.php" to query-string patterns
+* Added plugin link to [BBQ Pro](https://plugin-planet.com/bbq-pro/)
+* Testing on WP 4.3 (alpha)
 
 **2015/05/07**
 

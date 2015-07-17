@@ -1,7 +1,7 @@
 
 %%SUCURI.ModalWhenAPIRegistered%%
 
-<table class="wp-list-table widefat sucuriscan-table sucuriscan-settings">
+<table class="wp-list-table widefat sucuriscan-table sucuriscan-striped-table sucuriscan-settings">
     <thead>
         <tr>
             <th colspan="3" class="thead-with-button">
@@ -49,7 +49,7 @@
             </td>
         </tr>
 
-        <tr class="alternate">
+        <tr>
             <td width="200">Sucuri API key</td>
             <td>
                 <span class="sucuriscan-monospace">%%SUCURI.APIKey%%</span>
@@ -85,7 +85,19 @@
             </td>
         </tr>
 
-        <tr class="alternate">
+        <tr>
+            <td>Test email alerts</td>
+            <td><em>(Test ability to send email alerts)</em></td>
+            <td class="td-with-button">
+                <form action="%%SUCURI.URL.Settings%%" method="post">
+                    <input type="hidden" name="sucuriscan_page_nonce" value="%%SUCURI.PageNonce%%" />
+                    <input type="hidden" name="sucuriscan_debug_email" value="1" />
+                    <button type="submit" class="button-primary">Proceed</button>
+                </form>
+            </td>
+        </tr>
+
+        <tr>
             <td>Send plugin alerts to</td>
             <td>%%SUCURI.NotifyTo%%</td>
             <td class="td-with-button">
@@ -111,7 +123,7 @@
             </td>
         </tr>
 
-        <tr class="alternate">
+        <tr>
             <td>Consider brute-force after</td>
             <td>%%SUCURI.MaximumFailedLogins%%</td>
             <td class="td-with-button">
@@ -139,7 +151,7 @@
             </td>
         </tr>
 
-        <tr class="alternate">
+        <tr>
             <td>API request timeout</td>
             <td>%%SUCURI.RequestTimeout%%</td>
             <td class="td-with-button">
@@ -152,28 +164,35 @@
         </tr>
 
         <tr>
-            <td>API proxy host:port</td>
+            <td>API proxy <em>(host:port)</em></td>
             <td><span class="sucuriscan-monospace">%%SUCURI.APIProxy.Host%%:%%SUCURI.APIProxy.Port%%</span></td>
             <td>&nbsp;</td>
         </tr>
 
-        <tr class="alternate">
-            <td>API proxy username</td>
-            <td><span class="sucuriscan-monospace">%%SUCURI.APIProxy.Username%%</span></td>
-            <td>&nbsp;</td>
-        </tr>
-
         <tr>
-            <td>API proxy password</td>
+            <td>API proxy <em>(auth)</em></td>
             <td>
+                <span class="sucuriscan-monospace">%%SUCURI.APIProxy.Username%%</span>
                 <span class="sucuriscan-label-%%SUCURI.APIProxy.PasswordType%%">
-                    %%SUCURI.APIProxy.PasswordText%%
+                    <em>password is %%SUCURI.APIProxy.PasswordText%%</em>
                 </span>
             </td>
             <td>&nbsp;</td>
         </tr>
 
-        <tr class="alternate">
+        <tr>
+            <td>API test request</td>
+            <td><em>(Test ability to send HTTP requests)</em></td>
+            <td class="td-with-button">
+                <form action="%%SUCURI.URL.Settings%%" method="post">
+                    <input type="hidden" name="sucuriscan_page_nonce" value="%%SUCURI.PageNonce%%" />
+                    <input type="hidden" name="sucuriscan_debug_request" value="1" />
+                    <button type="submit" class="button-primary">Proceed</button>
+                </form>
+            </td>
+        </tr>
+
+        <tr>
             <td>Support reverse proxy</td>
             <td>%%SUCURI.ReverseProxyStatus%%</td>
             <td class="td-with-button">
@@ -197,7 +216,7 @@
             </td>
         </tr>
 
-        <tr class="alternate">
+        <tr>
             <td>Audit report limit</td>
             <td>Process latest %%SUCURI.AuditReportLimit%% logs</td>
             <td class="td-with-button">
@@ -221,7 +240,7 @@
             </td>
         </tr>
 
-        <tr class="alternate">
+        <tr>
             <td>Plugin advertisement</td>
             <td>%%SUCURI.AdsVisibility%%</td>
             <td class="td-with-button">

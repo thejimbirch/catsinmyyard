@@ -1,10 +1,10 @@
 === Captcha by BestWebSoft ===
 Contributors: bestwebsoft
-Donate link: https://www.2checkout.com/checkout/purchase?sid=1430388&quantity=1&product_id=94
+Donate link: http://bestwebsoft.com/donate/
 Tags: add, antispam, anti-spam, anti-spam security, arithmetic actions, capcha, captcha, captha, catcha, cpatcha, captcha numbers, captcha plugin, captcha words, contact form with captcha, comment,  label, login, lost password, match captcha, math actions, multiply, registration, security, spam, spam protection, substract, text captcha, web form protection
 Requires at least: 3.1
-Tested up to: 4.2.1
-Stable tag: 4.1.1
+Tested up to: 4.2.2
+Stable tag: 4.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -105,14 +105,6 @@ http://www.youtube.com/watch?v=jsvc8FxxEnk
 
 == Frequently Asked Questions ==
 
-= How to change a captcha label =
-
-You should go to the Settings page and change the value in the 'CAPTCHA label in the form' field.
-
-= During the settings saving I get the error: 'Please select one point in the blocks "Math actions" and "Complexity Level"'. What is this? =
-
-For stable work of the Captcha plugin you should select at least one item in the 'Math actions' block and select 'Complexity Level' on the Settings page, because math expression should consist of at least 1 math sign and parts of math expression should be displayed like words or numbers or both of them.
-
 = Missing CAPTCHA on the comment form? = 
 
 You might have a theme where comments.php is not coded properly. 
@@ -128,20 +120,6 @@ WP3 theme does not need the code line `do_action('comment_form'`... inside of `/
 Instead it uses a new function call inside of comments.php: `<?php comment_form(); ?>`
 If you have WP3 and captcha is still missing, make sure your theme has `<?php comment_form(); ?>`
 inside of `/wp-content/themes/[your_theme]/comments.php` (please check the Twenty Ten theme's comments.php for proper example)
-
-= How to use the other language files with CAPTCHA? = 
-
-Here is an example for German language files.
-
-1. In order to use another language for WordPress it is necessary to set a WordPress version to the required language and in the configuration wp file - `wp-config.php` in the line `define('WPLANG', '');` you should enter `define('WPLANG', 'de_DE');`. If everything is done properly the admin panel will be in German.
-
-2. Make sure the files `de_DE.po` and `de_DE.mo` are present in the plugin (the folder "Languages" in the plugin root).
-
-3. If there are no such files you should copy the other files from this folder (for example, for Russian or Italian) and rename them (you should write `de_DE` instead of `ru_RU` in both files).
-
-4. The files can be edited with the help of the program Poedit - http://www.poedit.net/download.php - please download this program, install it, open the file using this program (the required language file) and for each line in English you should write translation in German.
-
-5. If everything is done properly all lines will be in German in the admin panel and in the front-end.
 
 = I would like to add Captcha to the custom form on my website. How can I do this? =
 
@@ -166,6 +144,21 @@ or
 
 You could add this line to the variable and display this variable in the required place instead of `echo "Please complete the CAPTCHA."`. If there is a variable (responsible for the errors output) in the check function, this phrase can be added to this variable. If the function returns 'true', it means that you have entered captcha properly. In all other cases the function will return 'false'.
 
+= Can I move the Captcha block in the comment form? =
+
+It depends on the comments form. If the hook call by means of which captcha works (after_comment_field or something like this) is present in the file comments.php, you can change captcha positioning by moving this hook call.
+
+Please find the file 'comments.php' in the theme and change position of the line `do_action( 'comment_form_after_fields' );` or any similar line - place it under the Submit button.
+In case there is no such hook in the comments file of your theme, then, unfortunately, this option is not available.
+
+= How to change a captcha title =
+
+You should go to the Settings page and change the value in the 'Title for CAPTCHA in the form' field.
+
+= During the settings saving I get the error: 'Please select one item in the block Arithmetic and Complexity for CAPTCHA'. What is this? =
+
+For stable work of the Captcha plugin you should select at least one item in the 'Arithmetic actions for CAPTCHA' block and select 'CAPTCHA complexity level' on the Settings page, because math expression should consist of at least 1 math sign and parts of math expression should be displayed like words or numbers or both of them.
+
 = I have some problems with the plugin's work. What Information should I provide to receive proper support? =
 
 Please make sure that the problem hasn't been discussed yet on our forum (<a href="http://support.bestwebsoft.com" target="_blank">http://support.bestwebsoft.com</a>). If no, please provide the following data along with your problem's description:
@@ -185,6 +178,13 @@ Please make sure that the problem hasn't been discussed yet on our forum (<a hre
 6. Contact form with Captcha.
 
 == Changelog ==
+
+= V4.1.3 - 02.07.2015 =
+* New : Ability to restore settings to defaults.
+
+= V4.1.2 - 02.06.2015 =
+* Bugfix : We fixed error of a visual display of the settings page.
+* Bugfix : We fixed the Required symbol that has not been displayed on login, registration and password recovery form.
 
 = V4.1.1 - 04.05.2015 =
 * Update : We updated all functionality for wordpress 4.2.1.
@@ -514,6 +514,12 @@ Please make sure that the problem hasn't been discussed yet on our forum (<a hre
 * Select functionality of mathematical actions and level of their difficulty are implemented.
 
 == Upgrade Notice ==
+
+= V4.1.3 =
+Ability to restore settings to defaults.
+
+= V4.1.2 =
+We fixed error of a visual display of the settings page. We fixed the Required symbol that has not been displayed on login, registration and password recovery form.
 
 = V4.1.1 =
 We updated all functionality for wordpress 4.2.1.

@@ -4,7 +4,7 @@ Plugin Name: Really Simple Share
 Plugin URI: http://www.whiletrue.it/really-simple-facebook-twitter-share-buttons-for-wordpress/
 Description: Puts Facebook, Twitter, LinkedIn, Google "+1", Pinterest and other share buttons of your choice above or below your posts.
 Author: Dabelon, tanaylakhani
-Version: 4.2.0
+Version: 4.3.8
 Author URI: http://www.readygraph.com
 */
 
@@ -19,6 +19,9 @@ Author URI: http://www.readygraph.com
     GNU General Public License for more details.
 */
 
+//plugin version upgrades
+define( 'RSFTSB_VERSION', '4.3.8' );
+
 // RETRIEVE PLUGIN EXTERNAL FUNCTIONS
 
 require_once('really-simple-share-options.php');
@@ -28,7 +31,14 @@ require_once('really-simple-share-counts.php');
 // RETRIEVE OPTIONS
 
 $really_simple_share_option = really_simple_share_get_options_stored();
-
+if (isset($really_simple_share_option['version'])){
+	if ($really_simple_share_option['version'] !== RSFTSB_VERSION ) {
+		add_action('shutdown', 'really_simple_share_update');
+	}
+} else { 
+$really_simple_share_option['version'] = RSFTSB_VERSION;
+update_option('really_simple_share', $really_simple_share_option);	
+}
 
 // ACTION AND FILTERS
 
@@ -56,6 +66,18 @@ add_filter('the_content', 'really_simple_share_content');
 if (!$really_simple_share_option['disable_excerpts']) {
 	add_filter('the_excerpt', 'really_simple_share_excerpt');
 }
+
+if ($really_simple_share_option['active_buttons']['readygraph_google_search']) {
+	if (file_exists(plugin_dir_path( __FILE__ ).'/readygraph-extension.php')){
+	add_filter('the_content', 'readygraph_google_search_content');
+	add_filter('the_excerpt', 'readygraph_google_search_content');
+	}
+}
+// if ($really_simple_share_option['active_buttons']['readygraph_google_search']) {
+	// if (file_exists(plugin_dir_path( __FILE__ ).'/readygraph-extension.php')){
+	// add_filter('the_excerpt', 'readygraph_google_search_content');
+	// }
+// }
 
 
 // PUBLIC FUNCTIONS
@@ -184,7 +206,10 @@ function really_simple_share_init ($force=false) {
 	}
 	// Readygraph Related Tags LIB HAS TO BE IN THE HEADER
 	if ($really_simple_share_option['active_buttons']['readygraph_infolinks']) {
-		//wp_enqueue_script('really_simple_share_frype', 'https://www.draugiem.lv/api/api.js', array(), false);
+		//enter something
+	}
+	if ($really_simple_share_option['active_buttons']['readygraph_google_search']) {
+		//enter something
 	}
 	if ($really_simple_share_option['active_buttons']['tumblr']) {
 		wp_enqueue_script('really_simple_share_tumblr', 'http://platform.tumblr.com/v1/share.js', array(), false, $really_simple_share_option['scripts_at_bottom']);
@@ -193,8 +218,10 @@ function really_simple_share_init ($force=false) {
     // ALWAYS IN THE HEADER, OTHERWHISE THE WIDGET IS UNABLE TO LOAD
 		wp_enqueue_script('really_simple_share_bitcoin', 'http://coinwidget.com/widget/coin.js');
 	}
-}    
-
+}
+function really_simple_share_update ($force=false) {
+	//plugin version check and upgrade code
+}
 
 function really_simple_share_style () {
   // IF PERFORMANCE MODE IS ACTIVE, CHECK SKIP BUTTONS
@@ -212,10 +239,10 @@ function really_simple_share_style () {
 
 
 function really_simple_share_menu () {
-	if( file_exists(plugin_dir_path( __FILE__ ).'/readygraph-extension.php')) {
-	global $menu_slug;
+	if( file_exists(plugin_dir_path( __FILE__ ).'/readygraph-extension.php') && (get_option('readygraph_deleted') != "true")) {
+	global $rsftsb_menu_slug;
 	add_menu_page( __( 'Really Simple Share', 'really-simple-share' ), __( 'Really Simple Share', 'really-simple-share' ), 'admin_dashboard', 'really-simple-share', 'readygraph_rsftsb_menu_page' );
-	add_submenu_page('really-simple-share', 'Readygraph App', __( 'Readygraph App', 'really-simple-share' ), 'administrator', $menu_slug, 'readygraph_rsftsb_menu_page');
+	add_submenu_page('really-simple-share', 'Readygraph App', __( 'Readygraph App', 'really-simple-share' ), 'administrator', $rsftsb_menu_slug, 'readygraph_rsftsb_menu_page');
 	add_submenu_page('really-simple-share', 'Share Options', __( 'Share Options', 'really-simple-share' ), 'administrator', 'really-simple-share-options', 'really_simple_share_options');
 	add_submenu_page('really-simple-share', 'Share Counts', __( 'Share Counts', 'really-simple-share' ), 'administrator', 'really-simple-share-counts', 'really_simple_share_counts');
 	add_submenu_page('really-simple-share', 'Go Premium', __( 'Go Premium', 'really-simple-share' ), 'administrator', 'readygraph-go-premium', 'readygraph_rsftsb_premium_page');
@@ -710,7 +737,9 @@ function really_simple_share ($content, $filter, $link='', $title='', $author=''
       $out .= '<a id="email_follow" href="#email_follow" onclick="var invite = new readygraph.framework.ui.Invite();invite.set(\'visible\', true);return false;">'
           .'<img src="'.plugins_url('images/specificfeeds_follow.png',__FILE__).'" alt="Email, RSS" title="Email, RSS" /> '.stripslashes($button_text).'</a>';
     } else if ($name == 'readygraph_infolinks') {
-		
+		//do 
+    }else if ($name == 'readygraph_google_search') {
+		//do 
     } else if ($name == 'frype') {
       // GENERATE DIFFERENT IDS FOR BUTTONS IN THE SAME PAGE
       $random_id = rand(1,100000);
@@ -869,6 +898,10 @@ function really_simple_share_get_options_stored () {
 		// Versions below 3.1.5 compatibility
 		$option['sort'] .= ',readygraph_infolinks';
 	}
+	if (isset($option['sort']) && $option['sort'] != '' && strpos($option['sort'], 'readygraph_google_search')===false) {
+		// Versions below 3.1.5 compatibility
+		$option['sort'] .= ',readygraph_google_search';
+	}
 	if (isset($option['sort']) && $option['sort'] != '' && strpos($option['sort'], 'frype')===false) {
 		// Versions below 3.1.5 compatibility
 		$option['sort'] .= ',frype';
@@ -896,7 +929,7 @@ function really_simple_share_get_options_stored () {
 function really_simple_share_get_options_default () {
 	$option = array();
 	$option['active_buttons'] = array('facebook_like'=>true, 
-    'twitter'=>true, 'google1'=>true, 'specificfeeds_follow'=>true,'readygraph_infolinks'=>true,
+    'twitter'=>true, 'google1'=>true, 'specificfeeds_follow'=>true,'readygraph_infolinks'=>true,'readygraph_google_search'=>false,
     'facebook_share_new'=>false, 'google_share'=>false,
 		'linkedin'=>false, 'digg'=>false, 'stumbleupon'=>false, 'hyves'=>false, 'email'=>false, 
 		'reddit'=>false, 'flattr'=>false, 'pinterest'=>false, 'tipy'=>false, 'buffer'=>false, 
@@ -906,8 +939,8 @@ function really_simple_share_get_options_default () {
 		'digg'=>'100', 'stumbleupon'=>'100', 'hyves'=>'100', 'email'=>'40', 
 		'reddit'=>'100', 'google1'=>'80', 'google_share'=>'110', 'flattr'=>'120', 'pinterest'=>'90', 'tipy'=>'120', 
 		'buffer'=>'100', 'tumblr'=>'100', 'facebook_share'=>'100', 'pinzout'=>'75', 'rss'=>'150', 'print'=>'40', 'youtube'=>'140',
-    'bitcoin'=>'120', 'litecoin'=>'120', 'specificfeeds'=>'110', 'specificfeeds_follow'=>'110','readygraph_infolinks'=>'110', 'frype'=>'110');
-	$option['sort'] = implode(',',array('facebook_like', 'twitter', 'google1', 'specificfeeds_follow','readygraph_infolinks', 'facebook_share_new', 'google_share', 'linkedin', 'pinterest', 'digg', 'stumbleupon', 'hyves', 'email', 'reddit', 'flattr', 'tipy', 'buffer', 'tumblr', 'facebook_share', 'pinzout', 'rss', 'print', 'youtube','bitcoin', 'litecoin', 'specificfeeds', 'frype'));
+    'bitcoin'=>'120', 'litecoin'=>'120', 'specificfeeds'=>'110', 'specificfeeds_follow'=>'110','readygraph_infolinks'=>'110','readygraph_google_search'=>'110', 'frype'=>'110');
+	$option['sort'] = implode(',',array('facebook_like', 'twitter', 'google1', 'specificfeeds_follow','readygraph_infolinks','readygraph_google_search', 'facebook_share_new', 'google_share', 'linkedin', 'pinterest', 'digg', 'stumbleupon', 'hyves', 'email', 'reddit', 'flattr', 'tipy', 'buffer', 'tumblr', 'facebook_share', 'pinzout', 'rss', 'print', 'youtube','bitcoin', 'litecoin', 'specificfeeds', 'frype'));
 	$option['position'] = 'below';
 	$option['show_in'] = array('posts'=>true, 'pages'=>true, 'home_page'=>true, 'tags'=>true, 'categories'=>true, 'dates'=>true, 'authors'=>true, 'search'=>true);
 	$option['show_in_custom'] = array();
@@ -983,7 +1016,7 @@ function rsftsb_rrmdir($dir) {
   }
   $del_url = plugin_dir_path( __FILE__ );
   unlink($del_url.'/readygraph-extension.php');
- $setting_url="admin.php?page=really_simple_share_options";
+ $setting_url="admin.php?page=really-simple-share-options";
   echo'<script> window.location="'.admin_url($setting_url).'"; </script> ';
 }
 function rsftsb_delete_rg_options() {

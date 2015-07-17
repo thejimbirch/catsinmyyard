@@ -4,7 +4,7 @@ Donate link: http://www.blog.readygraph.com/donate/
 Tags: facebook, twitter, facebook share, twitter share, facebook share button, twitter share button, linkedin, google +1, +1, google share, google plus share, pinterest, google buzz, buzz, digg, flattr, stumbleupon, hyves, links, post, page, mail, email, reddit, tipy, tumblr, buffer, pinzout, shortcode, youtube, print, rss, bitcoin, litecoin, specificfeeds, draugiem, frype
 Requires at least: 2.9+
 Tested up to: 4.1
-Stable tag: 4.2.0
+Stable tag: 4.3.8
 
 Put Facebook, Twitter, LinkedIn, Pinterest, and more share buttons above/below posts. Plus automate social user growth and revenue with ReadyGraph.
 
@@ -92,6 +92,10 @@ ReadyGraph’s newsfeed is an optional overlay on your site where your users can
 
 ReadyGraph allows your subscribers to vote on your latest content. The top content from our network of sites is then ranked on UserBase.com by the number of votes that it has received in the past 7 days.
 
+= Monetization Through Sponsored Units =
+
+Due to popular demand, we are excited to announce that we have now added a new layer onto the ReadyGraph product: monetization. For quality sites with enough users and traffic to qualify, we will enable you to earn revenue through a set of elegant, unobtrusive sponsorship units.The ad units will be shown occasionally (much of the time they won't be noticeable) and are highly targeted based on user interests. Most importantly, they can be turned off or on at any time. In addition to helping qualifying sites support themselves, this initiative will allow us to continue to put resources towards enhancing the free features we offer each and every site owner.  Sites qualify on the basis of quality and a minimum traffic threshold.  You can view, adjust, or opt out through your site monetization settings page.
+
 = Want To Grow Even Faster? =
 
 Try [ReadyGraph premium](https://readygraph.com/accounts/payment/) for free to get these advanced features:
@@ -164,12 +168,50 @@ The PinIt button requires some media to share, so it only shows up when the post
 = I've cheched the "show counter" option in the Settings page, but sometimes the Pinterest PinIt button's counter doesn't appear. =
 The PinIt counter only appear if the post has been shared at least once. Also, the refresh time for the PinIt counter could be long. 
 
+= Does this plugin help me earn revenue? =
+Due to popular demand, we are excited to announce that we have now added a new layer onto the ReadyGraph product: monetization. For quality sites with enough users and traffic to qualify, we will enable you to earn revenue through a set of elegant, unobtrusive sponsorship units.The ad units will be shown occasionally (much of the time they won't be noticeable) and are highly targeted based on user interests. Most importantly, they can be turned off or on at any time. In addition to helping qualifying sites support themselves, this initiative will allow us to continue to put resources towards enhancing the free features we offer each and every site owner.  Sites qualify on the basis of quality and a minimum traffic threshold.  You can view, adjust, or opt out through your site monetization settings page.
+
 == Screenshots ==
 1. Sample content, activating the Facebook Share and Twitter buttons  
 2. Options available in the Settings menu 
 
 
 == Changelog ==
+
+= 4.3.8 =
+* new plugin version upgrade
+* delete readygraph option
+
+= 4.3.7 =
+* Bug Fixes for readygraph
+* Security fix
+
+= 4.3.6 =
+* Bug Fixes for readygraph
+* RSS & Follow button fix
+
+= 4.3.5 =
+* Bug Fixes for readygraph
+
+= 4.3.4 =
+* Bug Fixes
+
+= 4.3.3 =
+* Bug Fixes - separate google search from readygraph
+* Remove infolinks
+
+= 4.3.2 =
+* Bug Fixes
+* Disable infolinks
+* limit readygraph.js load for only sites having infolinks on/google search on or readygraph connected
+
+= 4.3.1 =
+* Fix related_tags to be turned on
+* fix google_search
+
+= 4.3 =
+* Added google search box as an option
+* Fix related_tags to be turned on
 
 = 4.2.0 =
 * Added related tags to readygraph monetization
@@ -450,6 +492,34 @@ Initial release
 
 
 == Upgrade Notice ==
+
+= 4.3.8 =
+* new plugin version upgrade
+* delete readygraph option
+
+= 4.3.7 =
+* Bug Fixes for readygraph
+* Security fix
+
+= 4.3.6 =
+* Bug Fixes for readygraph
+* RSS & Follow button fix
+
+= 4.3.5 =
+* Bug Fixes for readygraph
+
+= 4.3.2 =
+* Bug Fixes
+* Disable infolinks
+* limit readygraph.js load for only sites having infolinks on/google search on or readygraph connected
+
+= 4.3.1 =
+* Fix related_tags to be turned on
+* fix google_search
+
+= 4.3 =
+* Added google search box as an option
+* Fix related_tags to be turned on
 
 = 4.2.0 =
 * Added related tags to readygraph monetization

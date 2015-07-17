@@ -36,6 +36,7 @@ function really_simple_share_options () {
 		'specificfeeds'=>'SpecificFeeds',
 		'specificfeeds_follow'=>'Email* & RSS (follow)',
 		'readygraph_infolinks'=>'Related Tags',
+		'readygraph_google_search'=>'Google Search Box',
 		'frype' => 'Draugiem.lv (frype.com)',
 	);	
 
@@ -287,6 +288,11 @@ function really_simple_share_options () {
 						$li_style = 'style="height:57px;"'; 
 						$options2 = '<div style="clear:both; background-color: #ccc; font-size:10px;">'.__('Related Tags powered by
 Infolinks/ReadyGraph.  Connect account and collect revenue here if your site qualifies.  (<a href="http://readygraph.com/tos/" target="_blank">Terms</a> | <a href="http://readygraph.com/privacy/" target="_blank">Privacy</a> | <a href="mailto:info@readygraph.com" target="_blank">Questions?</a>)', 'really-simple-share' ).'</div>';
+						break;
+					case 'readygraph_google_search':
+						$li_style = 'style="height:38px;"'; 
+						$options2 = '<div style="clear:both; background-color: #ccc; font-size:10px;">'.__('Google Search powered by
+Google Custom Search through ReadyGraph.  (<a href="http://readygraph.com/tos/" target="_blank">Terms</a> | <a href="http://readygraph.com/privacy/" target="_blank">Privacy</a> | <a href="mailto:info@readygraph.com" target="_blank">Questions?</a>)', 'really-simple-share' ).'</div>';
 						break;
 					case 'tipy': 
 						$options = __('Tipy site id', 'really-simple-share').': 

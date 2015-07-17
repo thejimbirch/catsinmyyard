@@ -77,8 +77,15 @@ In version 1.4 and above you can also customise the image loop completely by cre
 
 ## Changelog
 
-####1.4
+####1.5.1
+* Invalidate old transients
+
+####1.5
 * Remove null framework support
+* Fix breaking change by Instagram whilst maintaining old style support
+* Remove thumbnail size option
+
+####1.4
 * Introduce class filters
 * Only set a transient if images are returned
 * Optional template part for complete output control

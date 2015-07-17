@@ -3,7 +3,7 @@
 Plugin Name:  Unattach
 Plugin URI:   http://outlandishideas.co.uk/blog/2011/03/unattach/
 Description:  Allows detaching images and other media from posts, pages and other content types.
-Version:      1.2
+Version:      1.2.2
 Author:       tamlyn
 **************************************************************************/
 

@@ -31,7 +31,8 @@ function wpt_get_twitter_feed( $atts, $content ) {
 		'hashtags' => 0,
 		'intents'  => 1,
 		'source'   => 0,
-		'show_images' => 1
+		'show_images' => 1,
+		'hide_header' => 0
 	), $atts, 'get_tweets' ) );
 	$instance = array(
 		'twitter_id'           => $id,
@@ -44,7 +45,8 @@ function wpt_get_twitter_feed( $atts, $content ) {
 		'link_hashtags'        => $hashtags,
 		'intents'              => $intents,
 		'source'               => $source,
-		'show_images'          => $show_images
+		'show_images'          => $show_images,
+		'hide_header'          => $hide_header
 	);
 
 	return wpt_twitter_feed( $instance );
@@ -53,7 +55,8 @@ function wpt_get_twitter_feed( $atts, $content ) {
 function wpt_twitter_feed( $instance ) {
 	$header = '';
 	if ( ! isset( $instance['search'] ) ) {
-		$user = wpt_get_user( $instance['twitter_id'] );
+		$twitter_ID = ( isset( $instance['twitter_id'] ) && $instance['twitter_id'] != '' ) ? $instance['twitter_id'] : get_option( 'wtt_twitter_username' );
+		$user = wpt_get_user( $twitter_ID );
 		if ( isset( $user->errors ) && $user->errors[0]->message ) {
 			return __( "Error: ", 'wp-to-twitter' ) . $user->errors[0]->message;
 		}
@@ -62,20 +65,20 @@ function wpt_twitter_feed( $instance ) {
 		$verified         = sanitize_title( $user->verified );
 		$img_alignment    = ( is_rtl() ) ? 'wpt-right' : 'wpt-left';
 		$follow_alignment = ( is_rtl() ) ? 'wpt-left' : 'wpt-right';
-		$follow_url       = esc_url( 'https://twitter.com/' . $instance['twitter_id'] );
-		$follow_button    = apply_filters( 'wpt_follow_button', "<a href='$follow_url' class='twitter-follow-button $follow_alignment' data-width='30px' data-show-screen-name='false' data-size='large' data-show-count='false' data-lang='en'>Follow @$instance[twitter_id]</a>" );
+		$follow_url       = esc_url( 'https://twitter.com/' . $twitter_ID );
+		$follow_button    = apply_filters( 'wpt_follow_button', "<a href='$follow_url' class='twitter-follow-button $follow_alignment' data-width='30px' data-show-screen-name='false' data-size='large' data-show-count='false' data-lang='en'>Follow @" .  esc_html( $twitter_ID ) . "</a>" );
 		$header .= '<div class="wpt-header">';
 		$header .= "<p>
 		$follow_button
 		<img src='$avatar' alt='' class='wpt-twitter-avatar $img_alignment $verified' />
 		<span class='wpt-twitter-name'>$name</span><br />
-		<span class='wpt-twitter-id'><a href='$follow_url'>@$instance[twitter_id]</a></span>
+		<span class='wpt-twitter-id'><a href='$follow_url'>@" .  esc_html( $twitter_ID ) . "</a></span>
 		</p>";
 		$header .= '</div>';
 	}
-
-	$return = $header . '<ul>' . "\n";
-
+	
+	$hide_header = ( $instance['hide_header'] == 1 ) ? true : false;
+	
 	if ( ! isset( $instance['search'] ) ) {
 		$options['exclude_replies'] = ( isset( $instance['twitter_hide_replies'] ) ) ? $instance['twitter_hide_replies'] : false;
 		$options['include_rts']     = $instance['twitter_include_rts'];
@@ -83,13 +86,19 @@ function wpt_twitter_feed( $instance ) {
 		$options['search']      = $instance['search'];
 		$options['geocode']     = $instance['geocode'];
 		$options['result_type'] = $instance['result_type'];
-		$instance['twitter_id'] = get_option( 'wtt_twitter_username' );
 	}
+	
+	if ( $hide_header ) {
+		$header = ''; 
+	}
+	
+	$return = $header . '<ul>' . "\n";	
+	
 	$opts['links']       = $instance['link_links'];
 	$opts['mentions']    = $instance['link_mentions'];
 	$opts['hashtags']    = $instance['link_hashtags'];
-	$opts['show_images'] = $instance['show_images'];
-	$rawtweets        = WPT_getTweets( $instance['twitter_num'], $instance['twitter_id'], $options );
+	$opts['show_images'] = isset( $instance['show_images'] ) ? $instance['show_images'] : false;
+	$rawtweets        = WPT_getTweets( $instance['twitter_num'], $twitter_ID, $options );
 
 	if ( isset( $rawtweets['error'] ) ) {
 		$return .= "<li>" . $rawtweets['error'] . "</li>";
@@ -103,9 +112,9 @@ function wpt_twitter_feed( $instance ) {
 			}
 			if ( $instance['source'] ) {
 				$source    = $tweet['source'];
-				$timetweet = sprintf( __( '<a href="%3$s">about %1$s ago</a> via %2$s', 'wp-to-twitter' ), human_time_diff( strtotime( $tweet['created_at'] ) ), $source, "http://twitter.com/$instance[twitter_id]/status/$tweet[id_str]" );
+				$timetweet = sprintf( __( '<a href="%3$s">about %1$s ago</a> via %2$s', 'wp-to-twitter' ), human_time_diff( strtotime( $tweet['created_at'] ) ), $source, "http://twitter.com/" . $twitter_ID . "/status/$tweet[id_str]" );
 			} else {
-				$timetweet = sprintf( __( '<a href="%2$s">about %1$s ago</a>', 'wp-to-twitter' ), human_time_diff( strtotime( $tweet['created_at'] ) ), "http://twitter.com/$instance[twitter_id]/status/$tweet[id_str]" );
+				$timetweet = sprintf( __( '<a href="%2$s">about %1$s ago</a>', 'wp-to-twitter' ), human_time_diff( strtotime( $tweet['created_at'] ) ), "http://twitter.com/$twitter_ID/status/$tweet[id_str]" );
 			}
 			$tweet_classes = wpt_generate_classes( $tweet );
 
@@ -155,7 +164,8 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 			'link_hashtags'        => '',
 			'intents'              => '',
 			'source'               => '',
-			'show_images'          => ''
+			'show_images'          => '',
+			'hide_header'          => 0
 		);
 
 		$widget_ops = array(
@@ -168,7 +178,7 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 			'width'   => 200,
 			'height'  => 250,
 		);
-		$this->WP_Widget( 'wpt-latest-tweets', __( 'WP to Twitter - Latest Tweets', 'wp-to-twitter' ), $widget_ops, $control_ops );
+		parent::__construct( 'wpt-latest-tweets', __( 'WP to Twitter - Latest Tweets', 'wp-to-twitter' ), $widget_ops, $control_ops );
 	}
 
 	/**
@@ -183,6 +193,7 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 		wp_enqueue_script( 'twitter-platform', "https://platform.twitter.com/widgets.js" );
 		/** Merge with defaults */
 		$instance = wp_parse_args( (array) $instance, $this->defaults );
+
 		echo $before_widget;
 		if ( $instance['title'] ) {
 			echo $before_title . apply_filters( 'widget_title', $instance['title'], $instance, $this->id_base ) . $after_title;
@@ -240,7 +251,15 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 			       name="<?php echo $this->get_field_name( 'twitter_id' ); ?>"
 			       value="<?php echo esc_attr( $instance['twitter_id'] ); ?>" class="widefat"/>
 		</p>
-
+		
+		<p>
+			<input id="<?php echo $this->get_field_id( 'hide_header' ); ?>" type="checkbox"
+			       name="<?php echo $this->get_field_name( 'hide_header' ); ?>"
+			       value="1" <?php checked( $instance['hide_header'], 1 ); ?>/>
+			<label
+				for="<?php echo $this->get_field_id( 'hide_header' ); ?>"><?php _e( 'Hide Widget Header', 'wp-to-twitter' ); ?></label>
+		</p>
+		
 		<p>
 			<label
 				for="<?php echo $this->get_field_id( 'twitter_num' ); ?>"><?php _e( 'Number of Tweets to Show', 'wp-to-twitter' ); ?>
@@ -253,7 +272,7 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 		<p>
 			<input id="<?php echo $this->get_field_id( 'twitter_hide_replies' ); ?>" type="checkbox"
 			       name="<?php echo $this->get_field_name( 'twitter_hide_replies' ); ?>"
-			       value="1" <?php checked( $instance['twitter_hide_replies'] ); ?>/>
+			       value="1" <?php checked( $instance['twitter_hide_replies'], 1 ); ?>/>
 			<label
 				for="<?php echo $this->get_field_id( 'twitter_hide_replies' ); ?>"><?php _e( 'Hide @ Replies', 'wp-to-twitter' ); ?></label>
 		</p>
@@ -261,7 +280,7 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 		<p>
 			<input id="<?php echo $this->get_field_id( 'twitter_include_rts' ); ?>" type="checkbox"
 			       name="<?php echo $this->get_field_name( 'twitter_include_rts' ); ?>"
-			       value="1" <?php checked( $instance['twitter_include_rts'] ); ?>/>
+			       value="1" <?php checked( $instance['twitter_include_rts'], 1 ); ?>/>
 			<label
 				for="<?php echo $this->get_field_id( 'twitter_include_rts' ); ?>"><?php _e( 'Include Retweets', 'wp-to-twitter' ); ?></label>
 		</p>
@@ -269,7 +288,7 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 		<p>
 			<input id="<?php echo $this->get_field_id( 'link_links' ); ?>" type="checkbox"
 			       name="<?php echo $this->get_field_name( 'link_links' ); ?>"
-			       value="1" <?php checked( $instance['link_links'] ); ?>/>
+			       value="1" <?php checked( $instance['link_links'], 1 ); ?>/>
 			<label
 				for="<?php echo $this->get_field_id( 'link_links' ); ?>"><?php _e( 'Parse links', 'wp-to-twitter' ); ?></label>
 		</p>
@@ -277,7 +296,7 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 		<p>
 			<input id="<?php echo $this->get_field_id( 'link_mentions' ); ?>" type="checkbox"
 			       name="<?php echo $this->get_field_name( 'link_mentions' ); ?>"
-			       value="1" <?php checked( $instance['link_mentions'] ); ?>/>
+			       value="1" <?php checked( $instance['link_mentions'], 1 ); ?>/>
 			<label
 				for="<?php echo $this->get_field_id( 'link_mentions' ); ?>"><?php _e( 'Parse @mentions', 'wp-to-twitter' ); ?></label>
 		</p>
@@ -285,7 +304,7 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 		<p>
 			<input id="<?php echo $this->get_field_id( 'show_images' ); ?>" type="checkbox"
 			       name="<?php echo $this->get_field_name( 'show_images' ); ?>"
-			       value="1" <?php checked( $instance['show_images'] ); ?>/>
+			       value="1" <?php checked( $instance['show_images'], 1 ); ?>/>
 			<label
 				for="<?php echo $this->get_field_id( 'show_images' ); ?>"><?php _e( 'Show Images', 'wp-to-twitter' ); ?></label>
 		</p>		
@@ -293,7 +312,7 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 		<p>
 			<input id="<?php echo $this->get_field_id( 'link_hashtags' ); ?>" type="checkbox"
 			       name="<?php echo $this->get_field_name( 'link_hashtags' ); ?>"
-			       value="1" <?php checked( $instance['link_hashtags'] ); ?>/>
+			       value="1" <?php checked( $instance['link_hashtags'], 1 ); ?>/>
 			<label
 				for="<?php echo $this->get_field_id( 'link_hashtags' ); ?>"><?php _e( 'Parse #hashtags', 'wp-to-twitter' ); ?></label>
 		</p>
@@ -301,7 +320,7 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 		<p>
 			<input id="<?php echo $this->get_field_id( 'intents' ); ?>" type="checkbox"
 			       name="<?php echo $this->get_field_name( 'intents' ); ?>"
-			       value="1" <?php checked( $instance['intents'] ); ?>/>
+			       value="1" <?php checked( $instance['intents'], 1 ); ?>/>
 			<label
 				for="<?php echo $this->get_field_id( 'intents' ); ?>"><?php _e( 'Include Reply/Retweet/Favorite Links', 'wp-to-twitter' ); ?></label>
 		</p>
@@ -309,7 +328,7 @@ class WPT_Latest_Tweets_Widget extends WP_Widget {
 		<p>
 			<input id="<?php echo $this->get_field_id( 'source' ); ?>" type="checkbox"
 			       name="<?php echo $this->get_field_name( 'source' ); ?>"
-			       value="1" <?php checked( $instance['source'] ); ?>/>
+			       value="1" <?php checked( $instance['source'], 1 ); ?>/>
 			<label
 				for="<?php echo $this->get_field_id( 'source' ); ?>"><?php _e( 'Include Tweet source', 'wp-to-twitter' ); ?></label>
 		</p>
@@ -359,7 +378,7 @@ class WPT_Search_Tweets_Widget extends WP_Widget {
 			'width'   => 200,
 			'height'  => 250,
 		);
-		$this->WP_Widget( 'wpt-search-tweets', __( 'WP to Twitter - Searched Tweets', 'wp-to-twitter' ), $widget_ops, $control_ops );
+		parent::__construct( 'wpt-search-tweets', __( 'WP to Twitter - Searched Tweets', 'wp-to-twitter' ), $widget_ops, $control_ops );
 	}
 
 	/**

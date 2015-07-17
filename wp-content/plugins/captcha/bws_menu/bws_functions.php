@@ -1,7 +1,7 @@
 <?php
 /*
 * General functions for BestWebSoft plugins
-* Version: 1.0.8
+* Version: 1.1.0
 */
 if ( ! function_exists ( 'bws_add_general_menu' ) ) {
 	function bws_add_general_menu( $base ) {
@@ -110,7 +110,7 @@ if ( ! function_exists( 'bws_plugin_banner' ) ) {
 		}
 
 		if ( false == strrpos( $banner_url_or_slug, '/' ) ) {
-			$banner_url_or_slug = 'http://ps.w.org/' . $banner_url_or_slug . '/assets/icon-128x128.png';
+			$banner_url_or_slug = '//ps.w.org/' . $banner_url_or_slug . '/assets/icon-128x128.png';
 		}
 
 		if ( ! function_exists( 'is_plugin_active' ) )
@@ -145,7 +145,7 @@ if ( ! function_exists( 'bws_plugin_banner' ) ) {
 					<div class="<?php echo $this_banner_prefix; ?>_message bws_banner_on_plugin_page" style="display: none;">
 						<img class="<?php echo $this_banner_prefix; ?>_close_icon close_icon" title="" src="<?php echo plugins_url( 'images/close_banner.png', __FILE__ ); ?>" alt=""/>
 						<div class="icon">
-							<img title="" src="<?php echo $banner_url_or_slug; ?>" alt="" />
+							<img title="" src="<?php echo esc_attr( $banner_url_or_slug ); ?>" alt="" />
 						</div>						
 						<div class="text"><?php
 							_e( 'It’s time to upgrade your', 'bestwebsoft' ); ?> <strong><?php echo $plugin_info['Name']; ?> plugin</strong> <?php _e( 'to', 'bestwebsoft' ); ?> <strong>PRO</strong> <?php _e( 'version!', 'bestwebsoft' ); ?><br />
@@ -365,7 +365,7 @@ if ( ! function_exists( 'bws_go_pro_tab' ) ) {
 					<p><?php _e( "Unfortunately, you have exceeded the number of available tries per day. Please, upload the plugin manually.", 'bestwebsoft' ); ?></p>
 				<?php } else { ?>
 					<p>
-						<input type="text" name="bws_license_key" value="<?php echo $bws_license_key; ?>" />
+						<input type="text" maxlength="100" name="bws_license_key" value="<?php echo $bws_license_key; ?>" />
 						<input type="hidden" name="bws_license_plugin" value="<?php echo $bws_license_plugin; ?>" />
 						<input type="hidden" name="bws_license_submit" value="submit" />
 						<input type="submit" class="button-primary" value="<?php _e( 'Activate', 'bestwebsoft' ); ?>" />
@@ -403,7 +403,7 @@ if ( ! function_exists( 'bws_go_pro_from_trial_tab' ) ) {
 					<p><?php _e( "Unfortunately, you have exceeded the number of available tries per day.", 'bestwebsoft' ); ?></p>
 				<?php } else { ?>
 					<p>
-						<input type="text" name="bws_license_key" value="" />
+						<input type="text" maxlength="100" name="bws_license_key" value="" />
 						<input type="hidden" name="bws_license_plugin" value="<?php echo $plugin_basename; ?>" />
 						<input type="hidden" name="bws_license_submit" value="submit" />
 						<input type="submit" class="button-primary" value="<?php _e( 'Activate', 'bestwebsoft' ); ?>" />
@@ -523,7 +523,7 @@ if ( ! function_exists ( 'bws_check_pro_license_form' ) ) {
 		<form method="post" action="admin.php?page=<?php echo $page; ?>">
 			<p><?php echo _e( 'If needed you can check if the license key is correct or reenter it in the field below. You can find your license key on your personal page - Client area - on our website', 'bestwebsoft' ) . ' <a href="http://bestwebsoft.com/wp-login.php">http://bestwebsoft.com/wp-login.php</a> ' . __( '(your username is the email you specify when purchasing the product). If necessary, please submit "Lost your password?" request.', 'bestwebsoft' ); ?></p>
 			<p>
-				<input type="text" name="bws_license_key" value="<?php echo $license_key; ?>" />
+				<input type="text" maxlength="100" name="bws_license_key" value="<?php echo $license_key; ?>" />
 				<input type="hidden" name="bws_license_submit" value="submit" />
 				<input type="submit" class="button-primary" value="<?php _e( 'Check license key', 'bestwebsoft' ) ?>" />
 				<?php wp_nonce_field( $plugin_basename, 'bws_license_nonce_name' ); ?>
@@ -539,7 +539,7 @@ if ( ! function_exists ( 'bws_plugin_update_row' ) ) {
 		if ( isset( $bstwbsftwppdtplgns_options['wrong_license_key'][ $plugin_key ] ) ) {
 			echo '<tr class="plugin-update-tr">
 					<td colspan="' . $wp_list_table->get_column_count() . '" class="plugin-update colspanchange">
-						<div class="update-message" style="background-color: #FFEBE8; border-color: #CC0000;">' . __( 'WARNING: We have noticed illegal use of our plugin by you. We strongly recommend you to solve the problem within 24 hours, otherwise the plugin will be deactivated. Please go to your personal', 'bestwebsoft' ) . ' <a href="http://bestwebsoft.com/wp-admin/admin.php?page=bws_plugins_client_area">Client area</a> ' . __( '(your username is the email you specify when purchasing the product), where you can make the necessary changes.', 'bestwebsoft' ) . '</div>
+						<div class="update-message" style="background-color: #FFEBE8; border-color: #CC0000;"><strong>' . __( 'WARNING: Illegal use notification', 'bestwebsoft' ) . '.</strong> ' . __( 'You can use one license of the Pro plugin for one domain only. Please check and edit your license or domain if necessary using you personal Client Area. We strongly recommend you to solve the problem within 24 hours, otherwise the Pro plugin will be deactivated.', 'bestwebsoft' ) . ' <a target="_blank" href="http://support.bestwebsoft.com/hc/en-us/articles/204240089">' . __( 'Learn More', 'bestwebsoft' ) . '</a></div>
 					</td>
 				</tr>';
 		} elseif ( isset( $bstwbsftwppdtplgns_options['time_out'][ $plugin_key ] ) && strtotime( $bstwbsftwppdtplgns_options['time_out'][ $plugin_key ] ) < strtotime( date("m/d/Y") ) ) {
@@ -763,6 +763,34 @@ if ( ! class_exists( 'BWS_admin_tooltip' ) ) {
 			</script>
 		<?php }
 	}
+}
+
+if ( ! function_exists ( 'bws_form_restore_default_settings' ) ) {
+	function bws_form_restore_default_settings( $plugin_basename ) { ?>
+		<form method="post" action="">			
+			<p><?php _e( 'Restore all plugin settings to defaults', 'bestwebsoft' ); ?></p>
+			<p>					
+				<input type="submit" class="button" value="<?php _e( 'Restore settings', 'bestwebsoft' ); ?>" />
+			</p>
+			<input type="hidden" name="bws_restore_default" value="submit" />
+			<?php wp_nonce_field( $plugin_basename, 'bws_settings_nonce_name' ); ?>
+		</form>
+	<?php }
+}
+
+if ( ! function_exists ( 'bws_form_restore_default_confirm' ) ) {
+	function bws_form_restore_default_confirm( $plugin_basename ) { ?>
+		<div>
+			<p><?php _e( 'Are you sure you want to restore all settings by default?', 'bestwebsoft' ) ?></p>
+			<form method="post" action="">
+				<p>
+					<button class="button" name="bws_restore_confirm"><?php _e( 'Yes, restore all settings', 'bestwebsoft' ) ?></button>
+					<button class="button" name="bws_restore_deny"><?php _e( 'No, go back to the settings page', 'bestwebsoft' ) ?></button>
+					<?php wp_nonce_field( $plugin_basename, 'bws_settings_nonce_name' ); ?>
+				</p>
+			</form>
+		</div>
+	<?php }
 }
 
 add_action( 'admin_init', 'bws_plugin_init' );

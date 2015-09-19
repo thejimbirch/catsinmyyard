@@ -453,8 +453,9 @@ class Wslm_LicenseServer {
 
 	protected function generateRandomString($length, $alphabet = null) {
 		if ( $alphabet === null ) {
-			$alphabet = 'ABDEFGHIJKLMNOPQRSTVWXYZ0123456789';
+			$alphabet = 'ABDEFGHJKLMNOPQRSTVWXYZ0123456789';
 			//U and C intentionally left out to lessen the chances of generating an obscene string.
+			//"I" was left out because it's visually similar to 1.
 		}
 		$maxIndex = strlen($alphabet) - 1;
 		$str = '';

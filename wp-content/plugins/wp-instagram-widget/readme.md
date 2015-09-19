@@ -29,6 +29,8 @@ To install this plugin:
 * Activate the plugin through the 'Plugins' menu in WordPress
 * That's it!
 
+Alternatively you can search for the plugin from your WordPress dashboard and install from there.
+
 Visit [WordPress.org for a comprehensive guide](http://codex.wordpress.org/Managing_Plugins#Manual_Plugin_Installation) on in how to install WordPress plugins.
 
 ## Hooks & Filters
@@ -76,6 +78,9 @@ In version 1.4 and above you can also customise the image loop completely by cre
 ...
 
 ## Changelog
+
+####1.6
+* Compatibility with 4.3
 
 ####1.5.1
 * Invalidate old transients

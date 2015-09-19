@@ -180,26 +180,15 @@ function wpt_update_settings() {
 		wpt_updated_settings(); 
 		wpt_show_last_tweet();
 		wpt_handle_errors();
+		wpt_show_debug();
 	?>
+	<?php $elem = ( version_compare( '4.3', get_option( 'version' ), '>=' ) ) ? 'h1' : 'h2'; ?>
+	<<?php echo $elem; ?>><?php _e( "WP to Twitter Options", 'wp-to-twitter' ); ?></<?php echo $elem; ?>>
 	
-	<h2><?php _e( "WP to Twitter Options", 'wp-to-twitter' ); ?></h2>
 	<div class='nav-tab-wrapper'>
 		<?php wpt_settings_tabs(); ?>
 	</div>
 	<div id="wpt_settings_page" class="postbox-container jcd-wide">
-
-	<?php
-	// Nothing triggers this. If you want some debugging information, just add the parameter to the URL.
-	if ( isset( $_GET['debug'] ) && $_GET['debug'] == 'true' ) {
-		$debug = get_option( 'wpt_debug' );
-		echo "<pre>";
-		print_r( $debug );
-		echo "</pre>";
-	}
-	if ( isset( $_GET['debug'] ) && $_GET['debug'] == 'delete' ) {
-		delete_option( 'wpt_debug' );
-	}
-	?>
 	<div class="metabox-holder">
 
 	<?php 
@@ -220,8 +209,7 @@ function wpt_update_settings() {
 			if ( ! function_exists( 'wpt_pro_exists' ) ) { ?>
 				<div class="ui-sortable meta-box-sortables">
 					<div class="postbox">
-						<div class="handlediv"><span class="screen-reader-text">Click to toggle</span></div>
-						<h3 class='wpt-upgrade hndle'><span><strong><?php _e( 'Upgrade Now!', 'wp-to-twitter' ); ?></strong></span>
+						<h3 class='wpt-upgrade'><span><strong><?php _e( 'Upgrade Now!', 'wp-to-twitter' ); ?></strong></span>
 						</h3>
 
 						<div class="inside purchase">
@@ -260,8 +248,7 @@ function wpt_update_settings() {
 	?>
 	<div class="ui-sortable meta-box-sortables">
 		<div class="postbox">
-			<div class="handlediv"><span class="screen-reader-text">Click to toggle</span></div>
-			<h3 class='hndle'><span><?php _e( 'Status Update Templates', 'wp-to-twitter' ); ?></span></h3>
+			<h3><span><?php _e( 'Status Update Templates', 'wp-to-twitter' ); ?></span></h3>
 
 			<div class="inside wpt-settings">
 				<form method="post" action="">
@@ -406,8 +393,7 @@ function wpt_update_settings() {
 	
 	<div class="ui-sortable meta-box-sortables">
 			<div class="postbox">
-				<div class="handlediv"><span class="screen-reader-text">Click to toggle</span></div>
-				<h3 class='hndle'><span><?php _e( 'Tweet Template Tags', 'wp-to-twitter' ); ?></span></h3>
+				<h3><span><?php _e( 'Tweet Template Tags', 'wp-to-twitter' ); ?></span></h3>
 
 				<div class="inside">
 					<ul>
@@ -450,8 +436,7 @@ function wpt_update_settings() {
 	?>
 	<div class="ui-sortable meta-box-sortables">
 		<div class="postbox">
-			<div class="handlediv"><span class="screen-reader-text">Click to toggle</span></div>
-			<h3 class='hndle'><span><?php _e( 'Advanced Settings', 'wp-to-twitter' ); ?></span></h3>
+			<h3><span><?php _e( 'Advanced Settings', 'wp-to-twitter' ); ?></span></h3>
 
 			<div class="inside">
 				<form method="post" action="">
@@ -602,7 +587,7 @@ function wpt_update_settings() {
 								<?php
 								if ( get_option( 'wpt_rate_limiting' ) == 1 ) {
 									?>
-								<input type="number" name="wpt_default_rate_limit" id="wpt_default_rate_limit"
+								<input type="number" name="wpt_default_rate_limit" min="1" id="wpt_default_rate_limit"
 								       value="<?php echo wpt_default_rate_limit(); ?>" />
 								<label
 									for="wpt_default_rate_limit"><?php _e( "Default Rate Limit per category per hour", 'wp-to-twitter' ); ?></label><br/>							
@@ -729,8 +714,7 @@ function wpt_update_settings() {
 	if ( $current == 'support' ) {
 	?>
 	<div class="postbox" id="get-support">
-		<div class="handlediv"><span class="screen-reader-text">Click to toggle</span></div>
-		<h3 class='hndle'><span><?php _e( 'Get Plug-in Support', 'wp-to-twitter' ); ?></span></h3>
+		<h3><span><?php _e( 'Get Plug-in Support', 'wp-to-twitter' ); ?></span></h3>
 
 		<div class="inside">
 			<?php wpt_get_support_form(); ?>
@@ -764,12 +748,11 @@ function wpt_sidebar() {
 	<div class="metabox-holder">
 		<div class="ui-sortable meta-box-sortables">
 			<div class="postbox">
-				<div class="handlediv"><span class="screen-reader-text">Click to toggle</span></div>
 				<?php if ( ! function_exists( 'wpt_pro_exists' ) ) { ?>
-					<h3 class='hndle'>
+					<h3>
 						<span><strong><?php _e( 'Support WP to Twitter', 'wp-to-twitter' ); ?></strong></span></h3>
 				<?php } else { ?>
-					<h3 class='hndle'>
+					<h3>
 						<span><strong><?php _e( 'WP to Twitter Support', 'wp-to-twitter' ); ?></strong></span></h3>
 				<?php } ?>
 				<div class="inside resources">
@@ -817,8 +800,7 @@ function wpt_sidebar() {
 		
 		<div class="ui-sortable meta-box-sortables">
 			<div class="postbox">
-				<div class="handlediv"><span class="screen-reader-text">Click to toggle</span></div>
-				<h3 class='hndle'><?php _e( 'Twitter Time Check', 'wp-to-twitter' ); ?></h3>
+				<h3><?php _e( 'Twitter Time Check', 'wp-to-twitter' ); ?></h3>
 
 				<div class="inside server">
 						<?php wpt_do_server_check(); ?>
@@ -829,8 +811,7 @@ function wpt_sidebar() {
 		<?php if ( get_option( 'wpt_rate_limiting' ) == 1 ) { ?>
 		<div class="ui-sortable meta-box-sortables">
 			<div class="postbox">
-				<div class="handlediv"><span class="screen-reader-text">Click to toggle</span></div>
-				<h3 class='hndle'><?php _e( 'Monitor Rate Limiting', 'wp-to-twitter' ); ?></h3>
+				<h3><?php _e( 'Monitor Rate Limiting', 'wp-to-twitter' ); ?></h3>
 
 				<div class="inside server">		
 					<?php echo wpt_view_rate_limits(); ?>

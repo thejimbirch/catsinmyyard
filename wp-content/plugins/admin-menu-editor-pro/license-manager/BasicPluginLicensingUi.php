@@ -516,7 +516,7 @@ class Wslm_BasicPluginLicensingUI {
 				$renewalUrl ? '</a>' : ''
 			),
 			'not_found' => 'The current license key or site token is invalid.',
-			'bad_site' => 'The current license is associated with a different site. Please re-enter your license key.',
+			'wrong_site' => 'The current license is associated with a different site. Please re-enter your license key.',
 		);
 		$status = $license->getStatus();
 		$notice = isset($messages[$status]) ? $messages[$status] : 'The current license is invalid.';

@@ -3,7 +3,7 @@
 Plugin Name: WP Instagram Widget
 Plugin URI: https://github.com/scottsweb/wp-instagram-widget
 Description: A WordPress widget for showing your latest Instagram photos.
-Version: 1.5.1
+Version: 1.6
 Author: Scott Evans
 Author URI: http://scott.ee
 Text Domain: wpiw
@@ -47,9 +47,12 @@ add_action( 'widgets_init', 'wpiw_widget' );
 
 class null_instagram_widget extends WP_Widget {
 
-	function null_instagram_widget() {
-		$widget_ops = array( 'classname' => 'null-instagram-feed', 'description' => __( 'Displays your latest Instagram photos', 'wpiw' ) );
-		$this->WP_Widget( 'null-instagram-feed', __( 'Instagram', 'wpiw' ), $widget_ops );
+	function __construct() {
+		parent::__construct(
+			'null-instagram-feed',
+			__( 'Instagram', 'wpiw' ),
+			array( 'classname' => 'null-instagram-feed', 'description' => __( 'Displays your latest Instagram photos', 'wpiw' ) )
+		);
 	}
 
 	function widget( $args, $instance ) {
@@ -171,7 +174,7 @@ class null_instagram_widget extends WP_Widget {
 				$images = $insta_array['entry_data']['ProfilePage'][0]['user']['media']['nodes'];
 				$type = 'new';
 			} else {
-				return new WP_Error( 'bad_josn_2', __( 'Instagram has returned invalid data.', 'wpiw' ) );
+				return new WP_Error( 'bad_json_2', __( 'Instagram has returned invalid data.', 'wpiw' ) );
 			}
 
 			if ( !is_array( $images ) )

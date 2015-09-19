@@ -1,5 +1,5 @@
-	<?php
-		if ( ! defined( 'ABSPATH' ) ) exit;
+<?php
+	if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * Represents the view for the administration dashboard.
  *
@@ -115,9 +115,9 @@ include("header.php");
 			</div>
 			<div style="width: 25%; margin: 1% 5% 0 0; float: left; background: #F0F0F0; border-radius: 15px;padding: 1% 2% 1% 1%"><h4 class="rg-h4">Select your plan</h4>
 			<div style="margin: 10px;"><div class="rg-icon-thumb"><input type="radio" name="select-plan" value="promote_free" style="font-weight: bold; margin: 12px 0"></div><p class="rg-icon-content"><strong>Free - Stick with the Basic Plan</strong> </input><br><span style="margin-top: -12px">Basic tools, Promotion if content ranks highly</span></p></div>
-			<div style="margin: 10px;"><div class="rg-icon-thumb"><input type="radio" name="select-plan" value="promote_19" style="font-weight: bold; margin: 12px 0" checked></div><p class="rg-icon-content"><strong>Get promoted to 2000 users monthly</strong></input><br><span style="margin-top: -12px">$19/month</span></p></div>
-			<div style="margin: 10px;"><div class="rg-icon-thumb"><input type="radio" name="select-plan" value="promote_59" style="font-weight: bold; margin: 12px 0"></div><p class="rg-icon-content"><strong>Get promoted to 20,000 users monthly</strong></input><br><span style="margin-top: -12px">$59/month</span></p></div>
-			<div style="margin: 10px;"><div class="rg-icon-thumb"><input type="radio" name="select-plan" value="promote_149" style="font-weight: bold; margin: 12px 0"></div><p class="rg-icon-content"><strong>Get promoted to 100,000 users monthly</strong></input><br><span style="margin-top: -12px">$149/month</span></p></div>
+			<div style="margin: 10px;"><div class="rg-icon-thumb"><input type="radio" name="select-plan" value="promote_39" style="font-weight: bold; margin: 12px 0" checked></div><p class="rg-icon-content"><strong>Get promoted to 2000 users monthly</strong></input><br><span style="margin-top: -12px">$39/month</span></p></div>
+			<div style="margin: 10px;"><div class="rg-icon-thumb"><input type="radio" name="select-plan" value="promote_59" style="font-weight: bold; margin: 12px 0"></div><p class="rg-icon-content"><strong>Get promoted to 10,000 users monthly</strong></input><br><span style="margin-top: -12px">$59/month</span></p></div>
+			<div style="margin: 10px;"><div class="rg-icon-thumb"><input type="radio" name="select-plan" value="promote_99" style="font-weight: bold; margin: 12px 0"></div><p class="rg-icon-content"><strong>Get promoted to 100,000 users monthly</strong></input><br><span style="margin-top: -12px">$99/month</span></p></div>
 			<div style="margin: 10px;"><div class="rg-icon-thumb"><input type="radio" name="select-plan" value="promote_no" style="font-weight: bold; margin: 12px 0"></div><p class="rg-icon-content"><strong>Don't promote my site</strong></input><br><span style="margin-top: -12px">Opt out of cross promotion network</span></p></div>
 			<div class="rg-icon-thumb" style="margin: 10px;width:100%"><input type="checkbox" id="plan-type" name="plan-type" value="annual" style="font-weight: bold">&nbsp;&nbsp; Save 20% with an annual plan</input></div>
 			<div class="save-changes" style="font-weight: normal; text-align: center;"><a class="btn btn-large btn-warning save-next" href="#" style="margin: 15px" onclick="subscribe_readygraph()">Continue</a><br> 

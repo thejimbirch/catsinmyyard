@@ -9,10 +9,10 @@ Author: Jeff Starr
 Author URI: http://monzilla.biz/
 Contributors: specialk, aldolat, WpBlogHost, James Wilkes, juliobox
 Donate link: http://m0n.co/donate
-Requires at least: 3.9
-Tested up to: 4.2
+Requires at least: 4.0
+Tested up to: 4.3
 Stable tag: trunk
-Version: 20150624
+Version: 20150808
 License: GPLv2 or later
 
 Block Bad Queries (BBQ) helps protect WordPress against malicious URL requests. 
@@ -56,6 +56,12 @@ To upgrade BBQ, remove old version and replace with new version. Nothing else ne
 No screenshots available - code only.
 
 == Changelog ==
+
+**2015/08/08**
+
+* Tested on WordPress 4.3
+* Updated minimum version requirement
+* Highlighted Pro link on Plugins screen
 
 **2015/06/24**
 

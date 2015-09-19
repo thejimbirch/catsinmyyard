@@ -4,7 +4,7 @@ Plugin Name: UpdraftPlus - Backup/Restore
 Plugin URI: https://updraftplus.com
 Description: Backup and restore: take backups locally, or backup to Amazon S3, Dropbox, Google Drive, Rackspace, (S)FTP, WebDAV & email, on automatic schedules.
 Author: UpdraftPlus.Com, DavidAnderson
-Version: 1.10.3
+Version: 1.11.9
 Donate link: http://david.dw-perspective.org.uk/donate
 License: GPLv3 or later
 Text Domain: updraftplus
@@ -36,12 +36,12 @@ if (!defined('ABSPATH')) die('No direct access allowed');
 
 define('UPDRAFTPLUS_DIR', dirname(__FILE__));
 define('UPDRAFTPLUS_URL', plugins_url('', __FILE__));
-define('UPDRAFT_DEFAULT_OTHERS_EXCLUDE','upgrade,cache,updraft,backup*,*backups');
+define('UPDRAFT_DEFAULT_OTHERS_EXCLUDE','upgrade,cache,updraft,backup*,*backups,mysql.sql');
 define('UPDRAFT_DEFAULT_UPLOADS_EXCLUDE','backup*,*backups,backwpup*,wp-clone');
 
 // The following can go in your wp-config.php
 // Tables whose data can be skipped without significant loss, if (and only if) the attempt to back them up fails (e.g. bwps_log, from WordPress Better Security, is log data; but individual entries can be huge and cause out-of-memory fatal errors on low-resource environments). Comma-separate the table names (without the WordPress table prefix).
-if (!defined('UPDRAFTPLUS_DATA_OPTIONAL_TABLES')) define('UPDRAFTPLUS_DATA_OPTIONAL_TABLES', 'bwps_log,statpress,slim_stats,redirection_logs,Counterize,Counterize_Referers,Counterize_UserAgents,wbz404_logs,wbz404_redirects,tts_trafficstats,tts_referrer_stats,wponlinebackup_generations,svisitor_stat,simple_feed_stats,itsec_log,relevanssi_log');
+if (!defined('UPDRAFTPLUS_DATA_OPTIONAL_TABLES')) define('UPDRAFTPLUS_DATA_OPTIONAL_TABLES', 'bwps_log,statpress,slim_stats,redirection_logs,Counterize,Counterize_Referers,Counterize_UserAgents,wbz404_logs,wbz404_redirects,tts_trafficstats,tts_referrer_stats,wponlinebackup_generations,svisitor_stat,simple_feed_stats,itsec_log,relevanssi_log,blc_instances');
 if (!defined('UPDRAFTPLUS_ZIP_EXECUTABLE')) define('UPDRAFTPLUS_ZIP_EXECUTABLE', "/usr/bin/zip,/bin/zip,/usr/local/bin/zip,/usr/sfw/bin/zip,/usr/xdg4/bin/zip,/opt/bin/zip");
 if (!defined('UPDRAFTPLUS_MYSQLDUMP_EXECUTABLE')) define('UPDRAFTPLUS_MYSQLDUMP_EXECUTABLE', "/usr/bin/mysqldump,/bin/mysqldump,/usr/local/bin/mysqldump,/usr/sfw/bin/mysqldump,/usr/xdg4/bin/mysqldump,/opt/bin/mysqldump");
 // If any individual file size is greater than this, then a warning is given
@@ -57,6 +57,9 @@ if (!defined('UPDRAFTPLUS_MAXBATCHFILES')) define('UPDRAFTPLUS_MAXBATCHFILES', 5
 
 // If any individual email attachment is greater than this, then a warning is given (and then removed if the email actually succeeds)
 if (!defined('UPDRAFTPLUS_WARN_EMAIL_SIZE')) define('UPDRAFTPLUS_WARN_EMAIL_SIZE', 20*1048576);
+
+// Options to pass to the zip binary (if that method happens to be used). By default, we mark several extensions that refer to filetypes that are already compressed as not needing further compression - which saves time/resources.
+if (!defined('UPDRAFTPLUS_BINZIP_OPTS')) define('UPDRAFTPLUS_BINZIP_OPTS', '-n .jpg:.JPG:.jpeg:.JPEG:.png:.PNG:.gif:.GIF:.zip:.ZIP:.gz:.bz2:.xz.:.rar:.RAR:.mp3:.MP3:.mp4:.MP4:.mpeg:.MPEG:.avi:.AVI:.mov:.MOV');
 
 // Load add-ons and files that may or may not be present, depending on where the plugin was distributed
 if (is_file(UPDRAFTPLUS_DIR.'/autoload.php')) require_once(UPDRAFTPLUS_DIR.'/autoload.php');
@@ -118,19 +121,30 @@ if (is_dir(UPDRAFTPLUS_DIR.'/addons') && $dir_handle = opendir(UPDRAFTPLUS_DIR.'
 
 if (is_file(UPDRAFTPLUS_DIR.'/udaddons/updraftplus-addons.php')) include_once(UPDRAFTPLUS_DIR.'/udaddons/updraftplus-addons.php');
 
-require_once(UPDRAFTPLUS_DIR.'/class-updraftplus.php');
-$updraftplus = new UpdraftPlus();
-$updraftplus->have_addons = $updraftplus_have_addons;
+if (!file_exists(UPDRAFTPLUS_DIR.'/class-updraftplus.php') || !file_exists(UPDRAFTPLUS_DIR.'/options.php')) {
+	// Warn if they've not got the whole plugin - can happen if WP crashes (e.g. out of disk space) when upgrading the plugin
+	function updraftplus_incomplete_install_warning() {
+		echo '<div class="updraftmessage error"><p><strong>'.__('Error','updraftplus').':</strong> '.__("You do not have UpdraftPlus completely installed - please de-install and install it again. Most likely, WordPress malfunctioned when copying the plugin files.", 'updraftplus').' <a href="https://updraftplus.com/faqs/wordpress-crashed-when-updating-updraftplus-what-can-i-do/">'.__('Go here for more information.','updraftplus').'</a></p></div>';
+	}
+	add_action('all_admin_notices', 'updraftplus_incomplete_install_warning');
+} else {
 
-if (!$updraftplus->memory_check(192)) {
-// Experience appears to show that the memory limit is only likely to be hit (unless it is very low) by single files that are larger than available memory (when compressed)
-	# Add sanity checks - found someone who'd set WP_MAX_MEMORY_LIMIT to 256K !
-	if (!$updraftplus->memory_check($updraftplus->memory_check_current(WP_MAX_MEMORY_LIMIT))) {
-		$new = absint($updraftplus->memory_check_current(WP_MAX_MEMORY_LIMIT));
-		if ($new>32 && $new<100000) {
-			@ini_set('memory_limit', $new.'M');
+	require_once(UPDRAFTPLUS_DIR.'/class-updraftplus.php');
+	$updraftplus = new UpdraftPlus();
+	$updraftplus->have_addons = $updraftplus_have_addons;
+
+	if (!$updraftplus->memory_check(192)) {
+	// Experience appears to show that the memory limit is only likely to be hit (unless it is very low) by single files that are larger than available memory (when compressed)
+		# Add sanity checks - found someone who'd set WP_MAX_MEMORY_LIMIT to 256K !
+		if (!$updraftplus->memory_check($updraftplus->memory_check_current(WP_MAX_MEMORY_LIMIT))) {
+			$new = absint($updraftplus->memory_check_current(WP_MAX_MEMORY_LIMIT));
+			if ($new>32 && $new<100000) {
+				@ini_set('memory_limit', $new.'M');
+			}
 		}
 	}
+
 }
 
-if (!class_exists('UpdraftPlus_Options')) require_once(UPDRAFTPLUS_DIR.'/options.php');
+// Do this even if the missing files detection above fired, as the "missing files" detection above has a greater chance of showing the user useful info
+if (!class_exists('UpdraftPlus_Options')) include_once(UPDRAFTPLUS_DIR.'/options.php');

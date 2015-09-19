@@ -93,6 +93,24 @@ add_action('admin_menu', function() {
 		'dummy-nh-submenu-2',
 		'amt_output_page'
 	);
+
+	//A submenu with special character(s) in the slug. Tests query parameter encoding.
+	add_options_page(
+		'Special Slug',
+		'Special Slug',
+		'read',
+		'dummy/special-characters-in-slug.php',
+		'amt_output_page'
+	);
+
+	//Add a page to a parent menu that includes a query parameter (edit.php?post_type=page)
+	add_pages_page(
+		'Pages Submenu',
+		'Pages Submenu',
+		'read',
+		'dummy-pages-submenu',
+		'amt_output_page'
+	);
 });
 
 function amt_output_page($content_id = 'ame-test-page-content') {

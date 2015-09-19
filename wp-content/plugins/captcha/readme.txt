@@ -1,10 +1,10 @@
 === Captcha by BestWebSoft ===
 Contributors: bestwebsoft
 Donate link: http://bestwebsoft.com/donate/
-Tags: add, antispam, anti-spam, anti-spam security, arithmetic actions, capcha, captcha, captha, catcha, cpatcha, captcha numbers, captcha plugin, captcha words, contact form with captcha, comment,  label, login, lost password, match captcha, math actions, multiply, registration, security, spam, spam protection, substract, text captcha, web form protection
-Requires at least: 3.1
-Tested up to: 4.2.2
-Stable tag: 4.1.3
+Tags: add, anti, anti-spam, anti-spam security, antispam, antispam security, antispambot, arithmetic actions, blacklist, block spam, bot, bots, best captcha, best wordpress captcha, captcha, capcha, captha, catcha, captcha bank, captcha numbers, captcha plugin, captcha protection, captcha words, contact form with captcha, comment captcha, comment, comments, cpatcha, form, forms, form captcha, forgot password captcha, free, login, lost password, label, login captcha, match captcha, math actions, multiply, plugin, protect, protection, popular captcha, protection shield, register, registration, registration spam, register captcha, rest password captcha, registration captcha security, spam, secure, security, signup, signup spam, spam blocker, spam comments, spam filter, spambot, shield, simple captcha, spam control, spam protection, substract, text captcha, user registration spam, web form protection, wordpress captcha, wordpress protection, wordpress security loss password captcha, register captcha, wp captcha, wp plugin, wp plugins
+Requires at least: 3.8
+Tested up to: 4.3.1
+Stable tag: 4.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,19 +18,22 @@ There is also a premium version of the plugin, allowing compatibility with Buddy
 
 http://www.youtube.com/watch?v=jxrvHaCmQfg
 
-<a href="http://www.youtube.com/watch?v=jsvc8FxxEnk" target="_blank">Video instruction on Installation</a>
+<a href="http://www.youtube.com/watch?v=jsvc8FxxEnk" target="_blank">Captcha by BestWebSoft Video instruction on Installation</a>
 
-<a href="http://wordpress.org/plugins/captcha/faq/" target="_blank">FAQ</a>
+<a href="http://wordpress.org/plugins/captcha/faq/" target="_blank">Captcha by BestWebSoft FAQ</a>
 
-<a href="http://support.bestwebsoft.com" target="_blank">Support</a>
+<a href="http://support.bestwebsoft.com" target="_blank">Captcha by BestWebSoft Support</a>
 
-<a href="http://bestwebsoft.com/products/captcha/?k=2d2d85a3c277bf3489697c9a9ff2d352" target="_blank">Upgrade to Pro Version</a>
+<a href="http://bestwebsoft.com/products/captcha/?k=2d2d85a3c277bf3489697c9a9ff2d352" target="_blank">Upgrade to Captcha Pro by BestWebSoft</a>
 
 = Features =
 
-* Display: You can use letters and numbers in captcha or just one of these two things - either letters or numbers.
-* Actions: The basic math actions are used - add, subtract, multiply.
-* Label: You can add a label to display captcha in the form.
+* Supports standard WordPress forms: registration form, login form, reset password form and comments form.
+* Contact Form by BestWebSoft compatibility.
+* You can use letters and numbers in captcha or just one of these two things - either letters or numbers.
+* The basic math actions are used - add, subtract, multiply.
+* Ability to hide Captcha for whitelisted IP.
+* You can add a label to display captcha in the form.
 
 = Recommended Plugins =
 
@@ -171,13 +174,27 @@ Please make sure that the problem hasn't been discussed yet on our forum (<a hre
 == Screenshots ==
 
 1. Captcha Settings page.
-2. Comments form with Captcha.
-3. Registration form with Captcha.
-4. Lost password form with Captcha.
-5. Login form with Captcha.
-6. Contact form with Captcha.
+2. Captcha Whitelist.
+3. Comments form with Captcha.
+4. Registration form with Captcha.
+5. Lost password form with Captcha.
+6. Login form with Captcha.
+7. Contact form with Captcha.
 
 == Changelog ==
+
+= V4.1.5 - 18.09.2015 =
+* New : The whitelist functionality was expanded: Ability to add current IP to the whitelist.
+* New : The whitelist functionality was expanded: If the IP is in the whitelist, then the indicated message will be displayed instead of the captcha.
+* Update : We updated all functionality for wordpress 4.3.1.
+* Update : The French language file is updated.
+* Bugfix : We fixed SQL injection vulnerability.
+
+= V4.1.4 - 18.08.2015 =
+* New : Ability to hide Captcha for whitelisted IP.
+* Update : We updated all functionality for wordpress 4.2.4.
+* Update : We updated structure of plugin settings page.
+* Bugfix : We fixed bug with displaying Captcha for rtl-oriented languages.
 
 = V4.1.3 - 02.07.2015 =
 * New : Ability to restore settings to defaults.
@@ -514,6 +531,12 @@ Please make sure that the problem hasn't been discussed yet on our forum (<a hre
 * Select functionality of mathematical actions and level of their difficulty are implemented.
 
 == Upgrade Notice ==
+
+= V4.1.5 =
+The whitelist functionality was expanded: Ability to add current IP to the whitelist. The whitelist functionality was expanded: If the IP is in the whitelist, then the indicated message will be displayed instead of the captcha. We updated all functionality for wordpress 4.3.1. The French language file is updated. We fixed SQL injection vulnerability.
+
+= V4.1.4 =
+Ability to hide Captcha for whitelisted IP. We updated all functionality for wordpress 4.2.4. We updated structure of plugin settings page. We fixed bug with displaying Captcha for rtl-oriented languages.
 
 = V4.1.3 =
 Ability to restore settings to defaults.

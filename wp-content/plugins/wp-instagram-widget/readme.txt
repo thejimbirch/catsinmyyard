@@ -2,7 +2,7 @@
 Contributors: scottsweb, codeforthepeople
 Tags: instagram, widget, photos, photography, hipster, sidebar, widgets, simple
 Requires at least: 3.0
-Tested up to: 4.2.2
+Tested up to: 4.3
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -30,10 +30,7 @@ To install this plugin:
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. That's it!
 
-To use within the [null theme framework](https://github.com/scottsweb/null) or [null child theme](https://github.com/scottsweb/null-child)
-
-1. Drop the wp-instagram-widget.php file into your /assets/inc/widgets/ folder
-1. Activate via 'Appearance' -> 'Theme Options' menu, under the 'WordPress' tab
+Alternatively you can search for the plugin from your WordPress dashboard and install from there.
 
 == Frequently Asked Questions ==
 
@@ -77,6 +74,9 @@ In version 1.4 and above you can also customise the image loop completely by cre
 2. Instagram widget in the theme customiser
 
 == Changelog ==
+
+= 1.6 =
+* Compatibility with 4.3
 
 = 1.5.1 =
 * Invalidate old transients

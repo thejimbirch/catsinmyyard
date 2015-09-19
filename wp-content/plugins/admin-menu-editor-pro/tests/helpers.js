@@ -184,6 +184,15 @@ var ameTest = {
 				item.find('.ws_edit_field-' + name + ' .ws_field_value').val(value).change();
 			});
 		}, level, properties);
+	},
+
+	getHighlightedMenuCount: function getHighlightedMenuCount() {
+		return jQuery('li.wp-has-current-submenu, li.menu-top.current', '#adminmenu').length;
+	},
+
+
+	getHighlightedItemCount: function () {
+		return jQuery('ul.wp-submenu li.current', '#adminmenu').length;
 	}
 };
 

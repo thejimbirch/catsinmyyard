@@ -9,10 +9,10 @@ Author: Jeff Starr
 Author URI: http://monzilla.biz/
 Contributors: specialk, aldolat, WpBlogHost, James Wilkes, juliobox
 Donate link: http://m0n.co/donate
-Requires at least: 3.9
-Tested up to: 4.2
+Requires at least: 4.0
+Tested up to: 4.3
 Stable tag: trunk
-Version: 20150624
+Version: 20150808
 License: GPLv2 or later
 */
 
@@ -52,7 +52,7 @@ function rate_bbq($links, $file) {
 		$rate_url = 'http://wordpress.org/support/view/plugin-reviews/' . basename(dirname(__FILE__)) . '?rate=5#postform';
 		$bbq_pro = 'https://plugin-planet.com/bbq-pro/';
 		$links[] = '<a target="_blank" href="' . $rate_url . '" title="Click here to rate and review this plugin on WordPress.org">Rate this plugin</a>';
-		$links[] = '<a target="_blank" href="'. $bbq_pro .'" title="Get BBQ Pro for advanced protection" style="font-weight:bold;">Go&nbsp;Pro&nbsp;&raquo;</a>';
+		$links[] = '<a target="_blank" href="'. $bbq_pro .'" title="Get BBQ Pro for advanced protection" style="padding:1px 3px;color:#fff;background:#feba12;border-radius:1px;">Go&nbsp;Pro</a>';
 	}
 	return $links;
 }

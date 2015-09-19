@@ -3,8 +3,8 @@ Contributors: whiteshadow
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A6P9S6CE3SRSW
 Tags: admin, dashboard, menu, security, wpmu
 Requires at least: 3.8
-Tested up to: 4.2
-Stable tag: 1.98
+Tested up to: 4.3
+Stable tag: 1.99
 
 Lets you directly edit the WordPress admin menu. You can re-order, hide or rename existing menus, add custom menus and more.
 
@@ -79,6 +79,17 @@ Here are some usage tips and other things that can be good to know when using th
 == Changelog ==
 
 [Get the latest version here.](http://adminmenueditor.com/updates/)
+
+= 1.99 =
+* Fixed a `TypeError: invalid 'in' operand a` error that caused compatibility issues with WordPress 4.3.
+* Fixed a bug where the current menu item wouldn't get highlighted if its URL included %-encoded query parameters.
+* Fixed a bug in menu URL generation that could cause problems when moving a plugin menu from "Posts", "Pages" or a CPT to another menu. The URL of the menu item got changed in a way that could break some plugins.
+* Fixed a .htaccess compatiblility issue with with Apache 2.3+.
+* Fixed a layout issue that caused the "reset to default" button for the "Color scheme" field to show up in the wrong place.
+* Fixed an incorrect directory name in an error message.
+* The "Links" menu will no longer show up in the editor unless explicitly enabled. As of WP 3.5, the "Links" menu still exists in WordPress core but is inaccessible because the Links Manager is disabled by default.
+* Slightly improved menu item drag-and-drop. You can now drop top level menus anywhere in the submenu box. Previously you had to drop them in a specific, fixed spot. Also, when dragging a submenu item to the top level, a placeholder box will show up to indicate where you can drop the item.
+* Tested with WordPress 4.3.
 
 = 1.98 =
 * Tested up to WordPress 4.2.

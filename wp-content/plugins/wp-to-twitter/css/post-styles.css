@@ -5,6 +5,7 @@
 
 #wp2t .jtw textarea {
     font-size: 1.2em;
+	width: 100%;
 }
 
 #wp2t .counter {

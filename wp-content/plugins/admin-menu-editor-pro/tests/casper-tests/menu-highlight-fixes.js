@@ -19,14 +19,6 @@ casper.then(function() {
 	casper.click('#ws_save_menu');
 });
 
-function getHighlightedMenuCount() {
-	return jQuery('li.wp-has-current-submenu, li.menu-top.current', '#adminmenu').length;
-}
-function getHighlightedItemCount() {
-	return jQuery('ul.wp-submenu li.current', '#adminmenu').length;
-}
-
-
 casper.waitForSelector('#message.updated', function() {
 	casper.test.assertDoesntExist(
 		'#menu-settings .wp-submenu li a[href="options-general.php"]',
@@ -45,11 +37,11 @@ casper.waitForSelector('#message.updated', function() {
 		'"Settings -> Menu Editor Pro" is still highlighted as the current menu item'
 	);
 	casper.test.assertEvalEquals(
-		getHighlightedMenuCount, 1,
+		ameTest.getHighlightedMenuCount, 1,
 		'There is only one highlighted top level menu'
 	);
 	casper.test.assertEvalEquals(
-		getHighlightedItemCount, 1,
+		ameTest.getHighlightedItemCount, 1,
 		'There is only one highlighted submenu item'
 	);
 
@@ -66,11 +58,11 @@ casper.thenOpen(ameTestConfig.adminUrl + '/options-general.php', function() {
 		'"Appearance -> General" is highlighted as the current menu item'
 	);
 	casper.test.assertEvalEquals(
-		getHighlightedMenuCount, 1,
+		ameTest.getHighlightedMenuCount, 1,
 		'There is only one highlighted top level menu'
 	);
 	casper.test.assertEvalEquals(
-		getHighlightedItemCount, 1,
+		ameTest.getHighlightedItemCount, 1,
 		'There is only one highlighted submenu item'
 	);
 });

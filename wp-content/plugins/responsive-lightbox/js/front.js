@@ -19,7 +19,7 @@
     		selector 	= event.selector
     		args 		= event.args;
 
-    	if ( script === undefined || selector === undefined ) {
+    	if ( typeof script === 'undefined' || typeof selector === 'undefined' ) {
     		return false;
     	}
 
@@ -110,17 +110,16 @@
 			case 'nivo':
 
 				$.each( $( 'a[rel*="' + rlArgs.selector + '"], a[data-rel*="' + rlArgs.selector + '"]' ), function () {
-
 					var attr = $( this ).attr( 'data-rel' );
 
-					if ( typeof attr == undefined || attr == false ) {
-						// backward rel compatibility
+					// check data-rel attribute first
+					if ( typeof attr === 'undefined' || attr == false ) {
+						// if not found then try to check rel attribute for backward compatibility
 						attr = $( this ).attr( 'rel' );
 					}
 
-					// for some browsers, `attr` is undefined; for others,
-					// `attr` is false.  Check for both.
-					if ( typeof attr !== undefined && attr !== false ) {
+					// for some browsers, `attr` is undefined; for others, `attr` is false. Check for both.
+					if ( typeof attr !== 'undefined' && attr !== false ) {
 						var match = attr.match( new RegExp( rlArgs.selector + '\\-(gallery\\-(?:[\\da-z]{1,4}))', 'ig' ) );
 
 						if ( match !== null ) {
@@ -146,19 +145,20 @@
 				$( 'a[rel*="' + rlArgs.selector + '"], a[data-rel*="' + rlArgs.selector + '"]' ).each( function ( i, item ) {
 					var attr = $( item ).attr( 'data-rel' );
 
-					if ( typeof attr !== undefined && attr !== false ) {
+					// check data-rel attribute first
+					if ( typeof attr !== 'undefined' && attr !== false && attr !== 'norl' )
 						selectors.push( attr );
-					}
+					// if not found then try to check rel attribute for backward compatibility
+					else {
+						attr = $( item ).attr( 'rel' );
 
-					// backward rel compatibility
-					var attr = $( item ).attr( 'rel' );
-
-					if ( typeof attr !== undefined && attr !== false ) {
-						selectors.push( attr );
+						if ( typeof attr !== 'undefined' && attr !== false && attr !== 'norl' )
+							selectors.push( attr );
 					}
 				} );
 
 				if ( selectors.length > 0 ) {
+
 					// make unique
 					selectors = $.unique( selectors );
 
@@ -183,24 +183,24 @@
 				$( 'a[rel*="' + rlArgs.selector + '"], a[data-rel*="' + rlArgs.selector + '"]' ).each( function ( i, item ) {
 					var attr = $( item ).attr( 'data-rel' );
 
-					if ( typeof attr !== undefined && attr !== false ) {
+					// check data-rel attribute first
+					if ( typeof attr !== 'undefined' && attr !== false && attr !== 'norl' )
 						selectors.push( attr );
-					}
+					// if not found then try to check rel attribute for backward compatibility
+					else {
+						attr = $( item ).attr( 'rel' );
 
-					// backward rel compatibility
-					var attr = $( item ).attr( 'rel' );
-
-					if ( typeof attr !== undefined && attr !== false ) {
-						selectors.push( attr );
+						if ( typeof attr !== 'undefined' && attr !== false && attr !== 'norl' )
+							selectors.push( attr );
 					}
 				} );
 
 				if ( selectors.length > 0 ) {
+
 					// make unique
 					selectors = $.unique( selectors );
 
 					$( selectors ).each( function ( i, item ) {
-
 						$( 'a[data-rel="' + item + '"], a[rel="' + item + '"]' ).tosrus( {
 							infinite			: ( rlArgs.infinite === '1' ? true : false ),
 							autoplay				: {

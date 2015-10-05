@@ -4,7 +4,7 @@ Donate link: http://www.dfactory.eu/
 Tags: gallery, images, lightbox, links, photos, template, theme, photo, image, picture, slideshow, modal, overlay, YouTube, Vimeo, video, videos
 Requires at least: 4.0
 Tested up to: 4.3.1
-Stable tag: 1.6.2
+Stable tag: 1.6.3
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -73,6 +73,11 @@ No questions yet.
 2. screenshot-2.jpg
 
 == Changelog ==
+
+= 1.6.3 =
+* Fix: Tos"R"Us script initialized multiple times in Ajax
+* Fix: Regex issue with replacing rel attribute
+* Tweak: Swipebox updated to 1.4.1
 
 = 1.6.2 =
 * New: Disable lightbox for single images with data-rel="norl" attribute
@@ -259,7 +264,7 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.6.2 =
-* New: Disable lightbox for single images with data-rel="norl" attribute
-* Tweak: Keep rel attribute intact is used in post content links
-* Tweak: Vimeo regex improvements
+= 1.6.3 =
+* Fix: Tos"R"Us script initialized multiple times in Ajax
+* Fix: Regex issue with replacing rel attribute
+* Tweak: Swipebox updated to 1.4.1

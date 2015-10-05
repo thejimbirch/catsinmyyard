@@ -119,7 +119,6 @@ class Responsive_Lightbox_Frontend {
 					}
 				}
 			}
-
 		}
 
 		return $content;
@@ -146,7 +145,7 @@ class Responsive_Lightbox_Frontend {
 			if ( $title )
 				$link = str_replace( '<a href', '<a title="'. $title .'" href', $link );
 
-			$link = ( preg_match( '/<a.*? (?:rel|data-rel)=("|\').*?("|\')>/', $link ) === 1 ? preg_replace( '/(<a.*? data-rel=(?:"|\').*?)((?:"|\').*?>)/', '$1 ' . Responsive_Lightbox()->options['settings']['selector'] . '-gallery-' . $this->gallery_no . '$2', $link ) : preg_replace( '/(<a.*?)>/', '$1 data-rel="' . Responsive_Lightbox()->options['settings']['selector'] . '-gallery-' . $this->gallery_no . '">', $link ) );
+			$link = ( preg_match( '/<a.*? (?:data-rel)=("|\').*?("|\')>/', $link ) === 1 ? preg_replace( '/(<a.*? data-rel=(?:"|\').*?)((?:"|\').*?>)/', '$1 ' . Responsive_Lightbox()->options['settings']['selector'] . '-gallery-' . $this->gallery_no . '$2', $link ) : preg_replace( '/(<a.*?)>/', '$1 data-rel="' . Responsive_Lightbox()->options['settings']['selector'] . '-gallery-' . $this->gallery_no . '">', $link ) );
 			
 			// gallery image size
 			if ( Responsive_Lightbox()->options['settings']['gallery_image_size'] != 'full' ) {
@@ -174,30 +173,30 @@ class Responsive_Lightbox_Frontend {
 	 * @return mixed
 	 */
 	public function add_custom_gallery_lightbox_selector( $content, $attr ) {
-		
+
 		if ( Responsive_Lightbox()->options['settings']['force_custom_gallery'] === true ) {
-		
+
 			preg_match_all( '/<a(.*?)href=(?:\'|")([^<]*?).(bmp|gif|jpeg|jpg|png)(?:\'|")(.*?)>/i', $content, $links );
-	
+
 			if ( isset( $links[0] ) ) {
-	
+
 				foreach ( $links[0] as $id => $link ) {
-					
+
 					// gallery image title
 					$title = '';
-					
+
 					if ( ( $title_arg = Responsive_Lightbox()->options['settings']['gallery_image_title'] ) !== 'default' ) {
-						
+
 						$image_id = (int) $this->get_attachment_id_by_url( $links[2][$id] . '.' . $links[3][$id] );
-		
+
 						if ( $image_id ) {
 							$title_arg = apply_filters( 'rl_lightbox_attachment_image_title_arg', $title_arg, $image_id, $links[2][$id] . '.' . $links[3][$id] );
 							$title = wp_strip_all_tags( trim( $this->get_attachment_title( $image_id, $title_arg ) ) );
 						}
 					}
-	
-					if ( preg_match( '/<a.*?(?:rel|data-rel)=(?:\'|")(.*?)(?:\'|").*?>/', $link, $result ) === 1 ) {
-						$content = str_replace( $link, preg_replace( '/(?:rel|data-rel)=(?:\'|")(.*?)(?:\'|")/', 'data-rel="' . Responsive_Lightbox()->options['settings']['selector'] . '-gallery-' . $this->gallery_no . '"' . ( ! empty ( $title ) ? ' title="' . $title . '"' : '' ) . ( Responsive_Lightbox()->options['settings']['script'] === 'imagelightbox' ? ' data-imagelightbox="' . $id . '"' : '' ), $link ), $content );
+
+					if ( preg_match( '/<a.*?(?:data-rel)=(?:\'|")(.*?)(?:\'|").*?>/', $link, $result ) === 1 ) {
+						$content = str_replace( $link, preg_replace( '/(?:data-rel)=(?:\'|")(.*?)(?:\'|")/', 'data-rel="' . Responsive_Lightbox()->options['settings']['selector'] . '-gallery-' . $this->gallery_no . '"' . ( ! empty ( $title ) ? ' title="' . $title . '"' : '' ) . ( Responsive_Lightbox()->options['settings']['script'] === 'imagelightbox' ? ' data-imagelightbox="' . $id . '"' : '' ), $link ), $content );
 					} else {
 						$content = str_replace( $link, '<a' . $links[1][$id] . 'href="' . $links[2][$id] . '.' . $links[3][$id] . '"' . $links[4][$id] . ' data-rel="' . Responsive_Lightbox()->options['settings']['selector'] . '-gallery-' . $this->gallery_no . '"' . ( Responsive_Lightbox()->options['settings']['script'] === 'imagelightbox' ? ' data-imagelightbox="' . $id . '"' : '' ) . ( ! empty ( $title ) ? ' title="' . $title . '"' : '' ) . '>', $content );
 					}

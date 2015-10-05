@@ -15,7 +15,7 @@ Please report issues on [community.nextgenthemes.com](https://community.nextgent
 * [Overview][1]
 * [Quick Introduction][2]
 * [Features][3]
-* [Additional Features with the Pro Addon][4]
+* [Pro Addon Features][4]
 * [Documentation][10]
 * [Tests & Examples][11]
 * [Github Page][21]
@@ -24,9 +24,10 @@ Please report issues on [community.nextgenthemes.com](https://community.nextgent
  [2]: https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/#quick-introduction
  [3]: https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/#features
  [4]: https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/#additional-features-with-the-pro-addon
- [10]: https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/documentation/
+ [10]: https://github.com/nextgenthemes/advanced-responsive-video-embedder/blob/master/docs.md
  [11]: https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/tests-and-examples/
  [21]: https://github.com/nextgenthemes/advanced-responsive-video-embedder
+
 
 ### Features ###
 
@@ -48,9 +49,10 @@ Please report issues on [community.nextgenthemes.com](https://community.nextgent
 
 * Feel good about yourself for helping me support my long time work on this plugin. Tons of hours, weekends ... always worked on [improving](https://wordpress.org/plugins/advanced-responsive-video-embedder/changelog/) 3+ years.
 * Lazyload mode: Only load a preview image on pageload instead of the Video itself, makes you site load faster.
-* Lazyload -> Lightbox: Shows the Video in a Lightbox after clicking a preview image.
+* lazyload -> Lightbox Shows the Video in a Lightbox after clicking a preview image.
 * Lazyload -> HTML5 Fullscreen: (experimental) This is a dream come true for me. Be aware that this has a Issue of going fullsceen a 2nd time from within fullscreen and fullscreen Buttons not working as expected.
 * Lazyload -> Half Screen Sticky: (experimental) Video that fills about half the screen/window and lets users continue to scroll and read the site, start writing a comment ... while watching a video. This relies on modern HTML5 features (calc, vw + vh) and may not work everywhere.
+* Link -> Lightbox: Make 
 
 ### Supported providers ###
 
@@ -198,7 +200,51 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 2. Pro Options
 3. Features
 
+## Todo List ##
+
+I would be glad if someone could [help me](https://github.com/nextgenthemes/advanced-responsive-video-embedder) with this, I can send you cash for helping out.
+
+These are not in any real priority order (for now)
+
+- [ ] Get advice how I could improve my sales of this the Pro Addon
+- [ ] Advertise the Pro Addon somewhere
+- [ ] Make the [Plugin Page](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/) and the selling process UX more professional look and feel.
+- [ ] Code review (and improvements)
+- [ ] Extensive testing
+- [ ] Write a special thanks page to [Howard Iken](http://www.myfloridalaw.com/)
+- [ ] Improve [Documentation][50] - wording, grammar
+- [ ] Improve [Documentation][50] - extend
+- [ ] Improve [Documentation][50] - simplify
+- [ ] Improve [Documentation][50] - write how to use kaltura, and other not directly supported providers with iframe
+- [ ] Create a Feature Table?
+- [ ] Comparison with other Plugins (Table?)
+- [ ] Write docs about how to use iframe for not supported providers.
+- [ ] Support for self hosting videos (or at least make them responsive as they are), consider making the WordPress videos responsive (maybe it just take a wrapper).
+- [ ] How to manage beta versions with WordPress.org and the EDD Software licensing plugin (for the Pro Version)
+- [ ] WordPress Language Pack thing (anything needed to do?)
+- [ ] Pro Addon: Fix bug when sometimes the URL of iframe starts with "#lity" and fails use [arve_tests] Shortcode and look at the IGN example, the lazyload-lightbox fails.
+- [ ] [Fix bug](https://community.nextgenthemes.com/90/i-put-in-youtube-url-and-get-the-no-provider-selected-message?show=90#q90) where youtube.be/xxxxx URLs are not detected by the shortcode creator. This may have something to do how PHP regexes are carried over do JS.
+- [ ] Get rid of globals in PHP Code
+- [ ] Consider writing JS create URL querys for embed customization (for use in shortcode creator dialog but also easy to use independant)
+
+ [50]: https://github.com/nextgenthemes/advanced-responsive-video-embedder/blob/master/docs.md
+
+
 ## Changelog ##
+
+### 6.3.2 ###
+
+Fixed/Improved: [arve_tests] shortcode.
+
+### Pro Addon 1.4 ###
+
+* Fix: Fake thumbnails now work for lazyload-lightbox mode.
+
+### 6.3.1 & Pro Addon 1.4.0 ###
+
+* Improved: Testing Shortcode.
+* Improved: When there is no thumbnail lazyload mode will fall back to normal mode.
+* New: Added support for alugha.com.
 
 ### Pro Addon 1.1.5 ###
 
@@ -207,7 +253,7 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 ### 6.1.2 ###
 
 * Improved: Added thumbnail and grow parameters to the Shortcode Creator Dialog.
-* Improved: Updated sceenshots.
+* Improved: Updated screenshots.
 
 ### Pro Addon 1.1.3 ###
 
@@ -256,7 +302,7 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 
 ### 6.0.2 Beta - 2015/07/24 - work time: ~60 days ###
 
-Please check the [migration guide](https://nextgenthemes.com/?p=1875) about upgrading to this version. 
+Please check the [migration guide](https://nextgenthemes.com/?p=1875) about upgrading to this version.
 
 * Fix: Jackpack Shortcode Embeds module incompatibility.
 * New: URL parameters are now possible via URLs used for embeds (passed to iframe src).
@@ -298,8 +344,8 @@ Please check the [migration guide](https://nextgenthemes.com/?p=1875) about upgr
 
 ### 5.3.4 Beta - 2015/03/15 ###
 
-* Fix: ID detection for youtu.be and dai.ly URLs, will now work with https://(www.) as well. 
-* Fix: Myvideo.de videos with 7 and 8 digit IDs. 
+* Fix: ID detection for youtu.be and dai.ly URLs, will now work with https://(www.) as well.
+* Fix: Myvideo.de videos with 7 and 8 digit IDs.
 
 ### 5.3.3 Beta ###
 
@@ -317,7 +363,7 @@ Please check the [migration guide](https://nextgenthemes.com/?p=1875) about upgr
 ### 5.3.0 Beta ###
 
 * **If you get a error '... array ...' please reset your options on the options page and redo the options you had before**
-* Fix: '... expected array' error when saving options on some cases. If you get a error please reset your 
+* Fix: '... expected array' error when saving options on some cases. If you get a error please reset your
 * Fix: ttp://youtu.be/... shortlinks are not detected correctly in the shortcode creator dialog.
 * Improved: Ported code to WordPress Plugin Boilerplate 3.0 style.
 * Improved: Switched vevo and xtube from object to iframe embeds.
@@ -344,7 +390,7 @@ Please check the [migration guide](https://nextgenthemes.com/?p=1875) about upgr
 
 * Fix: Max-width options should now work in all circumstances
 * Improved: Various CSS improvements
-* Improved: Changed play overlay image to a Google+ style image 
+* Improved: Changed play overlay image to a Google+ style image
 
 ### 4.9.0 Beta ###
 
@@ -476,7 +522,7 @@ Please check the [migration guide](https://nextgenthemes.com/?p=1875) about upgr
 
 ### 3.1.1 (github only) ###
 
-* Improved: Added `px` suffix to values on options page 
+* Improved: Added `px` suffix to values on options page
 
 ### 3.1.0 (beta) ###
 
@@ -489,7 +535,7 @@ Please check the [migration guide](https://nextgenthemes.com/?p=1875) about upgr
 * Fix: Colleghumor
 * Improved: Screenshots updated
 * Improved: Beginning process of provider based aspect ratios.
-* Improved: Dailymotion playlists/jukeboxes now show Native thumbnails 
+* Improved: Dailymotion playlists/jukeboxes now show Native thumbnails
 * Improved: Iframe embed code detection with with single quoted `src#''`
 
 ### 3.0.4 (beta) ###
@@ -520,7 +566,7 @@ Please check the [migration guide](https://nextgenthemes.com/?p=1875) about upgr
 
 ### 2.7.2 ###
 
-* Fix: Permissions for the button, now authors who 
+* Fix: Permissions for the button, now authors who
 
 ### 2.7.0 ###
 

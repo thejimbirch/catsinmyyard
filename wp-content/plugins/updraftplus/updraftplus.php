@@ -4,7 +4,7 @@ Plugin Name: UpdraftPlus - Backup/Restore
 Plugin URI: https://updraftplus.com
 Description: Backup and restore: take backups locally, or backup to Amazon S3, Dropbox, Google Drive, Rackspace, (S)FTP, WebDAV & email, on automatic schedules.
 Author: UpdraftPlus.Com, DavidAnderson
-Version: 1.11.9
+Version: 1.11.12
 Donate link: http://david.dw-perspective.org.uk/donate
 License: GPLv3 or later
 Text Domain: updraftplus
@@ -88,7 +88,7 @@ if (!is_admin() && (!defined('DOING_CRON') || !DOING_CRON) && (!defined('XMLRPC_
 	$gmt_time = microtime( true );
 	$lock = get_transient('doing_cron');
 	if ( $lock > $gmt_time + 10 * 60 ) $lock = 0;
-	if ((defined(WP_CRON_LOCK_TIMEOUT) && $lock + WP_CRON_LOCK_TIMEOUT > $gmt_time) || (!defined(WP_CRON_LOCK_TIMEOUT) && $lock + 60 > $gmt_time)) return;
+	if ((defined('WP_CRON_LOCK_TIMEOUT') && $lock + WP_CRON_LOCK_TIMEOUT > $gmt_time) || (!defined('WP_CRON_LOCK_TIMEOUT') && $lock + 60 > $gmt_time)) return;
 	if (function_exists('_get_cron_array')) {
 		$crons = _get_cron_array();
 	} else {

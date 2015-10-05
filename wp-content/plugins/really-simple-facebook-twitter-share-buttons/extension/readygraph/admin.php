@@ -14,7 +14,7 @@
  */
 
 include("header.php");
-	if (!get_option('readygraph_application_id') || strlen(get_option('readygraph_application_id')) <= 0)rsftsb_rg_connect();
+	/*if (!get_option('readygraph_application_id') || strlen(get_option('readygraph_application_id')) <= 0)rsftsb_rg_connect();*/
 	if(isset($_GET["tutorial"]) && $_GET["tutorial"] == "true"){update_option('readygraph_tutorial',"true");}
 	else{update_option('readygraph_tutorial',"false");}
 	if(isset($_GET["readygraph_upgrade_notice"]) && $_GET["readygraph_upgrade_notice"] == "dismiss") {update_option('readygraph_upgrade_notice', 'false');}

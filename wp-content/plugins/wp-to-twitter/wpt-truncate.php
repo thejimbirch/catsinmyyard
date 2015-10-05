@@ -9,9 +9,17 @@ function jd_truncate_tweet( $tweet, $post, $post_ID, $retweet = false, $ref = fa
 	$length       = ( wpt_post_with_media( $post_ID, $post ) ) ? $maxlength['with_media'] : $maxlength['without_media'];
 	$tweet        = apply_filters( 'wpt_tweet_sentence', $tweet, $post_ID );
 	$tweet        = trim( wpt_custom_shortcodes( $tweet, $post_ID ) );
-	$encoding     = ( get_option( 'blog_charset' ) != 'UTF-8' ) ? get_option( 'blog_charset' ) : 'UTF-8';
+	$encoding     = ( get_option( 'blog_charset' ) != 'UTF-8' && get_option( 'blog_charset' ) != '' ) ? get_option( 'blog_charset' ) : 'UTF-8';
 	$diff         = 0;
 
+	// Add custom append/prepend fields to Tweet text
+	if ( get_option( 'jd_twit_prepend' ) != "" && $tweet != '' ) {
+		$tweet = stripslashes( get_option( 'jd_twit_prepend' ) ) . " " . $tweet;
+	}
+	if ( get_option( 'jd_twit_append' ) != "" && $tweet != '' ) {
+		$tweet = $tweet . " " . stripslashes( get_option( 'jd_twit_append' ) );
+	}	
+	
 	// there are no tags in this Tweet. Truncate and return.
 	if ( !wpt_has_tags( $tweet ) ) {
 		$post_tweet = mb_substr( $tweet, 0, $length, $encoding );
@@ -213,7 +221,7 @@ function wpt_make_tag( $value ) {
 function wpt_create_values( $post, $post_ID, $ref ) {
 	$shrink       = ( $post['shortUrl'] != '' ) ? $post['shortUrl'] : apply_filters( 'wptt_shorten_link', $post['postLink'], $post['postTitle'], $post_ID, false );
 	// generate template variable values
-	$auth         = $post['authId'];
+	$auth         = $post['authId'];	
 	$title        = trim( apply_filters( 'wpt_status', $post['postTitle'], $post_ID, 'title' ) );
 	$blogname     = trim( $post['blogTitle'] );
 	$excerpt      = trim( apply_filters( 'wpt_status', $post['postExcerpt'], $post_ID, 'post' ) );
@@ -247,12 +255,6 @@ function wpt_create_values( $post, $post_ID, $ref ) {
 
 	if ( get_user_meta( $auth, 'wpt-remove', true ) == 'on' ) {
 		$account = '';
-	}
-	if ( get_option( 'jd_twit_prepend' ) != "" && $tweet != '' ) {
-		$tweet = stripslashes( get_option( 'jd_twit_prepend' ) ) . " " . $tweet;
-	}
-	if ( get_option( 'jd_twit_append' ) != "" && $tweet != '' ) {
-		$tweet = $tweet . " " . stripslashes( get_option( 'jd_twit_append' ) );
 	}
 		
 	if ( function_exists( 'wpt_pro_exists' ) && wpt_pro_exists() == true ) {

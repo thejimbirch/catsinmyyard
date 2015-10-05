@@ -4,7 +4,7 @@ Plugin Name: Really Simple Share
 Plugin URI: http://www.whiletrue.it/really-simple-facebook-twitter-share-buttons-for-wordpress/
 Description: Puts Facebook, Twitter, LinkedIn, Google "+1", Pinterest and other share buttons of your choice above or below your posts.
 Author: Dabelon, tanaylakhani
-Version: 4.3.9
+Version: 4.4
 Author URI: http://www.readygraph.com
 */
 
@@ -20,7 +20,7 @@ Author URI: http://www.readygraph.com
 */
 
 //plugin version upgrades
-define( 'RSFTSB_VERSION', '4.3.9' );
+define( 'RSFTSB_VERSION', '4.4' );
 
 // RETRIEVE PLUGIN EXTERNAL FUNCTIONS
 
@@ -734,7 +734,9 @@ function really_simple_share ($content, $filter, $link='', $title='', $author=''
           .'<span class="super">'.__('Subscribe', 'really-simple-share').':</span> <img src="http://www.specificfeeds.com/theme/classic/img/sf_20.png" alt="SpecificFeeds" title="SpecificFeeds" /></a>';
     } else if ($name == 'specificfeeds_follow') {
       $button_text = ($option['specificfeeds_follow_text']) ? $option['specificfeeds_follow_text'] : 'Follow';
-      $out .= '<a id="email_follow" href="#email_follow" onclick="var invite = new readygraph.framework.ui.Invite();invite.set(\'visible\', true);return false;">'
+      //$out .= '<a id="email_follow" href="#email_follow" onclick="var invite = new readygraph.framework.ui.Invite();invite.set(\'visible\', true);return false;">'
+	  $out .= '<a href="http://www.specificfeeds.com/follow" target="_blank">'
+      
           .'<img src="'.plugins_url('images/specificfeeds_follow.png',__FILE__).'" alt="Email, RSS" title="Email, RSS" /> '.stripslashes($button_text).'</a>';
     } else if ($name == 'readygraph_infolinks') {
 		//do 

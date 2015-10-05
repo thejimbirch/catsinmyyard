@@ -74,7 +74,7 @@ function wpt_updated_settings() {
 		update_option( 'wpt_inline_edits', ( isset( $_POST['wpt_inline_edits'] ) ) ? $_POST['wpt_inline_edits'] : 0 );
 		update_option( 'jd_twit_remote', ( isset( $_POST['jd_twit_remote'] ) ) ? $_POST['jd_twit_remote'] : 0 );
 		update_option( 'jd_twit_custom_url', $_POST['jd_twit_custom_url'] );
-		update_option( 'wpt_default_rate_limit', intval( $_POST['wpt_default_rate_limit'] ) );
+		update_option( 'wpt_default_rate_limit', ( isset( $_POST['wpt_default_rate_limit'] ) ? intval( $_POST['wpt_default_rate_limit'] ) : false ) );
 		update_option( 'jd_strip_nonan', ( isset( $_POST['jd_strip_nonan'] ) ) ? $_POST['jd_strip_nonan'] : 0 );
 		update_option( 'jd_twit_prepend', $_POST['jd_twit_prepend'] );
 		update_option( 'jd_twit_append', $_POST['jd_twit_append'] );

@@ -50,12 +50,14 @@ class Advanced_Responsive_Video_Embedder_Shared {
 				'dailymotion'            => 'dailymotion',
 				'dailymotionlist'        => 'dailymotionlist',
 				'flickr'                 => 'flickr',
+				'facebook'               => 'facebook',
 				'funnyordie'             => 'funnyordie',
 				'gametrailers'           => 'gametrailers',
 				'iframe'                 => 'iframe',
 				'ign'                    => 'ign',
 				'kickstarter'            => 'kickstarter',
 				'liveleak'               => 'liveleak',
+				'livestream'             => 'livestream',
 				'metacafe'               => 'metacafe',
 				'movieweb'               => 'movieweb',
 				'mpora'                  => 'mpora',
@@ -93,6 +95,7 @@ class Advanced_Responsive_Video_Embedder_Shared {
 				#'ign'             => '',
 				#'kickstarter'     => '',
 				'liveleak'        => 'wmode=transparent  ',
+				'livestream'      => 'layout=4  height=340  width=560  ',
 				#'metacafe'        => '',
 				#'movieweb'        => '',
 				#'myspace'         => '',
@@ -111,11 +114,11 @@ class Advanced_Responsive_Video_Embedder_Shared {
 				'youtube'         => 'wmode=transparent  iv_load_policy=3  modestbranding=1  rel=0  autohide=1',
 			)
 		);
-		
+
 		return $options[ $section ];
 	}
 
-	
+
 	/**
 	 * Get options by merging possibly existing options with defaults
 	 *
@@ -129,7 +132,7 @@ class Advanced_Responsive_Video_Embedder_Shared {
 
 		return $options;
 	}
-	
+
 	/**
 	 *
 	 * @since    3.0.0
@@ -137,7 +140,7 @@ class Advanced_Responsive_Video_Embedder_Shared {
 	 */
 	public static function get_regex_list() {
 
-		$hw = 'https?://(?:www\.)?';
+		$hw = 'https?://(?:[a-z0-9]+\.)?';
 		//* Double hash comment = no id in URL
 		return array(
 			'4players'            => $hw . '4players\.de/4players\.php/tvplayer/4PlayersTV/([0-9a-z_/]+\.html)',
@@ -153,12 +156,15 @@ class Advanced_Responsive_Video_Embedder_Shared {
 			'dailymotion'         => $hw . 'dailymotion\.com/video/([^_]+)',
 			#'dailymotion_jukebox' => $hw . 'dailymotion\.com/widget/jukebox?list\[\]=%2Fplaylist%2F([a-z0-9]+_[a-z0-9_\-]+)',
 			#'flickr'             => 'flickr',
+			'facebook'            => $hw . 'facebook\.com/(?:[^/]+)/videos/([0-9]+)',
 			'funnyordie'          => $hw . 'funnyordie\.com/videos/([a-z0-9_]+)',
 			##'gametrailers'      =>
 			'ign'                 => '(https?://(?:www\.)?ign\.com/videos/[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9a-z\-]+)',
 			##'iframe'            =>
 			'kickstarter'         => $hw . 'kickstarter\.com/projects/([0-9a-z\-]+/[0-9a-z\-]+)',
 			'liveleak'            => $hw . 'liveleak\.com/(?:view|ll_embed)\?((f|i)=[0-9a-z\_]+)',
+			'livestream'          => $hw . 'livestream\.com/accounts/([0-9]+/events/[0-9]+(?:/videos/[0-9]+)?)',
+			#'livestream'          => $hw . 'livestream\.com/(?|(accounts/[0-9]+/events/[0-9]+(?:/videos/[0-9]+)?)|([^\s/]+/video\?clipId=[^\s&]+)|([^\s/]+))',
 			'metacafe'            => $hw . 'metacafe\.com/(?:watch|fplayer)/([0-9]+)',
 			'movieweb'            => $hw . 'movieweb\.com/v/([a-z0-9]{14})',
 			'mpora'               => $hw . 'mpora\.(?:com|de)/videos/([a-z0-9]+)',
@@ -183,19 +189,19 @@ class Advanced_Responsive_Video_Embedder_Shared {
 			'dai_ly'              => $hw . 'dai\.ly/([^_]+)',
 		);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 *
 	 * @since     5.4.0
 	 */
 	public static function get_mode_options( $selected ) {
-		
+
 		$modes = self::get_supported_modes();
 		$out   = '';
-		
+
 		foreach( $modes as $mode => $desc ) {
-			
+
 			$out .= sprintf(
 				'<option value="%s" %s>%s</option>',
 				esc_attr( $mode ),
@@ -203,10 +209,10 @@ class Advanced_Responsive_Video_Embedder_Shared {
 				$desc
 			);
 		}
-		
+
 		return $out;
 	}
-	
+
 	public static function get_supported_modes() {
 		return apply_filters( 'arve_modes', array( 'normal' => __( 'Normal', 'advanced-responsive-video-embedder' ) ) );
 	}

@@ -1,0 +1,422 @@
+msgid ""
+msgstr "MIME-Version: 1.0\n"
+
+#. Name.
+msgid "BBQ: Block Bad Queries"
+msgstr ""
+
+#. Short description.
+msgid "Block Bad Queries (BBQ) helps protect WordPress against malicious URL requests."
+msgstr ""
+
+#. Found in description list item.
+msgid "Plug-n-play functionality"
+msgstr ""
+
+#. Found in description list item.
+msgid "No configuration required"
+msgstr ""
+
+#. Found in description list item.
+msgid "Born of simplicity, no frills"
+msgstr ""
+
+#. Found in description list item.
+msgid "Blocks a wide range of malicious requests"
+msgstr ""
+
+#. Found in description list item.
+msgid "Based on the <a href=\"https://perishablepress.com/6g-beta/\">5G/6G Blacklist</a>"
+msgstr ""
+
+#. Found in description list item.
+msgid "Scans all incoming traffic and blocks bad requests"
+msgstr ""
+
+#. Found in description list item.
+msgid "Works silently behind the scenes to protect your site"
+msgstr ""
+
+#. Found in description list item.
+msgid "New! Customize blocked strings via <a href=\"https://perishablepress.com/bbq-whitelist-blacklist/\">Whitelist/Blacklist plugins</a>"
+msgstr ""
+
+#. Found in description paragraph.
+msgid "<a href=\"https://perishablepress.com/block-bad-queries/\">Block Bad Queries (BBQ)</a> is a simple script that protects your website against malicious URL requests. BBQ checks all incoming traffic and quietly blocks bad requests containing nasty stuff like eval(, base64_, and excessively long request-strings. This is a simple yet solid solution that works great for sites where .htaccess is not available. The BBQ script is available as a plugin for WordPress or standalone script for any PHP-powered website."
+msgstr ""
+
+#. Found in description paragraph.
+msgid "<strong>Features include</strong>"
+msgstr ""
+
+#. Found in description paragraph.
+msgid "<strong>New Pro Version</strong>"
+msgstr ""
+
+#. Found in description paragraph.
+msgid "For advanced protection and awesome features, check out <a href=\"https://plugin-planet.com/bbq-pro/\">BBQ Pro</a>."
+msgstr ""
+
+#. Found in installation list item.
+msgid "To allow patterns otherwise blocked by BBQ, check out the <a href=\"https://perishablepress.com/bbq-whitelist-blacklist/\">BBQ Whitelist plugin</a>"
+msgstr ""
+
+#. Found in installation list item.
+msgid "To block patterns otherwise allowed by BBQ, check out the <a href=\"https://perishablepress.com/bbq-whitelist-blacklist/\">BBQ Blacklist plugin</a>"
+msgstr ""
+
+#. Found in installation paragraph.
+msgid "To protect your site using this lightweight plugin, unzip and upload the \"/block-bad-queries/\" folder and contents to your plugin directory and activate via the WP Admin. No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests. Once active, this plugin will silently and effectively close any connections for these sorts of injection-type attacks."
+msgstr ""
+
+#. Found in installation paragraph.
+msgid "<a href=\"http://codex.wordpress.org/Managing_Plugins#Installing_Plugins\">More info on installing WP plugins</a>"
+msgstr ""
+
+#. Found in installation paragraph.
+msgid "<strong>Customizing</strong>"
+msgstr ""
+
+#. Found in installation paragraph.
+msgid "Note that the <a href=\"https://plugin-planet.com/bbq-pro/\">Pro version of BBQ</a> makes it possible to customize patterns (add, edit, remove) directly via the plugin settings, with a click."
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added <code>\\.php\\([0-9]+\\)</code>, <code>__hdhdhd.php</code> to URI patterns (Thanks to <a href=\"http://www.glerner.com/\">George Lerner</a>)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added <code>acapbot</code>, <code>semalt</code> to User Agent patterns (Thanks to <a href=\"http://www.glerner.com/\">George Lerner</a>)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Replaced <code>UNION.*SELECT</code> with <code>UNION(.*)SELECT</code> in Request URI patterns"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added <code>morfeus</code>, <code>snoopy</code> to User Agent patterns"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Refactored redirect/exit functionality"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Renamed <code>rate_bbq()</code> to <code>bbq_links()</code>"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Tested with WordPress 4.4 beta"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Tested on WordPress 4.3"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Updated minimum version requirement"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Highlighted Pro link on Plugins screen"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Replaced <code>UNION\\+SELECT</code> with <code>UNION.*SELECT</code>"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added <code>wp-config.php</code> to query-string patterns"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Added plugin link to <a href=\"https://plugin-planet.com/bbq-pro/\">BBQ Pro</a>"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Testing on WP 4.3 (alpha)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Tested with WP 4.2 and 4.3 (alpha)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Replaced some <code>http</code> with <code>https</code> in readme.txt"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "introduce <code>bbq_core()</code>"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "tested on latest WP"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "tightened up code"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "tested on latest version of WordPress (4.0)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "retested on Multisite"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "increased minimum version requirement to WP 3.7"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Bugfix: added conditional checks for empty variables"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "tested on latest version of WordPress (3.8)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "added link to rate plugin"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "removed <code>?&gt;</code> from script"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "added optional line for blocking long URLs"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "added line to prevent direct access to BBQ script"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "added <code>\\;Nt\\.</code>, <code>\\=Nt\\.</code>, <code>\\,Nt\\.</code> to request URI items"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "tested on latest version of WordPress (3.7)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "replaced <code>Nt\\.</code> with <code>\\/Nt\\.</code> (resolves comment editing/approval issue)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "removed <code>https\\:</code> (from previous version)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "replaced <code>\\/https\\/</code> with <code>\\/https\\:</code>"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "replaced <code>\\/http\\/</code> with <code>\\/http\\:</code>"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "replaced <code>\\/ftp\\/</code> with <code>\\/ftp\\:</code>"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "removed block for <code>jakarta</code> in user-agents"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "removed <code>union</code> from query strings"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "added to request-URI: <code>\\%2Flocalhost</code>, <code>Nt\\.</code>, <code>https\\:</code>, <code>\\.exec\\(</code>, <code>\\)\\.html\\(</code>, <code>\\{x\\.html\\(</code>, <code>\\(function\\(</code>"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "resolved PHP Notice \"Undefined Index\" via <code>isset()</code>"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "removed block for <code>CONCAT</code> in request-URI"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "removed block for <code>environ</code> in query-string"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "removed block for <code>%3C</code> and <code>%3E</code> in query-string"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "removed block for <code>%22</code> and <code>%27</code> in query-string"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "removed block for <code>[</code> and <code>]</code> in query-string (to allow unsafe characters used in WordPress)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "removed block for <code>?</code> in query-string (to allow unsafe character used in WordPress)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "removed block for <code>:</code> in query-string (to allow unsafe character used by Google)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "removed block for <code>libwww</code> in user-agents (to allow access to Lynx browser)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Removed <code>:</code> match from query string (Google disregards encoding)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Removed <code>scanner</code> from query string from query string match"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "Streamlined source code for better performance (thanks to juliobox)"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "2012/10/27 - Disabled check for long strings, disabled check for scanner"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "2012/10/26 - Rebuilt plugin using 5G/6G technology"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "2011/02/21 - Updated readme.txt file"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "2009/12/30 - Added check for admin users"
+msgstr ""
+
+#. Found in changelog list item.
+msgid "2009/12/30 - Additional request strings added"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2015/11/07</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2015/08/08</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2015/06/24</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2015/05/07</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2015/03/14</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2014/09/22</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2014/03/05</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2014/01/23</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2013/11/03</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2013/07/07</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2013/07/05</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2013/07/04</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2013/01/03</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>2012/11/08</strong>"
+msgstr ""
+
+#. Found in changelog paragraph.
+msgid "<strong>Older versions</strong>"
+msgstr ""
+
+#. Found in faq header.
+msgid "Do I need to do anything else for BBQ to work?"
+msgstr ""
+
+#. Found in faq header.
+msgid "Got a question?"
+msgstr ""
+
+#. Found in faq paragraph.
+msgid "Nope, just install and relax knowing that BBQ is protecting your site from bad URL requests."
+msgstr ""
+
+#. Found in faq paragraph.
+msgid "To ask a question, visit the <a href=\"https://perishablepress.com/block-bad-queries/\">BBQ homepage</a> or <a href=\"https://perishablepress.com/contact/\">contact me</a>."
+msgstr ""
+
+#. Found in remaining content header.
+msgid "Support development of this plugin"
+msgstr ""
+
+#. Found in remaining content list item.
+msgid "<a href=\"https://wp-tao.com/\">The Tao of WordPress</a>"
+msgstr ""
+
+#. Found in remaining content list item.
+msgid "<a href=\"https://digwp.com/\">Digging into WordPress</a>"
+msgstr ""
+
+#. Found in remaining content list item.
+msgid "<a href=\"https://htaccessbook.com/\">.htaccess made easy</a>"
+msgstr ""
+
+#. Found in remaining content list item.
+msgid "<a href=\"https://wp-tao.com/wordpress-themes-book/\">WordPress Themes In Depth</a>"
+msgstr ""
+
+#. Found in remaining content list item.
+msgid "<a href=\"https://plugin-planet.com/bbq-pro/\">BBQ Pro</a> - Pro version of Block Bad Queries"
+msgstr ""
+
+#. Found in remaining content list item.
+msgid "<a href=\"https://plugin-planet.com/ses-pro/\">SES Pro</a> - Super-simple &amp; flexible email signup forms"
+msgstr ""
+
+#. Found in remaining content list item.
+msgid "<a href=\"https://plugin-planet.com/usp-pro/\">USP Pro</a> - Pro version of User Submitted Posts"
+msgstr ""
+
+#. Found in remaining content paragraph.
+msgid "I develop and maintain this free plugin with love for the WordPress community. To show support, you can <a href=\"http://m0n.co/donate\">make a donation</a> or purchase one of my books:"
+msgstr ""
+
+#. Found in remaining content paragraph.
+msgid "And/or purchase one of my premium WordPress plugins:"
+msgstr ""
+
+#. Found in remaining content paragraph.
+msgid "Links, tweets and likes also appreciated. Thank you! :)"
+msgstr ""

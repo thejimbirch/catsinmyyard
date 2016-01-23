@@ -1,75 +1,125 @@
 === Advanced Responsive Video Embedder ===
 Contributors: nico23
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UNDSCARF3ZPBC
+Donate link: https://nextgenthemes.com/donate/
 Tags: video, responsive, embed, video-embedder, iframe, minimal, lightweight, simplicity, shortcodes, Youtube, Blip, Dailymotion, Videojug, Collegehumor, Veoh, Break, Movieweb, Snotr, Gametrailers, Vimeo, Viddler, Funnyordie, Myspace, Liveleak, Metacafe, Myvideo, Yahoo Screen, Spike
 Requires at least: 3.3.2
-Tested up to: 4.2.2
-Stable tag: trunk
-License: GPLv3
+Tested up to: 4.4.0
+Stable tag: 6.6.0
+License: GPL 3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Easy responsive video embeds via URLs or shortcodes. Perfect drop-in replacement for WordPress' default embeds. Best plugin for videos?
 
-== Description ==
+
+## Description ##
 
 
-### The best WordPress plugin for videos? Supports close to everything you can imagine, still keeping it easy &amp; simple. ###
+<p class="lead">The best WordPress plugin for videos? Supports close to everything you can imagine, still keeping it easy &amp; simple.</p>
 
-This is very likely the one and only plugin you will ever need to handle video embeds on your WordPress site(s)
+<p>It is very likely the one and only plugin you will ever need to handle video embeds on your WordPress site(s).</p>
 
-Simple &bull; Lightweight &bull; Responsive &bull; Customizable
+<p>Simple • Lightweight • Responsive • Customizable</p>
 
-Please check the [migration guide](https://nextgenthemes.com/?p=1875) after updating to version 6.0.0+.
+<p class="lead">Thanks to everyone who bought the <a href="https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/#purchase">Pro Addon</a></p>
 
-Please report issues on [community.nextgenthemes.com](https://community.nextgenthemes.com/) **and not on the wordpress.org forums.**
+<p>I really appreciate this. I commercialized parts of this plugin because I no longer can work on this for free and donations were not really doing it. I am glad not everyone thinks, everything needs to be gratis on the Internet, especially in Open Source. The Pro Addon, like the base version here, is still Free Software - free as in Freedom! not as in gratis. Well, actually I have given 712 licenses out free of charge to legacy users. I am thinking of stopping the giveaways.</p>
 
-
-* [Overview][1]
-* [Quick Introduction][2]
-* [Features][3]
-* [Pro Addon Features][4]
-* [Documentation][10]
-* [Tests & Examples][11]
-* [Github Page][21]
-
- [1]: https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/
- [2]: https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/#quick-introduction
- [3]: https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/#features
- [4]: https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/#additional-features-with-the-pro-addon
- [10]: https://github.com/nextgenthemes/advanced-responsive-video-embedder/blob/master/docs.md
- [11]: https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/tests-and-examples/
- [21]: https://github.com/nextgenthemes/advanced-responsive-video-embedder
+<a class="btn btn-primary btn-lg" href="https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/#purchase">Purchase Pro Addon</a>
 
 
-### Features ###
+### Version 7 is coming ###
 
-* Embeds via pasting the URL in its own line just like WordPress!
-* Optionally use Shortcodes instead
-* One single button for all providers (for most providers not required because of URL embeds, but allows to create custom shortcodes with advanced features within seconds)
-* Responsive embeds with CSS, much better then with JS IMO
-* Tries to be as unobtrusive as possible, sets 'hide brand' variables if supported, disabled related videos at the end ... to help keep people on your Site rather then going to YouTube or keep watching videos
-* Clean Shortcode syntax `[vimeo id="123456"]` no ugly URLs, no unnecessary Shortcode wrapping.
-* Autostart (for providers that support them)
-* Custom URL Parameters to use all options providers offer
-* Optional maximal width
-* Video alignment
-* General iframe support for any provider that not included that support responsive iframe embeds or any URL you with to display in a iframe.
-* Detailed description of options in-place, also available translated into German, French and Spanish.
-* Custom Aspect Ratio
+[Please help testing the beta versions](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/help-testing-the-beta-version/).
 
-### Additional Features with the Pro Addon ###
+### 7.0.2 Beta ###
 
-* Feel good about yourself for helping me support my long time work on this plugin. Tons of hours, weekends ... always worked on [improving](https://wordpress.org/plugins/advanced-responsive-video-embedder/changelog/) 3+ years.
-* Lazyload mode: Only load a preview image on pageload instead of the Video itself, makes you site load faster.
-* lazyload -> Lightbox Shows the Video in a Lightbox after clicking a preview image.
-* Lazyload -> HTML5 Fullscreen: (experimental) This is a dream come true for me. Be aware that this has a Issue of going fullsceen a 2nd time from within fullscreen and fullscreen Buttons not working as expected.
-* Lazyload -> Half Screen Sticky: (experimental) Video that fills about half the screen/window and lets users continue to scroll and read the site, start writing a comment ... while watching a video. This relies on modern HTML5 features (calc, vw + vh) and may not work everywhere.
-* Link -> Lightbox: Make 
+* New: New Advanced shotcode Dialog, with very detailed helping texts, display of default settings, hiding of fields based on need ...
+* New: WYSIWYG Preview of shortcodes.
+* New: The two above features need the [Shortcake (Shortcode UI)](https://de.wordpress.org/plugins/shortcode-ui/) Plugin that is maybe moving into WordPress core later.
+* New: Amazing catch-all shortcode [arve url="..."] that can be used for all supported providers.
+* New: A default alignment can now be set in the Settings page. (fulfilled request)
+* New: 'iframe_name' shortcode parameter for `<iframe name="xxxxx"`, useful when wanting to target ARVE embeds with links. (fulfilled request)
+* New: ARVE is now SEO friendly giving you the ability to add some schema.org microdata. Googles tools should not complain anymore. (fulfilled request)
+* Deleted Language files in favor of [wordpress.org managed translations](https://translate.wordpress.org/projects/wp-plugins/advanced-responsive-video-embedder/dev) volunteers are welcome ;)
+* Improved: Got rid of PHP globals.
+* Improved: Added image upload dialog to settings page and shortcode dialog
+* Improved: Better CSS to overwrite unwanted theme styles.
+* Improved: Lots if code improvements.
+* Improved: SSL enabled for Vevo.
+* Fix: Prevent conflicts with WP Helpers plugin (possibly others). Thanks to Steve Bruner.
+* Fix: Issue with unwanted borders showing on embeds.
+* Fix: youtube.be URLs now detected correct in shortcode dialog.
+* Fix: All Vevo URLs are now detected correctly.
+* Removed blip because the service was shutdown.
+* Background-images are now applied to .arve-embed-container instead of .arve-wrapper.
+
+### Pro Addon 1.5.3 Beta ###
+
+* New: Added support for displaying title of videos on top of the thumbnail images.
+* Improved: Rectangle animation. (thinking about removing it completely)
+* Improved: Updated lity (lightbox script) to version 1.5.1
+* Improved: Thumbnail handling.
+* Improved: Removed the 'Lazyload Maximal Width' setting to simplify things (there still is 'Maximal Width' and 'Aligned Maximal Width').
+* Improved: Removed the 'Fake Thumbnail' because I now think the entire idea was bad and real thumbnails should be used.
+* Dropped PHP Class
+
+
+<ul class="nav nav-pills">
+  <li class="nav-item"><a class="nav-link" href="https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/">Overview</a></li>
+  <li class="nav-item"><a class="nav-link" href="https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/#features">Features</a></li>
+  <li class="nav-item"><a class="nav-link" href="https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/#additional-features-with-the-pro-addon">Pro Addon Features</a></li>
+  <li class="nav-item"><a class="nav-link" href="https://github.com/nextgenthemes/advanced-responsive-video-embedder/blob/beta/docs.md">Documentation</a></li>
+  <li class="nav-item"><a class="nav-link" href="https://advancedembeds.com">Tests &amp; Examples</a></li>
+  <li class="nav-item"><a class="nav-link" href="https://github.com/nextgenthemes/advanced-responsive-video-embedder">Github Page</a></li>
+</ul>
+
+
+<h3>Features</h3>
+<ul class="list-checked">
+	<li>Embeds via pasting the URL in its own line just like WordPress!</li>
+	<li>Supports <a href="https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/#supported-providers">almost every video hoster</a> that supports iframe embed codes.</li>
+	<li>Optionally use Shortcodes instead</li>
+	<li>One single button for all providers (for most providers not required because of URL embeds, but allows to create custom shortcodes with advanced features within seconds)</li>
+	<li>Responsive embeds with CSS, much better then with JS IMO</li>
+	<li>Tries to be as unobtrusive as possible, sets ‘hide brand’ variables if supported, disabled related videos at the end … to help keep people on your Site rather then going to YouTube or keep watching videos</li>
+	<li>Clean Shortcode syntax <code>[vimeo id="123456"]</code> no ugly URLs, no unnecessary shortcode wrapping.</li>
+	<li>Autostart (for providers that support them)</li>
+	<li>Custom URL Parameters to use all options providers offer</li>
+	<li>Optional maximal width</li>
+	<li>Video alignment</li>
+	<li>General iframe support for any provider that not included that support responsive iframe embeds or any URL you with to display in a iframe.</li>
+	<li>Detailed description of options in-place.</li>
+	<li>Custom Aspect Ratio</li>
+</ul>
+
+<img src="https://nextgenthemes.com/wp-content/uploads/2015/11/GPLv3_Logo.svg" class="img-resonsive" style="width: 320px; margin-bottom: 2rem;">
+
+
+<h3>Additional Features with the Pro Addon</h3>
+<ul class="list-checked">
+	<li><strong>Feel good about yourself</strong><br>
+		for supporting my long time work on this plugin. Tons of hours, weekends … always worked on <a href="https://wordpress.org/plugins/advanced-responsive-video-embedder/changelog/">improving it</a> 3+ years.</li>
+
+	<li><strong>Lazyload mode</strong><br>
+		Make your site load <strong>faster</strong> by loading only a image instead of the entire video player on pageload.</li>
+
+	<li><strong>Lazyload -&gt; Lightbox</strong><br>
+		Shows the Video in a Lightbox after clicking a preview image</li>
+
+	<li><strong>Link -&gt; Lightbox</strong><br>
+		Use simple links as triggers for lightboxed videos</li>
+
+	<li><strong>Lazyload -&gt; HTML5 Fullscreen</strong> (experimental)</li>
+
+	<li><strong>Lazyload -&gt; Half Screen Sticky</strong> (experimental)</li>
+</ul>
+
 
 ### Supported providers ###
 
 * iframe (General support for any provider that not included that support responsive iframe embeds)
 * 4players.de
+* alugha
 * archive.org
 * blip
 * break
@@ -102,74 +152,42 @@ Please report issues on [community.nextgenthemes.com](https://community.nextgent
 * Yahoo Screen
 * YouTube
 
-### Quick Introduction ###
 
-URLs like `https://vimeo.com/124400795` on its own line will produce full responsive embeds. If you already use this with WordPress default, this is the perfect drop-in replacement to make everything responsive, no need to do anything.
+Make sure to check out the [plugins page](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/) for more details on the plugin.
 
-https://vimeo.com/124400795
-
-Extremly customizable with support for anything providers offer to customize embeds. Other plugins offer some of this features with huge bloated dialogs, ARVE is different, it just lets you do anything you want if you have a few seconds to look up what the parameters do.
-
-Here we are starting the video at the 30 seconds mark, disable the fullscreen button, switch to YouTubes light theme and set the aspect_ratio to cinemascope.
-
-`https://youtu.be/Q6goNzXrmFs?start=30&fs=0&theme=light&arve[aspect_ratio]=21:9`
-
-the same thing can be done with a shortcode:
-
-`[youtube id="Q6goNzXrmFs" parameters="start=30 fs=0 theme=light" aspect_ratio="21:9"]`
-
-https://youtu.be/Q6goNzXrmFs?start=30&fs=0&theme=light&arve[aspect_ratio]=21:9
-
-### Pro Addon Feature Demonstration ###
-
-`[vimeo id="124858722" mode="lazyload" maxwidth="400" align="left"]] This is a demo of a aligned lazyloaded video [...]`
-
- This is a demo of a aligned lazyloaded video that has a maximal width set and will grow on click before loading the video.
-
-You can open up a lightbox with a normal link [youtube id="Q6goNzXrmFs" mode="link-lightbox" link_text="click me"] with this sortcode:
-
-`[youtube id="Q6goNzXrmFs" mode="link-lightbox" link_text="click me"]`
-<div class="clearfix"></div>
-
-We can also center videos and open then inside a Lightboxbox.
-
-`[youtube id="Q6goNzXrmFs" mode="lazyload-lightbox" maxwidth="600" align="center"]`
+Please report issues on [community.nextgenthemes.com](https://community.nextgenthemes.com/) **and not on the wordpress.org forums.**
 
 
+<h3>Reviews</h3>
 
-### Lazyloaded Preview Images in HD ###
-
-Contrary to what you might think, thumbnail in ARVE does not nessasary mean small images. You can provide your own images with thumbnail="https://your.image.url" or thumbnail="1234" where 1234 is the ID of the image in your WP Media Gallery. Most providers, which support automatic thubnails also support HD thumbnail images and this plugin will get the highest aviable size.
-
-
-
-### Reviews
-
-<div class=clearfix markdown=1>
-<img src="https://www.gravatar.com/avatar/a00d4c26eb35dfee5b8a3ba1c454e72f?d=mm&s=150&r=G" class="alignleft">
-
-#### &#9733; &#9733; &#9733; &#9733; &#9733; Finally something that works
-
-So I have a responsive theme but on pages with you tube videos it wasn't making the you tube videos fit in the mobile screen. I have spent the last hour trying many plugins and researching on google and finally I installed this. And I didn't have to update any settings or anything just refreshed a post with videos and all the sudden it is beautiful and responsive on my mobile phone!!!!!! THANK YOU!!!! [review by happyecho](https://wordpress.org/support/view/plugin-reviews/advanced-responsive-video-embedder?filter=5)
+<div class="media">
+	<div class="media-left">
+		<img class="img-circle" src="https://www.gravatar.com/avatar/a00d4c26eb35dfee5b8a3ba1c454e72f?d=mm&s=140&r=G">
+	</div>
+	<div class="media-body media-middle">
+		<h4>&#9733; &#9733; &#9733; &#9733; &#9733; Finally something that works</h4>
+		So I have a responsive theme but on pages with you tube videos it wasn't making the you tube videos fit in the mobile screen. I have spent the last hour trying many plugins and researching on google and finally I installed this. And I didn't have to update any settings or anything just refreshed a post with videos and all the sudden it is beautiful and responsive on my mobile phone!!!!!! THANK YOU!!!!<br>
+		<a href="https://wordpress.org/support/view/plugin-reviews/advanced-responsive-video-embedder?filter=5">review by happyecho</a>
+	</div>
 </div>
 
-<div class=clearfix markdown=1>
-<img src="https://www.gravatar.com/avatar/0ff987ed648114d5f81796594a9fcaf8?d=mm&s=150&r=G" class="alignleft">
-
-#### &#9733; &#9733; &#9733; &#9733; &#9733; Only Plug-in that worked
-
-I used a lot of high ranking plug-ins but they still broke my design. Downloaded this and worked right away. Thanks! [review by crconnell89](https://wordpress.org/support/view/plugin-reviews/advanced-responsive-video-embedder?filter=5)
+<div class="media">
+	<div class="media-left">
+		<img class="img-circle" src="https://www.gravatar.com/avatar/0ff987ed648114d5f81796594a9fcaf8?d=mm&s=140&r=G">
+	</div>
+	<div class="media-body media-middle">
+		<h4>&#9733; &#9733; &#9733; &#9733; &#9733; Only Plug-in that worked</h4>
+		I used a lot of high ranking plug-ins but they still broke my design. Downloaded this and worked right away. Thanks!<br>
+		<a href="https://wordpress.org/support/view/plugin-reviews/advanced-responsive-video-embedder?filter=5">review by crconnell89</a>
+	</div>
 </div>
 
-### Roadmap ###
 
-* Support for self-hosted videos.
-
-== Installation ==
+## Installation ##
 
 Please refer to [codex.wordpress.org/Managing_Plugins#Automatic_Plugin_Installation](https://codex.wordpress.org/Managing_Plugins#Automatic_Plugin_Installation).
 
-== Frequently Asked Questions ==
+## Frequently Asked Questions ##
 
 ### I have a problem ... ###
 
@@ -178,19 +196,11 @@ Please report it on [community.nextgenthemes.com](https://community.nextgentheme
 ### How to get the pro version working? ###
 
 1. Go though the purchase process on [nextgenthemes.com/advanced-responsive-video-embedder-pro/](https://nextgenthemes.com/advanced-responsive-video-embedder-pro/)
-1. Follow the 3 easy steps you get with the purchase reciept. Basically downloading a arve-pro.zip and installing it through your WordPress Admin panel.
-
-### My self hosted video that I embed with iframe is always autoplaying, how to disable autplay? ###
-
-You can not at this point. I do not recommend the bad workarround I gave out before to used iframes with .mp4/.ogg/.mkv files directly as depending on browser (and setup, I think some IE) it may lead to download instead of embed this just uses the default browsers behavior as if you navigate to a video file and you are stick with the defaults the browser throws at you. Most disliked in the autoplay. Propper support for self hosted videos is plannend, probably even for the free version but no estimated release date.
+1. Follow the 3 easy steps you get with the purchase receipt. It is basically downloading a arve-pro.zip and installing it through your WordPress Admin panel.
 
 ### Why are my videos not filling their container? ###
 
 You are most likely use `align`, this plugin has a option for limiting video with with alignment. If you want your videos to fill their containers then you should not use the `align=left/right/center` shortcode attribute or the `arve[align]=` URL parameter. This assumes that you left the 'Video Maximal Width' field on the options page empty (default + recommended)
-
-### Why are videos opening full window (provider URL) when I click on them? ###
-
-You most likely do not have the 'jQuery Colorbox' Plugin installed or JavaScript disabled both is needed for thumbnail mode. Another reason can be that do have JavascriptErrors or Browser addons like NoScript blocking JavaScript trom Executing.
 
 ### Can you add a video provider? ###
 
@@ -206,18 +216,18 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 
 `[youtube id="123456" parameters="loop=1 playlist=123456"]`
 
-== Screenshots ==
+
+## Screenshots ##
 
 1. Main Options
 2. Pro Options
 3. Features
 
-== Todo List ==
+## Todo List ##
 
 I would be glad if someone could [help me](https://github.com/nextgenthemes/advanced-responsive-video-embedder) with this, I can send you cash for helping out.
 
-These are not in any real priority order (for now)
-
+- [ ] Pro Addon: Fix [issue 17][17] Lazyload Lightbox fails with IGN (and maybe others)
 - [ ] Get advice how I could improve my sales of this the Pro Addon
 - [ ] Advertise the Pro Addon somewhere
 - [ ] Make the [Plugin Page](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/) and the selling process UX more professional look and feel.
@@ -228,25 +238,81 @@ These are not in any real priority order (for now)
 - [ ] Improve [Documentation][50] - extend
 - [ ] Improve [Documentation][50] - simplify
 - [ ] Improve [Documentation][50] - write how to use kaltura, and other not directly supported providers with iframe
-- [ ] Create a Feature Table?
+- [x] Create a Features Table?
 - [ ] Comparison with other Plugins (Table?)
 - [ ] Write docs about how to use iframe for not supported providers.
-- [ ] Support for self hosting videos (or at least make them responsive as they are), consider making the WordPress videos responsive (maybe it just take a wrapper).
 - [ ] How to manage beta versions with WordPress.org and the EDD Software licensing plugin (for the Pro Version)
-- [ ] WordPress Language Pack thing (anything needed to do?)
-- [ ] Pro Addon: Fix bug when sometimes the URL of iframe starts with "#lity" and fails use [arve_tests] Shortcode and look at the IGN example, the lazyload-lightbox fails.
-- [ ] [Fix bug](https://community.nextgenthemes.com/90/i-put-in-youtube-url-and-get-the-no-provider-selected-message?show=90#q90) where youtube.be/xxxxx URLs are not detected by the shortcode creator. This may have something to do how PHP regexes are carried over do JS.
+- [ ] WordPress Language Pack thing
 - [ ] Get rid of globals in PHP Code
 - [ ] Consider writing JS create URL querys for embed customization (for use in shortcode creator dialog but also easy to use independant)
+
+ [16]: https://github.com/nextgenthemes/advanced-responsive-video-embedder/issues/16
+ [17]: https://github.com/nextgenthemes/advanced-responsive-video-embedder/issues/17
 
  [50]: https://github.com/nextgenthemes/advanced-responsive-video-embedder/blob/master/docs.md
 
 
-== Changelog ==
+## Changelog ##
+
+### Version 7 is coming ###
+
+[Please help testing the beta versions](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/help-testing-the-beta-version/).
+
+### 7.0.2 Beta ###
+
+* New: New Advanced shotcode Dialog, with very detailed helping texts, display of default settings, hiding of fields based on need ...
+* New: WYSIWYG Preview of shortcodes.
+* New: The two above features need the [Shortcake (Shortcode UI)](https://de.wordpress.org/plugins/shortcode-ui/) Plugin that is maybe moving into WordPress core later.
+* New: Amazing catch-all shortcode [arve url="..."] that can be used for all supported providers.
+* New: A default alignment can now be set in the Settings page. (fulfilled request)
+* New: 'iframe_name' shortcode parameter for `<iframe name="xxxxx"`, useful when wanting to target ARVE embeds with links. (fulfilled request)
+* New: ARVE is now SEO friendly giving you the ability to add some schema.org microdata. Googles tools should not complain anymore. (fulfilled request)
+* Deleted Language files in favor of [wordpress.org managed translations](https://translate.wordpress.org/projects/wp-plugins/advanced-responsive-video-embedder/dev) volunteers are welcome ;)
+* Improved: Got rid of PHP globals.
+* Improved: Added image upload dialog to settings page and shortcode dialog
+* Improved: Better CSS to overwrite unwanted theme styles.
+* Improved: Lots if code improvements.
+* Improved: SSL enabled for Vevo.
+* Fix: Prevent conflicts with WP Helpers plugin (possibly others). Thanks to Steve Bruner.
+* Fix: Issue with unwanted borders showing on embeds.
+* Fix: youtube.be URLs now detected correct in shortcode dialog.
+* Fix: All Vevo URLs are now detected correctly.
+* Removed blip because the service was shutdown.
+* Background-images are now applied to .arve-embed-container instead of .arve-wrapper.
+
+### Pro Addon 1.5.3 Beta ###
+
+* New: Added support for displaying title of videos on top of the thumbnail images.
+* Improved: Rectangle animation. (thinking about removing it completely)
+* Improved: Updated lity (lightbox script) to version 1.5.1
+* Improved: Thumbnail handling.
+* Improved: Removed the 'Lazyload Maximal Width' setting to simplify things (there still is 'Maximal Width' and 'Aligned Maximal Width').
+* Improved: Removed the 'Fake Thumbnail' because I now think the entire idea was bad and real thumbnails should be used.
+* Dropped PHP Class
+
+### 6.3.9 ###
+
+* Fix: Facebook (now really, hopefully).
+
+### 6.3.8 ###
+
+* Fix: Facebook in lazyload modes.
+
+### 6.3.7 ###
+
+* New: Facebook video support.
+
+### 6.3.4 ###
+
+* Fix?: Iframes are now created with a fixed 853x480 size in feeds, this probably will fix some feedreaders incorrectly or not displaying videos.
+
+### 6.3.3 ###
+
+* Improved: Disabled file URL detection as this solution was bad.
 
 ### 6.3.2 ###
 
-Fixed/Improved: [arve_tests] shortcode.
+* Fixed/Improved: [arve_tests] shortcode.
 
 ### Pro Addon 1.4 ###
 
@@ -260,7 +326,7 @@ Fixed/Improved: [arve_tests] shortcode.
 
 ### Pro Addon 1.1.5 ###
 
-* New: Added setting and parameter grow="yes/no" to controll the grow-on-click behaviour that was introduced in 6.0 to your liking.
+* New: Added setting and parameter grow="yes/no" to control the grow-on-click behaviour that was introduced in 6.0 to your liking.
 
 ### 6.1.2 ###
 
@@ -607,7 +673,7 @@ Please check the [migration guide](https://nextgenthemes.com/?p=1875) about upgr
 ### 2.6.1 ###
 
 * Fix: Colorbox args script not having colorbox in depenency array
-* Fix: Maxwidth shortcode generotor field now has default value#""
+* Fix: Maxwidth shortcode generator field now has default value#""
 * Fix: Blip embed code detection
 
 ### 2.6.0 ###

@@ -2,11 +2,11 @@
 Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: twitter, microblogging, su.pr, bitly, yourls, redirect, shortener, post, links, social, sharing, media, tweet
-Requires at least: 3.9.8
-Tested up to: 4.3.1
+Requires at least: 4.0
+Tested up to: 4.4.0
 License: GPLv2 or later
 Text Domain: wp-to-twitter
-Stable tag: 3.1.6
+Stable tag: 3.1.8
 
 Posts a Twitter update when you update your WordPress blog or add a link, with your chosen URL shortening service.
 
@@ -54,12 +54,9 @@ Want to stay up to date on WP to Twitter? [Follow me on Twitter!](https://twitte
 
 = Translations =
 
-Visit the [WP to Twitter translations page](http://translate.joedolson.com/projects/wp-to-twitter) to see how complete these are.
+Visit the [WP to Twitter translation site](https://translate.wordpress.org/projects/wp-plugins/wp-to-twitter/stable) to see how complete the current translations are.
 
-Translations available (in order of completeness):
-English (Australia), Japanese, Dutch, French, Italian, Russian, Danish, Catalan, Portuguese (Brazil), Spanish (Spain), Chinese (Taiwan), German, Romanian, Estonian, Polish, Lithuanian, Ukrainian, Irish, Swedish, Turkish
-
-Translating my plug-ins is always appreciated. Visit <a href="http://translate.joedolson.com">my translations site</a> to start getting your language into shape!
+Translating my plug-ins is always appreciated. Work on WP to Twitter translations at <a href="https://translate.wordpress.org/projects/wp-plugins/wp-to-twitter">the WordPress translation site</a>! You'll need a WordPress.org account to contribute!
 
 == Changelog ==
 
@@ -69,6 +66,19 @@ Translating my plug-ins is always appreciated. Visit <a href="http://translate.j
 * Add regex filter to detect URLs typed into Tweet fields for counting/shortening purposes. [todo]
 * 4.2 added compat function for mb_substr; drop mine when I drop support for 4.1
 * WP to Twitter timing bug with images?
+
+= 3.1.9 =
+
+* CSS update in Twitter feed for new iframe generated follow button
+* Include target URL in information deleted when a post's Tweet History cleared
+* Minor design changes
+* Updated manual
+* Updated text
+
+= 3.1.8 =
+
+* Bug fix: Add support for calendar picker in WP Tweets Pro
+* New filter on random delay value
 
 = 3.1.7 =
 

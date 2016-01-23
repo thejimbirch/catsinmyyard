@@ -3,7 +3,7 @@
 Plugin Name: WP to Twitter
 Plugin URI: http://www.joedolson.com/wp-to-twitter/
 Description: Posts a Tweet when you update your WordPress blog or post a link, using your URL shortening service. Rich in features for customizing and promoting your Tweets.
-Version: 3.1.7
+Version: 3.1.9
 Author: Joseph Dolson
 Text Domain: wp-to-twitter
 Domain Path: /lang
@@ -46,7 +46,7 @@ require_once( plugin_dir_path( __FILE__ ) . '/wpt-widget.php' );
 require_once( plugin_dir_path( __FILE__ ) . '/wpt-rate-limiting.php' );
 
 global $wpt_version;
-$wpt_version = "3.1.7";
+$wpt_version = "3.1.9";
 
 add_action( 'plugins_loaded', 'wpt_load_textdomain' );
 function wpt_load_textdomain() {
@@ -929,7 +929,7 @@ function wpt_tweet( $post_ID, $type = 'instant' ) {
 					} else {
 						foreach ( $wpt_selected_users as $acct ) {
 							$acct = ( $acct == 'main' ) ? false : $acct;
-							$offset = ( $auth != $acct ) ? rand( 60, 480 ) : 0;
+							$offset = ( $auth != $acct ) ? apply_filters( 'wpt_random_delay', rand( 60, 480 ) ) : 0;
 							if ( wtt_oauth_test( $acct, 'verify' ) ) {
 								$time      = apply_filters( 'wpt_schedule_delay', ( (int) $post_info['wpt_delay_tweet'] ) * 60, $acct );
 								wp_schedule_single_event( time() + $time + $offset, 'wpt_schedule_tweet_action', array(
@@ -1196,16 +1196,19 @@ function wpt_add_twitter_inner_box( $post ) {
 								class="screen-reader-text"><?php _e( 'Set Date/Time', 'wp-to-twitter' ); ?></span></span>
 					</button>
 					<div id="jts">
-						<label for='wpt_date'><?php _e( 'Date', 'wp-to-twitter' ); ?></label> <input type='date'
-						                                                                             value='<?php echo date( 'Y-m-d', current_time( 'timestamp' ) ); ?>'
-						                                                                             class='date'
-						                                                                             name='wpt_datetime'
-						                                                                             id='wpt_date'/><br/>
-						<label for='wpt_time'><?php _e( 'Time', 'wp-to-twitter' ); ?></label> <input type='text'
-						                                                                             value='<?php echo date_i18n( 'h:s a', current_time( 'timestamp' ) + 3600 ); ?>'
-						                                                                             class='time'
-						                                                                             name='wpt_datetime'
-						                                                                             id='wpt_time'/>
+						<label for='wpt_date'><?php _e( 'Date', 'wp-to-twitter' ); ?></label> 
+						<input type='date'
+							value=''
+							class='date'
+							name='wpt_datetime'
+							id='wpt_date'
+							data-value='<?php echo date( 'Y-m-d', current_time( 'timestamp' ) ); ?>' /><br/>
+						<label for='wpt_time'><?php _e( 'Time', 'wp-to-twitter' ); ?></label> 
+						<input type='text'
+							value='<?php echo date_i18n( 'h:s a', current_time( 'timestamp' ) + 3600 ); ?>'
+							class='time'
+							name='wpt_datetime'
+							id='wpt_time'/>
 					</div>
 				<?php } ?>
 				<div class='wpt_log' aria-live='assertive'></div>
@@ -1340,8 +1343,6 @@ function wpt_add_twitter_inner_box( $post ) {
 			<?php if ( ! function_exists( 'wpt_pro_exists' ) ) { 
 			/* These aren't actually usages that require esc_url. But using it will give people the illusion that it does something. */
 			?>
-				<a target="_blank"
-				   href="<?php echo esc_url( add_query_arg( 'tab', 'support', admin_url( 'options-general.php?page=wp-to-twitter/wp-to-twitter.php' ) ) ); ?>#get-support"><?php _e( 'Get Support', 'wp-to-twitter', 'wp-to-twitter' ); ?></a> &bull;
 				<strong><a target="__blank" href="https://www.joedolson.com/wp-tweets-pro/"><?php _e( 'Go Premium', 'wp-to-twitter', 'wp-to-twitter' ) ?></a></strong> &raquo;
 			<?php } else { ?>
 				<a target="_blank"
@@ -1574,6 +1575,7 @@ function wpt_save_post( $id ) {
 		delete_post_meta( $id, '_wpt_failed' );
 		delete_post_meta( $id, '_jd_wp_twitter' );
 		delete_post_meta( $id, '_wpt_short_url' );
+		delete_post_meta( $id, '_wp_jd_twitter' );
 	}
 	// WPT PRO //
 	$update = apply_filters( 'wpt_insert_post', $_POST, $id );

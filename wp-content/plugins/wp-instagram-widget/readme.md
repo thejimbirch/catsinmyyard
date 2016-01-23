@@ -79,11 +79,29 @@ In version 1.4 and above you can also customise the image loop completely by cre
 
 ## Changelog
 
+####1.9.4
+* IMPORTANT: You must be on WordPress 4.4 or later to upgrade to this version of the plugin. This fixes a bug with PHP versions < 5.4.7. If you are on a version of WordPress older than 4.4 and you notice images are not loading then I recommend rolling your version of the widget back to this version: https://github.com/scottsweb/wp-instagram-widget/blob/c66550eded59bd51f508f304a85a3e031ac4044c/wp-instagram-widget.php
+
+####1.9.3
+* Fix issues introduced in the last version (apologies). Certain CDN URLs are still in use
+
+####1.9.2
+* Better handling of all image and video image URLs props @thegallagher
+
+####1.9.1
+* Fix bug with some image URLs
+
+####1.9
+* WordPress.com VIP checked
+* Updated CDN matching to ensure correct image sizes are served at all times
+* Shortened the transient key - should mean we bump into the character limit less often
+* Remove use of `extract`
+
 ####1.8.1
 * Apologies for all the recent updates, all good things though!
 * Update plugin text domain ready for translate.wordpress.org
 * Introduce an 'original' image size if you want to use non-square originals
-* Introduce new filter for <ul> class `wpiw_list_class`
+* Introduce new filter for `<ul>` class `wpiw_list_class`
 
 ####1.8
 * Bring back image captions

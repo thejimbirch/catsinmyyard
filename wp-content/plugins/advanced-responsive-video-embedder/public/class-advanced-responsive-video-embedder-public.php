@@ -187,6 +187,15 @@ class Advanced_Responsive_Video_Embedder_Public {
 					'[flickr id="2856467015"]',
 				)
 			),
+			'facebook' => array(
+				'url' => true,
+				'thumb' => false,
+				'aspect_ratio' => 56.25,
+				'wmode_transparent' => false,
+				'tests' => array(
+					'https://www.facebook.com/UScoastguard/videos/10153791849322679/',
+				)
+			),
 			'funnyordie' => array(
 				'name' => 'Funny or Die',
 				'url' => true,
@@ -248,6 +257,16 @@ class Advanced_Responsive_Video_Embedder_Public {
 					'http://www.liveleak.com/view?i=703_1385224413',
 					__('File <code>f=</code> URL', $this->plugin_slug) ,
 					'http://www.liveleak.com/view?f=c85bdf5e45b2',
+				)
+			),
+			'livestream' => array(
+				'url' => true,
+				'thumb' => false,
+				'wmode_transparent' => true,
+				'aspect_ratio' => 56.25,
+				'tests' => array(
+					'http://original.livestream.com/bethanychurchnh',
+					'http://original.livestream.com/bethanychurchnh/video?clipId=flv_b54a694b-043c-4886-9f35-03c8008c23ca',
 				)
 			),
 			'metacafe' => array(
@@ -595,6 +614,7 @@ class Advanced_Responsive_Video_Embedder_Public {
 
 		unset( $url_query['arve'] );
 		unset( $url_query['t'] );
+		unset( $url_query['clipId'] );
 
 		//* Pure awesomeness!
 		$atts               = array_merge( (array) $old_atts, (array) $new_atts );
@@ -760,6 +780,15 @@ class Advanced_Responsive_Video_Embedder_Public {
 				}
 				$url = 'http://www.liveleak.com/ll_embed?' . $id;
 				break;
+			case 'livestream':
+				if( $this->starts_with( $id, 'accounts/' ) ) {
+					$url = '//livestream.com/accounts/' .  $id . '/player';
+				} else {
+					str_replace( '/video?clipId=', '?clip=', $id );
+					$url = '//cdn.livestream.com/embed/' . $id;
+					$url = add_query_arg( 'layout', 4, $url );
+				}
+				break;
 			case 'myspace':
 				$url = 'https://myspace.com/play/video/' . $id;
 				break;
@@ -866,7 +895,7 @@ class Advanced_Responsive_Video_Embedder_Public {
 				$url = 'http://www.xtube.com/embedded/user/play.php?v=' . $id;
 				break;
 			case 'facebook':
-				$url = 'http://www.facebook.com/video/embed?video_id=' . $id;
+				$url = '//www.facebook.com/video/embed?video_id=' . $id;
 				break;
 			case 'twitch':
 				$tw = explode( '/', $id );
@@ -940,6 +969,9 @@ class Advanced_Responsive_Video_Embedder_Public {
 			case 'ustream':
 				$url_autoplay_no  = add_query_arg( 'autoplay', 'false', $url );
 				$url_autoplay_yes = add_query_arg( 'autoplay', 'true',  $url );
+			case 'livestream':
+				$url_autoplay_no  = add_query_arg( 'autoPlay', 'false', $url );
+				$url_autoplay_yes = add_query_arg( 'autoPlay', 'true',  $url );
 				break;
 			case 'yahoo':
 				$url_autoplay_no  = add_query_arg( 'player_autoplay', 'false', $url );
@@ -1161,6 +1193,8 @@ class Advanced_Responsive_Video_Embedder_Public {
 			'class'           => 'arve-inner',
 			'allowfullscreen' => '',
 			'frameborder'     => '0',
+			'width'           => is_feed() ? 853 : false,
+			'height'          => is_feed() ? 480 : false,
 		);
 
 		$args = wp_parse_args( $args, $defaults );

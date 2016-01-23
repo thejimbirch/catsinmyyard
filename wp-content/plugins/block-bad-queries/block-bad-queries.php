@@ -2,26 +2,27 @@
 /*
 Plugin Name: Block Bad Queries (BBQ)
 Plugin URI: https://perishablepress.com/block-bad-queries/
-Description: Automatically protects WordPress against malicious URL requests.
+Description: Automatically protects WordPress against malicious URL requests. This is the free/basic version of BBQ.
 Tags: security, protect, firewall, php, eval, malicious, url, request, blacklist
 Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests.
 Author: Jeff Starr
 Author URI: http://monzilla.biz/
-Contributors: specialk, aldolat, WpBlogHost, James Wilkes, juliobox
+Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsult
 Donate link: http://m0n.co/donate
-Requires at least: 4.0
-Tested up to: 4.3
+Requires at least: 4.1
+Tested up to: 4.4
 Stable tag: trunk
-Version: 20150808
+Version: 20151107
 License: GPLv2 or later
 */
 
 if (!defined('ABSPATH')) die();
 
 function bbq_core() {
-	$request_uri_array  = apply_filters('request_uri_items',  array('eval\(', 'UNION.*SELECT', '\(null\)', 'base64_', '\/localhost', '\%2Flocalhost', '\/pingserver', '\/config\.', '\/wwwroot', '\/makefile', 'crossdomain\.', 'proc\/self\/environ', 'etc\/passwd', '\/https\:', '\/http\:', '\/ftp\:', '\/cgi\/', '\.cgi', '\.exe', '\.sql', '\.ini', '\.dll', '\.asp', '\.jsp', '\/\.bash', '\/\.git', '\/\.svn', '\/\.tar', ' ', '\<', '\>', '\/\=', '\.\.\.', '\+\+\+', '\:\/\/', '\/&&', '\/Nt\.', '\;Nt\.', '\=Nt\.', '\,Nt\.', '\.exec\(', '\)\.html\(', '\{x\.html\(', '\(function\('));
+	
+	$request_uri_array  = apply_filters('request_uri_items',  array('eval\(', 'UNION(.*)SELECT', '\(null\)', 'base64_', '\/localhost', '\%2Flocalhost', '\/pingserver', '\/config\.', '\/wwwroot', '\/makefile', 'crossdomain\.', 'proc\/self\/environ', 'etc\/passwd', '\/https\:', '\/http\:', '\/ftp\:', '\/cgi\/', '\.cgi', '\.exe', '\.sql', '\.ini', '\.dll', '\.asp', '\.jsp', '\/\.bash', '\/\.git', '\/\.svn', '\/\.tar', ' ', '\<', '\>', '\/\=', '\.\.\.', '\+\+\+', '\:\/\/', '\/&&', '\/Nt\.', '\;Nt\.', '\=Nt\.', '\,Nt\.', '\.exec\(', '\)\.html\(', '\{x\.html\(', '\(function\(', '\.php\([0-9]+\)'));
 	$query_string_array = apply_filters('query_string_items', array('\.\.\/', '127\.0\.0\.1', 'localhost', 'loopback', '\%0A', '\%0D', '\%00', '\%2e\%2e', 'input_file', 'execute', 'mosconfig', 'path\=\.', 'mod\=\.', 'wp-config\.php'));
-	$user_agent_array   = apply_filters('user_agent_items',   array('binlar', 'casper', 'cmswor', 'diavol', 'dotbot', 'finder', 'flicky', 'nutch', 'planet', 'purebot', 'pycurl', 'skygrid', 'sucker', 'turnit', 'vikspi', 'zmeu'));
+	$user_agent_array   = apply_filters('user_agent_items',   array('acapbot', 'binlar', 'casper', 'cmswor', 'diavol', 'dotbot', 'finder', 'flicky', 'morfeus', 'nutch', 'planet', 'purebot', 'pycurl', 'semalt', 'skygrid', 'snoopy', 'sucker', 'turnit', 'vikspi', 'zmeu'));
 	
 	$request_uri_string  = false;
 	$query_string_string = false;
@@ -38,22 +39,26 @@ function bbq_core() {
 			preg_match( '/' . implode( '|', $query_string_array ) . '/i', $query_string_string ) || 
 			preg_match( '/' . implode( '|', $user_agent_array )   . '/i', $user_agent_string ) 
 		) {
-			header('HTTP/1.1 403 Forbidden');
-			header('Status: 403 Forbidden');
-			header('Connection: Close');
-			exit;
+			bbq_response();
 		}
 	}
 }
 add_action('plugins_loaded', 'bbq_core');
 
-function rate_bbq($links, $file) {
+function bbq_links($links, $file) {
 	if ($file == plugin_basename(__FILE__)) {
-		$rate_url = 'http://wordpress.org/support/view/plugin-reviews/' . basename(dirname(__FILE__)) . '?rate=5#postform';
-		$bbq_pro = 'https://plugin-planet.com/bbq-pro/';
-		$links[] = '<a target="_blank" href="' . $rate_url . '" title="Click here to rate and review this plugin on WordPress.org">Rate this plugin</a>';
-		$links[] = '<a target="_blank" href="'. $bbq_pro .'" title="Get BBQ Pro for advanced protection" style="padding:1px 3px;color:#fff;background:#feba12;border-radius:1px;">Go&nbsp;Pro</a>';
+		$rate_url = 'http://wordpress.org/support/view/plugin-reviews/'. basename(dirname(__FILE__)) .'?rate=5#postform';
+		$bbq_pro  = 'https://plugin-planet.com/bbq-pro/?plugin';
+		$links[]  = '<a target="_blank" href="'. $rate_url .'" title="Click here to rate and review this plugin on WordPress.org">Rate this plugin</a>';
+		$links[]  = '<a target="_blank" href="'. $bbq_pro .'" title="Get BBQ Pro for advanced protection" style="padding:1px 5px;color:#fff;background:#feba12;border-radius:1px;">Go&nbsp;Pro</a>';
 	}
 	return $links;
 }
-add_filter('plugin_row_meta', 'rate_bbq', 10, 2);
+add_filter('plugin_row_meta', 'bbq_links', 10, 2);
+
+function bbq_response() {
+	header('HTTP/1.1 403 Forbidden');
+	header('Status: 403 Forbidden');
+	header('Connection: Close');
+	exit;
+}

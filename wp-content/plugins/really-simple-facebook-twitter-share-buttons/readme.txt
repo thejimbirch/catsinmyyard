@@ -4,9 +4,9 @@ Donate link: http://www.blog.readygraph.com/donate/
 Tags: facebook, twitter, facebook share, twitter share, facebook share button, twitter share button, linkedin, google +1, +1, google share, google plus share, pinterest, google buzz, buzz, digg, flattr, stumbleupon, hyves, links, post, page, mail, email, reddit, tipy, tumblr, buffer, pinzout, shortcode, youtube, print, rss, bitcoin, litecoin, specificfeeds, draugiem, frype
 Requires at least: 2.9+
 Tested up to: 4.1
-Stable tag: 4.4
+Stable tag: 4.5
 
-Put Facebook, Twitter, LinkedIn, Pinterest, and more share buttons above/below posts. Plus automate social user growth and revenue with ReadyGraph.
+Put Facebook, Twitter, LinkedIn, Pinterest, and more share buttons above/below posts.
 
 == Description ==
 Check official website for live demo http://blog.readygraph.com/really-simple-share/
@@ -16,6 +16,8 @@ Check official website for live demo http://blog.readygraph.com/really-simple-sh
 * [More Description](http://blog.readygraph.com/really-simple-share/)
 
 * [Suggestion/comments](http://blog.readygraph.com/really-simple-share/)
+
+**ReadyGraph is removed from the plugin**
 
 This plugin shows Facebook, Twitter, LinkedIn, Google "+1", Pinterest and other popular social share buttons above or below your posts.
 Easy customization of active buttons and position in the Settings menu.
@@ -177,6 +179,12 @@ Due to popular demand, we are excited to announce that we have now added a new l
 
 
 == Changelog ==
+
+= 4.5 =
+* Remove ReadyGraph from really simple share
+
+= 4.4.1 =
+* access-denied on activation bug fix 
 
 = 4.4 =
 * Changed email and follow option to specificfeeds from readygraph
@@ -498,6 +506,12 @@ Initial release
 
 
 == Upgrade Notice ==
+
+= 4.5 =
+* Remove ReadyGraph from really simple share
+
+= 4.4.1 =
+* access-denied on activation bug fix 
 
 = 4.4 =
 * Changed email and follow option to specificfeeds from readygraph

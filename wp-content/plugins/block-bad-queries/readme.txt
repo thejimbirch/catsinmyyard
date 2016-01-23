@@ -2,17 +2,17 @@
 
 Plugin Name: Block Bad Queries (BBQ)
 Plugin URI: https://perishablepress.com/block-bad-queries/
-Description: Automatically protects WordPress against malicious URL requests.
+Description: Automatically protects WordPress against malicious URL requests. This is the free/basic version of BBQ.
 Tags: security, protect, firewall, php, eval, malicious, url, request, blacklist
-Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests.
+Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests. For advanced protection check out BBQ Pro.
 Author: Jeff Starr
 Author URI: http://monzilla.biz/
-Contributors: specialk, aldolat, WpBlogHost, James Wilkes, juliobox
+Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsult
 Donate link: http://m0n.co/donate
-Requires at least: 4.0
-Tested up to: 4.3
+Requires at least: 4.1
+Tested up to: 4.4
 Stable tag: trunk
-Version: 20150808
+Version: 20151107
 License: GPLv2 or later
 
 Block Bad Queries (BBQ) helps protect WordPress against malicious URL requests. 
@@ -34,7 +34,7 @@ Block Bad Queries (BBQ) helps protect WordPress against malicious URL requests.
 
 **New Pro Version**
 
-For advanced protection with some sweet features, check out [BBQ Pro](https://plugin-planet.com/bbq-pro/).
+For advanced protection and awesome features, check out [BBQ Pro](https://plugin-planet.com/bbq-pro/).
 
 == Installation ==
 
@@ -42,10 +42,12 @@ To protect your site using this lightweight plugin, unzip and upload the "/block
 
 [More info on installing WP plugins](http://codex.wordpress.org/Managing_Plugins#Installing_Plugins)
 
-**Notes**
+**Customizing**
 
-* To allow strings otherwise blocked by BBQ, check out the [BBQ Whitelist plugin](https://perishablepress.com/bbq-whitelist-blacklist/)
-* To block strings otherwise allowed by BBQ, check out the [BBQ Blacklist plugin](https://perishablepress.com/bbq-whitelist-blacklist/)
+* To allow patterns otherwise blocked by BBQ, check out the [BBQ Whitelist plugin](https://perishablepress.com/bbq-whitelist-blacklist/)
+* To block patterns otherwise allowed by BBQ, check out the [BBQ Blacklist plugin](https://perishablepress.com/bbq-whitelist-blacklist/)
+
+Note that the [Pro version of BBQ](https://plugin-planet.com/bbq-pro/) makes it possible to customize patterns (add, edit, remove) directly via the plugin settings, with a click. 
 
 == Upgrade Notice ==
 
@@ -53,9 +55,23 @@ To upgrade BBQ, remove old version and replace with new version. Nothing else ne
 
 == Screenshots ==
 
-No screenshots available - code only.
+No screenshots available or required :)
+
+The free version of BBQ is strictly plug-n-play, set-it-and-forget-it, with no settings to configure whatsoever. 
+
+Just install, activate, and enjoy better security and robust protection against malicious requests.
 
 == Changelog ==
+
+**2015/11/07**
+
+* Added `\.php\([0-9]+\)`, `__hdhdhd.php` to URI patterns (Thanks to [George Lerner](http://www.glerner.com/))
+* Added `acapbot`, `semalt` to User Agent patterns (Thanks to [George Lerner](http://www.glerner.com/))
+* Replaced `UNION.*SELECT` with `UNION(.*)SELECT` in Request URI patterns
+* Added `morfeus`, `snoopy` to User Agent patterns
+* Refactored redirect/exit functionality
+* Renamed `rate_bbq()` to `bbq_links()`
+* Tested with WordPress 4.4 beta
 
 **2015/08/08**
 
@@ -65,19 +81,19 @@ No screenshots available - code only.
 
 **2015/06/24**
 
-* Replaced "UNION\+SELECT" with "UNION.*SELECT"
-* Added "wp-config.php" to query-string patterns
+* Replaced `UNION\+SELECT` with `UNION.*SELECT`
+* Added `wp-config.php` to query-string patterns
 * Added plugin link to [BBQ Pro](https://plugin-planet.com/bbq-pro/)
 * Testing on WP 4.3 (alpha)
 
 **2015/05/07**
 
 * Tested with WP 4.2 and 4.3 (alpha)
-* Replaced some "http" with "https" in readme.txt
+* Replaced some `http` with `https` in readme.txt
 
 **2015/03/14**
 
-* introduce bbq_core()
+* introduce `bbq_core()`
 * tested on latest WP
 * tightened up code
 
@@ -98,45 +114,45 @@ No screenshots available - code only.
 
 **2013/11/03**
 
-* removed "?>" from script
+* removed `?>` from script
 * added optional line for blocking long URLs
 * added line to prevent direct access to BBQ script
-* added "\;Nt\.", "\=Nt\.", "\,Nt\." to request URI items
+* added `\;Nt\.`, `\=Nt\.`, `\,Nt\.` to request URI items
 * tested on latest version of WordPress (3.7)
 
 **2013/07/07**
 
-* replaced "Nt\." with "\/Nt\." (resolves comment editing/approval issue)
+* replaced `Nt\.` with `\/Nt\.` (resolves comment editing/approval issue)
 
 **2013/07/05**
 
-* removed "https\:" (from previous version)
-* replaced "\/https\/" with "\/https\:"
-* replaced "\/http\/" with "\/http\:"
-* replaced "\/ftp\/" with "\/ftp\:"
+* removed `https\:` (from previous version)
+* replaced `\/https\/` with `\/https\:`
+* replaced `\/http\/` with `\/http\:`
+* replaced `\/ftp\/` with `\/ftp\:`
 
 **2013/07/04**
 
-* removed block for "jakarta" in user-agents
-* removed "union" from query strings
-* added to request-URI: "\%2Flocalhost", "Nt\.", "https\:", "\.exec\(", "\)\.html\(", "\{x\.html\(", "\(function\("
-* resolved PHP Notice "Undefined Index" via isset()
+* removed block for `jakarta` in user-agents
+* removed `union` from query strings
+* added to request-URI: `\%2Flocalhost`, `Nt\.`, `https\:`, `\.exec\(`, `\)\.html\(`, `\{x\.html\(`, `\(function\(`
+* resolved PHP Notice "Undefined Index" via `isset()`
 
 **2013/01/03**
 
-* removed block for CONCAT in request-URI
-* removed block for "environ" in query-string
-* removed block for "%3C" and "%3E" in query-string
-* removed block for "%22" and "%27" in query-string
-* removed block for "[" and "]" in query-string (to allow unsafe characters used in WordPress)
-* removed block for "?" in query-string (to allow unsafe character used in WordPress)
-* removed block for ":" in query-string (to allow unsafe character used by Google)
-* removed block for "libwww" in user-agents (to allow access to Lynx browser)
+* removed block for `CONCAT` in request-URI
+* removed block for `environ` in query-string
+* removed block for `%3C` and `%3E` in query-string
+* removed block for `%22` and `%27` in query-string
+* removed block for `[` and `]` in query-string (to allow unsafe characters used in WordPress)
+* removed block for `?` in query-string (to allow unsafe character used in WordPress)
+* removed block for `:` in query-string (to allow unsafe character used by Google)
+* removed block for `libwww` in user-agents (to allow access to Lynx browser)
 
 **2012/11/08**
 
-* Removed ":" match from query string (Google disregards encoding)
-* Removed "scanner" from query string from query string match
+* Removed `:` match from query string (Google disregards encoding)
+* Removed `scanner` from query string from query string match
 * Streamlined source code for better performance (thanks to juliobox)
 
 **Older versions**
@@ -157,13 +173,20 @@ Nope, just install and relax knowing that BBQ is protecting your site from bad U
 
 To ask a question, visit the [BBQ homepage](https://perishablepress.com/block-bad-queries/) or [contact me](https://perishablepress.com/contact/).
 
-== Donations ==
+== Support development of this plugin ==
 
-I created this plugin with love for the WP community. To show support, you can [make a donation](http://m0n.co/donate) or purchase one of my books: 
+I develop and maintain this free plugin with love for the WordPress community. To show support, you can [make a donation](http://m0n.co/donate) or purchase one of my books: 
 
 * [The Tao of WordPress](https://wp-tao.com/)
 * [Digging into WordPress](https://digwp.com/)
 * [.htaccess made easy](https://htaccessbook.com/)
 * [WordPress Themes In Depth](https://wp-tao.com/wordpress-themes-book/)
 
-Links, tweets and likes also appreciated. Thanks! :)
+And/or purchase one of my premium WordPress plugins:
+
+* [BBQ Pro](https://plugin-planet.com/bbq-pro/) - Pro version of Block Bad Queries
+* [SES Pro](https://plugin-planet.com/ses-pro/) - Super-simple &amp; flexible email signup forms
+* [USP Pro](https://plugin-planet.com/usp-pro/) - Pro version of User Submitted Posts
+
+Links, tweets and likes also appreciated. Thank you! :)
+

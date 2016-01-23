@@ -6,3 +6,5 @@ wp-content/uploads/
 .ftpquota
 error_log
 php.ini-phpup-1397141242
+
+wp-content/updraft/*

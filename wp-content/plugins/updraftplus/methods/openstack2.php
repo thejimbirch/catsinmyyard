@@ -24,7 +24,7 @@ class UpdraftPlus_BackupModule_openstack extends UpdraftPlus_BackupModule_openst
 
 		if (empty($user) || empty($password) || empty($authurl)) throw new Exception(__('Authorisation failed (check your credentials)', 'updraftplus'));
 
-		require_once(UPDRAFTPLUS_DIR.'/oc/autoload.php');
+		require_once(UPDRAFTPLUS_DIR.'/vendor/autoload.php');
 		global $updraftplus;
 		$updraftplus->log("OpenStack authentication URL: ".$authurl);
 

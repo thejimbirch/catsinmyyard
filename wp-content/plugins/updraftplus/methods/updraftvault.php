@@ -137,7 +137,7 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 					$config['accesskey'] = $response['accesskey'];
 					$config['secretkey'] = $response['secretkey'];
 					$config['path'] = $response['path'];
-				} elseif (is_array($response) && isset($response['result']) && 'token_unknown' == $response['result']) {
+				} elseif (is_array($response) && isset($response['result']) && ('token_unknown' == $response['result'] || 'site_duplicated' == $response['result'])) {
 					$updraftplus->log("This site appears to not be connected to UpdraftPlus Vault");
 					$config['accesskey'] = '';
 					$config['secretkey'] = '';
@@ -203,6 +203,9 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 			break;
 			case 'vault_subscription_suspended':
 			return __("You have an UpdraftPlus Vault subscription that has not been renewed, and the grace period has expired. In a few days' time, your stored data will be permanently removed. If you do not wish this to happen, then you should renew as soon as possible.", 'updraftplus');
+			// The following shouldn't be a possible response (the server can deal with duplicated sites with the same IDs) - but there's no harm leaving it in for now (Dec 2015)
+			case 'site_duplicated':
+			return __('No Vault connection was found for this site (has it moved?); please disconnect and re-connect.', 'updraftplus');
 			break;
 		}
 		return $message;
@@ -255,19 +258,22 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 						<?php echo __('UpdraftPlus Vault brings you storage that is <strong>reliable, easy to use and a great price</strong>.', 'updraftplus').' '.__('Press a button to get started.', 'updraftplus');?>
 					</p>
 					<div style="float: left; clear:left; width:33%; text-align:center;">
-						<div style="font-size: 200%;">5 Gb</div>
-						<div style="clear:both;font-size: 150%;"><?php printf(__('%s per quarter', 'updraftplus'), '$10'); ?></div>
-						<div style="clear:both;font-size: 150%;"><a target="_blank" href="https://updraftplus.com/shop/updraftplus-vault-storage-5-gb/"><?php _e('Buy It Now', 'updraftplus');?></a></div>
+						<div style="font-size: 200%; font-weight:bold;">5 Gb</div>
+						<div style="clear:both;font-size: 150%;"><a target="_blank" href="https://updraftplus.com/vault-5gb-quarterly"><?php printf(__('%s per quarter', 'updraftplus'), '$10'); ?></a></div>
+						<div style="clear:both;font-size: 115%; font-style:italic;"><?php _e('or (annual discount)', 'updraftplus');?></div>
+						<div style="clear:both;font-size: 150%;"><a target="_blank" href="https://updraftplus.com/vault-5gb-annual"><?php printf(__('%s per year', 'updraftplus'), '$35'); ?></a></div>
 					</div>
 					<div style="float: left; width:33%; text-align:center;">
-						<div style="font-size: 200%;">15 Gb</div>
-						<div style="clear:both;font-size: 150%;"><?php printf(__('%s per quarter', 'updraftplus'), '$20'); ?></div>
-						<div style="clear:both;font-size: 150%;"><a target="_blank" href="https://updraftplus.com/shop/updraftplus-vault-storage-15-gb/"><?php _e('Buy It Now', 'updraftplus');?></a></div>
+						<div style="font-size: 200%;font-weight:bold;">15 Gb</div>
+						<div style="clear:both;font-size: 150%;"><a target="_blank" href="https://updraftplus.com/vault-15gb-quarterly"><?php printf(__('%s per quarter', 'updraftplus'), '$20'); ?></a></div>
+						<div style="clear:both;font-size: 115%; font-style:italic;"><?php _e('or (annual discount)', 'updraftplus');?></div>
+						<div style="clear:both;font-size: 150%;"><a target="_blank" href="https://updraftplus.com/vault-15gb-annual"><?php printf(__('%s per year', 'updraftplus'), '$70');?></a></div>
 					</div>
 					<div style="float: left; width:33%; text-align:center;">
-						<div style="font-size: 200%;">50 Gb</div>
-						<div style="clear:both;font-size: 150%;"><?php printf(__('%s per quarter', 'updraftplus'), '$50'); ?></div>
-						<div style="clear:both;font-size: 150%;"><a target="_blank" href="https://updraftplus.com/shop/updraftplus-vault-storage-50-gb/"><?php _e('Buy It Now', 'updraftplus');?></a></div>
+						<div style="font-size: 200%;font-weight:bold;">50 Gb</div>
+						<div style="clear:both;font-size: 150%;"><a target="_blank" href="https://updraftplus.com/vault-50gb-quarterly"><?php printf(__('%s per quarter', 'updraftplus'), '$50'); ?></a></div>
+						<div style="clear:both;font-size: 115%; font-style:italic;"><?php _e('or (annual discount)', 'updraftplus');?></div>
+						<div style="clear:both;font-size: 150%;"><a target="_blank" href="https://updraftplus.com/vault-50gb-annual"><?php printf(__('%s per year', 'updraftplus'), '$175');;?></a></div>
 					</div>
 					<p style="clear:left; padding-top:20px;">
 						<?php echo __('Payments can be made in US dollars, euros or GB pounds sterling, via card or PayPal.', 'updraftplus').' '. __('Subscriptions can be cancelled at any time.', 'updraftplus');?>
@@ -523,8 +529,13 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 					unset($vault_settings['last_config']);
 					if (isset($response['quota'])) $vault_settings['quota'] = $response['quota'];
 					UpdraftPlus_Options::update_updraft_option('updraft_updraftvault', $vault_settings);
-					if (!empty($response['config']) && is_array($response['config']) && !empty($response['config']['accesskey'])) {
-						$this->vault_set_config($response['config']);
+					if (!empty($response['config']) && is_array($response['config'])) {
+						if (!empty($response['config']['accesskey'])) {
+							$this->vault_set_config($response['config']);
+						} elseif (!empty($response['config']['result']) && ('token_unknown' == $response['config']['result'] || 'site_duplicated' == $response['config']['result'])) {
+							return new WP_Error($response['config']['result'], $this->vault_translate_remote_message($response['config']['message'], $response['config']['result']));
+						}
+						// else... would also be an error condition, but not one known possible (and it will show a generic error anyway)
 					}
 				} elseif (isset($response['quota']) && !$response['quota']) {
 					return new WP_Error('no_quota', __('You do not currently have any UpdraftPlus Vault quota', 'updraftplus'));

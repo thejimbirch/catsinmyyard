@@ -7,7 +7,7 @@ class UpdraftPlus_Options {
 
 	public static function user_can_manage() {
 		$user_can_manage = current_user_can(apply_filters('option_page_capability_updraft-options-group', 'manage_options'));
-		// false: not multisite add-on
+		// false: allows the filter to know that the request is not coming from the multisite add-on
 		return apply_filters('updraft_user_can_manage', $user_can_manage, false);
 	}
 

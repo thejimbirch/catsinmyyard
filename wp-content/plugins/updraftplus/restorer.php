@@ -811,7 +811,7 @@ class Updraft_Restorer extends WP_Upgrader {
 					// On the first time, create the -old directory in updraft_dir
 					// (Old style was: On the first time, move the existing data to -old)
 					if (!isset($this->been_restored[$type]) && empty($do_not_move_old)) {
-						$this->move_existing_to_old($type, $wp_filesystem, $wp_filesystem_dir);
+						$this->move_existing_to_old($type, $get_dir, $wp_filesystem, $wp_filesystem_dir);
 					}
 					
 					if (empty($short_circuit)) {
@@ -938,7 +938,7 @@ class Updraft_Restorer extends WP_Upgrader {
 
 	}
 
-	private function move_existing_to_old($type, $wp_filesystem, $wp_filesystem_dir) {
+	private function move_existing_to_old($type, $get_dir, $wp_filesystem, $wp_filesystem_dir) {
 
 		if (apply_filters('updraft_move_existing_to_old_short_circuit', false, $type, $this->ud_restore_options)) {
 			// Users of the filter should do their own logging
@@ -989,7 +989,7 @@ class Updraft_Restorer extends WP_Upgrader {
 		$this->skin->feedback('moving_old');
 
 		# Firstly, try direct filesystem method into updraft_dir
-		if ($move_old_destination >0 && 1 == $move_old_destination % 2) {
+		if ($move_old_destination > 0 && 1 == $move_old_destination % 2) {
 			# The final 'true' forces direct filesystem access
 			$move_old = @$this->move_backup_in($get_dir, $updraft_dir.'/'.$type.'-old/' , 3, array(), $type, false, true);
 			if (is_wp_error($move_old)) $updraftplus->log_wp_error($move_old);
@@ -1410,11 +1410,12 @@ ENDHERE;
 
 		$this->create_forbidden = false;
 		$this->drop_forbidden = false;
+		$this->lock_forbidden = false;
 
 		$this->last_error = '';
 		$random_table_name = 'updraft_tmp_'.rand(0,9999999).md5(microtime(true));
 
-		# The only purpose in funnelling queries directly here is to be able to get the error number
+		// The only purpose in funnelling queries directly here is to be able to get the error number
 		if ($this->use_wpdb) {
 			$req = $wpdb->query("CREATE TABLE $random_table_name");
 			if (!$req) $this->last_error = $wpdb->last_error;
@@ -1438,6 +1439,12 @@ ENDHERE;
 			echo '<strong>'.__('Warning:', 'updraftplus').'</strong> ';
 			$updraftplus->log_e('Your database user does not have permission to create tables. We will attempt to restore by simply emptying the tables; this should work as long as a) you are restoring from a WordPress version with the same database structure, and b) Your imported database does not contain any tables which are not already present on the importing site.', ' ('.$this->last_error.')');
 		} else {
+		
+			if (1142 === $this->lock_table($random_table_name)) {
+				$this->lock_forbidden = true;
+				$updraftplus->log("Database user has no permission to lock tables - will not lock after CREATE");
+			}
+		
 			if ($this->use_wpdb) {
 				$req = $wpdb->query("DROP TABLE $random_table_name");
 				if (!$req) $this->last_error = $wpdb->last_error;
@@ -1691,7 +1698,7 @@ ENDHERE;
 							if (!empty($updraftplus_addons_migrator->new_blogid)) restore_current_blog();
 						}
 					}
-
+					
 					if ($restoring_table != $this->new_table_name) $this->restored_table($restoring_table, $import_table_prefix, $this->old_table_prefix);
 
 				}
@@ -1770,7 +1777,12 @@ ENDHERE;
 
 		}
 
-		$updraftplus->log("Leaving maintenance mode");
+		if (!empty($this->lock_forbidden)) {
+			$updraftplus->log("Leaving maintenance mode");
+		} else {
+			$updraftplus->log("Unlocking database and leaving maintenance mode");
+			$this->unlock_tables();
+		}
 		$this->maintenance_mode(false);
 
 		if ($restoring_table) $this->restored_table($restoring_table, $import_table_prefix, $this->old_table_prefix);
@@ -1792,6 +1804,45 @@ ENDHERE;
 
 	}
 
+	private function lock_table($table) {
+	
+		// Not yet working
+		return true;
+	
+		global $updraftplus;
+		$table = $updraftplus->backquote($table);
+		
+		if ($this->use_wpdb) {
+			$req = $wpdb->query("LOCK TABLES $table WRITE;");
+		} else {
+			if ($this->use_mysqli) {
+				$req = mysqli_query($this->mysql_dbh, "LOCK TABLES $table WRITE;");
+			} else {
+				$req = mysql_unbuffered_query("LOCK TABLES $table WRITE;", $this->mysql_dbh);
+			}
+			if (!$req) {
+				$lock_error_no = $this->use_mysqli ? mysqli_errno($this->mysql_dbh) : mysql_errno($this->mysql_dbh);
+			}
+		}
+		if (!$req && ($this->use_wpdb || $lock_error_no === 1142)) {
+			// Permission denied
+			return 1142;
+		}
+		return true;
+	}
+	
+	public function unlock_tables() {
+		return;
+		// Not yet working
+		if ($this->use_wpdb) {
+			$$wpdb->query("UNLOCK TABLES;");
+		} elseif ($this->use_mysqli) {
+			$req = mysqli_query($this->mysql_dbh, "UNLOCK TABLES;");
+		} else {
+			$req = mysql_unbuffered_query("UNLOCK TABLES;");
+		}
+	}
+	
 	// Save configuration bundle, ready to restore it once the options table has been restored
 	private function save_configuration_bundle() {
 		$this->configuration_bundle = array();
@@ -1929,16 +1980,17 @@ ENDHERE;
 				return new WP_Error('initial_db_error', sprintf(__('An error occurred on the first %s command - aborting run','updraftplus'), 'SET NAMES').'. '.sprintf(__('To use this backup, your database server needs to support the %s character set.', 'updraftplus'), $this->set_names).$extra_msg);
 			}
 			
-			if ($this->errors>49) {
+			if ($this->errors > 49) {
 				$this->maintenance_mode(false);
 				return new WP_Error('too_many_db_errors', __('Too many database errors have occurred - aborting','updraftplus'));
 			}
 		} elseif ($sql_type == 2) {
+			if (!$this->lock_forbidden) $this->lock_table($this->new_table_name);
 			$this->tables_created++;
 		}
 
 		if ($this->line >0 && ($this->line)%50 == 0) {
-			if ($this->line > $this->line_last_logged && (($this->line)%250 == 0 || $this->line<250)) {
+			if ($this->line > $this->line_last_logged && (($this->line)%250 == 0 || $this->line < 250)) {
 				$this->line_last_logged = $this->line;
 				$time_taken = microtime(true) - $this->start_time;
 				$updraftplus->log_e('Database queries processed: %d in %.2f seconds',$this->line, $time_taken);
@@ -1968,10 +2020,8 @@ ENDHERE;
 		// Don't do this: it will cause rules created by plugins that weren't active at the start of the restore run to be lost
 		# flush_rewrite_rules(true);
 
-		if ( function_exists( 'save_mod_rewrite_rules' ) )
-			save_mod_rewrite_rules();
-		if ( function_exists( 'iis7_save_url_rewrite_rules' ) )
-			iis7_save_url_rewrite_rules();
+		if ( function_exists( 'save_mod_rewrite_rules' ) ) save_mod_rewrite_rules();
+		if ( function_exists( 'iis7_save_url_rewrite_rules' ) ) iis7_save_url_rewrite_rules();
 
 		foreach (array('permalink_structure', 'rewrite_rules', 'page_on_front') as $opt) {
 			remove_filter('pre_option_'.$opt, array($this, 'option_filter_'.$opt));

@@ -3,7 +3,7 @@ Contributors: Backup with UpdraftPlus, DavidAnderson, DNutbourne, lcahill
 Tags: backup, backups, restore, amazon backup, s3 backup, dropbox backup, google drive backup, rackspace cloud files, rackspace backup, dreamhost, dreamobjects backup, ftp backup, webdav backup, google cloud storage, onedrive, microsoft one drive, microsoft azure, azure, back up, multisite, restoration, sftp backup, ftps, scp backup, migrate, duplicate, copy, mysql backup, database backup, db backups, website backup, wordpress backup, full backup, openstack backup, sicherung
 Requires at least: 3.2
 Tested up to: 4.4
-Stable tag: 1.11.20
+Stable tag: 1.11.23
 Author URI: https://updraftplus.com
 Donate link: http://david.dw-perspective.org.uk/donate
 License: GPLv3 or later
@@ -16,7 +16,7 @@ Backup and restoration made easy. Complete backups; manual or scheduled (backup 
 
 <strong>Top-quality:</strong> UpdraftPlus is the <a href="http://rankwp.com/plugins/updraftplus">highest-ranking backup plugin on wordpress.org</a> (ranks in the top 40 out of over 30,000 WordPress plugins for quality on rankwp.com).
 
-<strong>Over 600,000 currently active installs:</strong> widely tested and reliable (over 3.6 million downloads). The #1 most installed scheduled backup plugin, according to wordpress.org. Many millions of backups completed!
+<strong>Over 600,000 currently active installs:</strong> widely tested and reliable (over 3.8 million downloads). The #1 most installed scheduled backup plugin, according to wordpress.org. Many millions of backups completed!
 
 * Supports WordPress backups to UpdraftPlus Vault, Amazon S3 (or compatible), Dropbox, Rackspace Cloud Files, Google Drive, Google Cloud Storage, DreamHost DreamObjects, FTP, OpenStack (Swift) and email. Also (via a paid add-on) backup to Microsoft OneDrive, Microsoft Azure, Google Cloud Storage, Copy.Com, FTP over SSL, SFTP, SCP, and WebDAV (and compatible services, e.g. Yandex, Cubby, OwnCloud). Examples of S3-compatible providers: Cloudian, Connectria, Constant, Eucalyptus, Nifty, Nimbula, Cloudn.
 * Quick restore (both file and database backups)
@@ -118,7 +118,36 @@ Thanks for asking; yes, we've got a few. Check out this profile page - https://p
 
 The <a href="https://updraftplus.com/news/">UpdraftPlus backup blog</a> is the best place to learn in more detail about any important changes.
 
-N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.11.20 of the free version correspond to changes made in 2.11.20.x of the paid version.
+N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.11.23 of the free version correspond to changes made in 2.11.23.x of the paid version.
+
+= 1.11.23 - 26/Jan/2016 =
+
+* FIX: When migrating a sub-folder based multisite into a non-root install with different relative path to the source multisite (I can't think of any good reasons to do this), the search/replace could leave sub-sites unreachable without manual correction
+* FIX: Logic errors in the advanced backup retention options could lead to the oldest backups being deleted prematurely, and some backups not being deleted when they were overdue for deletion
+* FIX: Amazon S3 bucket creation wizard (in the S3 enhanced add-on) was not honouring the chosen region for new buckets
+* FIX: Upon restoration over an existing site, inactive plugins could remain post-restore (bug introduced in 1.11.20)
+* TWEAK: Various internal re-organisations, to improve modularity/re-use of the code
+* TWEAK: Internal CSS re-organisation to make future layout changes easier
+* TWEAK: The "stop" link in the backup progress indicator now halts the backup asap, instead of at the next scheduled resumption
+* TWEAK: Clarify the course of action needed if you attempt a Dropbox backup without Curl
+* TWEAK: Add support for the new Asia Pacific (Seoul) region to Amazon S3
+* TWEAK: Make the automatic backup option box appear on the updates page for users who can update plugins or themes (not just core - previously it was assumed that these would always go together in the real world, but some managed hosts are now removing the core update capability from the default admin user, whilst leaving the others)
+* TWEAK: Change default zip split size to 400Mb on new installs
+* TWEAK: Clean up use of composer, to conform to proper usage standards, and update to current version (to avoid causing a problem for plugins using PSR-4 autoloaders)
+* TWEAK: Provide direct links to cart when choosing UpdraftPlus Vault storage
+* TWEAK: Add debug.log to the default exclusions in wp-content (when people leave debug logging on and forget, it can get huge)
+* TWEAK: On multisite, make sure that the site/blogs tables are placed early in the backup (assists with quickly scanning backup info)
+* TWEAK: Update to phpseclib 1.0.1
+* TWEAK: Prevent a PHP notice when using SCP
+* TWEAK: Add new termmeta table to the default list of core tables (which is usually automatically detected)
+
+= 1.11.21 - 28/Dec/2015 =
+
+* TWEAK: If there's a problem connecting to UpdraftPlus Vault, in some situations the information on the cause was not easily readable
+* TWEAK: Slightly more logging on failed OneDrive operations, to aid problem-solving
+* TWEAK: Add wysija_email_user_stat to the list of potentially huge non-critical tables (which can get skipped in an emergency)
+* FIX: Package Pear/Exception.php, so that servers without it already can use Microsoft Azure blob storage
+* FIX: Prevent PHP fatal error on admin area in some restore scenarios
 
 = 1.11.20 - 21/Dec/2015 =
 
@@ -1722,4 +1751,4 @@ We recognise and thank the following for code and/or libraries used and/or modif
 
 
 == Upgrade Notice ==
-* 1.11.20: Various tweaks and fixes, plus new multisite-related features in UpdraftPlus Premium
+* 1.11.23: Various tweaks and fixes, and foundation-laying internal improvements.

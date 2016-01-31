@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the UpdraftPlus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2015-12-21 13:43:57+0000\n"
+"PO-Revision-Date: 2016-01-26 09:50:36+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -12,15 +12,15 @@ msgstr ""
 
 #: addons/onedrive.php:51
 msgid "The required %s PHP module is not installed - ask your web hosting company to enable it."
-msgstr ""
+msgstr "Το απαραίτητο PHP module %s δεν είναι εγκατεστημένο - επικοινωνήστε με την εταιρεία παροχής web hosting σας για να το ενεργοποιήσετε."
 
 #: backup.php:383
 msgid "Unexpected error: no class '%s' was found (your UpdraftPlus installation seems broken - try re-installing)"
-msgstr ""
+msgstr "Μη αναμενόμενο σφάλμα: καμία κατηγορία '%s' δε βρέθηκε (η εγκατάσταση του UpdraftPlus φαίνεται πως είναι κατεστραμμένη - προσπαθήστε να κάνετε εγκατάσταση ξανά)"
 
 #: restorer.php:1526
 msgid "Uploads URL:"
-msgstr ""
+msgstr "URL μεταφορτώσεων:"
 
 #: addons/multisite.php:372 addons/multisite.php:382
 msgid "Restoring only the site with id=%s: removing other data (if any) from the unpacked backup"

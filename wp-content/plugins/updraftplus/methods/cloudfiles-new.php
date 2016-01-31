@@ -27,7 +27,7 @@ class UpdraftPlus_BackupModule_cloudfiles_opencloudsdk extends UpdraftPlus_Backu
 		$authurl = $opts['authurl'];
 		$region = (!empty($opts['region'])) ? $opts['region'] : null;
 
-		require_once(UPDRAFTPLUS_DIR.'/oc/autoload.php');
+		require_once(UPDRAFTPLUS_DIR.'/vendor/autoload.php');
 
 		global $updraftplus;
 

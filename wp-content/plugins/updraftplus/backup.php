@@ -14,7 +14,7 @@ class UpdraftPlus_Backup {
 	public $zipfiles_dirbatched;
 	public $zipfiles_batched;
 	public $zipfiles_skipped_notaltered;
-	private $zip_split_every = 524288000; # 500Mb
+	private $zip_split_every = 419430400; # 400Mb
 	private $zip_last_ratio = 1;
 	private $whichone;
 	private $zip_basename = '';
@@ -470,14 +470,24 @@ class UpdraftPlus_Backup {
 			foreach ($backup_to_examine as $key => $data) {
 				if ('db' != strtolower(substr($key, 0, 2)) || '-size' == substr($key, -5, 5)) continue;
 
-				$how_many_found = (empty($database_backups_found[$key])) ? 0 : $database_backups_found[$key];
+				if (empty($database_backups_found[$key])) $database_backups_found[$key] = 0;
+				
+				if (!empty($backup_to_examine['nonce']) && $backup_to_examine['nonce'] == $updraftplus->nonce) {
+					$updraftplus->log("This backup set ($backup_datestamp) is the backup set just made, so will not be deleted.");
+					$database_backups_found[$key]++;
+					continue;
+				}
+				
 				if ($is_autobackup) {
 					if ($any_deleted_via_filter_yet) {
 						$updraftplus->log("This backup set ($backup_datestamp) was an automatic backup, but we have previously deleted a backup due to a limit, so it will be pruned (but not counted towards numerical limits).");
 						$prune_it = true;
-					} elseif ($how_many_found < $updraft_retain_db) {
+					} elseif ($database_backups_found[$key] < $updraft_retain_db) {
 						$updraftplus->log("This backup set ($backup_datestamp) was an automatic backup, and we have not yet reached any retain limits, so it will not be counted or pruned. Skipping.");
 						continue;
+					} else {
+						$updraftplus->log("This backup set ($backup_datestamp) was an automatic backup, and we have already reached retain limits, so it will be pruned.");
+						$prune_it = true;
 					}
 				} else {
 					$prune_it = false;
@@ -486,22 +496,6 @@ class UpdraftPlus_Backup {
 				if ($remote_sent) {
 					$prune_it = true;
 					$updraftplus->log("$backup_datestamp: $key: was sent to remote site; will remove from local record (only)");
-				} else {
-
-					if (empty($database_backups_found[$key])) $database_backups_found[$key] = 0;
-
-					if (!$is_autobackup) {
-						$database_backups_found[$key] = $database_backups_found[$key] + 1;
-
-						if ($database_backups_found[$key] > $updraft_retain_db) {
-							$prune_it = true;
-
-							$fname = (is_string($data)) ? $data : $data[0];
-							$updraftplus->log("$backup_datestamp: $key: this set includes a database (".$fname."); db count is now ".$database_backups_found[$key]);
-
-							$updraftplus->log("$backup_datestamp: $key: over retain limit ($updraft_retain_db); will delete this database");
-						}
-					}
 				}
 				
 				// All non-auto backups must be run through this filter (in date order) regardless of the current state of $prune_it - so that filters are able to track state.
@@ -509,16 +503,21 @@ class UpdraftPlus_Backup {
 
 				if (!$is_autobackup) $prune_it = apply_filters('updraftplus_prune_or_not', $prune_it, 'db', $backup_datestamp, $database_backups_found[$key], $key, $data, $updraft_retain_db);
 
-				if ($prune_it) {
-					// This should only be able to happen if you import backups with a future timestamp
-					if (!empty($backup_to_examine['nonce']) && $backup_to_examine['nonce'] == $updraftplus->nonce) {
-						$updraftplus->log("This backup set ($backup_datestamp) is the backup set just made, so will not be deleted.");
-						$prune_it = false;
+				// Apply the final retention limit list (do not increase the 'retained' counter before seeing if the backup is being pruned for some other reason)
+				if (!$prune_it && !$is_autobackup) {
+
+					if ($database_backups_found[$key] + 1 > $updraft_retain_db) {
+						$prune_it = true;
+
+						$fname = (is_string($data)) ? $data : $data[0];
+						$updraftplus->log("$backup_datestamp: $key: this set includes a database (".$fname."); db count is now ".$database_backups_found[$key]);
+
+						$updraftplus->log("$backup_datestamp: $key: over retain limit ($updraft_retain_db); will delete this database");
 					}
+				
 				}
-
+				
 				if ($prune_it) {
-
 					if (!$prune_it_before_filter) $any_deleted_via_filter_yet = true;
 
 					if (!empty($data)) {
@@ -530,6 +529,8 @@ class UpdraftPlus_Backup {
 					}
 					unset($backup_to_examine[$key]);
 					$updraftplus->record_still_alive();
+				} elseif (!$is_autobackup) {
+					$database_backups_found[$key]++;
 				}
 
 			}
@@ -541,6 +542,14 @@ class UpdraftPlus_Backup {
 			# Files
 			foreach ($backupable_entities as $entity => $info) {
 				if (!empty($backup_to_examine[$entity])) {
+				
+					// This should only be able to happen if you import backups with a future timestamp
+					if (!empty($backup_to_examine['nonce']) && $backup_to_examine['nonce'] == $updraftplus->nonce) {
+						$updraftplus->log("This backup set ($backup_datestamp) is the backup set just made, so will not be deleted, despite being over the retain limit.");
+						$file_entities_backups_found[$entity]++;
+						continue;
+					}
+				
 
 					if ($is_autobackup) {
 						if ($any_deleted_via_filter_yet) {
@@ -550,7 +559,8 @@ class UpdraftPlus_Backup {
 							$updraftplus->log("This backup set ($backup_datestamp) was an automatic backup, and we have not yet reached any retain limits, so it will not be counted or pruned. Skipping.");
 							continue;
 						} else {
-							$prune_it = false;
+							$updraftplus->log("This backup set ($backup_datestamp) was an automatic backup, and we have already reached retain limits, so it will be pruned.");
+							$prune_it = true;
 						}
 					} else {
 						$prune_it = false;
@@ -558,33 +568,28 @@ class UpdraftPlus_Backup {
 
 					if ($remote_sent) {
 						$prune_it = true;
-					} elseif (!$is_autobackup) {
-						$file_entities_backups_found[$entity]++;
-						if ($file_entities_backups_found[$entity] > $updraft_retain) {
-							$prune_it = true;
-						}
 					}
 
 					// All non-auto backups must be run through this filter (in date order) regardless of the current state of $prune_it - so that filters are able to track state.
 					$prune_it_before_filter = $prune_it;
 					if (!$is_autobackup) $prune_it = apply_filters('updraftplus_prune_or_not', $prune_it, 'files', $backup_datestamp, $file_entities_backups_found[$entity], $entity, $data, $updraft_retain);
 
+					// The "more than maximum to keep?" counter should not be increased until we actually know that the set is being kept. Before verison 1.11.22, we checked this before running the filter, which resulted in the counter being increased for sets that got pruned via the filter (i.e. not kept) - and too many backups were thus deleted
+					if (!$prune_it && !$is_autobackup) {
+						if ($file_entities_backups_found[$entity] >= $updraft_retain) {
+							$updraftplus->log("$entity: $backup_datestamp: over retain limit ($updraft_retain); will delete this file entity");
+							$prune_it = true;
+						}
+					}
+					
 					if ($prune_it) {
 						if (!$prune_it_before_filter) $any_deleted_via_filter_yet = true;
 						$prune_this = $backup_to_examine[$entity];
 						if (is_string($prune_this)) $prune_this = array($prune_this);
 
-						// This should only be able to happen if you import backups with a future timestamp
-						if (!empty($backup_to_examine['nonce']) && $backup_to_examine['nonce'] == $updraftplus->nonce) {
-							$updraftplus->log("This backup set ($backup_datestamp) is the backup set just made, so will not be deleted, despite being over the retain limit.");
-							continue;
-						}
-
 						foreach ($prune_this as $k => $prune_file) {
 							if ($remote_sent) {
 								$updraftplus->log("$entity: $backup_datestamp: was sent to remote site; will remove from local record (only)");
-							} else {
-								$updraftplus->log("$entity: $backup_datestamp: over retain limit ($updraft_retain); will delete this file ($prune_file)");
 							}
 							$size_key = (0 == $k) ? $entity.'-size' : $entity.$k.'-size';
 							$size = (isset($backup_to_examine[$size_key])) ? $backup_to_examine[$size_key] : null;
@@ -593,6 +598,8 @@ class UpdraftPlus_Backup {
 						}
 						unset($backup_to_examine[$entity]);
 						
+					} elseif (!$is_autobackup) {
+						$file_entities_backups_found[$entity]++;
 					}
 				}
 			}
@@ -689,7 +696,11 @@ class UpdraftPlus_Backup {
 
 		$backup_type = ('backup' == $jobdata['job_type']) ? __('Full backup', 'updraftplus') : __('Incremental', 'updraftplus');
 
-		if ('finished' == $backup_files && ('finished' == $backup_db || 'encrypted' == $backup_db)) {
+		$was_aborted = !empty($jobdata['aborted']);
+		
+		if ($was_aborted) {
+			$backup_contains = __('The backup was aborted by the user', 'updraftplus');
+		} elseif ('finished' == $backup_files && ('finished' == $backup_db || 'encrypted' == $backup_db)) {
 			$backup_contains = __("Files and database", 'updraftplus')." ($backup_type)";
 		} elseif ('finished' == $backup_files) {
 			$backup_contains = ($backup_db == "begun") ? __("Files (database backup has not completed)", 'updraftplus') : __("Files only (database was not part of this particular schedule)", 'updraftplus');
@@ -837,7 +848,7 @@ class UpdraftPlus_Backup {
 
 	}
 
-	// The purpose of this function is to make sure that the options table is put in the database first, then the users table, then the usermeta table; and after that the core WP tables - so that when restoring we restore the core tables first
+	// The purpose of this function is to make sure that the options table is put in the database first, then the users table, then the site + blogs tables (if present - multisite), then the usermeta table; and after that the core WP tables - so that when restoring we restore the core tables first
 	private function backup_db_sorttables($a_arr, $b_arr) {
 
 		$a = $a_arr['name'];
@@ -856,6 +867,10 @@ class UpdraftPlus_Backup {
 		$our_table_prefix = $this->table_prefix_raw;
 		if ($a == $our_table_prefix.'options') return -1;
 		if ($b ==  $our_table_prefix.'options') return 1;
+		if ($a == $our_table_prefix.'site') return -1;
+		if ($b ==  $our_table_prefix.'site') return 1;
+		if ($a == $our_table_prefix.'blogs') return -1;
+		if ($b ==  $our_table_prefix.'blogs') return 1;
 		if ($a == $our_table_prefix.'users') return -1;
 		if ($b ==  $our_table_prefix.'users') return 1;
 		if ($a == $our_table_prefix.'usermeta') return -1;
@@ -866,8 +881,10 @@ class UpdraftPlus_Backup {
 		try {
 			$core_tables = array_merge($this->wpdb_obj->tables, $this->wpdb_obj->global_tables, $this->wpdb_obj->ms_global_tables);
 		} catch (Exception $e) {
+			$updraftplus->log($e->getMessage());
 		}
-		if (empty($core_tables)) $core_tables = array('terms', 'term_taxonomy', 'term_relationships', 'commentmeta', 'comments', 'links', 'postmeta', 'posts', 'site', 'sitemeta', 'blogs', 'blogversions');
+		
+		if (empty($core_tables)) $core_tables = array('terms', 'term_taxonomy', 'termmeta', 'term_relationships', 'commentmeta', 'comments', 'links', 'postmeta', 'posts', 'site', 'sitemeta', 'blogs', 'blogversions');
 
 		global $updraftplus;
 		$na = $updraftplus->str_replace_once($our_table_prefix, '', $a);

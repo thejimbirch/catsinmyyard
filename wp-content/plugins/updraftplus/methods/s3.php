@@ -190,6 +190,7 @@ class UpdraftPlus_BackupModule_s3 {
 			case 'ap-southeast-1':
 			case 'ap-southeast-2':
 			case 'ap-northeast-1':
+			case 'ap-northeast-2':
 			case 'sa-east-1':
 			case 'us-gov-west-1':
 			case 'eu-central-1':

@@ -135,11 +135,11 @@ class UpdraftPlus {
 		return $ud_rpc;
 	}
 
-	public function create_remote_control_key($name_hash, $extra_info = array()) {
+	public function create_remote_control_key($name_hash, $extra_info = array(), $post_it = false) {
 
-		$indicator_name = $name_hash.'.remotecontrol.updraftplus.com';
+		$indicator_name = $name_hash.'.central.updraftplus.com';
 
-		$our_keys = UpdraftPlus_Options::get_updraft_option('updraft_remotecontrol_localkeys');
+		$our_keys = UpdraftPlus_Options::get_updraft_option('updraft_central_localkeys');
 		if (!is_array($our_keys)) $our_keys = array();
 		
 		if (isset($our_keys[$name_hash])) {
@@ -149,13 +149,54 @@ class UpdraftPlus {
 		$ud_rpc = $this->get_udrpc($indicator_name);
 
 		if (is_object($ud_rpc) && $ud_rpc->generate_new_keypair()) {
-			$local_bundle = $ud_rpc->get_portable_bundle('base64_with_count', $extra_info);
+		
+			if ($post_it) {
+				// This option allows the key to be sent to the other side via a known-secure channel (e.g. http over SSL), rather than potentially allowing it to travel over an unencrypted channel (e.g. http back to the user's browser). As such, if specified, it is compulsory for it to work.
+				$sent_key = wp_remote_post(
+					$post_it,
+					array(
+						'timeout' => 15,
+						'body' => array(
+							'key' => $ud_rpc->get_key_remote()
+						)
+					)
+				);
+				if (is_wp_error($sent_key) || empty($sent_key)) {
+					$err_msg = sprintf(__('A key was created, but the attempt to register it with %s was unsuccessful - please try again later.', 'updraftplus'), (string)$post_it);
+					if (is_wp_error($sent_key)) $err_msg .= ' '.$sent_key->get_error_message().' ('.$sent_key->get_error_code().')';
+					return array(
+						'r' => $err_msg
+					);
+				}
+				
+				$response = json_decode($sent_key['body'], true);
+
+				if (!is_array($response) || !isset($response['key_id']) || !isset($response['key_public'])) {
+					return array(
+						'r' => sprintf(__('A key was created, but the attempt to register it with %s was unsuccessful - please try again later.', 'updraftplus'), (string)$post_it),
+						'raw' => $sent_key['body']
+					);
+				}
+				
+				$key_hash = hash('sha256', $ud_rpc->get_key_remote());
+
+				$local_bundle = $ud_rpc->get_portable_bundle('base64_with_count', $extra_info, array('key' => array('key_hash' => $key_hash, 'key_id' => $response['key_id'])));
+
+			} else {
+				$local_bundle = $ud_rpc->get_portable_bundle('base64_with_count', $extra_info, array('key' => $ud_rpc->get_key_remote()));
+			}
+		
 
 			$our_keys[$name_hash] = array(
 				'name' => 'Updraft Remote Control',
-				'key' => $ud_rpc->get_key_local()
+				'key' => $ud_rpc->get_key_local(),
+				'extra_info' => $extra_info
 			);
-			UpdraftPlus_Options::update_updraft_option('updraft_remotecontrol_localkeys', $our_keys);
+			// Store the other side's public key
+			if (!empty($response) && is_array($response) && !empty($response['key_public'])) {
+				$our_keys[$name_hash]['publickey_remote'] = $response['key_public'];
+			}
+			UpdraftPlus_Options::update_updraft_option('updraft_central_localkeys', $our_keys);
 
 			return array(
 				'bundle' => $local_bundle,
@@ -375,7 +416,7 @@ class UpdraftPlus {
 	public function siteid() {
 		$sid = get_site_option('updraftplus-addons_siteid');
 		if (!is_string($sid) || empty($sid)) {
-			$sid = md5(rand().time().home_url());
+			$sid = md5(rand().microtime(true).home_url());
 			update_site_option('updraftplus-addons_siteid', $sid);
 		}
 		return $sid;
@@ -413,10 +454,10 @@ class UpdraftPlus {
 			if (!file_exists(UPDRAFTPLUS_DIR.'/remote.php')) return;
 			require_once(UPDRAFTPLUS_DIR.'/remote.php');
 		}
-
+		
 		// Remote control keys
 		// These are different from the remote send keys, which are set up in the Migrator add-on
-		$our_keys = UpdraftPlus_Options::get_updraft_option('updraft_remotecontrol_localkeys');
+		$our_keys = UpdraftPlus_Options::get_updraft_option('updraft_central_localkeys');
 		if (is_array($our_keys) && !empty($our_keys)) {	
 			$remote_control = new UpdraftPlus_RemoteControl($our_keys);
 		}
@@ -1164,6 +1205,14 @@ class UpdraftPlus {
 
 		$this->something_useful_happened = true;
 
+		$updraft_dir = $this->backups_dir_location();
+		if (file_exists($updraft_dir.'/deleteflag-'.$this->nonce.'.txt')) {
+			$this->log("User request for abort: backup job will be immediately halted");
+			@unlink($updraft_dir.'/deleteflag-'.$this->nonce.'.txt');
+			$this->backup_finish($this->current_resumption + 1, true, true, $this->current_resumption, true);
+			die;
+		}
+		
 		if ($this->current_resumption >= 9 && false == $this->newresumption_scheduled) {
 			$this->log("This is resumption ".$this->current_resumption.", but meaningful activity is still taking place; so a new one will be scheduled");
 			// We just use max here to make sure we get a number at all
@@ -1954,7 +2003,7 @@ class UpdraftPlus {
 
 		$followups_allowed = (((!$one_shot && defined('DOING_CRON') && DOING_CRON)) || (defined('UPDRAFTPLUS_FOLLOWUPS_ALLOWED') && UPDRAFTPLUS_FOLLOWUPS_ALLOWED));
 
-		$split_every = max(intval(UpdraftPlus_Options::get_updraft_option('updraft_split_every', 500)), UPDRAFTPLUS_SPLIT_MIN);
+		$split_every = max(intval(UpdraftPlus_Options::get_updraft_option('updraft_split_every', 400)), UPDRAFTPLUS_SPLIT_MIN);
 
 		$initial_jobdata = array(
 			'resume_interval', $resume_interval,
@@ -2292,7 +2341,7 @@ class UpdraftPlus {
 
 	}
 
-	private function backup_finish($cancel_event, $do_cleanup, $allow_email, $resumption_no) {
+	private function backup_finish($cancel_event, $do_cleanup, $allow_email, $resumption_no, $force_abort = false) {
 
 		if (!empty($this->semaphore)) $this->semaphore->unlock();
 
@@ -2301,7 +2350,7 @@ class UpdraftPlus {
 		// The valid use of $do_cleanup is to indicate if in fact anything exists to clean up (if no job really started, then there may be nothing)
 
 		// In fact, leaving the hook to run (if debug is set) is harmless, as the resume job should only do tasks that were left unfinished, which at this stage is none.
-		if (0 == $this->error_count()) {
+		if (0 == $this->error_count() || $force_abort) {
 			if ($do_cleanup) {
 				$this->log("There were no errors in the uploads, so the 'resume' event ($cancel_event) is being unscheduled");
 				# This apparently-worthless setting of metadata before deleting it is for the benefit of a WP install seen where wp_clear_scheduled_hook() and delete_transient() apparently did nothing (probably a faulty cache)
@@ -2336,7 +2385,10 @@ class UpdraftPlus {
 		$jobdata_as_was = $this->jobdata;
 
 		// Make sure that the final status is shown
-		if (0 == $this->error_count()) {
+		if ($force_abort) {
+			$send_an_email = true;
+			$final_message = __('The backup was aborted by the user', 'updraftplus');
+		} elseif (0 == $this->error_count()) {
 			$send_an_email = true;
 			$service = $this->jobdata_get('service');
 			$remote_sent = (!empty($service) && ((is_array($service) && in_array('remotesend', $service)) || 'remotesend' === $service)) ? true : false;
@@ -2352,7 +2404,7 @@ class UpdraftPlus {
 					$this->log('The backup apparently succeeded (with warnings) and is now complete');
 				}
 			}
-			if ($remote_sent) $final_message .= '. '.__('To complete your migration/clone, you should now log in to the remote site and restore the backup set.', 'updraftplus');
+			if ($remote_sent && !$force_abort) $final_message .= '. '.__('To complete your migration/clone, you should now log in to the remote site and restore the backup set.', 'updraftplus');
 			if ($do_cleanup) $delete_jobdata = apply_filters('updraftplus_backup_complete', $delete_jobdata);
 		} elseif (false == $this->newresumption_scheduled) {
 			$send_an_email = true;
@@ -2380,6 +2432,7 @@ class UpdraftPlus {
 		}
 
 		global $updraftplus_backup;
+		if ($force_abort) $jobdata_as_was['aborted'] = true;
 		if ($send_an_email) $updraftplus_backup->send_results_email($final_message, $jobdata_as_was);
 
 		# Make sure this is the final message logged (so it remains on the dashboard)
@@ -3610,7 +3663,7 @@ CREATE TABLE $wpdb->signups (
 	public function get_settings_keys() {
 	// N.B. updraft_backup_history is not included here, as we don't want that wiped
 		return array('updraft_autobackup_default', 'updraft_dropbox', 'updraft_googledrive', 'updraftplus_tmp_googledrive_access_token', 'updraftplus_dismissedautobackup', 'updraftplus_dismissedexpiry', 'updraftplus_dismisseddashnotice', 'updraft_interval', 'updraft_interval_increments', 'updraft_interval_database', 'updraft_retain', 'updraft_retain_db', 'updraft_encryptionphrase', 'updraft_service', 'updraft_dropbox_appkey', 'updraft_dropbox_secret', 'updraft_googledrive_clientid', 'updraft_googledrive_secret', 'updraft_googledrive_remotepath', 'updraft_ftp', 'updraft_ftp_login', 'updraft_ftp_pass', 'updraft_ftp_remote_path', 'updraft_server_address', 'updraft_dir', 'updraft_email', 'updraft_delete_local', 'updraft_debug_mode', 'updraft_include_plugins', 'updraft_include_themes', 'updraft_include_uploads', 'updraft_include_others', 'updraft_include_wpcore', 'updraft_include_wpcore_exclude', 'updraft_include_more', 'updraft_include_blogs', 'updraft_include_mu-plugins',
-		'updraft_include_others_exclude', 'updraft_include_uploads_exclude', 'updraft_lastmessage', 'updraft_googledrive_token', 'updraft_dropboxtk_request_token', 'updraft_dropboxtk_access_token', 'updraft_dropbox_folder', 'updraft_adminlocking', 'updraft_updraftvault', 'updraft_remotesites', 'updraft_migrator_localkeys', 'updraft_remotecontrol_localkeys', 'updraft_retain_extrarules', 'updraft_googlecloud', 'updraft_include_more_path', 'updraft_split_every', 'updraft_ssl_nossl', 'updraft_backupdb_nonwp', 'updraft_extradbs',
+		'updraft_include_others_exclude', 'updraft_include_uploads_exclude', 'updraft_lastmessage', 'updraft_googledrive_token', 'updraft_dropboxtk_request_token', 'updraft_dropboxtk_access_token', 'updraft_dropbox_folder', 'updraft_adminlocking', 'updraft_updraftvault', 'updraft_remotesites', 'updraft_migrator_localkeys', 'updraft_central_localkeys', 'updraft_retain_extrarules', 'updraft_googlecloud', 'updraft_include_more_path', 'updraft_split_every', 'updraft_ssl_nossl', 'updraft_backupdb_nonwp', 'updraft_extradbs',
 		'updraft_last_backup', 'updraft_starttime_files', 'updraft_starttime_db', 'updraft_startday_db', 'updraft_startday_files', 'updraft_sftp_settings', 'updraft_s3', 'updraft_s3generic', 'updraft_dreamhost', 'updraft_s3generic_login', 'updraft_s3generic_pass', 'updraft_s3generic_remote_path', 'updraft_s3generic_endpoint', 'updraft_webdav_settings', 'updraft_openstack', 'updraft_bitcasa', 'updraft_copycom', 'updraft_onedrive', 'updraft_azure', 'updraft_cloudfiles', 'updraft_cloudfiles_user', 'updraft_cloudfiles_apikey', 'updraft_cloudfiles_path', 'updraft_cloudfiles_authurl', 'updraft_ssl_useservercerts', 'updraft_ssl_disableverify', 'updraft_s3_login', 'updraft_s3_pass', 'updraft_s3_remote_path', 'updraft_dreamobjects_login', 'updraft_dreamobjects_pass', 'updraft_dreamobjects_remote_path', 'updraft_dreamobjects', 'updraft_report_warningsonly', 'updraft_report_wholebackup', 'updraft_log_syslog', 'updraft_extradatabases');
 	}
 

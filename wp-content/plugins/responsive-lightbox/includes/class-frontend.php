@@ -23,6 +23,11 @@ class Responsive_Lightbox_Frontend {
 		add_filter( 'wp_get_attachment_link', array( $this, 'add_gallery_lightbox_selector' ), 1000, 6 );
 		add_filter( 'the_content', array( $this, 'add_videos_lightbox_selector' ) );
 		add_filter( 'the_content', array( $this, 'add_links_lightbox_selector' ) );
+		add_filter( 'woocommerce_single_product_image_html', array( $this, 'woocommerce_single_product_image_html' ), 100 );
+		add_filter( 'woocommerce_single_product_image_thumbnail_html', array( $this, 'woocommerce_single_product_image_html' ), 100 );
+		
+		// actions
+		add_action( 'wp_enqueue_scripts', array( $this, 'woocommerce_remove_lightbox' ), 100 );
 	}
 
 	/**
@@ -203,6 +208,35 @@ class Responsive_Lightbox_Frontend {
 		}
 
 		return $content;
+	}
+	
+	/**
+	 * Remove WooCommerce prettyPhoto lightbox stylrs and scripts.
+	 */
+	public function woocommerce_remove_lightbox() {
+		if ( Responsive_Lightbox()->options['settings']['woocommerce_gallery_lightbox'] === true ) {
+			// remove styles
+			wp_dequeue_style( 'woocommerce_prettyPhoto_css' );
+
+			// remove scripts
+			wp_dequeue_script( 'prettyPhoto' );
+			wp_dequeue_script( 'prettyPhoto-init' );
+			wp_dequeue_script( 'fancybox' );
+			wp_dequeue_script( 'enable-lightbox' );
+		}
+	}
+	
+	/**
+	 * Apply lightbox to WooCommerce procust gallery.
+	 * 
+	 * @param mixed $html
+	 * @return mixed
+	 */
+	public function woocommerce_single_product_image_html( $html ) {
+		if ( Responsive_Lightbox()->options['settings']['woocommerce_gallery_lightbox'] === true ) {
+			$html = str_replace( 'data-rel="prettyPhoto[product-gallery]"', 'data-rel="lightbox-gallery-' . $this->gallery_no . '"', $html );
+		}
+		return $html;
 	}
 
 	/**

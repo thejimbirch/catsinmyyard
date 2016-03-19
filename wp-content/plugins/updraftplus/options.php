@@ -29,7 +29,7 @@ class UpdraftPlus_Options {
 
 	// The apparently unused parameter is used in the alternative class in the Multisite add-on
 	public static function update_updraft_option($option, $value, $use_cache = true) {
-		update_option($option, $value);
+		return update_option($option, $value);
 	}
 
 	public static function delete_updraft_option($option) {

@@ -214,6 +214,12 @@ class Responsive_Lightbox_Settings {
 						'type' => 'boolean',
 						'label' => __( 'Try to force lightbox for custom WP gallery replacements, like Jetpack tiled galleries.', 'responsive-lightbox' ),
 					),
+					'woocommerce_gallery_lightbox' => array(
+						'title' => __( 'WooCommerce lightbox', 'responsive-lightbox' ),
+						'section' => 'responsive_lightbox_settings',
+						'type' => 'boolean',
+						'label' => __( 'Replace WooCommerce product gallery lightbox.', 'responsive-lightbox' ),
+					),
 					'videos' => array(
 						'title' => __( 'Video links', 'responsive-lightbox' ),
 						'section' => 'responsive_lightbox_settings',
@@ -1139,7 +1145,7 @@ class Responsive_Lightbox_Settings {
 			case ( 'checkbox' ) :
 				
 				foreach ( $args['options'] as $key => $name ) {
-					$html .= '<label class="cb-checkbox"><input id="' . $args['id'] . '-' . $key . '" type="checkbox" name="' . $args['name'] . '" value="' . $key . '" ' . checked( $key, $args['value'], false ) . ' />' . $name . '</label> ';
+					$html .= '<label class="cb-checkbox"><input id="' . $args['id'] . '-' . $key . '" type="checkbox" name="' . $args['name'] . '[' . $key . ']" value="1" ' . checked( in_array( $key, $args['value'] ), true, false ) . ' />' . $name . '</label> ';
 				}
 				break;
 				
@@ -1226,7 +1232,7 @@ class Responsive_Lightbox_Settings {
 				break;
 
 			case 'checkbox':
-				$value = is_array( $value ) ? array_map( 'sanitize_text_field', $value ) : false;
+				$value = is_array( $value ) && ! empty( $value ) ? array_map( 'sanitize_text_field', $value ) : array();
 				break;
 
 			case 'radio':
@@ -1343,11 +1349,11 @@ class Responsive_Lightbox_Settings {
 							
 							$field_parent = $this->settings[$setting_id]['fields'][$field_id]['parent'];
 							
-							$input[$field_parent][$field_id] = isset( $input[$field_parent][$field_id] ) ? $this->sanitize_field( $input[$field_parent][$field_id], $field['type'] ) : ( $field['type'] === 'boolean' ? false : Responsive_Lightbox()->defaults[$setting_id][$field_parent][$field_id] );
+							$input[$field_parent][$field_id] = isset( $input[$field_parent][$field_id] ) ? ( $field['type'] === 'checkbox' ? array_keys( $this->sanitize_field( $input[$field_parent][$field_id], $field['type'] ) ) : $this->sanitize_field( $input[$field_parent][$field_id], $field['type'] ) ) : ( in_array( $field['type'], array( 'boolean', 'checkbox' ) ) ? false : Responsive_Lightbox()->defaults[$setting_id][$field_parent][$field_id] );
 						
 						} else {
 
-							$input[$field_id] = isset( $input[$field_id] ) ? $this->sanitize_field( $input[$field_id], $field['type'] ) : ( $field['type'] === 'boolean' ? false : Responsive_Lightbox()->defaults[$setting_id][$field_id] );
+							$input[$field_id] = isset( $input[$field_id] ) ? ( $field['type'] === 'checkbox' ? array_keys( $this->sanitize_field( $input[$field_id], $field['type'] ) ) : $this->sanitize_field( $input[$field_id], $field['type'] ) ) : ( in_array( $field['type'], array( 'boolean', 'checkbox' ) ) ? false : Responsive_Lightbox()->defaults[$setting_id][$field_id] );
 						
 						}
 

@@ -914,17 +914,14 @@ class Updraft_Restorer extends WP_Upgrader {
 					'expected_oldhome' => $this->old_home,
 					'expected_oldcontent' => $this->old_content
 				), $import_table_prefix);
+				
+				# N.B. flush_rewrite_rules() causes $wp_rewrite to become up to date again - important for the no_mod_rewrite() call
 				$this->flush_rewrite_rules();
 
-				# N.B. flush_rewrite_rules() causes $wp_rewrite to become up to date again
-				if (function_exists('apache_get_modules')) {
-					global $wp_rewrite;
-					$mods = apache_get_modules();
-					if (($wp_rewrite->using_mod_rewrite_permalinks() && in_array('core', $mods) || in_array('http_core', $mods)) && !in_array('mod_rewrite', $mods)) {
-						$updraftplus->log("Using Apache, with permalinks (".get_option('permalink_structure').") but no mod_rewrite enabled - enable it to make your permalinks work");
-						$warn_no_rewrite = sprintf(__('You are using the %s webserver, but do not seem to have the %s module loaded.', 'updraftplus'), 'Apache', 'mod_rewrite').' '.sprintf(__('You should enable %s to make your pretty permalinks (e.g. %s) work', 'updraftplus'), 'mod_rewrite', 'http://example.com/my-page/');
-						echo '<p><strong>'.htmlspecialchars($warn_no_rewrite).'</strong></p>';
-					}
+				if ($updraftplus->mod_rewrite_unavailable()) {
+					$updraftplus->log("Using Apache, with permalinks (".get_option('permalink_structure').") but no mod_rewrite enabled - enable it to make your permalinks work");
+					$warn_no_rewrite = sprintf(__('You are using the %s webserver, but do not seem to have the %s module loaded.', 'updraftplus'), 'Apache', 'mod_rewrite').' '.sprintf(__('You should enable %s to make any pretty permalinks (e.g. %s) work', 'updraftplus'), 'mod_rewrite', 'http://example.com/my-page/');
+					echo '<p><strong>'.htmlspecialchars($warn_no_rewrite).'</strong></p>';
 				}
 
 			break;
@@ -1848,7 +1845,7 @@ ENDHERE;
 		$this->configuration_bundle = array();
 		// Some items must always be saved + restored; others only on a migration
 		// Remember, if modifying this, that a restoration can include restoring a destroyed site from a backup onto a fresh WP install on the same URL. So, it is not necessarily desirable to retain the current settings and drop the ones in the backup.
-		$keys_to_save = array('updraft_remotesites', 'updraft_migrator_localkeys');
+		$keys_to_save = array('updraft_remotesites', 'updraft_migrator_localkeys', 'updraft_central_localkeys');
 
 		if ($this->old_siteurl != $this->our_siteurl) {
 			global $updraftplus;

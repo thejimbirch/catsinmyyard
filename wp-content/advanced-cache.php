@@ -1,14 +1,27 @@
 <?php
-# WP SUPER CACHE 0.8.9.1
+# WP SUPER CACHE 1.2
 function wpcache_broken_message() {
-	if ( false == strpos( $_SERVER[ 'REQUEST_URI' ], 'wp-admin' ) )
-		echo "<!-- WP Super Cache is installed but broken. The path to wp-cache-phase1.php in wp-content/advanced-cache.php must be fixed! -->";
-}
+	global $wp_cache_config_file;
+	if ( isset( $wp_cache_config_file ) == false )
+		return '';
 
-if ( !include_once( '/home/jimbirch/public_html/catsinmyyard.com/wp-content/plugins/wp-super-cache/' . 'wp-cache-phase1.php' ) ) {
-	if ( !@is_file( '/home/jimbirch/public_html/catsinmyyard.com/wp-content/plugins/wp-super-cache/' . 'wp-cache-phase1.php' ) ) {
-		define( 'ADVANCEDCACHEPROBLEM', 1 );
-		register_shutdown_function( 'wpcache_broken_message' );
+	$doing_ajax =     defined( 'DOING_AJAX' ) && DOING_AJAX;
+	$xmlrpc_request = defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST;
+	$rest_request =   defined( 'REST_REQUEST' ) && REST_REQUEST;
+
+	$skip_output = ( $doing_ajax || $xmlrpc_request || $rest_request );
+	if ( false == strpos( $_SERVER[ 'REQUEST_URI' ], 'wp-admin' ) && !$skip_output ) {
+		echo "<!-- WP Super Cache is installed but broken. The constant WPCACHEHOME must be set in the file wp-config.php and point at the WP Super Cache plugin directory. -->";
 	}
 }
+
+if ( false == defined( 'WPCACHEHOME' ) ) {
+	define( 'ADVANCEDCACHEPROBLEM', 1 );
+} elseif ( !include_once( WPCACHEHOME . 'wp-cache-phase1.php' ) ) {
+	if ( !@is_file( WPCACHEHOME . 'wp-cache-phase1.php' ) ) {
+		define( 'ADVANCEDCACHEPROBLEM', 1 );
+	}
+}
+if ( defined( 'ADVANCEDCACHEPROBLEM' ) )
+	register_shutdown_function( 'wpcache_broken_message' );
 ?>

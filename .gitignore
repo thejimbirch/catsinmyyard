@@ -8,3 +8,7 @@ error_log
 php.ini-phpup-1397141242
 
 wp-content/updraft/*
+
+wp-content/advanced-cache.php
+wp-content/cache/*
+wp-content/wp-cache-config.php

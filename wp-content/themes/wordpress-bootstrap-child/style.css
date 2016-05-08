@@ -75,12 +75,17 @@ h3, .h3, h4, .h4 {
 
 #main article .comments-area img {
     width: auto;
-    max-width: 100%
+    max-width: 100%;
     height: auto;
 }
 
 #main article img.avatar {
     width: auto;
+}
+
+#main article .post_content img.ajax-loader {
+    width: auto;
+    margin: 0 0 0 1em;
 }
 
 article header h2 {
@@ -213,7 +218,7 @@ article header h1 a {
     article header h1 {
         font-size: 2em;
         width: 75%;
-        text-align:left; 
+        text-align:left;
     }
     .meta .meta-post-date {
         display: none;
@@ -392,7 +397,6 @@ footer .col-sm-12 {
 }
 
 /* Gallery Reset */
-
 .gallery-item {
     margin-top: 0 !important;
     margin-right: 3% !important;
@@ -402,7 +406,7 @@ footer .col-sm-12 {
 
 .gallery-item img {
     border: none !important;
-} 
+}
 
 .gallery-item img {
     border-radius: 50%;
@@ -416,6 +420,7 @@ footer .col-sm-12 {
     padding: 0;
 }
 
+/* Instagram Sidebar */
 .instagram-pics {
     margin:0;
     padding:0;
@@ -431,5 +436,3 @@ footer .col-sm-12 {
 .instagram-pics li:last-child {
     margin-bottom: 20px;
 }
-
-/* Add a comment

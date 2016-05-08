@@ -7,7 +7,7 @@
     <head>
         <meta charset="utf-8">
     	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    	<title><?php wp_title( '|', true, 'right' ); ?></title>	
+    	<title><?php wp_title( '|', true, 'right' ); ?></title>
     	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     	<!--[if lt IE 9]><script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script><![endif]-->
             <!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -37,7 +37,7 @@
     <body <?php body_class(); ?>>
         <header role="banner">
             <div class="navbar navbar-default">
-		<div class="container">
+                <div class="container">
                     <div class="row">
                         <div class="navbar-header col-sm-2">
                             <a class="navbar-brand" title="<?php echo get_bloginfo('description'); ?>" href="<?php echo home_url(); ?>"><?php bloginfo('name'); ?></a>
@@ -53,21 +53,21 @@
                             </div>
                             <div class="col-sm-2 search-container">
                                 <form action="https://www.paypal.com/cgi-bin/webscr" method="post" style="text-align:right;">
-                                <input type="hidden" name="cmd" value="_s-xclick">
-                                <input type="hidden" name="hosted_button_id" value="T6HGC3AKK5PAL">
-                                <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-                                <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+                                    <input type="hidden" name="cmd" value="_s-xclick">
+                                    <input type="hidden" name="hosted_button_id" value="T6HGC3AKK5PAL">
+                                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                                    <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
                                 </form>
                                 <?php //if(of_get_option('search_bar', '1')) {?>
-                                    <form class="navbar-form navbar-right" role="search" method="get" id="searchform" action="<?php echo home_url( '/' ); ?>">
-                                        <div class="form-group">
-                                            <input name="s" id="s" type="text" class="search-query form-control" placeholder="<?php _e('Search','wpbootstrap'); ?>">
-                                        </div>
-                                    </form>
+                                <form class="navbar-form navbar-right" role="search" method="get" id="searchform" action="<?php echo home_url( '/' ); ?>">
+                                    <div class="form-group">
+                                        <input name="s" id="s" type="text" class="search-query form-control" placeholder="<?php _e('Search','wpbootstrap'); ?>">
+                                    </div>
+                                </form>
                                 <?php //} ?>
                             </div>
                         </div>
                     </div><!-- end row -->
                 </div> <!-- end .container -->
             </div> <!-- end .navbar -->
-	</header> <!-- end header -->
+	   </header> <!-- end header -->

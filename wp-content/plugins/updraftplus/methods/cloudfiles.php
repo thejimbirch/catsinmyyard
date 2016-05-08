@@ -132,7 +132,7 @@ class UpdraftPlus_BackupModule_cloudfiles_oldsdk {
 					}
 
 					$chunks = floor($orig_file_size / $chunk_size);
-					// There will be a remnant unless the file size was exactly on a 5Mb boundary
+					// There will be a remnant unless the file size was exactly on a 5MB boundary
 					if ($orig_file_size % $chunk_size > 0 ) $chunks++;
 
 					$updraftplus->log("Cloud Files upload: $file (chunks: $chunks) -> cloudfiles://$container/$cfpath ($uploaded_size)");

@@ -238,7 +238,7 @@ class UpdraftPlus_BackupModule_googledrive {
 			global $updraftplus;
 			$updraftplus->log(sprintf(__('The %s authentication could not go ahead, because something else on your site is breaking it. Try disabling your other plugins and switching to a default theme. (Specifically, you are looking for the component that sends output (most likely PHP warnings/errors) before the page begins. Turning off any debugging settings may also help).', ''), 'Google Drive'), 'error');
 		} else {
-			header('Location: https://accounts.google.com/o/oauth2/auth?'.http_build_query($params));
+			header('Location: https://accounts.google.com/o/oauth2/auth?'.http_build_query($params, null, '&'));
 		}
 	}
 
@@ -329,7 +329,7 @@ class UpdraftPlus_BackupModule_googledrive {
 				if (is_numeric($quota_total) && is_numeric($quota_used)) {
 					$available_quota = $quota_total - $quota_used;
 					$used_perc = round($quota_used*100/$quota_total, 1);
-					$message .= sprintf(__('Your %s quota usage: %s %% used, %s available','updraftplus'), 'Google Drive', $used_perc, round($available_quota/1048576, 1).' Mb');
+					$message .= sprintf(__('Your %s quota usage: %s %% used, %s available','updraftplus'), 'Google Drive', $used_perc, round($available_quota/1048576, 1).' MB');
 				}
 			}
 		} catch (Exception $e) {
@@ -391,7 +391,7 @@ class UpdraftPlus_BackupModule_googledrive {
 				$quota_total = max($about->getQuotaBytesTotal(), 1);
 				$quota_used = $about->getQuotaBytesUsed();
 				$available_quota = $quota_total - $quota_used;
-				$message = "Google Drive quota usage: used=".round($quota_used/1048576,1)." Mb, total=".round($quota_total/1048576,1)." Mb, available=".round($available_quota/1048576,1)." Mb";
+				$message = "Google Drive quota usage: used=".round($quota_used/1048576,1)." MB, total=".round($quota_total/1048576,1)." MB, available=".round($available_quota/1048576,1)." MB";
 				$updraftplus->log($message);
 			} catch (Exception $e) {
 				$updraftplus->log("Google Drive quota usage: failed to obtain this information: ".$e->getMessage());
@@ -412,9 +412,9 @@ class UpdraftPlus_BackupModule_googledrive {
 			}
 
 			if (!$already_failed && $filesize > 10737418240) {
-				# 10Gb
-				$updraftplus->log("File upload expected to fail: file ($file_name) size is $filesize b (".round($filesize/1073741824, 4)." Gb), whereas Google Drive's limit is 10Gb (1073741824 bytes)");
-				$updraftplus->log(sprintf(__("Upload expected to fail: the %s limit for any single file is %s, whereas this file is %s Gb (%d bytes)",'updraftplus'),__('Google Drive', 'updraftplus'), '10Gb (1073741824)', round($filesize/1073741824, 4), $filesize), 'warning');
+				# 10GB
+				$updraftplus->log("File upload expected to fail: file ($file_name) size is $filesize b (".round($filesize/1073741824, 4)." GB), whereas Google Drive's limit is 10GB (1073741824 bytes)");
+				$updraftplus->log(sprintf(__("Upload expected to fail: the %s limit for any single file is %s, whereas this file is %s GB (%d bytes)",'updraftplus'),__('Google Drive', 'updraftplus'), '10GB (1073741824)', round($filesize/1073741824, 4), $filesize), 'warning');
 			} 
 
 			try {
@@ -833,7 +833,7 @@ class UpdraftPlus_BackupModule_googledrive {
 			return true;
 		}
 
-		# Chunk in units of 2Mb
+		# Chunk in units of 2MB
 		$chunk_size = 2097152;
 
 		try {
@@ -958,7 +958,7 @@ class UpdraftPlus_BackupModule_googledrive {
 				</p>
 				<p>
 
-				<a href="<?php echo UpdraftPlus_Options::admin_page_url();?>?action=updraftmethod-googledrive-auth&page=updraftplus&updraftplus_googleauth=doit"><?php print __('<strong>After</strong> you have saved your settings (by clicking \'Save Changes\' below), then come back here once and click this link to complete authentication with Google.','updraftplus');?></a>
+				<a class="updraft_authlink" href="<?php echo UpdraftPlus_Options::admin_page_url();?>?action=updraftmethod-googledrive-auth&page=updraftplus&updraftplus_googleauth=doit"><?php print __('<strong>After</strong> you have saved your settings (by clicking \'Save Changes\' below), then come back here once and click this link to complete authentication with Google.','updraftplus');?></a>
 				</p>
 				</td>
 			</tr>

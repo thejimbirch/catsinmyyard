@@ -91,6 +91,14 @@ class UpdraftPlus_Options {
 
 	public static function admin_init() {
 
+		static $already_inited = false;
+		if ($already_inited) return;
+		
+		$already_inited = true;
+	
+		// If being called outside of the admin context, this may not be loaded yet
+		if (!function_exists('register_setting')) include_once(ABSPATH.'wp-admin/includes/plugin.php');
+	
 		global $updraftplus, $updraftplus_admin;
 		register_setting('updraft-options-group', 'updraft_interval', array($updraftplus, 'schedule_backup') );
 		register_setting('updraft-options-group', 'updraft_interval_database', array($updraftplus, 'schedule_backup_database') );

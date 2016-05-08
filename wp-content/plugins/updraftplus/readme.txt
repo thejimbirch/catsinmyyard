@@ -1,9 +1,9 @@
 === UpdraftPlus Backup and Restoration ===
-Contributors: Backup with UpdraftPlus, DavidAnderson, DNutbourne, lcahill
+Contributors: Backup with UpdraftPlus, DavidAnderson, DNutbourne
 Tags: backup, backups, restore, amazon backup, s3 backup, dropbox backup, google drive backup, rackspace cloud files, rackspace backup, dreamhost, dreamobjects backup, ftp backup, webdav backup, google cloud storage, onedrive, microsoft one drive, microsoft azure, azure, back up, multisite, restoration, sftp backup, ftps, scp backup, migrate, duplicate, copy, mysql backup, database backup, db backups, website backup, wordpress backup, full backup, openstack backup, sicherung
 Requires at least: 3.2
-Tested up to: 4.4
-Stable tag: 1.11.28
+Tested up to: 4.5
+Stable tag: 1.12.6
 Author URI: https://updraftplus.com
 Donate link: http://david.dw-perspective.org.uk/donate
 License: GPLv3 or later
@@ -24,6 +24,7 @@ Backup and restoration made easy. Complete backups; manual or scheduled (backup 
 * Site duplicator/migrator: can copy sites, and (with add-on) duplicate them at new locations
 * Restores and migrates backup sets from other backup plugins (Premium) (currently supported: BackWPUp, BackupWordPress, Simple Backup, WordPress Backup To Dropbox)
 * Files and database backups can have separate schedules
+* Remotely control your backups on every site from a single dashboard with UpdraftCentral - <a href="https://updraftcentral.com">hosted for you</a> or <a href="https://wordpress.org/plugins/updraftcentral/">self-hosted</a>
 * Failed uploads are automatically resumed/retried
 * Large sites can be split into multiple archives
 * Select which files to backup (plugins, themes, content, other)
@@ -48,6 +49,13 @@ Your WordPress backups are worth the same as your entire investment in your webs
 UpdraftPlus Backup/Restore is not crippled in any way - it is fully functional for backing up and restoring your site. What we do have is various extra features (including site cloning), and guaranteed support, available <a href="https://updraftplus.com/">from our website, updraftplus.com</a>. See <a href="https://updraftplus.com/comparison-updraftplus-free-updraftplus-premium/">a comparison of the free/Premium versions, here</a>.
 
 If you need WordPress multisite backup compatibility (you'll know if you do), <a href="https://updraftplus.com/shop/">then you need UpdraftPlus Premium</a>.
+
+= UpdraftCentral - Remote control =
+
+As well as controlling your backups from within WordPress, you can also control all your sites' backups from a single dashboard, with <a href="https://updraftcentral.com">UpdraftCentral</a>. UpdraftCentral can control both free and Premium versions of UpdraftPlus, and comes in two versions:
+
+* Hosted dashboard: <a href="https://updraftplus.com/my-account/updraftcentral-remote-control/">a ready-to-go dashboard on updraftplus.com</a>, with 5 free licences for everyone (<a href="https://updraftcentral.com">read more here</a>).
+* Host your own: Host the dashboard on your own WP install, with <a href="https://wordpress.org/plugins/updraftcentral/">the free self-install plugin</a>
 
 = Professional / Enterprise support agreements available =
 
@@ -113,17 +121,75 @@ Yes; especially before you submit any support requests.
 
 Thanks for asking; yes, we've got a few. Check out this profile page - https://profiles.wordpress.org/DavidAnderson/ .
 
-
 == Changelog ==
 
 The <a href="https://updraftplus.com/news/">UpdraftPlus backup blog</a> is the best place to learn in more detail about any important changes.
 
-N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.11.28 of the free version correspond to changes made in 2.11.28.x of the paid version.
+N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.12.6 of the free version correspond to changes made in 2.12.6.x of the paid version.
 
-= 1.11.28 - 27/Feb/2016 =
+= 1.12.6 - 30/Apr/2016 =
+
+* FIX: UpdraftVault quota usage was being shown incorrectly in recounts on sites connected to accounts backing up multiple sites
+* TWEAK: In accordance with Barracuda's previous announcement, copy.com no longer exists - https://techlib.barracuda.com/CudaDrive/EOL
+* TWEAK: Allow particular log lines to be cancelled
+* TWEAK: Explicitly set the separator when calling http_build_query(), to prevent problems with non-default configurations
+* TWEAK: Tweak the algorithm for sending data to a remote UD installation to cope with eventually-consistent filesystems that are temporarily inconsistent
+* TWEAK: Make the automatic backups advert prettier
+* TWEAK: Detect and combine file and database backups running on different schedules which coincide
+* TWEAK: Update bundled Select2 to version 4.0.2
+* TWEAK: Update UDRPC library to version 1.4.3
+
+= 1.12.5 - 08/Apr/2016 =
+
+* TWEAK: (Paid versions) - tweak the updater class so that it sends the information that updraftplus.com needs in order to correctly advise about language pack update availability. (If you are continuously seeing the same language pack update offered, then this may continue for a few more hours - please be patient!).
+* TWEAK: Detect another case and deal with an HTTP 413 response when sending chunked data on a direct site-to-site migration
+
+= 1.12.4 - 07/Apr/2016 =
+
+* FEATURE: Faster uploads to Dropbox, via adapting to network conditions: https://updraftplus.com/faster-dropbox-uploads/
+* FEATURE: (Paid versions) Plugin now no longer bundles all translations - instead, WP's mechanism for downloading single translations, as/when needed, is used (reduces on-disk size by 12MB=36%)).
+* FIX: Deal with some database encryption phrases with special characters that were incorrectly processed
+* FIX: Deal with an error in the advanced retention rules processing code, that could lead to keeping the wrong backup set
+* FIX: Fix an unescaped string which could cause a JavaScript notice on the UD settings page in some non-English translations
+* FIX: The minimum allowed value for the split size was not previously taking effect when saving settings
+* TWEAK: When connection to an updraftplus.com UpdraftCentral dashboard, allow use of the alternative connection method
+* TWEAK: Suppress some known deprecation warnings on PHP 7
+* TWEAK: Show OpenSSL/Mcrypt info in the log + debug info
+* TWEAK: Detect a completed upload to Dropbox masked by a race event from the WP scheduler
+* TWEAK: The drop-down in the 'Migrate' dialog will now update on a rescan without needing a page reload
+* TWEAK: (Paid versions) Update bundled plugin updater class (Yahnis Elsts) to version 3.0
+* TWEAK: Add woocommerce_sessions to the list of tables of transient data
+* TWEAK: When saving settings, if invalid input is adjusted, this will be reflected back to the UI without a page load (not on all elements)
+* TWEAK: When saving settings, the schedule was written twice on non-multisite installs
+
+= 1.12.2 - 30/Mar/2016 =
+
+* TWEAK: When testing Amazon S3 bucket accessibility, slightly improve one of the corner-case checks
+* TWEAK: When creating an encryption key for direct Migration, or UpdraftCentral, allow the user to choose their key size (this helps with PHP installs lacking both OpenSSL and GMP, in which case key creation can be really slow)
+* TWEAK: Detect another case and deal with an HTTP 413 response when sending chunked data on a direct site-to-site migration
+
+= 1.12.1 - 24/Mar/2016 =
+
+* TWEAK: Update the bundled remote communications library - needed for some UpdraftCentral users
+
+= 1.12.0 - 23/Mar/2016 =
+
+* FEATURE: Compatible with the forthcoming (very soon!) UpdraftCentral remote control panel
+* COMPATIBILITY: Tested + supported on the upcoming WordPress 4.5
+* FIX: On some setups, if no remote storage was configured (not recommended), then old backups were not being pruned
+* FIX: Make FTP active mode (very rarely seen) work correctly again
+* TWEAK: Added a hint to FTP users who appear to be firewalled on only the data channel when attempting to use encrypted FTP
+* TWEAK: Improve detection of the WordPress scheduler duplicating periodic events when the server is overloaded
+* TWEAK: Simplify main tab layout upon first use
+* TWEAK: Add some previously unbundled licence files
+* TWEAK: Prevent a couple of PHP notices being logged when running a manual search/replace
+* TWEAK: Add a filter to allow more over-riding of pruning
+
+= 1.11.29 - 27/Feb/2016 =
 
 * FIX: When saving settings on multisite, some connections to remote storage could drop and need to be re-made
 * FIX: Fix an inoperative button in the Clone dialog box
+* FIX: Fix an error upon automatic backups (Premium) in 2.11.28
 * TWEAK: Updated readme to reflect > 700,000 active sites
 * TWEAK: When cloning a site and mod_rewrite is not available, give a warning pre-restore
 * TWEAK: Options saving on multisite is now much more efficient (in terms of database requests required)
@@ -1794,4 +1860,4 @@ We recognise and thank the following for code and/or libraries used and/or modif
 
 
 == Upgrade Notice ==
-* 1.11.28: Various tweaks, fixes and small improvements.
+* 1.12.6: Various minor tweaks

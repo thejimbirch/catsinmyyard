@@ -35,6 +35,9 @@ class Updraft_Restorer extends WP_Upgrader {
 	
 	private $restore_this_table = array();
 
+	private $line = 0;
+	private $statements_run = 0;
+	
 	// Constants for use with the move_backup_in method
 	// These can't be arbitrarily changed; there is legacy code doing bitwise operations and numerical comparisons, and possibly legacy code still using the values directly.
 	const MOVEIN_OVERWRITE_NO_BACKUP = 0;
@@ -94,7 +97,7 @@ class Updraft_Restorer extends WP_Upgrader {
 		$this->strings['moving_backup'] = __('Moving unpacked backup into place...','updraftplus');
 		$this->strings['restore_database'] = __('Restoring the database (on a large site this can take a long time - if it times out (which can happen if your web hosting company has configured your hosting to limit resources) then you should use a different method, such as phpMyAdmin)...','updraftplus');
 		$this->strings['cleaning_up'] = __('Cleaning up rubbish...','updraftplus');
-		$this->strings['old_move_failed'] = __('Could not move old files out of the way.','updraftplus').' '.__('You should check the file permissions in your WordPress installation', 'updraftplus');
+		$this->strings['old_move_failed'] = __('Could not move old files out of the way.','updraftplus').' '.__('You should check the file ownerships and permissions in your WordPress installation', 'updraftplus');
 		$this->strings['old_delete_failed'] = __('Could not delete old directory.','updraftplus');
 		$this->strings['new_move_failed'] = __('Could not move new files into place. Check your wp-content/upgrade folder.','updraftplus');
 		$this->strings['move_failed'] = __('Could not move the files into place. Check your file permissions.','updraftplus');
@@ -1752,9 +1755,9 @@ ENDHERE;
 			} elseif (preg_match('/^use /i', $sql_line)) {
 				# WPB2D produces these, as do some phpMyAdmin dumps
 				$sql_type = 7;
-			} elseif (preg_match('#/\*\!40\d+ SET NAMES (\S+)#', $sql_line, $smatches)) {
+			} elseif (preg_match('#/\*\!40\d+ SET NAMES (.*)\*\/#', $sql_line, $smatches)) {
 				$sql_type = 8;
-				$this->set_names = $smatches[1];
+				$this->set_names = rtrim($smatches[1]);
 			} else {
 				# Prevent the previous value of $sql_type being retained for an unknown type
 				$sql_type = 0;

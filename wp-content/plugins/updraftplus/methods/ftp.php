@@ -71,7 +71,8 @@ class UpdraftPlus_BackupModule_ftp {
 			$opts['pass'],
 			$updraftplus->get_job_option('updraft_ssl_nossl'),
 			$updraftplus->get_job_option('updraft_ssl_disableverify'),
-			$updraftplus->get_job_option('updraft_ssl_useservercerts')
+			$updraftplus->get_job_option('updraft_ssl_useservercerts'),
+			$opts['passive']
 		);
 
 		if (is_wp_error($ftp) || !$ftp->connect()) {
@@ -103,7 +104,7 @@ class UpdraftPlus_BackupModule_ftp {
 			}
 
 			if ($ftp->put($fullpath, $ftp_remote_path.$file, FTP_BINARY, $resume, $updraftplus)) {
-				$updraftplus->log("FTP upload attempt successful (".$size_k."Kb in ".(round(microtime(true)-$timer_start,2)).'s)');
+				$updraftplus->log("FTP upload attempt successful (".$size_k."KB in ".(round(microtime(true)-$timer_start,2)).'s)');
 				$updraftplus->uploaded_file($file);
 			} else {
 				$updraftplus->log("ERROR: FTP upload failed" );
@@ -125,7 +126,8 @@ class UpdraftPlus_BackupModule_ftp {
 			$opts['pass'],
 			$updraftplus->get_job_option('updraft_ssl_nossl'),
 			$updraftplus->get_job_option('updraft_ssl_disableverify'),
-			$updraftplus->get_job_option('updraft_ssl_useservercerts')
+			$updraftplus->get_job_option('updraft_ssl_useservercerts'),
+			$opts['passive']
 		);
 
 		if (is_wp_error($ftp)) return $ftp;
@@ -188,7 +190,8 @@ class UpdraftPlus_BackupModule_ftp {
 				$opts['pass'],
 				$updraftplus->get_job_option('updraft_ssl_nossl'),
 				$updraftplus->get_job_option('updraft_ssl_disableverify'),
-				$updraftplus->get_job_option('updraft_ssl_useservercerts')
+				$updraftplus->get_job_option('updraft_ssl_useservercerts'),
+				$opts['passive']
 			);
 
 			if (is_wp_error($ftp) || !$ftp->connect()) {
@@ -226,7 +229,8 @@ class UpdraftPlus_BackupModule_ftp {
 			$opts['pass'],
 			$updraftplus->get_job_option('updraft_ssl_nossl'),
 			$updraftplus->get_job_option('updraft_ssl_disableverify'),
-			$updraftplus->get_job_option('updraft_ssl_useservercerts')
+			$updraftplus->get_job_option('updraft_ssl_useservercerts'),
+			$opts['passive']
 		);
 		if (is_wp_error($ftp)) return $ftp;
 
@@ -317,12 +321,12 @@ class UpdraftPlus_BackupModule_ftp {
 		</tr>
 		<tr class="updraftplusmethod ftp">
 			<th><?php _e('Passive mode','updraftplus');?>:</th>
-			<td><input type="hidden" name="updraft_ftp[passive]" value="0" /> <!-- provide an alternating value -->
+			<td>
 			<input type="checkbox" data-updraft_settings_test="passive" id="updraft_ftp_passive" name="updraft_ftp[passive]" value="1" <?php if ($opts['passive']) echo 'checked="checked"'; ?> /> <br><em><?php echo __('Almost all FTP servers will want passive mode; but if you need active mode, then uncheck this.', 'updraftplus');?></em></td>
 		</tr>
 		<tr class="updraftplusmethod ftp">
 		<th></th>
-		<td><p><button id="updraft-ftp-test" type="button" class="button-primary updraft-test-button" data-method="ftp" data-method_label="FTP"><?php echo sprintf(__('Test %s Settings','updraftplus'),'FTP');?></button></p></td>
+		<td><p><button id="updraft-ftp-test" type="button" class="button-primary updraft-test-button" data-method="ftp" data-method_label="FTP"><?php printf(__('Test %s Settings', 'updraftplus'), 'FTP');?></button></p></td>
 		</tr>
 		<?php
 	}
@@ -348,11 +352,11 @@ class UpdraftPlus_BackupModule_ftp {
 			return;
 		}
 		if (empty($login)) {
-			printf(__("Failure: No %s was given.",'updraftplus'),'login');
+			printf(__("Failure: No %s was given.",'updraftplus'), __('login', 'updraftplus'));
 			return;
 		}
 		if (empty($pass)) {
-			printf(__("Failure: No %s was given.",'updraftplus'),'password');
+			printf(__("Failure: No %s was given.",'updraftplus'), __('password', 'updraftplus'));
 			return;
 		}
 
@@ -369,15 +373,15 @@ class UpdraftPlus_BackupModule_ftp {
 
 		$file = md5(rand(0,99999999)).'.tmp';
 		$fullpath = trailingslashit($path).$file;
-		if (!file_exists(ABSPATH.WPINC.'/version.php')) {
-			_e("Failure: an unexpected internal UpdraftPlus error occurred when testing the credentials - please contact the developer");
-			return;
-		}
+		
 		if ($ftp->put(ABSPATH.WPINC.'/version.php', $fullpath, FTP_BINARY, false, true)) {
-			echo __("Success: we successfully logged in, and confirmed our ability to create a file in the given directory (login type:",'updraftplus')." ".$ftp->login_type.')';
+			echo __("Success: we successfully logged in, and confirmed our ability to create a file in the given directory (login type:", 'updraftplus')." ".$ftp->login_type.')';
 			@$ftp->delete($fullpath);
 		} else {
-			_e('Failure: we successfully logged in, but were not able to create a file in the given directory.');
+			_e('Failure: we successfully logged in, but were not able to create a file in the given directory.', 'updraftplus');
+			if (!empty($ftp->ssl)) {
+				echo ' '.__('This is sometimes caused by a firewall - try turning off SSL in the expert settings, and testing again.', 'updraftplus');
+			}
 		}
 
 	}

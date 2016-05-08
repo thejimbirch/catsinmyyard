@@ -556,16 +556,20 @@ a .udp-logo {
 	padding: 0px !important;
 }
 
-.next-backup .updraft_scheduled {
-	width: 124px; 
+.next-backup .updraft_scheduled  {
+	/* width: 124px;*/
 	margin: 0px; 
-	padding: 0px;
+	padding: 2px 4px 2px 0px;
 }
 
-.next-backup .updraft_scheduled .updraft_all-files {
+#next-backup-table-inner td {
+	vertical-align: top;
+}
+
+.next-backup .updraft_all-files {
 	color: blue; 
 	margin: 0px; 
-	padding: 0px;
+	padding: 2px 0px 0px;
 }	
 
 .multisite-advert-width {
@@ -1384,3 +1388,87 @@ input #backupnow_includefiles_moreoptions {
 	font-size: 115%;
 	font-style: italic;
 }
+
+/* Automation Backup Advert by B */
+.autobackup-image {
+/* 	display: inline-block; */
+/*	min-width: 10%;
+	max-width:25%;*/
+/*	float: left;*/
+	clear: left;
+	float: left;
+	width: 110px;
+	height: 110px;
+}
+
+.autobackup-description {
+	width: 100%;
+}
+
+.advert-description {
+	float: left;
+	clear: right;
+	padding: 4px 10px 8px;
+	width: 70%;
+	clear:right;
+	vertical-align: top;
+}
+
+.advert-btn {
+	display: inline-block;
+	min-width:10%;
+	vertical-align: top;
+	margin-bottom: 8px;
+}
+
+.advert-btn:first-of-type {
+	margin-top: 25px;
+}
+
+.advert-btn a {
+	display: block;
+	cursor: pointer;
+}
+
+a.btn-get-started {
+	background: #fff;
+	border: 2px solid #df6926;
+	border-radius: 4px;
+	color: #df6926;
+	display: inline-block;
+	margin-left: 10px !important;
+	margin-bottom: 7px !important;
+	font-size: 18px !important;
+	line-height: 20px;
+	min-height: 28px;
+	padding: 11px 10px 5px;
+	text-transform: uppercase;
+	text-decoration: none;
+}
+
+.circle-dblarrow {
+	border: 1px solid #df6926;
+    border-radius: 100%;
+    display: inline-block;
+	font-size: 17px;
+	line-height: 17px;
+    margin-left: 5px;
+	width: 20px;
+    height: 20px;
+	text-align: center;
+}
+
+@media screen and (max-width: 782px)  {
+	
+/*	.advert-description {
+		min-width: 75%;
+		margin-bottom: 5px;
+	}
+
+	.advert-btn {
+		margin-top: 15px;
+		margin-left:86px;
+		min-width: 100%;
+	}*/
+}
+/* End Automation Backup Advert by B */

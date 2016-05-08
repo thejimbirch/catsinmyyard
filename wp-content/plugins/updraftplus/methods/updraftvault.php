@@ -127,6 +127,12 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 					$opts['last_config']['accesskey'] = $response['accesskey'];
 					$opts['last_config']['secretkey'] = $response['secretkey'];
 					$opts['last_config']['path'] = $response['path'];
+					unset($opts['last_config']['quota_root']);
+					if (!empty($response['quota_root'])) {
+						$opts['last_config']['quota_root'] = $response['quota_root'];
+						$config['quota_root'] = $response['quota_root'];
+						$opts['quota_root'] = $response['quota_root'];
+					}
 					$opts['last_config']['time'] = time();
 					// This is just a cache of the most recent setting
 					if (isset($response['quota'])) {
@@ -170,17 +176,17 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 		}
 
 		if (!$details_retrieved) {
-			$updraftplus->log("UpdraftPlus Vault: failed to retrieve access details from updraftplus.com");
+			// Don't log anything yet, as this will replace the most recently logged message in the main panel
 			if (!empty($opts['last_config']) && is_array($opts['last_config'])) {
 				$last_config = $opts['last_config'];
 				if (!empty($last_config['time']) && is_numeric($last_config['time']) && $last_config['time'] > time() - 86400*15) {
-					$updraftplus->log("Will attempt to use most recently stored configuration");
+					$updraftplus->log("UpdraftPlus Vault: failed to retrieve access details from updraftplus.com: will attempt to use most recently stored configuration");
 					if (!empty($last_config['accesskey'])) $config['accesskey'] = $last_config['accesskey'];
 					if (!empty($last_config['secretkey'])) $config['secretkey'] = $last_config['secretkey'];
 					if (isset($last_config['path'])) $config['path'] = $last_config['path'];
 					if (isset($opts['quota'])) $config['quota'] = $opts['quota'];
 				} else {
-					$updraftplus->log("No recently stored configuration was found to use instead");
+					$updraftplus->log("UpdraftPlus Vault: failed to retrieve access details from updraftplus.com: no recently stored configuration was found to use instead");
 				}
 			}
 		}
@@ -258,19 +264,19 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 						<?php echo __('UpdraftPlus Vault brings you storage that is <strong>reliable, easy to use and a great price</strong>.', 'updraftplus').' '.__('Press a button to get started.', 'updraftplus');?>
 					</p>
 					<div class="vault-purchase-option">
-						<div class="vault-purchase-option-size">5 Gb</div>
+						<div class="vault-purchase-option-size">5 GB</div>
 						<div class="vault-purchase-option-link"><a target="_blank" href="https://updraftplus.com/vault-5gb-quarterly"><?php printf(__('%s per quarter', 'updraftplus'), '$10'); ?></a></div>
 						<div class="vault-purchase-option-or"><?php _e('or (annual discount)', 'updraftplus');?></div>
 						<div class="vault-purchase-option-link"><a target="_blank" href="https://updraftplus.com/vault-5gb-annual"><?php printf(__('%s per year', 'updraftplus'), '$35'); ?></a></div>
 					</div>
 					<div class="vault-purchase-option">
-						<div class="vault-purchase-option-size">15 Gb</div>
+						<div class="vault-purchase-option-size">15 GB</div>
 						<div class="vault-purchase-option-link"><a target="_blank" href="https://updraftplus.com/vault-15gb-quarterly"><?php printf(__('%s per quarter', 'updraftplus'), '$20'); ?></a></div>
 						<div class="vault-purchase-option-or"><?php _e('or (annual discount)', 'updraftplus');?></div>
 						<div class="vault-purchase-option-link"><a target="_blank" href="https://updraftplus.com/vault-15gb-annual"><?php printf(__('%s per year', 'updraftplus'), '$70');?></a></div>
 					</div>
 					<div class="vault-purchase-option">
-						<div class="vault-purchase-option-size">50 Gb</div>
+						<div class="vault-purchase-option-size">50 GB</div>
 						<div class="vault-purchase-option-link"><a target="_blank" href="https://updraftplus.com/vault-50gb-quarterly"><?php printf(__('%s per quarter', 'updraftplus'), '$50'); ?></a></div>
 						<div class="vault-purchase-option-or"><?php _e('or (annual discount)', 'updraftplus');?></div>
 						<div class="vault-purchase-option-link"><a target="_blank" href="https://updraftplus.com/vault-50gb-annual"><?php printf(__('%s per year', 'updraftplus'), '$175');;?></a></div>
@@ -340,12 +346,12 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 	protected function s3_out_of_quota($total, $used, $needed) {
 		global $updraftplus;
 		$updraftplus->log("UpdraftPlus Vault Error: Quota exhausted (used=$used, total=$total, needed=$needed)");
-		$updraftplus->log(sprintf(__('%s Error: you have insufficient storage quota available (%s) to upload this archive (%s).','updraftplus'), 'UpdraftPlus Vault', round(($total-$used)/1048576, 2).' Mb', round($needed/1048576, 2).' Mb').' '.__('You can get more quota here', 'updraftplus').': '.$this->get_url('get_more_quota'), 'error');
+		$updraftplus->log(sprintf(__('%s Error: you have insufficient storage quota available (%s) to upload this archive (%s).','updraftplus'), 'UpdraftPlus Vault', round(($total-$used)/1048576, 2).' MB', round($needed/1048576, 2).' MB').' '.__('You can get more quota here', 'updraftplus').': '.$this->get_url('get_more_quota'), 'error');
 	}
 
 	protected function s3_record_quota_info($quota_used, $quota) {
 
-		$ret = __('Current use:', 'updraftplus').' '.round($quota_used / 1048576, 1).' / '.round($quota / 1048576, 1).' Mb';
+		$ret = __('Current use:', 'updraftplus').' '.round($quota_used / 1048576, 1).' / '.round($quota / 1048576, 1).' MB';
 		$ret .= ' ('.sprintf('%.1f', 100*$quota_used / max($quota, 1)).' %)';
 
 		$ret_plain = $ret . ' - '.__('Get more quota', 'updraftplus').': '.$this->get_url('get_more_quota');
@@ -372,7 +378,16 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 			}
 
 			try {
-				$current_files = $this->listfiles('');
+				
+				$config = $this->get_config();
+				
+				if (empty($config['quota_root'])) {
+					// This next line is wrong: it lists the files *in this site's sub-folder*, rather than the whole Vault
+					$current_files = $this->listfiles('');
+				} else {
+					$current_files = $this->listfiles_with_path($config['quota_root'], '');
+				}
+				
 			} catch (Exception $e) {
 				global $updraftplus;
 				$updraftplus->log("Listfiles failed during quota calculation: ".$e->getMessage());
@@ -391,7 +406,7 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 					$counted += $file['size'];
 				}
 				$ret .= round($counted / 1048576, 1);
-				$ret .= ' / '.round($quota / 1048576, 1).' Mb';
+				$ret .= ' / '.round($quota / 1048576, 1).' MB';
 				$ret .= ' ('.sprintf('%.1f', 100*$counted / $quota).' %)';
 			}
 		} else {
@@ -409,31 +424,26 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 		$this->credentials_test_engine($this->get_config(), $posted_settings);
 	}
 	
-	public function ajax_vault_recountquota() {
+	public function ajax_vault_recountquota($echo_results = true) {
 		// Force the opts to be refreshed
 		$config = $this->get_config();
 
 		if (empty($config['accesskey']) && !empty($config['error_message'])) {
 			$results = array('html' => htmlspecialchars($config['error_message']), 'connected' => 0);
 		} else {
-
 			// Now read the opts
 			$opts = $this->get_opts();
-	// 		$quota_limit = !isset($opts['quota']) ? $opts['quota'] : -1;
-
 			$results = array('html' => $this->connected_html($opts), 'connected' => 1);
-	/*
-			$results = array(
-				'limit' => $quota_limit,
-				'used' => $quota_used,
-			);*/
 		}
-
-		echo json_encode($results);
+		if ($echo_results) {
+			echo json_encode($results);
+		} else {
+			return $results;
+		}
 	}
 
 	// This method also gets called directly, so don't add code that assumes that it's definitely an AJAX situation
-	public function ajax_vault_disconnect() {
+	public function ajax_vault_disconnect($echo_results = true) {
 		$vault_settings = UpdraftPlus_Options::get_updraft_option('updraft_updraftvault');
 		UpdraftPlus_Options::update_updraft_option('updraft_updraftvault', array());
 		global $updraftplus;
@@ -441,7 +451,11 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 		delete_transient('udvault_last_config');
 		delete_transient('updraftvault_quota_text');
 
-		$updraftplus->close_browser_connection(json_encode(array('disconnected' => 1, 'html' => $this->connected_html())));
+		$response = array('disconnected' => 1, 'html' => $this->connected_html());
+		
+		if ($echo_results) {
+			$updraftplus->close_browser_connection(json_encode($response));
+		}
 
 		// If $_POST['reset_hash'] is set, then we were alerted by updraftplus.com - no need to notify back
 		if (is_array($vault_settings) && isset($vault_settings['email']) && empty($_POST['reset_hash'])) {
@@ -460,11 +474,17 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 				'body' => $post_body,
 			));
 		}
+		
+		return $response;
+		
 	}
 
 	// This is called from the UD admin object
-	public function ajax_vault_connect() {
-		$connect = $this->vault_connect($_REQUEST['email'], $_REQUEST['pass']);
+	public function ajax_vault_connect($echo_results = true, $use_credentials = false) {
+	
+		if (empty($use_credentials)) $use_credentials = $_REQUEST;
+	
+		$connect = $this->vault_connect($use_credentials['email'], $use_credentials['pass']);
 		if (true === $connect) {
 			$response = array('connected' => true, 'html' => $this->connected_html(false));
 		} else {
@@ -476,8 +496,13 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 				$response['code'] = $connect->get_error_code();
 				$response['data'] = serialize($connect->get_error_data());
 			}
-		} 
-		echo json_encode($response);
+		}
+		
+		if ($echo_results) {
+			echo json_encode($response);
+		} else {
+			return $response;
+		}
 	}
 
 	// Returns either true (in which case the Vault token will be stored), or false|WP_Error

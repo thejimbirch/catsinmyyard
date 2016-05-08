@@ -145,7 +145,7 @@ class UpdraftPlus_Semaphore {
 			return true;
 		}
 
-		$updraftplus->log('Semaphore ('.$this->lock_name.') still locked');
+		$updraftplus->log('Semaphore ('.$this->lock_name.') still locked ('.$result.')');
 		return false;
 	}
 

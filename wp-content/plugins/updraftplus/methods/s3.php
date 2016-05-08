@@ -267,7 +267,7 @@ class UpdraftPlus_BackupModule_s3 {
 		$region = ($config['key'] == 's3' || $config['key'] == 'updraftvault') ? @$s3->getBucketLocation($bucket_name) : 'n/a';
 
 		// See if we can detect the region (which implies the bucket exists and is ours), or if not create it
-		if (!empty($region) || @$s3->putBucket($bucket_name, 'private') || ('s3' == $config['key'] && false !== ($s3 = $this->use_dns_bucket_name($s3, $bucket_name)) && false !== @$s3->getBucket($bucket_name, null, null, 1))) {
+		if (!empty($region) || @$s3->putBucket($bucket_name, 'private') || ('s3' == $config['key'] && false !== ($s3 = $this->use_dns_bucket_name($s3, $bucket_name)) && false !== @$s3->getBucket($bucket_name, $bucket_path, null, 1))) {
 			if (empty($region) && ($config['key'] == 's3' || $config['key'] == 'updraftvault')) $region = $s3->getBucketLocation($bucket_name);
 			if (!empty($region)) $this->set_region($s3, $region, $bucket_name);
 
@@ -275,8 +275,8 @@ class UpdraftPlus_BackupModule_s3 {
 
 			foreach ($backup_array as $key => $file) {
 
-				// We upload in 5Mb chunks to allow more efficient resuming and hence uploading of larger files
-				// N.B.: 5Mb is Amazon's minimum. So don't go lower or you'll break it.
+				// We upload in 5MB chunks to allow more efficient resuming and hence uploading of larger files
+				// N.B.: 5MB is Amazon's minimum. So don't go lower or you'll break it.
 				$fullpath = $updraft_dir.$file;
 				$orig_file_size = filesize($fullpath);
 
@@ -291,13 +291,13 @@ class UpdraftPlus_BackupModule_s3 {
 							continue;
 						} else {
 							// We don't need to log this always - the s3_out_of_quota method will do its own logging
-							$updraftplus->log("$whoweare: Quota is available: used=$quota_used (".round($quota_used/1048576, 1)." Mb), total=".$config['quota']." (".round($config['quota']/1048576, 1)." Mb), needed=$orig_file_size (".round($orig_file_size/1048576, 1)." Mb)");
+							$updraftplus->log("$whoweare: Quota is available: used=$quota_used (".round($quota_used/1048576, 1)." MB), total=".$config['quota']." (".round($config['quota']/1048576, 1)." MB), needed=$orig_file_size (".round($orig_file_size/1048576, 1)." MB)");
 						}
 					}
 				}
 
 				$chunks = floor($orig_file_size / 5242880);
-				// There will be a remnant unless the file size was exactly on a 5Mb boundary
+				// There will be a remnant unless the file size was exactly on a 5MB boundary
 				if ($orig_file_size % 5242880 > 0) $chunks++;
 				$hash = md5($file);
 
@@ -317,7 +317,7 @@ class UpdraftPlus_BackupModule_s3 {
 							if (method_exists($this, 's3_record_quota_info')) $this->s3_record_quota_info($this->quota_used, $config['quota']);
 							$extra_log = '';
 							if (method_exists($this, 's3_get_quota_info')) {
-								$extra_log = ', quota used now: '.round($this->quota_used / 1048576, 1).' Mb';
+								$extra_log = ', quota used now: '.round($this->quota_used / 1048576, 1).' MB';
 							}
 							$updraftplus->log("$whoweare regular upload: success$extra_log");
 							$updraftplus->uploaded_file($file);
@@ -414,12 +414,30 @@ class UpdraftPlus_BackupModule_s3 {
 
 	public function listfiles($match = 'backup_') {
 
-		global $updraftplus;
-
 		$config = $this->get_config();
+
+		return $this->listfiles_with_path($config['path'], $match);
+		
+	}
+	
+	// The purpose of splitting this into a separate method, is to also allow listing with a different path
+	public function listfiles_with_path($path, $match = 'backup_') {
+		
+		$bucket_name = untrailingslashit($path);
+		$bucket_path = '';
+
+		if (preg_match("#^([^/]+)/(.*)$#", $bucket_name, $bmatches)) {
+			$bucket_name = $bmatches[1];
+			$bucket_path = trailingslashit($bmatches[2]);
+		}
+		
+		$config = $this->get_config();
+		
+		global $updraftplus;
+		
 		$whoweare = $config['whoweare'];
 		$whoweare_key = $config['key'];
-		$sse = (empty($config['server_side_encryption'])) ? false : true;
+		$sse = empty($config['server_side_encryption']) ? false : true;
 
 		$s3 = $this->getS3(
 			$config['accesskey'],
@@ -432,15 +450,7 @@ class UpdraftPlus_BackupModule_s3 {
 
 		if (is_wp_error($s3)) return $s3;
 		if (!is_a($s3, 'UpdraftPlus_S3') && !is_a($s3, 'UpdraftPlus_S3_Compat')) return new WP_Error('no_s3object', 'Failed to gain access to '.$config['whoweare']);
-
-		$bucket_name = untrailingslashit($config['path']);
-		$bucket_path = '';
-
-		if (preg_match("#^([^/]+)/(.*)$#", $bucket_name, $bmatches)) {
-			$bucket_name = $bmatches[1];
-			$bucket_path = trailingslashit($bmatches[2]);
-		}
-
+		
 		if (!empty($config['is_new_bucket'])) {
 			if (method_exists($s3, 'waitForBucket')) {
 				$s3->setExceptions(true);
@@ -456,6 +466,34 @@ class UpdraftPlus_BackupModule_s3 {
 			} else {
 				sleep(4);
 			}
+		} elseif (!empty($config['is_new_user'])) {
+			// A crude waiter, because the AWS toolkit does not have one for IAM propagation - basically, loop around a few times whilst the access attempt still fails
+			$attempt_flag = 0;
+			while ($attempt_flag < 5) {
+
+				$attempt_flag++;
+				if (@$s3->getBucketLocation($bucket_name)) {
+					$attempt_flag = 100;
+				} else {
+
+					sleep($attempt_flag*1.5 + 1);
+					
+					// Get the bucket object again... because, for some reason, the AWS PHP SDK (at least on the current version we're using, March 2016) calculates an incorrect signature on subsequent attempts
+					$this->s3_object = null;
+					$s3 = $this->getS3(
+						$config['accesskey'],
+						$config['secretkey'],
+						UpdraftPlus_Options::get_updraft_option('updraft_ssl_useservercerts'), UpdraftPlus_Options::get_updraft_option('updraft_ssl_disableverify'),
+						UpdraftPlus_Options::get_updraft_option('updraft_ssl_nossl'),
+						null,
+						$sse
+					);
+
+					if (is_wp_error($s3)) return $s3;
+					if (!is_a($s3, 'UpdraftPlus_S3') && !is_a($s3, 'UpdraftPlus_S3_Compat')) return new WP_Error('no_s3object', 'Failed to gain access to '.$config['whoweare']);
+					
+				}
+			}
 		}
 
 		$region = ($config['key'] == 'dreamobjects' || $config['key'] == 's3generic') ? 'n/a' : @$s3->getBucketLocation($bucket_name);
@@ -464,12 +502,11 @@ class UpdraftPlus_BackupModule_s3 {
 		} else {
 			# Final thing to attempt - see if it was just the location request that failed
 			$s3 = $this->use_dns_bucket_name($s3, $bucket_name);
-			if (false === ($gb = @$s3->getBucket($bucket_name, null, null, 1))) {
+			if (false === ($gb = @$s3->getBucket($bucket_name, $bucket_path, null, 1))) {
 				$updraftplus->log("$whoweare Error: Failed to access bucket $bucket_name. Check your permissions and credentials.");
 				return new WP_Error('bucket_not_accessed', sprintf(__('%s Error: Failed to access bucket %s. Check your permissions and credentials.','updraftplus'),$whoweare, $bucket_name));
 			}
 		}
-
 		$bucket = $s3->getBucket($bucket_name, $bucket_path.$match);
 
 		if (!is_array($bucket)) return array();
@@ -528,6 +565,8 @@ class UpdraftPlus_BackupModule_s3 {
 			if (preg_match("#^([^/]+)/(.*)$#",$bucket_name,$bmatches)) {
 				$bucket_name = $bmatches[1];
 				$bucket_path = $bmatches[2]."/";
+			} else {
+				$bucket_path = '';
 			}
 
 			$region = ($config['key'] == 'dreamobjects' || $config['key'] == 's3generic') ? 'n/a' : @$s3->getBucketLocation($bucket_name);
@@ -536,7 +575,7 @@ class UpdraftPlus_BackupModule_s3 {
 			} else {
 				# Final thing to attempt - see if it was just the location request that failed
 				$s3 = $this->use_dns_bucket_name($s3, $bucket_name);
-				if (false === ($gb = @$s3->getBucket($bucket_name, null, null, 1))) {
+				if (false === ($gb = @$s3->getBucket($bucket_name, $bucket_path, null, 1))) {
 					$updraftplus->log("$whoweare Error: Failed to access bucket $bucket_name. Check your permissions and credentials.");
 					$updraftplus->log(sprintf(__('%s Error: Failed to access bucket %s. Check your permissions and credentials.','updraftplus'),$whoweare, $bucket_name), 'error');
 					return false;
@@ -609,7 +648,7 @@ class UpdraftPlus_BackupModule_s3 {
 		if (empty($region) && 's3' == $config['key']) {
 			# Final thing to attempt - see if it was just the location request that failed
 			$s3 = $this->use_dns_bucket_name($s3, $bucket_name);
-			if (false !== ($gb = @$s3->getBucket($bucket_name, null, null, 1))) {
+			if (false !== ($gb = @$s3->getBucket($bucket_name, $bucket_path, null, 1))) {
 				$keep_going = true;
 			}
 		}
@@ -811,7 +850,7 @@ class UpdraftPlus_BackupModule_s3 {
 		# Feb 2015: after we moved to the new SDK which didn't support this, two more reports came in
 		if (!isset($bucket_exists) && 's3' == $config['key']) {
 			$s3 = $this->use_dns_bucket_name($s3, $bucket, true);
-			$gb = @$s3->getBucket($bucket, null, null, 1);
+			$gb = @$s3->getBucket($bucket, $path, null, 1);
 			if ($gb !== false) {
 				$bucket_exists = true;
 				$location = '';

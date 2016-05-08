@@ -59,7 +59,7 @@ if (!class_exists('UpdraftPlus_Remote_Communications')):
 class UpdraftPlus_Remote_Communications {
 
 	// Version numbers relate to versions of this PHP library only (i.e. it's not a protocol support number, and version numbers of other compatible libraries (e.g. JavaScript) are not comparable)
-	public $version = '1.3';
+	public $version = '1.4.3';
 
 	private $key_name_indicator;
 
@@ -86,9 +86,17 @@ class UpdraftPlus_Remote_Communications {
 	
 	private $allow_cors_from = array();
 	
+	private $http_transport = null;
+	
 	// Default protocol version - this can be over-ridden with set_message_format
 	// Protocol version 1 (which uses only one RSA key-pair, instead of two) is legacy/deprecated
 	private $format = 2;
+	
+	private $http_credentials = array();
+	
+	private $incoming_message = null;
+	
+	private $message_random_number = null;
 	
 	public function __construct($key_name_indicator = 'default', $can_generate = false) {
 		$this->set_key_name_indicator($key_name_indicator);
@@ -114,6 +122,11 @@ class UpdraftPlus_Remote_Communications {
 	// This will cause more things to be sent to $this->log()
 	public function set_debug($debug = true) {
 		$this->debug = (bool)$debug;
+	}
+	
+	// Supported values: a Guzzle object, or, if not, then WP's HTTP API function siwll be used
+	public function set_http_transport($transport) {
+		$this->http_transport = $transport;
 	}
 	
 	// Sequence protection and replay protection perform similar functions, and using both is often over-kill; the distinction is that sequence protection can be used without needing to do database writes on the sending side (e.g. use the value of time() as the sequence number).
@@ -167,6 +180,10 @@ class UpdraftPlus_Remote_Communications {
 
 	public function set_destination_url($destination_url) {
 		$this->destination_url = $destination_url;
+	}
+
+	public function get_destination_url() {
+		return $this->destination_url;
 	}
 
 	public function set_option_name($key_option_name) {
@@ -260,12 +277,12 @@ class UpdraftPlus_Remote_Communications {
 		if ($this->key_option_name) update_site_option($this->key_option_name, $this->key_local);
 	}
 
-	public function generate_new_keypair() {
+	public function generate_new_keypair($key_size = 2048) {
 
 		$this->ensure_crypto_loaded();
 
 		$rsa = new Crypt_RSA();
-		$keys = $rsa->createKey(2048);
+		$keys = $rsa->createKey($key_size);
 
 		if (empty($keys['privatekey'])) {
 			$this->set_key_local(false);
@@ -430,13 +447,19 @@ class UpdraftPlus_Remote_Communications {
 		$send_array['key_name'] = $this->key_name_indicator;
 
 		// This random element means that if the site needs to send two identical commands or responses in the same second, then it can, and still use replay protection
-		$send_array['rand'] = rand(0, PHP_INT_MAX);
+		// The value of PHP_INT_MAX on a 32-bit platform
+		$this->message_random_number = rand(1, 2147483647);
+		$send_array['rand'] = $this->message_random_number;
 		
 		if ($this->next_send_sequence_id) {
 			$send_array['sequence_id'] = $this->next_send_sequence_id;
 			$this->next_send_sequence_id++;
 		}
 
+		if ($is_response && !empty($this->incoming_message) && isset($this->incoming_message['rand'])) {
+			$send_array['incoming_rand'] = $this->incoming_message['rand'];
+		}
+		
 		if (null !== $data) $send_array['data'] = $data;
 		$send_data = $this->encrypt_message(json_encode($send_array), $use_key_remote);
 
@@ -450,7 +473,7 @@ class UpdraftPlus_Remote_Communications {
 			$signature = $this->signature_for_message($send_data, $use_key_local);
 			$message['signature'] = $signature;
 		}
-		
+
 		return $message;
 
 	}
@@ -465,25 +488,140 @@ class UpdraftPlus_Remote_Communications {
 		$this->next_send_sequence_id = $id;
 	}
 
+	// $credentials should be an array with entries for 'username' and 'password'
+	public function set_http_credentials($credentials) {
+		$this->http_credentials = $credentials;
+	}
+	
+	// This needs only to return an array with keys body and response - where response is also an array, with key 'code' (the HTTP status code)
+	// The $post_options array support these keys: timeout, body,
+	// Public, to allow short-circuiting of the library's own encoding/decoding (e.g. for acting as a proxy for a message already encrypted elsewhere)
+	public function http_post($post_options) {
+	
+		@include(ABSPATH.WPINC.'/version.php');
+		$http_credentials = $this->http_credentials;
+
+		if (is_a($this->http_transport, 'GuzzleHttp\Client')) {
+			
+			// https://guzzle.readthedocs.org/en/5.3/clients.html
+			
+			$client = $this->http_transport;
+			
+			$guzzle_options = array(
+				'body' => $post_options['body'],
+				'headers' => array(
+					'User-Agent' => 'WordPress/' . $wp_version . '; class-udrpc.php-Guzzle/'.$this->version.'; ' . get_bloginfo( 'url' ),
+				),
+				'exceptions' => false,
+				'timeout' => $post_options['timeout']
+			);
+			
+			if (!class_exists('WP_HTTP_Proxy')) require_once(ABSPATH.WPINC.'/class-http.php');
+			$proxy = new WP_HTTP_Proxy();
+			if ($proxy->is_enabled()) {
+				$user = $proxy->username();
+				$pass = $proxy->password();
+				$host = $proxy->host();
+				$port = (int)$proxy->port();
+				if (empty($port)) $port = 8080;
+				if (!empty($host) && $proxy->send_through_proxy($this->destination_url)) {
+					$proxy_auth = '';
+					if (!empty($user)) {
+						$proxy_auth = $user;
+						if (!empty($pass)) $proxy_auth .= ':'.$pass;
+						$proxy_auth .= '@';
+					}
+					$guzzle_options['proxy'] = array(
+						'http' => "http://${proxy_auth}$host:$port",
+						'https' => "http://${proxy_auth}$host:$port",
+					);
+				}
+			}
+			
+			if (defined('UDRPC_GUZZLE_SSL_VERIFY')) {
+				$verify = UDRPC_GUZZLE_SSL_VERIFY;
+			} elseif (file_exists(ABSPATH.WPINC.'/certificates/ca-bundle.crt')) {
+				$verify = ABSPATH.WPINC.'/certificates/ca-bundle.crt';
+			} else {
+				$verify = true;
+			}
+			$guzzle_options['verify'] = apply_filters('udrpc_guzzle_verify', $verify);
+			
+			if (!empty($http_credentials['username'])) {
+			
+				$authentication_method = empty($http_credentials['authentication_method']) ? 'basic' : $http_credentials['authentication_method'];
+			
+				$password = empty($http_credentials['password']) ? '' : $http_credentials['password'];
+				
+				$guzzle_options['auth'] = array(
+					$http_credentials['username'],
+					$password,
+					$authentication_method
+				);
+				
+			}
+			
+			$response = $client->post($this->destination_url, apply_filters('udrpc_guzzle_options', $guzzle_options, $this));
+			
+			$formatted_response = array(
+				'response' => array(
+					'code' => $response->getStatusCode(),
+				),
+				'body' => $response->getBody(),
+			);
+			
+			return $formatted_response;
+			
+		} else {
+			
+			$post_options['user-agent'] = 'WordPress/' . $wp_version . '; class-udrpc.php/'.$this->version.'; ' . get_bloginfo( 'url' );
+			
+			if (!empty($http_credentials['username'])) {
+			
+				$authentication_type = empty($http_credentials['authentication_type']) ? 'basic' : $http_credentials['authentication_type'];
+				
+				if ('basic' != $authentication_type) {
+					return new WP_Error('unsupported_http_authentication_type', 'Only HTTP basic authentication is supported (for other types, use Guzzle)');
+				}
+			
+				$password = empty($http_credentials['password']) ? '' : $http_credentials['password'];
+				$post_options['headers'] = array(
+					'Authorization' => 'Basic '.base64_encode($http_credentials['username'].':'.$password)
+				);
+			}
+			
+			return wp_remote_post(
+				$this->destination_url,
+				$post_options
+			);
+		}
+	}
+	
 	public function send_message($command, $data = null, $timeout = 20) {
 
 		if (empty($this->destination_url)) return new WP_Error('not_initialised', 'RPC error: URL not initialised');
 
 		$message = $this->create_message($command, $data);
 
-		$post = wp_remote_post(
-			$this->destination_url,
-			array(
-				'timeout' => $timeout,
-				'body' => $message
-			)
+		$post_options = array(
+			'timeout' => $timeout,
+			'body' => $message,
 		);
-
+		
+		$post_options = apply_filters('udrpc_post_options', $post_options, $command, $data, $timeout, $this);
+		
+		try {
+			$post = $this->http_post($post_options);
+		} catch (Exception $e) {
+			// Curl can return an error code 0, which causes WP_Error to return early, without recording the message. So, we prefix the code.
+			return new WP_Error('http_post_'.$e->getCode(), $e->getMessage());
+		}
+		
 		if (is_wp_error($post)) return $post;
 
 		if (empty($post['response']) || empty($post['response']['code'])) return new WP_Error('empty_http_code', 'Unexpected HTTP response code');
 
-		if ($post['response']['code'] < 200 || $post['response']['code'] >= 300) return new WP_Error('unexpected_http_code', 'Unexpected HTTP response code ('.$post['response']['code'].')', $post['response']['code']);
+		if ($post['response']['code'] < 200 || $post['response']['code'] >= 300) return new WP_Error('unexpected_http_code', 'Unexpected HTTP response code ('.$post['response']['code'].')', $post);
 
 		if (empty($post['body'])) return new WP_Error('empty_response', 'Empty response from remote site');
 
@@ -537,6 +675,20 @@ class UpdraftPlus_Remote_Communications {
 				'maximum_difference' => $this->maximum_replay_time_difference
 			)
 		);
+		
+		if (isset($json_decoded['incoming_rand']) && !empty($this->message_random_number) && $json_decoded['incoming_rand'] != $this->message_random_number) {
+			$this->log("UDRPC: Message mismatch (possibly MITM) (sent_rand="+$this->message_random_number+", returned_rand=".$json_decoded['incoming_rand']."): dropping", 'error');
+			
+			return array(
+				'response' => 'rpcerror',
+				'data' => array(
+					'code' => 'message_mismatch_error',
+					'ours' => $this->message_random_number,
+					'returned' => $json_decoded['incoming_rand']
+				)
+			);
+			
+		}
 
 		// Should be an array with keys including 'response' and (if relevant) 'data'
 		return $json_decoded;
@@ -564,15 +716,26 @@ class UpdraftPlus_Remote_Communications {
 	}
 
 	public function wp_loaded() {
+
+		/*
+		// What if something else already set some response headers?
+		if (function_exists('apache_response_headers')) {
+			$apache_response_headers = apache_response_headers();
+			// Do something...
+		}
+		*/
+	
 		// CORS: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
 		// get_http_origin() : since WP 3.4
 		$http_origin = function_exists('get_http_origin') ? get_http_origin() : (empty($_SERVER['HTTP_ORIGIN']) ? '' : $_SERVER['HTTP_ORIGIN']);
 		if (!empty($_SERVER['REQUEST_METHOD']) && 'OPTIONS' == $_SERVER['REQUEST_METHOD'] && $http_origin) {
 			if (in_array($http_origin, $this->allow_cors_from)) {
-				header("Access-Control-Allow-Origin: $http_origin");
-				header("Access-Control-Allow-Credentials: true");
-				if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) header('Access-Control-Allow-Methods: POST, OPTIONS');
-				if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) header('Access-Control-Allow-Headers: '.$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']);
+				if (!@constant('UDRPC_DO_NOT_SEND_CORS_HEADERS')) {
+					header("Access-Control-Allow-Origin: $http_origin");
+					header("Access-Control-Allow-Credentials: true");
+					if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) header('Access-Control-Allow-Methods: POST, OPTIONS');
+					if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) header('Access-Control-Allow-Headers: '.$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']);
+				}
 				die;
 			} elseif ($this->debug) {
 				$this->log("Non-allowed CORS from: ".$http_origin);
@@ -727,11 +890,13 @@ class UpdraftPlus_Remote_Communications {
 			$wpdb->query($sql);
 			
 		}
+		
+		$this->incoming_message = $udrpc_message;
 
 		$command = (string)$udrpc_message['command'];
 		$data = empty($udrpc_message['data']) ? null : $udrpc_message['data'];
 
-		if ($http_origin) {
+		if ($http_origin && !empty($udrpc_message['cors_headers_wanted']) && !@constant('UDRPC_DO_NOT_SEND_CORS_HEADERS')) {
 			header("Access-Control-Allow-Origin: $http_origin");
 			header("Access-Control-Allow-Credentials: true");
 		}

@@ -14,7 +14,7 @@ class UpdraftPlus_Backup {
 	public $zipfiles_dirbatched;
 	public $zipfiles_batched;
 	public $zipfiles_skipped_notaltered;
-	private $zip_split_every = 419430400; # 400Mb
+	private $zip_split_every = 419430400; # 400MB
 	private $zip_last_ratio = 1;
 	private $whichone;
 	private $zip_basename = '';
@@ -95,7 +95,7 @@ class UpdraftPlus_Backup {
 				if (is_string($meminfo) && preg_match('/MemTotal:\s+(\d+) kB/', $meminfo, $matches)) {
 					$memory_mb = $matches[1]/1024;
 					# If the report is of a large amount, then we're probably getting the total memory on the hypervisor (this has been observed), and don't really know the VPS's memory
-					$vz_log = "OpenVZ; reported memory: ".round($memory_mb, 1)." Mb";
+					$vz_log = "OpenVZ; reported memory: ".round($memory_mb, 1)." MB";
 					if ($memory_mb < 1024 || $memory_mb > 8192) {
 						$openvz_lowmem = true;
 						$vz_log .= " (will not use BinZip)";
@@ -141,7 +141,7 @@ class UpdraftPlus_Backup {
 
 		$this->zip_split_every = max((int)$updraftplus->jobdata_get('split_every'), UPDRAFTPLUS_SPLIT_MIN)*1048576;
 
-		if ('others' != $whichone) $updraftplus->log("Beginning creation of dump of $whichone (split every: ".round($this->zip_split_every/1048576,1)." Mb)");
+		if ('others' != $whichone) $updraftplus->log("Beginning creation of dump of $whichone (split every: ".round($this->zip_split_every/1048576,1)." MB)");
 
 		if (is_string($create_from_dir) && !file_exists($create_from_dir)) {
 			$flag_error = true;
@@ -243,7 +243,7 @@ class UpdraftPlus_Backup {
 					$timetaken = max(microtime(true)-$this->zip_microtime_start, 0.000001);
 					$kbsize = filesize($full_path)/1024;
 					$rate = round($kbsize/$timetaken, 1);
-					$updraftplus->log("Created $whichone zip (".$this->index.") - ".round($kbsize,1)." Kb in ".round($timetaken,1)." s ($rate Kb/s) (SHA1 checksum: $sha)");
+					$updraftplus->log("Created $whichone zip (".$this->index.") - ".round($kbsize,1)." KB in ".round($timetaken,1)." s ($rate KB/s) (SHA1 checksum: $sha)");
 					// We can now remove any left-over temporary files from this job
 				}
 			} elseif ($this->index > $original_index) {
@@ -310,6 +310,9 @@ class UpdraftPlus_Backup {
 
 		$services = $updraftplus->just_one($updraftplus->jobdata_get('service'));
 		if (!is_array($services)) $services = array($services);
+
+		// We need to make sure that the loop below actually runs
+		if (empty($services)) $services = array('none');
 
 		$updraftplus->jobdata_set('jobstatus', 'clouduploading');
 
@@ -393,11 +396,6 @@ class UpdraftPlus_Backup {
 
 	private function group_backups($backup_history) {
 		return array(array('sets' => $backup_history, 'process_order' => 'keep_newest'));
-// 		$groups = array();
-// 		foreach ($backup_history as $k => $v) {
-// 			$groups[] = array('sets' => array($k => $v));
-// 		}
-// 		return $groups;
 	}
 	
 	// $services *must* be an array
@@ -640,7 +638,7 @@ class UpdraftPlus_Backup {
 					
 						// This should only be able to happen if you import backups with a future timestamp
 						if ($nonce == $updraftplus->nonce) {
-							$updraftplus->log("This backup set is the backup set just made, so will not be deleted, despite being over the retain limit.");
+							$updraftplus->log("This backup set is the backup set just made, so will not be deleted.");
 							$file_entities_backups_found[$entity]++;
 							continue;
 						}
@@ -792,6 +790,11 @@ class UpdraftPlus_Backup {
 	private function prune_file($service, $dofiles, $method_object = null, $object_passback = null, $file_sizes = array()) {
 		global $updraftplus;
 		if (!is_array($dofiles)) $dofiles=array($dofiles);
+		
+		if (!apply_filters('updraftplus_prune_file', true, $dofiles, $service, $method_object, $object_passback, $file_sizes)) {
+			$updraftplus->log("Prune: service=$service: skipped via filter");
+		}
+		
 		foreach ($dofiles as $i => $dofile) {
 			if (empty($dofile)) continue;
 			$updraftplus->log("Delete file: $dofile, service=$service");
@@ -934,7 +937,7 @@ class UpdraftPlus_Backup {
 		foreach ($this->attachments as $ind => $attach) {
 			if ($attach == $updraftplus->logfile_name && filesize($attach) > 6*1048576) {
 				
-				$updraftplus->log("Log file is large (".round(filesize($attach)/1024, 1)." Kb): will compress before e-mailing");
+				$updraftplus->log("Log file is large (".round(filesize($attach)/1024, 1)." KB): will compress before e-mailing");
 
 				if (!$handle = fopen($attach, "r")) {
 					$updraftplus->log("Error: Failed to open log file for reading: ".$attach);
@@ -960,7 +963,7 @@ class UpdraftPlus_Backup {
 			if (false === apply_filters('updraft_report_sendto', true, $mailto, $error_count, count($warnings), $ind)) continue;
 
 			foreach (explode(',', $mailto) as $sendmail_addr) {
-				$updraftplus->log("Sending email ('$backup_contains') report (attachments: ".count($attachments).", size: ".round($attach_size/1024, 1)." Kb) to: ".substr($sendmail_addr, 0, 5)."...");
+				$updraftplus->log("Sending email ('$backup_contains') report (attachments: ".count($attachments).", size: ".round($attach_size/1024, 1)." KB) to: ".substr($sendmail_addr, 0, 5)."...");
 				try {
 					wp_mail(trim($sendmail_addr), $subject, $body, array("X-UpdraftPlus-Backup-ID: ".$updraftplus->nonce));
 				} catch (Exception $e) {
@@ -1029,7 +1032,7 @@ class UpdraftPlus_Backup {
 		$hosting_bytes_free = $updraftplus->get_hosting_disk_quota_free();
 		if (is_array($hosting_bytes_free)) {
 			$perc = round(100*$hosting_bytes_free[1]/(max($hosting_bytes_free[2], 1)), 1);
-			$updraftplus->log(sprintf('Free disk space in account: %s (%s used)', round($hosting_bytes_free[3]/1048576, 1)." Mb", "$perc %"));
+			$updraftplus->log(sprintf('Free disk space in account: %s (%s used)', round($hosting_bytes_free[3]/1048576, 1)." MB", "$perc %"));
 		}
 	}
 
@@ -1486,7 +1489,7 @@ class UpdraftPlus_Backup {
 
 						$this->close();
 
-						$updraftplus->log("Table $table: finishing file (${table_file_prefix}.gz - ".round(filesize($this->updraft_dir.'/'.$table_file_prefix.'.tmp.gz')/1024,1)." Kb)");
+						$updraftplus->log("Table $table: finishing file (${table_file_prefix}.gz - ".round(filesize($this->updraft_dir.'/'.$table_file_prefix.'.tmp.gz')/1024,1)." KB)");
 
 						rename($this->updraft_dir.'/'.$table_file_prefix.'.tmp.gz', $this->updraft_dir.'/'.$table_file_prefix.'.gz');
 						$updraftplus->something_useful_happened();
@@ -1569,7 +1572,7 @@ class UpdraftPlus_Backup {
 			$this->stow("/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;\n/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;\n/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;\n");
 		}
 
-		$updraftplus->log($file_base.'-db'.$this->whichdb_suffix.'.gz: finished writing out complete database file ('.round(filesize($backup_final_file_name)/1024,1).' Kb)');
+		$updraftplus->log($file_base.'-db'.$this->whichdb_suffix.'.gz: finished writing out complete database file ('.round(filesize($backup_final_file_name)/1024,1).' KB)');
 		if (!$this->close()) {
 			$updraftplus->log('An error occurred whilst closing the final database file');
 			$updraftplus->log(__('An error occurred whilst closing the final database file', 'updraftplus'), 'error');
@@ -1781,7 +1784,7 @@ class UpdraftPlus_Backup {
 						}
 						if ($thisentry) $thisentry .= ",\n ";
 						$thisentry .= '('.implode(', ', $values).')';
-						// Flush every 512Kb
+						// Flush every 512KB
 						if (strlen($thisentry) > 524288) {
 							$this->stow(" \n".$entries.$thisentry.';');
 							$thisentry = "";
@@ -1967,7 +1970,7 @@ class UpdraftPlus_Backup {
 				}
 			} else {
 				$updraftplus->log("$fullpath: unreadable file");
-				$updraftplus->log(sprintf(__("%s: unreadable file - could not be backed up (check the file permissions)", 'updraftplus'), $fullpath), 'warning');
+				$updraftplus->log(sprintf(__("%s: unreadable file - could not be backed up (check the file permissions and ownership)", 'updraftplus'), $fullpath), 'warning');
 			}
 		} elseif (is_dir($fullpath)) {
 			if ($fullpath == $this->updraft_dir_realpath) {
@@ -1981,7 +1984,7 @@ class UpdraftPlus_Backup {
 			if (!isset($this->existing_files[$use_path_when_storing])) $this->zipfiles_dirbatched[] = $use_path_when_storing;
 			if (!$dir_handle = @opendir($fullpath)) {
 				$updraftplus->log("Failed to open directory: $fullpath");
-				$updraftplus->log(sprintf(__("Failed to open directory (check the file permissions): %s",'updraftplus'), $fullpath), 'error');
+				$updraftplus->log(sprintf(__("Failed to open directory (check the file permissions and ownership): %s",'updraftplus'), $fullpath), 'error');
 				return false;
 			}
 
@@ -2217,12 +2220,12 @@ class UpdraftPlus_Backup {
 								min(filesize($examine_zip)-1048576, $this->zip_split_every)
 							);
 							$updraftplus->jobdata_set('split_every', (int)($this->zip_split_every/1048576));
-							$updraftplus->log("No check-in on last two runs; bumping index and reducing zip split to: ".round($this->zip_split_every/1048576, 1)." Mb");
+							$updraftplus->log("No check-in on last two runs; bumping index and reducing zip split to: ".round($this->zip_split_every/1048576, 1)." MB");
 							$do_bump_index = true;
 						}
 						unset($this->try_split);
 					} elseif (filesize($examine_zip) > $this->zip_split_every) {
-						$updraftplus->log(sprintf("Zip size is at/near split limit (%s Mb / %s Mb) - bumping index (from: %d)", filesize($examine_zip), round($this->zip_split_every/1048576, 1), $this->index));
+						$updraftplus->log(sprintf("Zip size is at/near split limit (%s MB / %s MB) - bumping index (from: %d)", filesize($examine_zip), round($this->zip_split_every/1048576, 1), $this->index));
 						$do_bump_index = true;
 					}
 				}
@@ -2424,7 +2427,7 @@ class UpdraftPlus_Backup {
 
 		if (count($this->zipfiles_dirbatched) > 0 || count($this->zipfiles_batched) > 0) {
 
-			$updraftplus->log(sprintf("Total entities for the zip file: %d directories, %d files (%d skipped as non-modified), %s Mb", count($this->zipfiles_dirbatched), count($this->zipfiles_batched), count($this->zipfiles_skipped_notaltered), round($this->makezip_recursive_batchedbytes/1048576,1)));
+			$updraftplus->log(sprintf("Total entities for the zip file: %d directories, %d files (%d skipped as non-modified), %s MB", count($this->zipfiles_dirbatched), count($this->zipfiles_batched), count($this->zipfiles_skipped_notaltered), round($this->makezip_recursive_batchedbytes/1048576,1)));
 
 			// No need to warn if we're going to retry anyway. (And if we get killed, the zip will be rescanned for its contents upon resumption).
 			$warn_on_failures = ($retry_on_error) ? false : true;
@@ -2499,7 +2502,7 @@ class UpdraftPlus_Backup {
 	}
 
 	// Q. Why don't we only open and close the zip file just once?
-	// A. Because apparently PHP doesn't write out until the final close, and it will return an error if anything file has vanished in the meantime. So going directory-by-directory reduces our chances of hitting an error if the filesystem is changing underneath us (which is very possible if dealing with e.g. 1Gb of files)
+	// A. Because apparently PHP doesn't write out until the final close, and it will return an error if anything file has vanished in the meantime. So going directory-by-directory reduces our chances of hitting an error if the filesystem is changing underneath us (which is very possible if dealing with e.g. 1GB of files)
 
 	// We batch up the files, rather than do them one at a time. So we are more efficient than open,one-write,close.
 	// To call into here, the array $this->zipfiles_batched must be populated (keys=paths, values=add-to-zip-as values). It gets reset upon exit from here.
@@ -2525,11 +2528,11 @@ class UpdraftPlus_Backup {
 		$force_allinone = false;
 		if (0 == $this->index && $this->makezip_recursive_batchedbytes < $this->zip_split_every) {
 			# So far, we only have a processor for this for PclZip; but that check can be removed - need to address the below items
-			# TODO: Is this really what we want? Always go all-in-one for < 500Mb???? Should be more conservative? Or, is it always faster to go all-in-one? What about situations where we might want to auto-split because of slowness - check that that is still working.
+			# TODO: Is this really what we want? Always go all-in-one for < 500MB???? Should be more conservative? Or, is it always faster to go all-in-one? What about situations where we might want to auto-split because of slowness - check that that is still working.
 			# TODO: Test this new method for PclZip - are we still getting the performance gains? Test for ZipArchive too.
 			if ('UpdraftPlus_PclZip' == $this->use_zip_object && ($this->makezip_recursive_batchedbytes < 512*1048576 || (defined('UPDRAFTPLUS_PCLZIP_FORCEALLINONE') && UPDRAFTPLUS_PCLZIP_FORCEALLINONE == true && 'UpdraftPlus_PclZip' == $this->use_zip_object))) {
-				$updraftplus->log("Only one archive required (".$this->use_zip_object.") - will attempt to do in single operation (data: ".round($this->makezip_recursive_batchedbytes/1024,1)." Kb, split: ".round($this->zip_split_every/1024, 1)." Kb)");
-// 				$updraftplus->log("PclZip, and only one archive required - will attempt to do in single operation (data: ".round($this->makezip_recursive_batchedbytes/1024,1)." Kb, split: ".round($this->zip_split_every/1024, 1)." Kb)");
+				$updraftplus->log("Only one archive required (".$this->use_zip_object.") - will attempt to do in single operation (data: ".round($this->makezip_recursive_batchedbytes/1024,1)." KB, split: ".round($this->zip_split_every/1024, 1)." KB)");
+// 				$updraftplus->log("PclZip, and only one archive required - will attempt to do in single operation (data: ".round($this->makezip_recursive_batchedbytes/1024,1)." KB, split: ".round($this->zip_split_every/1024, 1)." KB)");
 				$force_allinone = true;
 // 				if(!class_exists('PclZip')) require_once(ABSPATH.'/wp-admin/includes/class-pclzip.php');
 // 				$zip = new PclZip($zipfile);
@@ -2561,7 +2564,7 @@ class UpdraftPlus_Backup {
 			}
 		}
 
-		// 05-Mar-2013 - added a new check on the total data added; it appears that things fall over if too much data is contained in the cumulative total of files that were addFile'd without a close-open cycle; presumably data is being stored in memory. In the case in question, it was a batch of MP3 files of around 100Mb each - 25 of those equals 2.5Gb!
+		// 05-Mar-2013 - added a new check on the total data added; it appears that things fall over if too much data is contained in the cumulative total of files that were addFile'd without a close-open cycle; presumably data is being stored in memory. In the case in question, it was a batch of MP3 files of around 100MB each - 25 of those equals 2.5GB!
 
 		$data_added_since_reopen = 0;
 		# The following array is used only for error reporting if ZipArchive::close fails (since that method itself reports no error messages - we have to track manually what we were attempting to add)
@@ -2625,7 +2628,7 @@ class UpdraftPlus_Backup {
 				- more than 500 files batched (should perhaps intelligently lower this as the zip file gets bigger - not yet needed)
 				*/
 
-				# Add 10% margin. It only really matters when the OS has a file size limit, exceeding which causes failure (e.g. 2Gb on 32-bit)
+				# Add 10% margin. It only really matters when the OS has a file size limit, exceeding which causes failure (e.g. 2GB on 32-bit)
 				# Since we don't test before the file has been created (so that zip_last_ratio has meaningful data), we rely on max_zip_batch being less than zip_split_every - which should always be the case
 				$reaching_split_limit = ( $this->zip_last_ratio > 0 && $original_size>0 && ($original_size + 1.1*$data_added_since_reopen*$this->zip_last_ratio) > $this->zip_split_every) ? true : false;
 
@@ -2636,13 +2639,13 @@ class UpdraftPlus_Backup {
 
 					if ($data_added_since_reopen > $maxzipbatch) {
 						$something_useful_sizetest = true;
-						$updraftplus->log("Adding batch to zip file (".$this->use_zip_object."): over ".round($maxzipbatch/1048576,1)." Mb added on this batch (".round($data_added_since_reopen/1048576,1)." Mb, ".count($this->zipfiles_batched)." files batched, $zipfiles_added_thisbatch (".$this->zipfiles_added_thisrun.") added so far); re-opening (prior size: ".round($original_size/1024,1).' Kb)');
+						$updraftplus->log("Adding batch to zip file (".$this->use_zip_object."): over ".round($maxzipbatch/1048576,1)." MB added on this batch (".round($data_added_since_reopen/1048576,1)." MB, ".count($this->zipfiles_batched)." files batched, $zipfiles_added_thisbatch (".$this->zipfiles_added_thisrun.") added so far); re-opening (prior size: ".round($original_size/1024,1).' KB)');
 					} elseif ($zipfiles_added_thisbatch > UPDRAFTPLUS_MAXBATCHFILES) {
-						$updraftplus->log("Adding batch to zip file (".$this->use_zip_object."): over ".UPDRAFTPLUS_MAXBATCHFILES." files added on this batch (".round($data_added_since_reopen/1048576,1)." Mb, ".count($this->zipfiles_batched)." files batched, $zipfiles_added_thisbatch (".$this->zipfiles_added_thisrun.") added so far); re-opening (prior size: ".round($original_size/1024,1).' Kb)');
+						$updraftplus->log("Adding batch to zip file (".$this->use_zip_object."): over ".UPDRAFTPLUS_MAXBATCHFILES." files added on this batch (".round($data_added_since_reopen/1048576,1)." MB, ".count($this->zipfiles_batched)." files batched, $zipfiles_added_thisbatch (".$this->zipfiles_added_thisrun.") added so far); re-opening (prior size: ".round($original_size/1024,1).' KB)');
 					} elseif (!$reaching_split_limit) {
-						$updraftplus->log("Adding batch to zip file (".$this->use_zip_object."): over 2.0 seconds have passed since the last write (".round($data_added_since_reopen/1048576,1)." Mb, $zipfiles_added_thisbatch (".$this->zipfiles_added_thisrun.") files added so far); re-opening (prior size: ".round($original_size/1024,1).' Kb)');
+						$updraftplus->log("Adding batch to zip file (".$this->use_zip_object."): over 2.0 seconds have passed since the last write (".round($data_added_since_reopen/1048576,1)." MB, $zipfiles_added_thisbatch (".$this->zipfiles_added_thisrun.") files added so far); re-opening (prior size: ".round($original_size/1024,1).' KB)');
 					} else {
-						$updraftplus->log("Adding batch to zip file (".$this->use_zip_object."): possibly approaching split limit (".round($data_added_since_reopen/1048576,1)." Mb, $zipfiles_added_thisbatch (".$this->zipfiles_added_thisrun.") files added so far); last ratio: ".round($this->zip_last_ratio,4)."; re-opening (prior size: ".round($original_size/1024,1).' Kb)');
+						$updraftplus->log("Adding batch to zip file (".$this->use_zip_object."): possibly approaching split limit (".round($data_added_since_reopen/1048576,1)." MB, $zipfiles_added_thisbatch (".$this->zipfiles_added_thisrun.") files added so far); last ratio: ".round($this->zip_last_ratio,4)."; re-opening (prior size: ".round($original_size/1024,1).' KB)');
 					}
 
 					if (!$zip->close()) {
@@ -2688,9 +2691,9 @@ class UpdraftPlus_Backup {
 							// Don't measure speed until after ZipArchive::close()
 							$rate = round($data_added_since_reopen/$time_since_began, 1);
 
-							$updraftplus->log(sprintf("A useful amount of data was added after this amount of zip processing: %s s (normalised: %s s, rate: %s Kb/s)", round($time_since_began, 1), round($normalised_time_since_began, 1), round($rate/1024, 1)));
+							$updraftplus->log(sprintf("A useful amount of data was added after this amount of zip processing: %s s (normalised: %s s, rate: %s KB/s)", round($time_since_began, 1), round($normalised_time_since_began, 1), round($rate/1024, 1)));
 
-							// We want to detect not only that we need to reduce the size of batches, but also the capability to increase them. This is particularly important because of ZipArchive()'s (understandable, given the tendency of PHP processes being terminated without notice) practice of first creating a temporary zip file via copying before acting on that zip file (so the information is atomic). Unfortunately, once the size of the zip file gets over 100Mb, the copy operation beguns to be significant. By the time you've hit 500Mb on many web hosts the copy is the majority of the time taken. So we want to do more in between these copies if possible.
+							// We want to detect not only that we need to reduce the size of batches, but also the capability to increase them. This is particularly important because of ZipArchive()'s (understandable, given the tendency of PHP processes being terminated without notice) practice of first creating a temporary zip file via copying before acting on that zip file (so the information is atomic). Unfortunately, once the size of the zip file gets over 100MB, the copy operation beguns to be significant. By the time you've hit 500MB on many web hosts the copy is the majority of the time taken. So we want to do more in between these copies if possible.
 
 							/* "Could have done more" - detect as:
 							- A batch operation would still leave a "good chunk" of time in a run
@@ -2721,7 +2724,7 @@ class UpdraftPlus_Backup {
 										200*1024*1024
 										);
 									} else {
-										# Maximum of 200Mb in a batch
+										# Maximum of 200MB in a batch
 										$new_maxzipbatch = min( floor($maxzipbatch*6/$normalised_time_since_began),
 										200*1024*1024
 										);
@@ -2783,7 +2786,7 @@ class UpdraftPlus_Backup {
 										$updraftplus->jobdata_set("maxzipbatch", $new_maxzipbatch);
 										$updraftplus->log("We are within a small amount of the expected maximum amount of time available; the zip-writing thresholds will be reduced (time_passed=$time_since_began, normalised_time_passed=$normalised_time_since_began, max_time=$max_time, data points known=$run_times_known, old_max_bytes=$maxzipbatch, new_max_bytes=$new_maxzipbatch)");
 									} else {
-										$updraftplus->log("We are within a small amount of the expected maximum amount of time available, but the zip-writing threshold is already at its lower limit (20Mb), so will not be further reduced (max_time=$max_time, data points known=$run_times_known, max_bytes=$maxzipbatch)");
+										$updraftplus->log("We are within a small amount of the expected maximum amount of time available, but the zip-writing threshold is already at its lower limit (20MB), so will not be further reduced (max_time=$max_time, data points known=$run_times_known, max_bytes=$maxzipbatch)");
 									}
 								}
 
@@ -2809,10 +2812,10 @@ class UpdraftPlus_Backup {
 			$this->zipfiles_added++;
 
 			// Don't call something_useful_happened() here - nothing necessarily happens until close() is called
-			if ($this->zipfiles_added % 100 == 0) $updraftplus->log("Zip: ".basename($zipfile).": ".$this->zipfiles_added." files added (on-disk size: ".round(@filesize($zipfile)/1024,1)." Kb)");
+			if ($this->zipfiles_added % 100 == 0) $updraftplus->log("Zip: ".basename($zipfile).": ".$this->zipfiles_added." files added (on-disk size: ".round(@filesize($zipfile)/1024,1)." KB)");
 
 			if ($bump_index) {
-				$updraftplus->log(sprintf("Zip size is at/near split limit (%s Mb / %s Mb) - bumping index (from: %d)", $bumped_at, round($this->zip_split_every/1048576, 1), $this->index));
+				$updraftplus->log(sprintf("Zip size is at/near split limit (%s MB / %s MB) - bumping index (from: %d)", $bumped_at, round($this->zip_split_every/1048576, 1), $this->index));
 				$bump_index = false;
 				$this->bump_index();
 				$zipfile = $this->zip_basename.($this->index+1).'.zip.tmp';
@@ -2866,7 +2869,7 @@ class UpdraftPlus_Backup {
 			$hosting_bytes_free = $updraftplus->get_hosting_disk_quota_free();
 			if (is_array($hosting_bytes_free)) {
 				$perc = round(100*$hosting_bytes_free[1]/(max($hosting_bytes_free[2], 1)), 1);
-				$quota_free_msg = sprintf('Free disk space in account: %s (%s used)', round($hosting_bytes_free[3]/1048576, 1)." Mb", "$perc %");
+				$quota_free_msg = sprintf('Free disk space in account: %s (%s used)', round($hosting_bytes_free[3]/1048576, 1)." MB", "$perc %");
 				$updraftplus->log($quota_free_msg);
 				if ($hosting_bytes_free[3] < 1048576*50) {
 					$quota_low = true;
@@ -2920,7 +2923,7 @@ class UpdraftPlus_Backup {
 		}
 		$kbsize = filesize($full_path)/1024;
 		$rate = round($kbsize/$timetaken, 1);
-		$updraftplus->log("Created ".$this->whichone." zip (".$this->index.") - ".round($kbsize,1)." Kb in ".round($timetaken,1)." s ($rate Kb/s) (SHA1 checksum: ".$sha.")");
+		$updraftplus->log("Created ".$this->whichone." zip (".$this->index.") - ".round($kbsize,1)." KB in ".round($timetaken,1)." s ($rate KB/s) (SHA1 checksum: ".$sha.")");
 		$this->zip_microtime_start = microtime(true);
 
 		# No need to add $itext here - we can just delete any temporary files for this zip

@@ -105,7 +105,7 @@ class Jetpack_RelatedPosts {
 	}
 
 	/**
-	 * Load related posts assets if it's a elegiable frontend page or execute search and return JSON if it's an endpoint request.
+	 * Load related posts assets if it's a elegiable front end page or execute search and return JSON if it's an endpoint request.
 	 *
 	 * @global $_GET
 	 * @action wp
@@ -231,7 +231,7 @@ EOT;
 	 */
 	public function get_options() {
 		if ( null === $this->_options ) {
-			$this->_options = Jetpack_Options::get_option( 'relatedposts' );
+			$this->_options = Jetpack_Options::get_option( 'relatedposts', array() );
 			if ( ! is_array( $this->_options ) )
 				$this->_options = array();
 			if ( ! isset( $this->_options['enabled'] ) )
@@ -361,6 +361,11 @@ EOT;
 
 		// only dislay the Related Posts JavaScript on the Reading Settings Admin Page
 		$current_screen =  get_current_screen();
+
+		if ( is_null( $current_screen ) ) {
+			return;
+		}
+
 		if( 'options-reading' != $current_screen->id )
 			return;
 
@@ -463,10 +468,10 @@ EOT;
 
 		var update_preview = function() {
 			var html = '';
-			if ( $( 'input[name="jetpack_relatedposts[show_headline]"]:checked' ).size() ) {
+			if ( $( 'input[name="jetpack_relatedposts[show_headline]"]:checked' ).length ) {
 				html += '$related_headline';
 			}
-			if ( $( 'input[name="jetpack_relatedposts[show_thumbnails]"]:checked' ).size() ) {
+			if ( $( 'input[name="jetpack_relatedposts[show_thumbnails]"]:checked' ).length ) {
 				html += '$related_with_images';
 			} else {
 				html += '$related_without_images';
@@ -1009,17 +1014,27 @@ EOT;
 		if ( !empty( $filters ) )
 			$body['filter'] = array( 'and' => $filters );
 
-		// Load all cached values
-		$cache = get_post_meta( $post_id, $cache_meta_key, true );
-		if ( empty( $cache ) )
-			$cache = array();
-
 		// Build cache key
 		$cache_key = md5( serialize( $body ) );
 
-		// Cache is valid! Return cached value.
-		if ( isset( $cache[ $cache_key ] ) && is_array( $cache[ $cache_key ] ) && $cache[ $cache_key ][ 'expires' ] > $now_ts ) {
-			return $cache[ $cache_key ][ 'payload' ];
+		// Load all cached values
+		if ( wp_using_ext_object_cache() ) {
+			$transient_name = "{$cache_meta_key}_{$cache_key}_{$post_id}";
+			$cache = get_transient( $transient_name );
+			if ( false !== $cache ) {
+				return $cache;
+			}
+		} else {
+			$cache = get_post_meta( $post_id, $cache_meta_key, true );
+
+			if ( empty( $cache ) )
+				$cache = array();
+
+
+			// Cache is valid! Return cached value.
+			if ( isset( $cache[ $cache_key ] ) && is_array( $cache[ $cache_key ] ) && $cache[ $cache_key ][ 'expires' ] > $now_ts ) {
+				return $cache[ $cache_key ][ 'payload' ];
+			}
 		}
 
 		$response = wp_remote_post(
@@ -1050,24 +1065,35 @@ EOT;
 			}
 		}
 
-		// Copy all valid cache values
-		$new_cache = array();
-		foreach ( $cache as $k => $v ) {
-			if ( is_array( $v ) && $v[ 'expires' ] > $now_ts ) {
-				$new_cache[ $k ] = $v;
-			}
-		}
-
-		// Set new cache value if valid
-		if ( ! empty( $related_posts ) ) {
-			$new_cache[ $cache_key ] = array(
-				'expires' => 12 * HOUR_IN_SECONDS + $now_ts,
-				'payload' => $related_posts,
-			);
+		// An empty array might indicate no related posts or that posts
+		// are not yet synced to WordPress.com, so we cache for only 1
+		// minute in this case
+		if ( empty( $related_posts ) ) {
+			$cache_ttl = 60;
+		} else {
+			$cache_ttl = 12 * HOUR_IN_SECONDS;
 		}
 
 		// Update cache
-		update_post_meta( $post_id, $cache_meta_key, $new_cache );
+		if ( wp_using_ext_object_cache() ) {
+			set_transient( $transient_name, $related_posts, $cache_ttl );
+		} else {
+			// Copy all valid cache values
+			$new_cache = array();
+			foreach ( $cache as $k => $v ) {
+				if ( is_array( $v ) && $v[ 'expires' ] > $now_ts ) {
+					$new_cache[ $k ] = $v;
+				}
+			}
+
+			// Set new cache value
+			$cache_expires = $cache_ttl + $now_ts;
+			$new_cache[ $cache_key ] = array(
+				'expires' => $cache_expires,
+				'payload' => $related_posts,
+			);
+			update_post_meta( $post_id, $cache_meta_key, $new_cache );
+		}
 
 		return $related_posts;
 	}

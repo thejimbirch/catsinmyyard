@@ -1,11 +1,5 @@
 <?php
-
 /**
- * The file that defines the core plugin class
- *
- * A class definition that includes attributes and functions used across both the
- * public-facing side of the site and the dashboard.
- *
  * @link       https://nextgenthemes.com
  * @since      1.0.0
  *
@@ -14,14 +8,6 @@
  */
 
 /**
- * The core plugin class.
- *
- * This is used to define internationalization, dashboard-specific hooks, and
- * public-facing site hooks.
- *
- * Also maintains the unique identifier of this plugin as well as the current
- * version of the plugin.
- *
  * @since      1.0.0
  * @package    Advanced_Responsive_Video_Embedder
  * @subpackage Advanced_Responsive_Video_Embedder/includes
@@ -29,32 +15,8 @@
  */
 class Advanced_Responsive_Video_Embedder {
 
-	/**
-	 * The loader that's responsible for maintaining and registering all hooks that power
-	 * the plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   protected
-	 * @var      Advanced_Responsive_Video_Embedder_Loader    $loader    Maintains and registers all hooks for the plugin.
-	 */
 	protected $loader;
-
-	/**
-	 * The unique identifier of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   protected
-	 * @var      string    $plugin_slug    The string used to uniquely identify this plugin.
-	 */
 	protected $plugin_slug;
-
-	/**
-	 * The current version of the plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   protected
-	 * @var      string    $version    The current version of the plugin.
-	 */
 	protected $version;
 
 	/**
@@ -69,7 +31,7 @@ class Advanced_Responsive_Video_Embedder {
 	public function __construct() {
 
 		$this->plugin_slug = 'advanced-responsive-video-embedder';
-		$this->version = '7.0.6';
+		$this->version = '7.5.1';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -161,8 +123,6 @@ class Advanced_Responsive_Video_Embedder {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'enqueue_shortcode_ui', $plugin_admin, 'enqueue_shortcode_ui_scripts' );
 
-		$this->loader->add_action( 'admin_footer', $plugin_admin, 'print_dialog' );
-
 		// Add the options page and menu item.
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_plugin_admin_menu' );
 
@@ -178,25 +138,11 @@ class Advanced_Responsive_Video_Embedder {
 
 		$this->loader->add_action( 'wp_dashboard_setup', $plugin_admin, 'add_dashboard_widget' );
 
+		$this->loader->add_action( 'admin_init', $plugin_admin, 'action_admin_init_setup_messages' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings_debug', 99 );
 
 		$this->loader->add_action( 'media_buttons', $plugin_admin, 'add_media_button', 11 );
-
-		$msg = sprintf(
-			__( 'WTF %s', $this->plugin_slug ),
-			'https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/documentation/installing-and-license-management/'
-		);
-		new Advanced_Responsive_Video_Embedder_Admin_Notice_Factory( 'wtf', $msg );
-
-		if( is_file( WP_PLUGIN_DIR . '/arve-pro/arve-pro.php' ) && ( ! defined( 'ARVE_PRO_VERSION' ) || version_compare( ARVE_PRO_VERSION, ARVE_PRO_VERSION_REQUIRED, '<' ) ) ) {
-
-			$msg = sprintf(
-				__( 'Your ARVE Pro Addon is outdated, please <a href="%s">look here</a> for manual updates if your auto-updates do not work or are disabled.', $this->plugin_slug ),
-				'https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/documentation/installing-and-license-management/'
-			);
-			new Advanced_Responsive_Video_Embedder_Admin_Notice_Factory(	'arve-pro-outdated', $msg, false );
-		}
 	}
 
 	/**
@@ -210,18 +156,18 @@ class Advanced_Responsive_Video_Embedder {
 
 		$plugin_public = new Advanced_Responsive_Video_Embedder_Public( $this->get_plugin_slug(), $this->get_version() );
 
-		$this->loader->add_action( 'init', $plugin_public, 'oembed_remove_providers', 99 );
-		$this->loader->add_action( 'init', $plugin_public, 'create_shortcodes', 99 );
-		$this->loader->add_action( 'init', $plugin_public, 'create_url_handlers', 99 );
+		$this->loader->add_action( 'plugins_loaded', $plugin_public, 'oembed_remove_providers', 999 );
+		$this->loader->add_action( 'plugins_loaded', $plugin_public, 'create_shortcodes', 999 );
+		$this->loader->add_action( 'plugins_loaded', $plugin_public, 'create_url_handlers', 999 );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		#$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'register_scripts', 0 );
+		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'register_scripts', 0 );
 
 		$this->loader->add_action( 'wp_head', $plugin_public, 'print_styles' );
 
 		$this->loader->add_action( 'arve_output', $plugin_public, 'normal_output', 10, 2 );
 
-		$this->loader->add_action( 'wp_video_shortcode_override', $plugin_public, 'wp_video_shortcode_override', 10, 4 );
+		#$this->loader->add_action( 'wp_video_shortcode_override', $plugin_public, 'wp_video_shortcode_override', 10, 4 );
 
 		add_filter( 'widget_text', 'do_shortcode' );
 	}

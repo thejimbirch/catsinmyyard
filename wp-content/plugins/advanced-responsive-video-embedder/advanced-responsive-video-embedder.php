@@ -1,50 +1,44 @@
 <?php
-
 /**
- * The plugin bootstrap file
- *
- * This file is read by WordPress to generate the plugin information in the plugin
- * Dashboard. This file also includes all of the dependencies used by the plugin,
- * registers the activation and deactivation functions, and defines a function
- * that starts the plugin.
- *
  * @link              https://nextgenthemes.com
  * @since             3.0.0
  * @package           Advanced_Responsive_Video_Embedder
  *
  * @wordpress-plugin
- * Plugin Name:       Advanced Responsive Video Embedder
+ * Plugin Name:       ARVE Advanced Responsive Video Embedder
  * Plugin URI:        https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/
  * Description:       Easy responsive video embeds via URL (like WordPress) or Shortcodes. Supports almost anything you can imagine.
- * Version:           6.4.1
+ * Version:           7.5.1
  * Author:            Nicolas Jonas
- * Author URI:        http://nico.onl
+ * Author URI:        https://nextgenthemes.com
  * License:           GPL-3.0
- * License URI:       http://www.gnu.org/licenses/gpl-3.0.html
+ * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       advanced-responsive-video-embedder
  * Domain Path:       /languages
+ * GitHub Plugin URI: https://github.com/nextgenthemes/advanced-responsive-video-embedder
+ * GitHub Branch:     beta
  */
-
-// If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+define( 'ARVE_PRO_VERSION_REQUIRED', '2.4.3' );
+
 /**
  * The code that runs during plugin activation.
- * This action is documented in includes/class-advanced-responsive-video-embedder-activator.php
+ * This action is documented in includes/class-arve-activator.php
  */
 function activate_advanced_responsive_video_embedder() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-advanced-responsive-video-embedder-activator.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-arve-activator.php';
 	Advanced_Responsive_Video_Embedder_Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
- * This action is documented in includes/class-advanced-responsive-video-embedder-deactivator.php
+ * This action is documented in includes/class-arve-deactivator.php
  */
 function deactivate_advanced_responsive_video_embedder() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-advanced-responsive-video-embedder-deactivator.php';
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-arve-deactivator.php';
 	Advanced_Responsive_Video_Embedder_Deactivator::deactivate();
 }
 
@@ -55,7 +49,7 @@ register_deactivation_hook( __FILE__, 'deactivate_advanced_responsive_video_embe
  * The core plugin class that is used to define internationalization,
  * dashboard-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-advanced-responsive-video-embedder.php';
+require plugin_dir_path( __FILE__ ) . 'includes/class-arve.php';
 
 /**
  * Begins execution of the plugin.

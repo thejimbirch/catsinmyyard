@@ -2,11 +2,11 @@
 Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: twitter, microblogging, su.pr, bitly, yourls, redirect, shortener, post, links, social, sharing, media, tweet
-Requires at least: 4.1
-Tested up to: 4.5
+Requires at least: 4.2
+Tested up to: 4.6
 License: GPLv2 or later
 Text Domain: wp-to-twitter
-Stable tag: 3.2.7
+Stable tag: 3.2.13
 
 Posts a Twitter update when you update your WordPress blog or add a link, with your chosen URL shortening service.
 
@@ -63,9 +63,39 @@ Translating my plug-ins is always appreciated. Work on WP to Twitter translation
 = Future =
 
 * Use apply_filters( 'wpt_tweet_sentence', $tweet, $post_ID ) to pass custom taxonomy Tweet formats - Pending WordPress support for taxonomy meta.
-* Add regex filter to detect URLs typed into Tweet fields for counting/shortening purposes.
-* 4.2 added compat function for mb_substr; drop mine when I drop support for 4.1
 * WP to Twitter timing bug with images?
+* If first #category# is excluded from Tweet, fetch 2nd category in its place? See #1490
+* Remove @mention capabilities; possibly causing app suspensions from Twitter; see https://support.twitter.com/articles/76915#
+* Test with Visual Composer plug-ins for infinite loops; perhaps need to remove actions while in process?
+
+= 3.2.13 =
+
+* Bug fix: help/config should not be queried if user has not yet authenticated.
+
+= 3.2.12 =
+
+* Bug fix: call help/config to check t.co URL lengths and make sure length used is current value
+* Parse URLs in text and send to URL shortener before Tweeting.
+* Test for WordPress 4.6
+
+= 3.2.11 =
+
+* Two new filters in post meta box
+* Add option to set your own Goo.gl API key for improved shortener reliability
+* Removed my fallback functions for mb_substr and mb_strlen & support for WordPress 4.1
+* Fixed a broken URL
+* Updated sales copy
+
+= 3.2.10 =
+
+* Bug fix: extra closing `p` tag in widget output.
+* Feature: pattern for getting arbitrary author meta: {{meta_field}}
+* Minor security fix: ignored wpnonce verification if nonce not provided in settings admin.
+
+= 3.2.9 =
+
+* Bug fix: extra is_admin call in Freemius implementation
+* Feature: 'Tweet Now' & dynamic scheduling recognizes currently selected users & upload media status (Pro)
 
 = 3.2.8 =
 
@@ -295,4 +325,4 @@ Writing and maintaining a plug-in is a lot of work. You can help me by providing
 
 == Upgrade Notice ==
 
-* 3.2.7: Several important bug fixes; incorporates Freemius opt-in information tracking. 
+* 3.2.10: Minor security fix; recommend updating immediately. 

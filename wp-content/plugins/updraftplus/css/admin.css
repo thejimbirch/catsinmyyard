@@ -328,6 +328,11 @@ a .udp-logo {
 		min-width: 300px;
 		vertical-align: bottom;
 	}
+	
+	#updraft_webdav_host_error {
+		color: red;
+	}
+	
 	.updraftplus-morefiles-row-delete {
 		cursor: pointer;
 		color: red;
@@ -753,17 +758,6 @@ input #backupnow_includefiles_moreoptions {
 .uncompressed-data {
 	clear: left;
 	max-width: 600px;
-}
-
-.immediate-run {
-	clear: left; 
-	padding-top: 20px;
-	max-width: 600px;
-	margin:0;
-}
-
-.debug-table {
-	border: none;
 }
 
 .delete-old-directories {

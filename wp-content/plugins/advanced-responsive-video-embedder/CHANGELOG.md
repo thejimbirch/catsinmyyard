@@ -1,5 +1,139 @@
 ## Changelog ##
 
+### Pro Addon 2.5.1 beta - 2016-09-21 ###
+
+* New: Thumbnail support for Liveleak.
+* Fix: Update loop.
+
+### Pro Addon 2.5.0 beta - 2016-09-21 ###
+
+* Improved: Thumbnails detection.
+* Improved how license keys are handled when set in wp-config.php.
+
+### 7.5.1 beta - 2016-09-21 ###
+
+* Fix: Liveleak seems to require flash for some videos.
+
+### 7.5.0 beta - 2016-09-21 ###
+
+* Fix: Youku URL detection and aspect ratio.
+* Improved: `.arve-inner` css class in favor of some more specific classes combining styles.
+* Improved: removed TGMPA class because it was causing horrible isses.
+
+### Pro Addon 2.4.5 beta - 2016-09-19 ###
+
+* New: Adds the ability to define the pro key in your wp-config.php file with `define( 'ARVE_PRO_KEY', 'your_key_here' )`. When activating the plugin it now also tries to activate its license when a key is defined.
+
+### 7.4.3 beta - 2016-09-19 ###
+
+* Fix: Deal with fluid-vids script messing with this plugin, making videos invisible.
+
+### Pro Addon 2.4.0 beta - 2016-09-18 ###
+
+* New: Adds Yahoo auto thumnail and title support
+
+### 7.4.1 beta - 2016-09-18 ###
+
+* New: Adds Yahoo Video support
+
+### 7.3.2 beta - 2016-09-17 ###
+
+* Fix: Remove security="restricted" from iframes to make IE work again.
+
+### 7.3.1 beta - 2016-09-17 ###
+
+* Fix: Get rid of undefined index warnings when pro addon is not active.
+
+### 7.3.0 beta - 2016-09-17 ###
+
+* Improved: Show admin notices only to users who have the 'activate_plugins' capability.
+* Improved: Added notice to the readme for the TGMPA cause white screen of death issue.
+
+### Pro Addon 2.3.2 - 2016-09-17 ###
+
+* Possible Fix for not centered play button.
+
+### 7.2.13 beta - 2016-09-16 ###
+
+* Fix: Set fitvidsignore class and remove the fitvids container to prevent it from messing with ARVE embeds.
+* Fix: Remove possible width and height paramaeters on iframes to prevent scripts from messing with ARVE embeds.
+
+### 7.2.12 beta - 2016-09-16 ###
+
+* Improved: replaced static:: with self:: to support older php versions.
+
+### 7.2.10 beta - 2016-09-15 ###
+
+* Fix: [iframe] shortcode not working.
+
+### Pro Addon 2.3.1 beta - 2016-09-15 ###
+
+* New: Added support for displaying title of videos on top of the thumbnail images.
+* New: Responsive thumbnails using srcset the browser takes the best image resolution for the users device. (HTML5 srcset)
+* New: Choose between 3 hover styles for the thumbnails: 'zoom image' (new default), 'rectangle move in' (old), or 'none' where only the play button changes.
+* New: Choose beween 2 play button styles.
+* Fix: Screenfull error.
+* Fix: License API call.
+* Improved: Rectangle animation.
+* Improved: Updated 'lity' lightbox script.
+* Improved: Thumbnail handling.
+* Improved: Removed the 'Lazyload Maximal Width' setting to simplify things (there still is 'Maximal Width' and 'Aligned Maximal Width').
+* Improved: Removed the 'Fake Thumbnail' feature because the entire idea was bad and real thumbnails should be used.
+* Improved: Updated EDD_SL_Plugin_Updater Class
+* Dropped PHP Class.
+
+### 7.2.9 beta - 2016-09-15 ###
+
+* New: Recommend and guide to users to install [Shortcake (Shortcode UI)](https://de.wordpress.org/plugins/shortcode-ui/) via [TGMPA](http://tgmpluginactivation.com/)
+* New: Amazing catch-all shortcode [arve url="..."] that can be used for all supported providers and even with any iframe `src` if all unlisted providers that support responsive iframe embeds.
+* New: Support for kla.tv.
+* New: Support for youku (fulfilled request)
+* New: New Advanced Shortcode Dialog with nice UI for choose thumbnails from your WP Media Gallery, very detailed helping texts, display of default settings, hiding of fields based on need ...
+* New: WYSIWYG Preview of Shortcodes.
+* New: The two above features need the [Shortcake (Shortcode UI)](https://de.wordpress.org/plugins/shortcode-ui/) Plugin that is maybe moving into WordPress core later.
+* New: A default alignment can now be set in the Settings page. (fulfilled request)
+* New: 'iframe_name' shortcode parameter for `<iframe name="xxxxx"`, useful when wanting to target ARVE embeds with links. (fulfilled request)
+* New: ARVE is now SEO friendly giving you the ability to add some schema.org microdata. Googles tools should not complain anymore if you add title, description and upload date. (fulfilled request)
+* Deleted Language files in favor of [wordpress.org managed translations](https://translate.wordpress.org/projects/wp-plugins/advanced-responsive-video-embedder/dev) volunteers are welcome ;)
+* Improved: Got rid of PHP globals.
+* Improved: Added image upload dialog to settings page and shortcode dialog.
+* Improved: Better CSS to overwrite unwanted theme styles.
+* Improved: Lots if code improvements.
+* Improved: SSL enabled and forced when supported by provoders.
+* Fix: Blury Vimeo thumbnails
+* Fix: Prevent Dashboard Widget conflicts with WP Helpers plugin (possibly others). Thanks to Steve Bruner.
+* Fix: Issue with unwanted borders showing on embeds.
+* Fix: youtu.be URLs now detected correct in shortcode dialog.
+* Fix: All Vevo URLs are now detected correctly.
+* Fix: Bool options settings.
+* Removed blip because the service was shutdown.
+* Removed myvideo.de because the service was restructured.
+
+### 6.4.0 ###
+
+* Fix: Always prevent scrollbars.
+
+### Pro Addon 1.4.4
+
+* Fixed: Infinite update loop.
+* Improved: Updated Updater class.
+
+### Pro Addon 1.4.3
+
+* Fixed: rectangle overflow issue.
+
+### Pro Addon 1.4.2
+
+* Fixed: license activation problems.
+
+### Pro Addon 1.4.1
+
+* Fixed critical bug for auto updates. Please [click here](https://nextgenthemes.com/support/915/add-wont-update-wordpress-says-download-failed-unauthorized?show=1053#a1053) if your update fails.
+
+### 6.3.9 ###
+
+* Fix: Facebook (now really, hopefully).
+
 ### 6.3.8 ###
 
 * Fix: Facebook in lazyload modes.
@@ -7,10 +141,6 @@
 ### 6.3.7 ###
 
 * New: Facebook video support.
-
-### 6.3.5 ###
-
-* Removed Github updater information that may cause some unwanted updates. You should not run any version higher then current one on wordpress.org unless your adventurous and try beta code.
 
 ### 6.3.4 ###
 
@@ -36,7 +166,7 @@
 
 ### Pro Addon 1.1.5 ###
 
-* New: Added setting and parameter grow="yes/no" to controll the grow-on-click behaviour that was introduced in 6.0 to your liking.
+* New: Added setting and parameter grow="yes/no" to control the grow-on-click behaviour that was introduced in 6.0 to your liking.
 
 ### 6.1.2 ###
 

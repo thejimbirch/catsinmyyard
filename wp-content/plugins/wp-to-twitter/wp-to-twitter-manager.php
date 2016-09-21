@@ -5,12 +5,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	
 function wpt_updated_settings() {
 	wpt_check_version();
-
-	if ( ! empty( $_POST['_wpnonce'] ) ) {
-		$nonce = $_REQUEST['_wpnonce'];
-		if ( ! wp_verify_nonce( $nonce, 'wp-to-twitter-nonce' ) ) {
-			die( "Security check failed" );
-		}
+	
+	if ( empty( $_POST ) ) {
+		return;
+	}
+	
+	$nonce = $_REQUEST['_wpnonce'];
+	if ( ! wp_verify_nonce( $nonce, 'wp-to-twitter-nonce' ) ) {
+		die( "Security check failed" );
 	}
 
 	if ( isset( $_POST['oauth_settings'] ) ) {
@@ -185,6 +187,8 @@ function wpt_update_settings() {
 	<?php $elem = ( version_compare( '4.3', get_option( 'version' ), '>=' ) ) ? 'h1' : 'h2'; ?>
 	<<?php echo $elem; ?>><?php _e( "WP to Twitter Options", 'wp-to-twitter' ); ?></<?php echo $elem; ?>>
 	
+	<?php wpt_max_length(); ?>
+	
 	<div class='nav-tab-wrapper'>
 		<?php wpt_settings_tabs(); ?>
 	</div>
@@ -222,11 +226,12 @@ function wpt_update_settings() {
 								<li><?php _e( 'Publish to unique Twitter accounts for each site author.','wp-to-twitter' ); ?></li>
 								<li><?php _e( 'Schedule up to 3 re-posts of Tweets at an interval of your choice.', 'wp-to-twitter' ); ?></li>
 								<li><?php _e( 'With a delay between publishing and Tweeting, verify your tweets before you share online.', 'wp-to-twitter' ); ?></li>
+								<li><?php _e( 'Automatically your great old posts every few hours, days, or weeks!', 'wp-to-twitter' ); ?></li>
+								<li><?php _e( 'Upload your featured images to Twitter with each Tweet', 'wp-to-twitter' ); ?></li>
+								<li><?php printf( __( 'Take a look at the <a href="%s">complete feature list</a>', 'wp-to-twitter' ), 'http://www.wptweetspro.com/wp-tweets-pro/' ); ?></li>
 							</ul>
 							<p>
-								<?php 
-									_e( "Use WP Tweets PRO to keep traffic coming for every post.", 'wp-to-twitter' ); 
-								?>
+								<strong><?php _e( "Use WP Tweets PRO to keep traffic coming for every post.", 'wp-to-twitter' ); ?></strong>
 							</p>
 							<p class='wpt-button'>
 								<strong class='cta'><a href="http://www.wptweetspro.com/wp-tweets-pro"><?php _e( 'Upgrade to <strong>WP Tweets PRO</strong>!', 'wp-to-twitter' ); ?></a></strong>
@@ -238,7 +243,10 @@ function wpt_update_settings() {
 								<?php _e( 'WP Tweets PRO is packed with features to help you increase engagement with your Twitter followers. Upload images, use Twitter Cards, and automated re-posting of your Tweets are just a few of the features available in the premium add-on to WP to Twitter.', 'wp-to-twitter' ); ?>
 							</p>
 							<p>
-								<?php sprintf( _e( '<a href="%s">Learn more about WP Tweets PRO</a>!', 'wp-to-twitter' ), 'http://www.wptweetspro.com/wp-tweets-pro?campaign=get-wpt' ); ?>
+								<?php printf( __( 'Is there something that WP Tweets PRO <em>doesn\'t already do for you</em>? No problem! Take a look at the extensive <a href="%s">library of plug-in extensions</a> - you can try out or modify any of these code samples to extend and customize WP Tweets PRO.', 'wp-to-twitter' ), 'https://github.com/joedolson/plugin-extensions/tree/master/wp-to-twitter' ); ?>
+							</p>
+							<p>
+								<?php printf( __( '<a href="%s">Learn more about WP Tweets PRO</a>!', 'wp-to-twitter' ), 'http://www.wptweetspro.com/wp-tweets-pro?campaign=get-wpt' ); ?>
 							</p>
 							
 							<p class='wpt-button'>
@@ -432,6 +440,15 @@ function wpt_update_settings() {
 						_e( "<strong>Example:</strong> <code>[[custom_field]]</code>", 'wp-to-twitter' ); 
 					?>
 					</p>
+					<p>
+					<?php 
+						_e( "Create custom shortcodes and access the post author's custom user meta fields by using curly brackets and the name of the custom field.", 'wp-to-twitter' );
+					?>
+					<br />
+					<?php
+						_e( "<strong>Example:</strong> <code>{{user_meta}}</code>", 'wp-to-twitter' ); 
+					?>
+					</p>					
 				</div>
 			</div>
 		</div>	

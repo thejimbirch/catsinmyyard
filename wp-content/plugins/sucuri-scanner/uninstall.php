@@ -3,7 +3,6 @@
  * Uninstallation instructions.
  *
  * @package   Sucuri Security
- * @author    Yorman Arias <yorman.arias@sucuri.net>
  * @author    Daniel Cid   <dcid@sucuri.net>
  * @copyright Since 2010-2015 Sucuri Inc.
  * @license   Released under the GPL - see LICENSE file for details.
@@ -21,7 +20,9 @@ $sucuriscan_option_names = array(
     'account',
     'addr_header',
     'ads_visibility',
+    'api_handler',
     'api_key',
+    'api_protocol',
     'api_service',
     'audit_report',
     'cloudproxy_apikey',
@@ -41,10 +42,12 @@ $sucuriscan_option_names = array(
     'heartbeat_pulse',
     'ignore_scanning',
     'ignored_events',
+    'language',
     'last_email_at',
     'lastlogin_redirection',
     'logs4report',
     'maximum_failed_logins',
+    'notify_available_updates',
     'notify_bruteforce_attack',
     'notify_failed_login',
     'notify_plugin_activated',
@@ -68,6 +71,7 @@ $sucuriscan_option_names = array(
     'notify_widget_added',
     'notify_widget_deleted',
     'parse_errorlogs',
+    'plugin_version',
     'prettify_mails',
     'request_timeout',
     'revproxy',
@@ -82,6 +86,7 @@ $sucuriscan_option_names = array(
     'site_version',
     'sitecheck_counter',
     'sitecheck_scanner',
+    'sitecheck_timeout',
     'use_wpmail',
     'verify_ssl_cert',
     'xhr_monitor',
@@ -103,6 +108,7 @@ if ($sucuriscan_storage_path !== false
     @unlink($sucuriscan_storage_path . '/sucuri-oldfailedlogins.php');
     @unlink($sucuriscan_storage_path . '/sucuri-plugindata.php');
     @unlink($sucuriscan_storage_path . '/sucuri-sitecheck.php');
+    @unlink($sucuriscan_storage_path . '/sucuri-settings.php');
     @unlink($sucuriscan_storage_path . '/sucuri-trustip.php');
 
     @rmdir($sucuriscan_storage_path);

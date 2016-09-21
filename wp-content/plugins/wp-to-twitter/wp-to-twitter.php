@@ -3,7 +3,7 @@
 Plugin Name: WP to Twitter
 Plugin URI: http://www.joedolson.com/wp-to-twitter/
 Description: Posts a Tweet when you update your WordPress blog or post a link, using your URL shortening service. Rich in features for customizing and promoting your Tweets.
-Version: 3.2.8
+Version: 3.2.13
 Author: Joseph Dolson
 Text Domain: wp-to-twitter
 Domain Path: /lang
@@ -44,7 +44,7 @@ require_once( plugin_dir_path( __FILE__ ) . '/wpt-widget.php' );
 require_once( plugin_dir_path( __FILE__ ) . '/wpt-rate-limiting.php' );
 
 global $wpt_version;
-$wpt_version = "3.2.8";
+$wpt_version = "3.2.13";
 
 
 // Create a helper function for easy SDK access.
@@ -93,13 +93,11 @@ function wtt_fs_custom_connect_message(
 	);
 }
 
-// this should only be called when in the admin.
-if ( is_admin() ) {
-	// Init Freemius.
-	wtt_fs();
-	wtt_fs()->add_filter( 'connect_message', 'wtt_fs_custom_connect_message', 10, 6 );
-	wtt_fs()->add_action( 'after_uninstall', 'wtt_fs_uninstall_cleanup' );
-}
+// Init Freemius.
+wtt_fs();
+wtt_fs()->add_filter( 'connect_message', 'wtt_fs_custom_connect_message', 10, 6 );
+wtt_fs()->add_action( 'after_uninstall', 'wtt_fs_uninstall_cleanup' );
+
 
 add_action( 'plugins_loaded', 'wpt_load_textdomain' );
 function wpt_load_textdomain() {
@@ -450,7 +448,7 @@ function jd_doTwitterAPIPost( $twit, $auth = false, $id = false, $media = false 
 
 		if ( wtt_oauth_test( $auth ) && ( $connection = wtt_oauth_connection( $auth ) ) ) {
 			if ( $media && $attachment && !$media_id ) {
-				$media_id  = $connection->media( $upload_api, array( 'auth'=>$auth, 'media'=>$attachment ) );
+				$media_id     = $connection->media( $upload_api, array( 'auth'=>$auth, 'media'=>$attachment ) );
 				wpt_mail( 'Media Uploaded', "$auth, $media_id, $attachment" );
 				if ( $media_id ) {
 					$status['media_ids'] = $media_id;
@@ -792,7 +790,7 @@ function wpt_category_limit( $post_type, $post_info, $post_ID ) {
  * @return integer $post_ID
  */
 function wpt_tweet( $post_ID, $type = 'instant' ) {
-	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE || wp_is_post_revision( $post_ID ) ) {
+	if ( wp_is_post_autosave( $post_ID ) || wp_is_post_revision( $post_ID ) ) {
 		return $post_ID;
 	}
 	
@@ -1209,9 +1207,9 @@ function wpt_add_twitter_inner_box( $post ) {
 		if ( current_user_can( 'wpt_twitter_custom' ) || current_user_can( 'manage_options' ) ) {
 			?>
 			<p class='jtw'>
-				<label
-					for="jtw"><?php _e( "Custom Twitter Post", 'wp-to-twitter', 'wp-to-twitter' ) ?></label><br/><textarea class="wpt_tweet_box" name="_jd_twitter" id="jtw" rows="2"
-					cols="60"><?php echo esc_attr( $tweet ); ?></textarea>
+				<label for="jtw"><?php _e( "Custom Twitter Post", 'wp-to-twitter', 'wp-to-twitter' ) ?></label><br/>
+				<textarea class="wpt_tweet_box" name="_jd_twitter" id="jtw" rows="2" cols="60"><?php echo esc_attr( $tweet ); ?></textarea>
+				<?php echo apply_filters( 'wpt_custom_box', '', $tweet, $post_id ); ?>				
 			</p>
 			<?php
 			$jd_expanded = $jd_template;
@@ -1225,6 +1223,7 @@ function wpt_add_twitter_inner_box( $post ) {
 			<p class='template'>
 				<?php _e( 'Template:', 'wp-to-twitter' ); ?><br />
 				<code><?php echo stripcslashes( $jd_expanded ); ?></code>
+				<?php echo apply_filters( 'wpt_template_block', '', $jd_expanded, $post_id ); ?>
 			</p>
 			<?php
 			echo apply_filters( 'wpt_custom_retweet_fields', '', $post_id );
@@ -1453,8 +1452,8 @@ function wpt_ajax_tweet() {
 		die;
 	}
 	$action       = ( $_REQUEST['tweet_action'] == 'tweet' ) ? 'tweet' : 'schedule';
-	// This isn't used right now, because of time. 
 	$authors      = ( isset( $_REQUEST['tweet_auth'] ) && $_REQUEST['tweet_auth'] != null ) ? $_REQUEST['tweet_auth'] : false;
+	$upload      = ( isset( $_REQUEST['tweet_upload'] ) && $_REQUEST['tweet_upload'] != null ) ? $_REQUEST['tweet_upload'] : 1;
 	$current_user = wp_get_current_user();
 	if ( function_exists( 'wpt_pro_exists' ) && wpt_pro_exists() ) {
 		if ( wtt_oauth_test( $current_user->ID, 'verify' ) ) {
@@ -1467,6 +1466,8 @@ function wpt_ajax_tweet() {
 		$auth    = false;
 		$user_ID = $current_user->ID;
 	}
+	$authors = ( is_array( $authors ) && !empty( $authors ) ) ? $authors : array( $auth );
+	
 	if ( current_user_can( 'wpt_can_tweet' ) ) {
 		$options        = get_option( 'wpt_post_types' );
 		$post_ID        = intval( $_REQUEST['tweet_post_id'] );
@@ -1480,22 +1481,28 @@ function wpt_ajax_tweet() {
 		$print_schedule = date_i18n( get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' ), $schedule );
 		$offset         = ( 60 * 60 * get_option( 'gmt_offset' ) );
 		$schedule       = $schedule - $offset;
-		$media          = wpt_post_with_media( $post_ID, $post_info );
-		switch ( $action ) {
-			case 'tweet' :
-				jd_doTwitterAPIPost( $sentence, $auth, $post_ID, $media );
-				break;
-			case 'schedule' :
-				wp_schedule_single_event( $schedule, 'wpt_schedule_tweet_action', array(
-						'id'       => $auth,
-						'sentence' => $sentence,
-						'rt'       => 0,
-						'post_id'  => $post_ID
-					) );
-				break;
+		$media          = ( $upload == 1 ) ? false: true; // this is correct; the boolean logic is reversed. Blah.
+		
+		foreach( $authors as $auth ) {
+			switch ( $action ) {
+				case 'tweet' :
+					jd_doTwitterAPIPost( $sentence, $auth, $post_ID, $media );
+					break;
+				case 'schedule' :
+					wp_schedule_single_event( $schedule, 'wpt_schedule_tweet_action', array(
+							'id'       => $auth,
+							'sentence' => $sentence,
+							'rt'       => 0,
+							'post_id'  => $post_ID
+						) );
+					break;
+			}
+			$return = ( $action == 'tweet' ) ? wpt_log( 'wpt_status_message', $post_ID ) : sprintf( __( "Tweet scheduled: '%s' for %s", 'wp-tweets-pro' ), $sentence, $print_schedule );
+			echo $return;
+			if ( count( $authors ) > 1 ) {
+				echo "<br />";
+			}
 		}
-		$return = ( $action == 'tweet' ) ? wpt_log( 'wpt_status_message', $post_ID ) : "Tweet scheduled: '$sentence' for $print_schedule";
-		echo $return;
 	} else {
 		echo __( 'You are not authorized to perform this action', 'wp-to-twitter' );
 	}
@@ -1512,7 +1519,7 @@ function wpt_admin_script() {
 		wp_register_style( 'wpt-post-styles', plugins_url( 'css/post-styles.css', __FILE__ ) );
 		wp_enqueue_style( 'wpt-post-styles' );
 		if ( $current_screen->base == 'post' ) {
-			$allowed = 140 - mb_strlen( get_option( 'jd_twit_prepend' ) . get_option( 'jd_twit_append' ) );
+			$allowed = 140 - mb_strlen( stripslashes( get_option( 'jd_twit_prepend' ) . get_option( 'jd_twit_append' ) ) );
 		} else {
 			$allowed = ( wpt_is_ssl( home_url() ) ) ? 137 : 138;
 		}
@@ -1582,32 +1589,6 @@ function wpt_save_post( $id ) {
 	// only send debug data if post meta is updated. 
 	if ( $update == true || is_int( $update ) ) {
 		wpt_mail( "Post Meta Inserted: #$id", print_r( $_POST, 1 ) ); // DEBUG
-	}
-}
-
-/**
- * Parse custom shortcodes 
- *
- * @param string $sentence Tweet template
- * @param integer $post_ID Post ID.
- *
- * @return string $sentence with any custom shortcodes replaced with their appropriate content.
- */
-function wpt_custom_shortcodes( $sentence, $post_ID ) {
-	$pattern = '/([([\[\]?)([A-Za-z0-9-_])*(\]\]]?)+/';
-	$params  = array( 0 => "[[", 1 => "]]" );
-	preg_match_all( $pattern, $sentence, $matches );
-	if ( $matches && is_array( $matches[0] ) ) {
-		foreach ( $matches[0] as $value ) {
-			$shortcode = "$value";
-			$field     = str_replace( $params, "", $shortcode );
-			$custom    = apply_filters( 'wpt_custom_shortcode', strip_tags( get_post_meta( $post_ID, $field, true ) ), $post_ID, $field );
-			$sentence  = str_replace( $shortcode, $custom, $sentence );
-		}
-
-		return $sentence;
-	} else {
-		return $sentence;
 	}
 }
 
@@ -1799,6 +1780,7 @@ function wpt_in_post_type( $id ) {
 			}
 		}
 	}
+	
 	return false;
 }
 
@@ -1808,7 +1790,7 @@ add_action( 'future_to_publish', 'wpt_future_to_publish', 16 );
  */
 function wpt_future_to_publish( $post ) {
 	$id = $post->ID;
-	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE || wp_is_post_revision( $id ) || ! wpt_in_post_type( $id ) ) {
+	if ( wp_is_post_autosave( $id ) || wp_is_post_revision( $id ) || ! wpt_in_post_type( $id ) ) {
 		return;
 	}
 	wpt_twit_future( $id );
@@ -1825,7 +1807,10 @@ function wpt_twit( $id ) {
 	if ( $post->post_status != 'publish' ) {
 		return;
 	} // is there any reason to accept any other status?
+	
+	remove_action( 'save_post', 'wpt_twit', 15 );
 	wpt_twit_instant( $id );
+	add_action( 'save_post', 'wpt_twit', 15 );
 }
 
 add_action( 'xmlrpc_publish_post', 'wpt_twit_xmlrpc' );
@@ -1844,6 +1829,7 @@ function wpt_twit_future( $id ) {
 
 		return;
 	}
+	
 	wpt_tweet( $id, 'future' );
 }
 

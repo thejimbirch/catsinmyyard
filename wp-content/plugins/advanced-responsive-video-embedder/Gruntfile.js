@@ -1,11 +1,3 @@
-/*!
- * Bootstrap's Gruntfile
- * http://getbootstrap.com
- * Copyright 2013-2015 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- *
- */
-
 module.exports = function (grunt) {
   'use strict';
 
@@ -14,7 +6,6 @@ module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
-
     concat: {
       options: {
         separator: '\n\n',
@@ -23,15 +14,18 @@ module.exports = function (grunt) {
         src: [
            'readme/description.md',
            'readme/description-lead.html',
+           'readme/description-lead-wp-org-only.md',
            'readme/description-features.html',
+           'readme/blockquote-open.html',
            'readme/description-features-pro.html',
-           'readme/description-supported-providers.md',
-           'readme/description-only-wp-org.md',
+           'readme/blockquote-close.html',
+           'readme/description-links.md',
+           'readme/description-supported-providers.html',
            'readme/description-reviews.html',
+           'readme/description-thanks.html',
            'readme/installation.md',
            'readme/faq.md',
            'readme/screenshots.md',
-           'todo.md',
            'CHANGELOG.md'
         ],
         dest: 'README.md'

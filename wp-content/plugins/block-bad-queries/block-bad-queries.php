@@ -1,19 +1,21 @@
 <?php
 /*
-Plugin Name: Block Bad Queries (BBQ)
-Plugin URI: https://perishablepress.com/block-bad-queries/
-Description: Automatically protects WordPress against malicious URL requests. This is the free/basic version of BBQ.
-Tags: security, protect, firewall, php, eval, malicious, url, request, blacklist
-Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests.
-Author: Jeff Starr
-Author URI: http://monzilla.biz/
-Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsult
-Donate link: http://m0n.co/donate
-Requires at least: 4.1
-Tested up to: 4.5
-Stable tag: trunk
-Version: 20160328
-License: GPLv2 or later
+	Plugin Name: Block Bad Queries (BBQ)
+	Plugin URI: https://perishablepress.com/block-bad-queries/
+	Description: Automatically protects WordPress against malicious URL requests. This is the free/basic version of BBQ.
+	Tags: security, protect, firewall, php, eval, malicious, url, request, blacklist
+	Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests.
+	Author: Jeff Starr
+	Author URI: https://plugin-planet.com/
+	Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsult
+	Donate link: http://m0n.co/donate
+	Requires at least: 4.1
+	Tested up to: 4.6
+	Stable tag: trunk
+	Version: 20160810
+	Text Domain: block-bad-queries
+	Domain Path: /languages
+	License: GPLv2 or later
 */
 
 if (!defined('ABSPATH')) die();
@@ -33,32 +35,62 @@ function bbq_core() {
 	if (isset($_SERVER['HTTP_USER_AGENT']) && !empty($_SERVER['HTTP_USER_AGENT'])) $user_agent_string   = $_SERVER['HTTP_USER_AGENT'];
 	
 	if ($request_uri_string || $query_string_string || $user_agent_string) {
+		
 		if (
+			
 			// strlen( $_SERVER['REQUEST_URI'] ) > 255 || // optional
-			preg_match( '/' . implode( '|', $request_uri_array )  . '/i', $request_uri_string ) || 
-			preg_match( '/' . implode( '|', $query_string_array ) . '/i', $query_string_string ) || 
-			preg_match( '/' . implode( '|', $user_agent_array )   . '/i', $user_agent_string ) 
+			
+			preg_match('/'. implode('|', $request_uri_array)  .'/i', $request_uri_string)  || 
+			preg_match('/'. implode('|', $query_string_array) .'/i', $query_string_string) || 
+			preg_match('/'. implode('|', $user_agent_array)   .'/i', $user_agent_string) 
+			
 		) {
+			
 			bbq_response();
+			
 		}
+		
 	}
+	
 }
 add_action('plugins_loaded', 'bbq_core');
 
 function bbq_links($links, $file) {
+	
 	if ($file == plugin_basename(__FILE__)) {
-		$rate_url = 'http://wordpress.org/support/view/plugin-reviews/'. basename(dirname(__FILE__)) .'?rate=5#postform';
-		$bbq_pro  = 'https://plugin-planet.com/bbq-pro/?plugin';
-		$links[]  = '<a target="_blank" href="'. $rate_url .'" title="Click here to rate and review this plugin on WordPress.org">Rate this plugin</a>';
-		$links[]  = '<a target="_blank" href="'. $bbq_pro .'" title="Get BBQ Pro for advanced protection" style="padding:1px 5px;color:#fff;background:#feba12;border-radius:1px;">Go&nbsp;Pro</a>';
+		
+		$rate_url   = 'http://wordpress.org/support/view/plugin-reviews/'. basename(dirname(__FILE__)) .'?rate=5#postform';
+		$rate_title = esc_html__('Click here to rate and review this plugin on WordPress.org', 'block-bad-queries');
+		$rate_text  = esc_html__('Rate this plugin', 'block-bad-queries');
+		
+		$bbq_url   = 'https://plugin-planet.com/bbq-pro/?plugin';
+		$bbq_title = esc_html__('Get BBQ Pro for advanced protection', 'block-bad-queries');
+		$bbq_text  = esc_html__('Go&nbsp;Pro', 'block-bad-queries');
+		$bbq_style = 'padding:1px 5px;color:#fff;background:#feba12;border-radius:1px;';
+		
+		$links[]  = '<a target="_blank" href="'. $rate_url .'" title="'. $rate_title .'">'. $rate_text .'</a>';
+		$links[]  = '<a target="_blank" href="'. $bbq_url .'" title="'. $bbq_title .'" style="'. $bbq_style .'">'. $bbq_text .'</a>';
+	
 	}
+	
 	return $links;
+	
 }
 add_filter('plugin_row_meta', 'bbq_links', 10, 2);
 
+function bbq_languages() {
+	
+	load_plugin_textdomain('block-bad-queries', false, basename(dirname(__FILE__)) .'/languages/');
+	
+}
+add_action('plugins_loaded', 'bbq_languages');
+
 function bbq_response() {
+	
 	header('HTTP/1.1 403 Forbidden');
 	header('Status: 403 Forbidden');
 	header('Connection: Close');
+	
 	exit;
+	
 }

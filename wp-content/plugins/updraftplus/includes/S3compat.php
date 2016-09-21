@@ -1,10 +1,10 @@
 <?php
 
-// This is a compatibility library, using Amazon's official PHP SDK (PHP 5.3.3+), but providing the methods of Donovan Schönknecht's S3.php library (which we used to always use) - but we've only cared about making code-paths in UpdraftPlus work, so be careful if re-reploying this in another project. And, we have a few bits of UpdraftPlus-specific code below, for logging.
+// This is a compatibility library, using Amazon's official PHP SDK (PHP 5.3.3+), but providing the methods of Donovan Schönknecht's S3.php library (which we used to always use) - but we've only cared about making code-paths in UpdraftPlus work, so be careful if re-deploying this in another project. And, we have a few bits of UpdraftPlus-specific code below, for logging.
 
 /**
 *
-* Copyright (c) 2012-5, David Anderson (http://www.simbahosting.co.uk).  All rights reserved.
+* Copyright (c) 2012-5, David Anderson (https://www.simbahosting.co.uk).  All rights reserved.
 * Portions copyright (c) 2011, Donovan Schönknecht.  All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -396,7 +396,11 @@ class UpdraftPlus_S3_Compat
 			return $results;
 
 		} catch (Exception $e) {
-			return $this->trigger_from_exception($e);
+			if ($this->useExceptions) {
+				throw $e;
+			} else {
+				return $this->trigger_from_exception($e);
+			}
 		}
 	}
 

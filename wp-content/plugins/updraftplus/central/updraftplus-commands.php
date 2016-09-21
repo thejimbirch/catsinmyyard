@@ -238,7 +238,7 @@ class UpdraftPlus_RemoteControl_Commands extends UpdraftCentral_Commands {
 		
 		if (!UpdraftPlus_Options::user_can_manage()) return $this->_generic_error_response('updraftplus_permission_denied');
 	
-		$results = $this->_get_vault()->ajax_vault_disconnect(false);
+		$results = (array)$this->_get_vault()->ajax_vault_disconnect(false);
 
 		return $this->_response($results);
 	
@@ -279,6 +279,22 @@ class UpdraftPlus_RemoteControl_Commands extends UpdraftCentral_Commands {
 		return $this->_response($results);
 	}
 	
+	public function cloudfiles_newuser($data) {
+	
+		global $updraftplus_addon_cloudfilesenhanced;
+		if (!is_a($updraftplus_addon_cloudfilesenhanced, 'UpdraftPlus_Addon_CloudFilesEnhanced')) {
+			$data = array('e' => 1, 'm' => sprintf(__('%s add-on not found', 'updraftplus'), 'Rackspace Cloud Files'));
+		} else {
+			$data = $updraftplus_addon_cloudfilesenhanced->create_api_user($data);
+		}
+		
+		if ($data["e"] === 0) {
+			return $this->_response($data);
+		} else {
+			return $this->_generic_error_response("error", $data);
+		}
+	}
+	
 	public function get_fragment($fragment) {
 	
 		if (false === ($updraftplus_admin = $this->_load_ud_admin()) || false === ($updraftplus = $this->_load_ud())) return $this->_generic_error_response('no_updraftplus');
@@ -297,6 +313,18 @@ class UpdraftPlus_RemoteControl_Commands extends UpdraftCentral_Commands {
 				do_action('updraft_s3_print_new_api_user_form', false);
 				$output = ob_get_contents();
 				ob_end_clean();
+				break;
+			case 'cloudfiles_new_api_user_form':
+				global $updraftplus_addon_cloudfilesenhanced;
+				if (!is_a($updraftplus_addon_cloudfilesenhanced, 'UpdraftPlus_Addon_CloudFilesEnhanced')) {
+					$error = true;
+					$output = 'cloudfiles_addon_not_found';
+				} else {
+					$output = array(
+						'accounts' => $updraftplus_addon_cloudfilesenhanced->account_options(),
+						'regions' => $updraftplus_addon_cloudfilesenhanced->region_options(),
+					);
+				}
 				break;
 			case 'backupnow_modal_contents':
 				$updraft_dir = $updraftplus->backups_dir_location();

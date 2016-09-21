@@ -1,0 +1,89 @@
+[data-nj-notice-id] p {
+	font-size: 1.2em;
+}
+
+.arve-btn {
+	padding-left: 3px;
+}
+
+#arve-form {
+	display: none;
+}
+
+.arve-icon:before {
+	content: "\f236" !important; /* dashicon-video-alt */
+}
+
+.arve-input-group {
+	float: left;
+	margin-top: 10px;
+	height: 35px;
+	width: 275px;
+}
+
+.arve-input-group label,
+.arve-input-group input,
+.arve-input-group select {
+	display: inline-block;
+	width: 120px;
+	margin-right: 15px;
+}
+
+.arve-input-group-full {
+	float: none;
+	width: 550px;
+	max-width: 100%;
+}
+
+.arve-input-group-full input {
+	width: 396px;
+	max-width: 100%;
+}
+
+.arve-input-group-full input.arve-input-url {
+	width: 274px;
+}
+
+#arve-url {
+	width: 100%;
+}
+
+.arve-shortcode-display {
+	padding: 15px;
+	font-size: 17px;
+	text-align: center;
+}
+
+.arve-submit-wrap {
+	text-align: center;
+}
+
+.arve-button-primary {
+	display: inline-block;
+}
+
+.arve-options-wrap {
+	max-width: 1000px;
+}
+
+.edit-shortcode-form-fields.shortcode-ui-edit-arve .field-block {
+    padding-top: .4em;
+	padding-bottom: .4em;
+}
+
+.edit-shortcode-form-fields.shortcode-ui-edit-arve .field-block label {
+	display: inline-block;
+	margin: 0;
+}
+
+.edit-shortcode-form-fields.shortcode-ui-edit-arve .field-block label:first-child {
+	width: 110px;
+}
+
+.edit-shortcode-form-fields.shortcode-ui-edit-arve .shortcode-ui-attribute-upload_date input,
+.edit-shortcode-form-fields.shortcode-ui-edit-arve .shortcode-ui-attribute-aspect_ratio input,
+.edit-shortcode-form-fields.shortcode-ui-edit-arve .shortcode-ui-attribute-url input,
+.edit-shortcode-form-fields.shortcode-ui-edit-arve .shortcode-ui-attribute-title input,
+.edit-shortcode-form-fields.shortcode-ui-edit-arve .shortcode-ui-attribute-description input {
+	width: 700px;
+}

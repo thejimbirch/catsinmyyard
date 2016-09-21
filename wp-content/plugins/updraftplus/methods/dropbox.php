@@ -93,13 +93,6 @@ class UpdraftPlus_BackupModule_dropbox {
 		global $updraftplus, $updraftplus_backup;
 		$updraftplus->log("Dropbox: begin cloud upload");
 
-		// Since 1.10.4, we can use phpseclib
-// 		if (!function_exists('mcrypt_encrypt')) {
-// 			$updraftplus->log('The required mcrypt PHP module is not installed');
-// 			$updraftplus->log(sprintf(__('The required %s PHP module is not installed - ask your web hosting company to enable it', 'updraftplus'), 'mcrypt'), 'error');
-// 			return false;
-// 		}
-
 		$opts = $this->get_opts();
 
 		if (empty($opts['tk_request_token'])) {
@@ -434,10 +427,7 @@ class UpdraftPlus_BackupModule_dropbox {
 			<?php
 			// Check requirements.
 			global $updraftplus_admin;
-			// Since 1.10.4, we can use phpseclib
-// 			if (!function_exists('mcrypt_encrypt')) {
-// 				$updraftplus_admin->show_double_warning('<strong>'.__('Warning','updraftplus').':</strong> '. sprintf(__('Your web server\'s PHP installation does not included a required module (%s). Please contact your web hosting provider\'s support and ask for them to enable it.', 'updraftplus'), 'mcrypt'));
-// 			}
+
 			$updraftplus_admin->curl_check('Dropbox', false, 'dropbox');
 			?>
 			</td>
@@ -445,7 +435,7 @@ class UpdraftPlus_BackupModule_dropbox {
 
 			<?php
 
-				$defmsg = '<tr class="updraftplusmethod dropbox"><td></td><td><strong>'.__('Need to use sub-folders?','updraftplus').'</strong> '.__('Backups are saved in','updraftplus').' apps/UpdraftPlus. '.__('If you back up several sites into the same Dropbox and want to organise with sub-folders, then ','updraftplus').'<a href="https://updraftplus.com/shop/">'.__("there's an add-on for that.",'updraftplus').'</a></td></tr>';
+				$defmsg = '<tr class="updraftplusmethod dropbox"><td></td><td><strong>'.__('Need to use sub-folders?','updraftplus').'</strong> '.__('Backups are saved in','updraftplus').' apps/UpdraftPlus. '.__('If you back up several sites into the same Dropbox and want to organise with sub-folders, then ','updraftplus').'<a href="'.apply_filters("updraftplus_com_link","https://updraftplus.com/shop/").'">'.__("there's an add-on for that.",'updraftplus').'</a></td></tr>';
 
 				echo apply_filters('updraftplus_dropbox_extra_config', $defmsg); ?>
 

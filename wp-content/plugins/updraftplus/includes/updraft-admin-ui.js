@@ -1108,6 +1108,52 @@ jQuery(document).ready(function($){
 		$('#updraftcentral_keycreate_altmethod_moreinfo').slideDown();
 	});
 	
+	// Update WebDAV URL as user edits
+	$(".updraft_webdav_settings").on("change keyup paste", function(){
+		
+		var updraft_webdav_settings = [];
+		$('.updraft_webdav_settings').each(function(index, item) {
+			
+			var id = $(item).attr('id');
+			
+			if (id && 'updraft_webdav_settings_' == id.substring(0, 24)) {
+				var which_one = id.substring(24);
+				updraft_webdav_settings[which_one] = this.value;
+			}
+		});
+		
+		var updraft_webdav_url = "";
+		var host = "@";
+		var slash = "/";
+		var colon = ":";
+		var colon_port = ":";
+		
+		if (updraft_webdav_settings['host'].indexOf("@") >= 0 || updraft_webdav_settings['host'] === "" ) {
+			host = "";
+		}
+		if (updraft_webdav_settings['host'].indexOf("/") >= 0 ) {
+			$('#updraft_webdav_host_error').show();
+		} else {
+			$('#updraft_webdav_host_error').hide();
+		}
+		
+		if (updraft_webdav_settings['path'].indexOf("/") == 0 || updraft_webdav_settings['path'] === "" ) {
+			slash = "";
+		}
+		
+		if (updraft_webdav_settings['user'] === "" || updraft_webdav_settings['pass'] === "" ) {
+			colon = "";
+		}
+		
+		if (updraft_webdav_settings['host'] === "" || updraft_webdav_settings['port'] === "") {
+			colon_port = "";
+		}
+		
+		updraft_webdav_url = updraft_webdav_settings['webdav'] + updraft_webdav_settings['user'] + colon + updraft_webdav_settings['pass'] + host +encodeURIComponent(updraft_webdav_settings['host']) + colon_port + updraft_webdav_settings['port'] + slash + updraft_webdav_settings['path'];
+		
+		$('#updraft_webdav_settings_url').val(updraft_webdav_url);
+	});
+	
 	$('#updraft-navtab-backups-content').on('click', '.updraft_existing_backups .updraft_existing_backups_row', function(e) {
 		if (! e.ctrlKey && ! e.metaKey) return;
 		$(this).toggleClass('backuprowselected');
@@ -1135,31 +1181,31 @@ jQuery(document).ready(function($){
 		});
 	});
 	
-	jQuery('#updraft-navtab-settings-content select.updraft_interval, #updraft-navtab-settings-content select.updraft_interval_database').change(function() {
+	$('#updraft-navtab-settings-content select.updraft_interval, #updraft-navtab-settings-content select.updraft_interval_database').change(function() {
 		updraft_check_same_times();
 	});
 	
-	jQuery('#backupnow_includefiles_showmoreoptions').click(function(e) {
+	$('#backupnow_includefiles_showmoreoptions').click(function(e) {
 		e.preventDefault();
-		jQuery('#backupnow_includefiles_moreoptions').toggle();
+		$('#backupnow_includefiles_moreoptions').toggle();
 	});
 	
-	jQuery('#updraft-navtab-backups-content a.updraft_diskspaceused_update').click(function(e) {
+	$('#updraft-navtab-backups-content a.updraft_diskspaceused_update').click(function(e) {
 		e.preventDefault();
 		updraftplus_diskspace();
 	});
 	
-	jQuery('#updraft-navtab-backups-content a.updraft_uploader_toggle').click(function(e) {
+	$('#updraft-navtab-backups-content a.updraft_uploader_toggle').click(function(e) {
 		e.preventDefault();
-		jQuery('#updraft-plupload-modal').slideToggle();
+		$('#updraft-plupload-modal').slideToggle();
 	});
 	
-	jQuery('#updraft-navtab-backups-content a.updraft_rescan_local').click(function(e) {
+	$('#updraft-navtab-backups-content a.updraft_rescan_local').click(function(e) {
 		e.preventDefault();
 		updraft_updatehistory(1, 0);
 	});
 	
-	jQuery('#updraft-navtab-backups-content a.updraft_rescan_remote').click(function(e) {
+	$('#updraft-navtab-backups-content a.updraft_rescan_remote').click(function(e) {
 		e.preventDefault();
 		updraft_updatehistory(1, 1);
 	});
@@ -1243,7 +1289,7 @@ jQuery(document).ready(function($){
 		data.mothership_firewalled = jQuery('#updraftcentral_keycreate_mothership_firewalled').is(':checked') ? 1 : 0;
 		data.where_send = where_send;
 		
-		jQuery('#updraftcentral_keys').block({ message: '<div style="margin: 8px; font-size:150%;"><img src="'+updraftlion.ud_url+'/images/udlogo-rotating.gif" height="80" width="80" style="padding-bottom:10px;"><br>'+updraftlion.creating+'</div>'});
+		jQuery('#updraftcentral_keys').block({ message: '<div style="margin: 8px; font-size:150%;"><img src="'+updraftlion.ud_url+'/images/udlogo-rotating.gif" height="80" width="80" style="padding-bottom:10px;"><br>'+updraftlion.creating_please_allow+'</div>'});
 
 		try {
 			jQuery.post(ajaxurl, data, function(response) {
@@ -2213,9 +2259,8 @@ jQuery(document).ready(function($){
 
 });
 
-// Save settings via AJAX
+// Save/Export/Import settings via AJAX
 jQuery(document).ready(function($){
-
 	// Pre-load the image so that it doesn't jerk when first used
 	var my_image = new Image();
 	my_image.src = updraftlion.ud_url+'/images/udlogo-rotating.gif';
@@ -2232,21 +2277,7 @@ jQuery(document).ready(function($){
 		e.preventDefault();
 		$.blockUI({ message: '<div style="margin: 8px; font-size:150%;"><img src="'+updraftlion.ud_url+'/images/udlogo-rotating.gif" height="80" width="80" style="padding-bottom:10px;"><br>'+updraftlion.saving+'</div>'});
 		
-		//Gather data
-		var form_data = $("#updraft-navtab-settings-content form input, #updraft-navtab-settings-content form textarea, #updraft-navtab-settings-content form select").serialize();
-		
-		//include unchecked checkboxes. user filter to only include unchecked boxes.
-		$.each($('#updraft-navtab-settings-content form input[type=checkbox]')
-		.filter(function(idx){
-			return $(this).prop('checked') == false
-		}),
-		 function(idx, el){
-			 //attach matched element names to the form_data with chosen value.
-			 var empty_val = '0';
-			 form_data += '&' + $(el).attr('name') + '=' + empty_val;
-		 }
-		);
-		
+		var form_data = gather_updraft_settings();
 		// POST the settings back to the AJAX handler
 		$.post(ajaxurl, {
 			action: 'updraft_savesettings',
@@ -2255,63 +2286,7 @@ jQuery(document).ready(function($){
 			nonce: updraftplus_settings_nonce
 		}, function(response) {
 			// Add page updates etc based on response
-			
-			try {
-				var resp = jQuery.parseJSON(response);
-				
-				var messages = resp.messages;
-// 				var debug = resp.changed.updraft_debug_mode;
-				
-				// If backup dir is not writable, change the text, and grey out the 'Backup Now' button
-				var backup_dir_writable = resp.backup_dir.writable;
-				var backup_dir_message = resp.backup_dir.message;
-				var backup_button_title = resp.backup_dir.button_title;
-			} catch (e) {
-				console.log(e);
-				console.log(response);
-				alert(updraftlion.jsonnotunderstood);
-				$.unblockUI();
-				return;
-			}
-			
-			if (resp.hasOwnProperty('changed')) {
-				console.log("UpdraftPlus: savesettings: some values were changed after being filtered");
-				console.log(resp.changed);
-				for(prop in resp.changed){
-					if(typeof resp.changed[prop] === 'object'){
-						for(innerprop in resp.changed[prop]){
-							if(!$("[name='"+innerprop+"']").is(':checkbox')){
-								$("[name='"+prop+"["+innerprop+"]']").val(resp.changed[prop][innerprop]);
-							}
-						}
-					} else {
-						if(!$("[name='"+prop+"']").is(':checkbox')){				
-							$("[name='"+prop+"']").val(resp.changed[prop]);
-						}
-					}
-				}
-			}
-			
-			$('#updraft_writable_mess').html(backup_dir_message);
-			
-			if (backup_dir_writable == false){
-				$('#updraft-backupnow-button').attr('disabled', 'disabled');
-				$('#updraft-backupnow-button').attr('title', backup_button_title);
-				$('.backupdirrow').css('display', 'table-row');
-			} else {
-				$('#updraft-backupnow-button').removeAttr('disabled');
-				$('#updraft-backupnow-button').removeAttr('title');
-				//$('.backupdirrow').hide();
-			}
-			
-			if (resp.hasOwnProperty('backup_now_message')) { $('#backupnow_remote_container').html(resp.backup_now_message); }
-			
-			// Move from 2 to 1
-			$('.updraftmessage').remove();
-			
-			$('#updraft_backup_started').before(resp.messages);
-
-			$('#next-backup-table-inner').html(resp.scheduled);
+			updraft_handle_page_updates(response);
 			
 			$('#updraft-wrap .fade').delay(6000).fadeOut(2000);
 			$('html, body').animate({
@@ -2319,9 +2294,185 @@ jQuery(document).ready(function($){
 			}, 1000);
 			
 			$.unblockUI();
-			
 		});
 	});
+	
+	$('#updraftplus-settings-export').click(function() {
+		if (updraft_settings_form_changed) {
+			alert(updraftlion.unsaved_settings_export);
+		}
+		export_settings();
+	});
+
+	$('#updraftplus-settings-import').click(function() {
+		$.blockUI({ message: '<div style="margin: 8px; font-size:150%;"><img src="'+updraftlion.ud_url+'/images/udlogo-rotating.gif" height="80" width="80" style="padding-bottom:10px;"><br>'+updraftlion.importing+'</div>'});
+		var updraft_import_file_input = document.getElementById('import_settings');
+		if (updraft_import_file_input.files.length == 0) {
+			alert(updraftlion.import_select_file);
+			$.unblockUI();
+			return;
+		}
+		var updraft_import_file_file = updraft_import_file_input.files[0];
+		var updraft_import_file_reader = new FileReader();
+		updraft_import_file_reader.onload = function() {
+			import_settings(this.result);
+		};
+		updraft_import_file_reader.readAsText(updraft_import_file_file);
+	});
+	
+	function export_settings() {
+		var form_data = gather_updraft_settings().split('&');
+		var input = {};
+		
+		//Function to convert serialized settings to the correct format ready for json encoding
+		$.each(form_data, function(key, value) {
+		var data = value.split('=');
+
+			var name = decodeURIComponent(data[0]);
+			if (name.indexOf("option_page") >= 0 || name.indexOf("_wpnonce") >= 0 || name.indexOf("_wp_http_referer") >= 0){
+				return true;
+			}
+			
+			if (name.indexOf("[") >= 0){
+				var extract = name.match(/\[(.*)\]/).pop();
+				name = name.substring(0, name.indexOf('['));
+				//some options either have a blank or 0 as their nested array key and need to be delt with differently 
+				if (!extract || extract === '0'){
+					if(typeof input[name] === "undefined") input[name] = [];
+					input[name].push(decodeURIComponent(data[1]));
+				}else{
+					if(typeof input[name] === "undefined") input[name] = {};
+					input[name][extract] = decodeURIComponent(data[1]);
+				}
+			} else {
+				input[name] = decodeURIComponent(data[1]);   
+			}
+		});
+		
+		var date_now = new Date();
+		
+		form_data = JSON.stringify({
+			// Indicate the last time the format changed - i.e. do not update this unless there is a format change
+			version: '1.12.19',
+			epoch_date: date_now.getTime(),
+			local_date: date_now.toLocaleString(),
+			network_site_url: updraftlion.network_site_url,
+			data: input
+		});
+		
+		//Attach this data to an anchor on page
+		var link = document.body.appendChild(document.createElement('a'));
+		link.setAttribute('download', 'updraftplus-settings.json');
+		link.setAttribute('style', "display:none;");
+		link.setAttribute('href', 'data:text/json' + ';charset=UTF-8,' + encodeURIComponent(form_data));
+		link.click();
+	}
+	
+	function import_settings(updraft_file_result) {
+		
+		var data = decodeURIComponent(updraft_file_result);
+
+		data = JSON.parse(data);
+
+		if (window.confirm(updraftlion.importing_data_from + ' ' + data['network_site_url'] + "\n" + updraftlion.exported_on + ' ' + data['local_date'] + "\n" + updraftlion.continue_import)) {
+			// GET the settings back to the AJAX handler
+			data = JSON.stringify(data['data']);
+			$.post(ajaxurl, {
+				action: 'updraft_importsettings',
+				subaction: 'importsettings',
+				settings: data,
+				nonce: updraftplus_settings_nonce
+			}, function(response) {
+				updraft_handle_page_updates(response);
+				// Prevent the user being told they have unsaved settings
+				updraft_settings_form_changed = false;
+				// Add page updates etc based on response
+				location.replace(updraftlion.updraft_settings_url);
+			});
+		} else {
+			$.unblockUI();
+		}
+	}
+			
+	function gather_updraft_settings() {
+		// Excluding the unnecessary 'action' input avoids triggering a very mis-conceived mod_security rule seen on one user's site
+		var form_data = $("#updraft-navtab-settings-content form input[name!='action'], #updraft-navtab-settings-content form textarea, #updraft-navtab-settings-content form select").serialize();
+		
+		//include unchecked checkboxes. user filter to only include unchecked boxes.
+		$.each($('#updraft-navtab-settings-content form input[type=checkbox]')
+		.filter(function(idx){
+			return $(this).prop('checked') == false
+		}),
+			function(idx, el){
+				//attach matched element names to the form_data with chosen value.
+				var empty_val = '0';
+				form_data += '&' + $(el).attr('name') + '=' + empty_val;
+			}
+		);
+		
+		return form_data;
+	}
+	
+	function updraft_handle_page_updates(response) {
+					
+		try {
+			var resp = jQuery.parseJSON(response);
+			
+			var messages = resp.messages;
+			//var debug = resp.changed.updraft_debug_mode;
+			
+			// If backup dir is not writable, change the text, and grey out the 'Backup Now' button
+			var backup_dir_writable = resp.backup_dir.writable;
+			var backup_dir_message = resp.backup_dir.message;
+			var backup_button_title = resp.backup_dir.button_title;
+		} catch (e) {
+			console.log(e);
+			console.log(response);
+			alert(updraftlion.jsonnotunderstood);
+			$.unblockUI();
+			return;
+		}
+		
+		if (resp.hasOwnProperty('changed')) {
+			console.log("UpdraftPlus: savesettings: some values were changed after being filtered");
+			console.log(resp.changed);
+			for(prop in resp.changed){
+				if(typeof resp.changed[prop] === 'object'){
+					for(innerprop in resp.changed[prop]){
+						if(!$("[name='"+innerprop+"']").is(':checkbox')){
+							$("[name='"+prop+"["+innerprop+"]']").val(resp.changed[prop][innerprop]);
+						}
+					}
+				} else {
+					if(!$("[name='"+prop+"']").is(':checkbox')){				
+						$("[name='"+prop+"']").val(resp.changed[prop]);
+					}
+				}
+			}
+		}
+		
+		$('#updraft_writable_mess').html(backup_dir_message);
+		
+		if (backup_dir_writable == false){
+			$('#updraft-backupnow-button').attr('disabled', 'disabled');
+			$('#updraft-backupnow-button').attr('title', backup_button_title);
+			$('.backupdirrow').css('display', 'table-row');
+		} else {
+			$('#updraft-backupnow-button').removeAttr('disabled');
+			$('#updraft-backupnow-button').removeAttr('title');
+			//$('.backupdirrow').hide();
+		}
+		
+		if (resp.hasOwnProperty('backup_now_message')) { $('#backupnow_remote_container').html(resp.backup_now_message); }
+		
+		// Move from 2 to 1
+		$('.updraftmessage').remove();
+		
+		$('#updraft_backup_started').before(resp.messages);
+	
+		$('#next-backup-table-inner').html(resp.scheduled);
+		
+	}
 });
 
 // https://github.com/richadams/jquery-tripleclick/
@@ -2389,7 +2540,7 @@ jQuery(document).ready(function($){
 		},
 		teardown: function(namespaces)
 		{
-			$(this).unbind("touchstart click.triple", data, tripleHandler);
+			$(this).unbind("touchstart click.triple", tripleHandler);
 		}
 	};
 })(jQuery);

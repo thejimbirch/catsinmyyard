@@ -6,13 +6,13 @@ Description: Automatically protects WordPress against malicious URL requests. Th
 Tags: blacklist, eval, firewall, hack, http, lockdown, malicious, protect, query, request, security, secure, spam, whitelist
 Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests. For advanced protection check out BBQ Pro.
 Author: Jeff Starr
-Author URI: http://monzilla.biz/
+Author URI: https://plugin-planet.com/
 Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsult
 Donate link: http://m0n.co/donate
 Requires at least: 4.1
-Tested up to: 4.5
+Tested up to: 4.6
 Stable tag: trunk
-Version: 20160328
+Version: 20160810
 License: GPLv2 or later
 
 The fastest firewall plugin for WordPress.
@@ -30,12 +30,16 @@ The fastest firewall plugin for WordPress.
 * 100% Plug-n-play functionality
 * No configuration required (it just works)
 * Born of speed and simplicity, no frills
+* 100% focused on security and performance
 * Blocks a wide range of malicious requests
-* Based on the [5G/6G Blacklist](https://perishablepress.com/6g/)
+* Based on the [5G/6G Firewall](https://perishablepress.com/6g/)
 * Scans all incoming traffic and blocks bad requests
+* Scans all types of requests: GET, POST, PUT, DELETE, etc.
 * Works silently behind the scenes to protect your site
+* Hassle-free security plugin that's easy to use
 * Thoroughly tested, error-free performance
-* New! Customize blocked strings via [Whitelist/Blacklist plugins](https://perishablepress.com/bbq-whitelist-blacklist/)
+* Compatible with other security plugins
+* Customize blocked strings via [Whitelist/Blacklist plugins](https://perishablepress.com/bbq-whitelist-blacklist/)
 
 **Pro Version**
 
@@ -85,6 +89,18 @@ The Pro version of BBQ is just as fast and simple to use, but is much more power
 
 Nope, just install and relax knowing that BBQ is protecting your site from bad URL requests.
 
+**Does BBQ make changes to my .htaccess file?**
+
+Absolutely not. Unlike other security/firewall plugins, neither BBQ (free version) nor BBQ Pro make any changes to any .htaccess file.
+
+**Does BBQ make any changes to my WP database?**
+
+No, the free version of BBQ operates as each page is loaded; it does not make any changes whatsoever to the WP database.
+
+**Does BBQ block malicious strings included in arrays?**
+
+Yes, BBQ scans any arrays that are included in the URI request. If any matching patterns are found, the request is blocked.
+
 **Do I need WordPress to run BBQ?**
 
 Nope! BBQ is available in the following flavors:
@@ -122,6 +138,13 @@ Links, tweets and likes also appreciated. Thank you! :)
 
 
 == Changelog ==
+
+**2016/08/10**
+
+* Added translation support
+* Added plugin icons and larger banner
+* General fine-tuning and testing
+* Tested on WordPress 4.6
 
 **2016/03/28**
 

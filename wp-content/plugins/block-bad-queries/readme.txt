@@ -10,9 +10,9 @@ Author URI: https://plugin-planet.com/
 Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsult
 Donate link: http://m0n.co/donate
 Requires at least: 4.1
-Tested up to: 4.6
-Stable tag: trunk
-Version: 20160810
+Tested up to: 4.7
+Stable tag: 20161114
+Version: 20161114
 License: GPLv2 or later
 
 The fastest firewall plugin for WordPress.
@@ -85,21 +85,30 @@ The Pro version of BBQ is just as fast and simple to use, but is much more power
 
 == Frequently Asked Questions ==
 
+**What other security plugins do you recommend?**
+
+I recently recorded a video tutorial series for Lynda.com on [how to secure WordPress sites](http://m0n.co/securewp). That's a good place to learn more about the best techniques and WP plugins for protecting your site against threats.
+
+
 **Do I need to do anything else for BBQ to work?**
 
 Nope, just install and relax knowing that BBQ is protecting your site from bad URL requests.
+
 
 **Does BBQ make changes to my .htaccess file?**
 
 Absolutely not. Unlike other security/firewall plugins, neither BBQ (free version) nor BBQ Pro make any changes to any .htaccess file.
 
+
 **Does BBQ make any changes to my WP database?**
 
 No, the free version of BBQ operates as each page is loaded; it does not make any changes whatsoever to the WP database.
 
+
 **Does BBQ block malicious strings included in arrays?**
 
 Yes, BBQ scans any arrays that are included in the URI request. If any matching patterns are found, the request is blocked.
+
 
 **Do I need WordPress to run BBQ?**
 
@@ -138,6 +147,17 @@ Links, tweets and likes also appreciated. Thank you! :)
 
 
 == Changelog ==
+
+**2016/11/14**
+
+* Replaces `esc_html` with `esc_attr` for link title attributes
+* Changes stable tag from trunk to latest version
+* Adds `&raquo;` to rate this plugin link
+* Updates URL for rate this plugin link
+* Moves "Go Pro" link to action links
+* Renames action/meta link functions
+* Updates default translation template
+* Tests on WordPress version 4.7 (beta)
 
 **2016/08/10**
 

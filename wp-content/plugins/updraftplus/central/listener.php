@@ -58,7 +58,9 @@ class UpdraftPlus_UpdraftCentral_Listener {
 
 			if (!empty($_GET['login_id']) && is_numeric($_GET['login_id']) && !empty($_GET['login_key'])) {
 				$login_user = get_user_by('id', $_GET['login_id']);
-				if (is_a($login_user, 'WP_User')) {
+				
+				require_once(ABSPATH.WPINC.'/version.php');
+				if (is_a($login_user, 'WP_User') || (version_compare($wp_version, '3.5', '<') && !empty($login_user->ID))) {
 					// Allow site implementers to disable this functionality
 					$allow_autologin = apply_filters('updraftcentral_allow_autologin', true, $login_user);
 					if ($allow_autologin) {
@@ -84,7 +86,8 @@ class UpdraftPlus_UpdraftCentral_Listener {
 	private function autologin_user($user, $redirect_url = false) {
 		if (!is_user_logged_in()) {
 	// 		$user = get_user_by('id', $user_id);
-			if (!is_object($user) || !is_a($user, 'WP_User')) return;
+			// Don't check that it's a WP_User - that's WP 3.5+ only
+			if (!is_object($user) || empty($user->ID)) return;
 			wp_set_current_user($user->ID, $user->user_login);
 			wp_set_auth_cookie($user->ID);
 			do_action('wp_login', $user->user_login, $user);
@@ -109,7 +112,14 @@ class UpdraftPlus_UpdraftCentral_Listener {
 
 		$command_php_class = $this->command_classes[$class_prefix];
 		
-		if (!class_exists($command_php_class) && file_exists(UPDRAFTPLUS_DIR.'/central/'.$class_prefix.'-commands.php')) require_once(UPDRAFTPLUS_DIR.'/central/'.$class_prefix.'-commands.php');
+		do_action('updraftcentral_command_class_wanted', $command_php_class);
+		
+		if (!class_exists($command_php_class)) {
+			if (file_exists(UPDRAFTPLUS_DIR.'/central/modules/'.$class_prefix.'.php')) {
+				if (!class_exists('UpdraftCentral_Commands')) require_once(UPDRAFTPLUS_DIR.'/central/commands.php');
+				require_once(UPDRAFTPLUS_DIR.'/central/modules/'.$class_prefix.'.php');
+			}
+		}
 		
 		if (empty($this->commands[$class_prefix])) {
 			if (class_exists($command_php_class)) {

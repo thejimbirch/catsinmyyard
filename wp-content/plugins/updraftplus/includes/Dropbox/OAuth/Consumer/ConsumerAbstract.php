@@ -14,9 +14,10 @@ abstract class Dropbox_ConsumerAbstract
     const WEB_URL = 'https://www.dropbox.com/1/';
     
     // OAuth flow methods
-    const REQUEST_TOKEN_METHOD = 'oauth/request_token';
-    const AUTHORISE_METHOD = 'oauth/authorize';
-    const ACCESS_TOKEN_METHOD = 'oauth/access_token';
+    const AUTHORISE_METHOD = 'oauth2/authorize';
+    const DEAUTHORISE_METHOD = 'disable_access_token';
+    const ACCESS_TOKEN_METHOD = 'oauth2/token';
+    const OAUTH_UPGRADE = 'oauth2/token_from_oauth1';
     
     /**
      * Signature method, either PLAINTEXT or HMAC-SHA1
@@ -43,7 +44,16 @@ abstract class Dropbox_ConsumerAbstract
      */
     protected function authenticate()
     {
+        global $updraftplus;
+        
         $access_token = $this->storage->get('access_token');
+        //Check if the new token type is set if not they need to be upgraded to OAuth2
+        if (!empty($access_token) && isset($access_token->oauth_token) && !isset($access_token->token_type)) {
+            $updraftplus->log('OAuth v1 token found: upgrading to v2');
+            $this->upgradeOAuth();
+            $updraftplus->log('OAuth token upgrade successful');
+        }
+        
         if (empty($access_token) || !isset($access_token->oauth_token)) {
             try {
                 $this->getAccessToken();
@@ -53,7 +63,7 @@ abstract class Dropbox_ConsumerAbstract
                 if ('Dropbox_BadRequestException' == $excep_class || 'Dropbox_Exception' == $excep_class) {
                     global $updraftplus;
                     $updraftplus->log($e->getMessage().' - need to reauthenticate this site with Dropbox (if this fails, then you can also try wiping your settings from the Expert Settings section)');
-                    $this->getRequestToken();
+                    //$this->getRequestToken();
                     $this->authorise();
                 } else {
                     throw $e;
@@ -63,18 +73,28 @@ abstract class Dropbox_ConsumerAbstract
     }
     
     /**
-    * Acquire an unauthorised request token
-    * @link http://tools.ietf.org/html/rfc5849#section-2.1
+    * Upgrade the user's OAuth1 token to a OAuth2 token
     * @return void
     */
-    private function getRequestToken()
+    private function upgradeOAuth()
     {
-        // Nullify any request token we already have
-        $this->storage->set(null, 'request_token');
-        $url = UpdraftPlus_Dropbox_API::API_URL . self::REQUEST_TOKEN_METHOD;
-        $response = $this->fetch('POST', $url, '');
-        $token = $this->parseTokenString($response['body']);
-        $this->storage->set($token, 'request_token');
+	    $url = UpdraftPlus_Dropbox_API::API_URL . self::OAUTH_UPGRADE;
+	    $response = $this->fetch('POST', $url, '');
+        $token = new stdClass();
+        /*
+	        oauth token secret and oauth token were needed by oauth1 
+	        these are replaced in oauth2 with an access token
+	        currently they are still there just in case a method somewhere is expecting them to both be set
+	        as far as I can tell only the oauth token is used
+	        after more testing token secret can be removed.
+        */
+        
+        $token->oauth_token_secret = $response['body']->access_token;
+        $token->oauth_token = $response['body']->access_token;
+        $token->token_type = $response['body']->token_type;
+        $this->storage->set($token, 'access_token'); 
+        $this->storage->set('true','upgraded');
+        $this->storage->do_unset('request_token');
     }
     
     /**
@@ -99,9 +119,7 @@ abstract class Dropbox_ConsumerAbstract
         }
         global $updraftplus;
         $updraftplus->log('Dropbox reauthorisation needed; but we are running from cron, AJAX or the CLI, so this is not possible');
-        $opts = UpdraftPlus_Options::get_updraft_option("updraft_dropbox");
-        $opts['tk_request_token'] = '';
-        UpdraftPlus_Options::update_updraft_option("updraft_dropbox", $opts);
+        $this->storage->do_unset('access_token');
         throw new Dropbox_Exception(sprintf(__('You need to re-authenticate with %s, as your existing credentials are not working.', 'updraftplus'), 'Dropbox'));
         #$updraftplus->log(sprintf(__('You need to re-authenticate with %s, as your existing credentials are not working.', 'updraftplus'), 'Dropbox'), 'error');
         return false;
@@ -113,20 +131,54 @@ abstract class Dropbox_ConsumerAbstract
     */
     public function getAuthoriseUrl()
     {
-        // Get the request token
-        $token = $this->getToken();
-    
+	    /*
+		    Generate a random key to be passed to Dropbox and stored in session to be checked to prevent CSRF
+		    Uses OpenSSL or Mcrypt or defaults to pure PHP implementaion if neither are available.
+		*/
+	    
+		global $updraftplus;
+		if (!function_exists('crypt_random_string')) $updraftplus->ensure_phpseclib('Crypt_Random', 'Crypt/Random');
+
+		$CSRF = base64_encode(crypt_random_string(16));
+        $this->storage->set($CSRF,'CSRF');
         // Prepare request parameters
+        /*
+            For OAuth v2 Dropbox needs to use a authorisation url that matches one that is set inside the
+            Dropbox developer console. In order to check this it needs the client ID for the OAuth v2 app
+            This will use the default one unless the user is using their own Dropbox App
+            
+            For users that use their own Dropbox App there is also no need to provide the callbackhome as
+            part of the CSRF as there is no need to go to auth.updraftplus.com also the redirect uri can
+            then be set to the home as default
+            
+            Check if the key has dropbox: if so then remove it to stop the request from being invalid
+        */
+        $appkey = $this->storage->get('appkey');
+        
+        if (!empty($appkey) && 'dropbox:' == substr($appkey, 0, 8)) {
+			$key = substr($appkey, 8);
+        } else if (!empty($appkey)) {
+            $key = $appkey;
+        }
+        
         $params = array(
-            'oauth_token' => $token->oauth_token,
-            'oauth_token_secret' => $token->oauth_token_secret,
-            'oauth_callback' => $this->callback,
+            'client_id' => empty($key) ? $this->oauth2_id : $key,
+            'response_type' => 'code',
+            'redirect_uri' => empty($key) ? $this->callback : $this->callbackhome,
+            'state' => empty($key) ? $CSRF.$this->callbackhome : $CSRF,
         );
     
         // Build the URL and redirect the user
         $query = '?' . http_build_query($params, '', '&');
         $url = self::WEB_URL . self::AUTHORISE_METHOD . $query;
         return $url;
+    }
+    
+    protected function deauthenticate()
+    {
+	    $url = UpdraftPlus_Dropbox_API::API_URL . self::DEAUTHORISE_METHOD;
+	    $response = $this->fetch('POST', $url, '');
+        $this->storage->delete();
     }
     
     /**
@@ -137,10 +189,56 @@ abstract class Dropbox_ConsumerAbstract
      */
     public function getAccessToken()
     {
-        // Get the signed request URL
-        $response = $this->fetch('POST', UpdraftPlus_Dropbox_API::API_URL, self::ACCESS_TOKEN_METHOD);
-        $token = $this->parseTokenString($response['body']);
-        $this->storage->set($token, 'access_token');
+    
+		// If this is non-empty, then we just received a code. It is stored in 'code' - our next job is to put it into the proper place.
+	    $code = $this->storage->get('code');
+        /*
+            Checks to see if the user is using their own Dropbox App if so then they need to get
+            a request token. If they are using our App then we just need to save these details
+        */
+        if (!empty($code)){	
+            $appkey = $this->storage->get('appkey');
+            if (!empty($appkey)){
+                // Get the signed request URL
+                $url = UpdraftPlus_Dropbox_API::API_URL . self::ACCESS_TOKEN_METHOD;
+                $params = array(
+                    'code' => $code,
+                    'grant_type' => 'authorization_code',
+                    'redirect_uri' => $this->callbackhome,
+                    'client_id' => $this->consumerKey,
+                    'client_secret' => $this->consumerSecret,
+                );
+                $response = $this->fetch('POST', $url, '' , $params);
+                
+                $code  = json_decode(json_encode($response['body']),true);
+            
+            } else {
+                $code = base64_decode($code);
+                $code = json_decode($code, true);    
+            }
+            
+	        /*
+		        Again oauth token secret and oauth token were needed by oauth1 
+		        these are replaced in oauth2 with an access token
+		        currently they are still there just in case a method somewhere is expecting them to both be set
+		        as far as I can tell only the oauth token is used
+		        after more testing token secret can be removed.
+			*/
+            
+            $token = new stdClass();
+            $token->oauth_token_secret = $code['access_token'];
+            $token->oauth_token = $code['access_token'];
+            $token->account_id = $code['account_id'];
+            $token->token_type = $code['token_type'];
+            $token->uid = $code['uid'];
+            $this->storage->set($token, 'access_token');
+            $this->storage->do_unset('upgraded');
+            
+            //reset code
+            $this->storage->do_unset('code');
+	    } else {
+		    throw new Dropbox_BadRequestException("No Dropbox Code found, will try to get one now", 400);
+	    }
     }
     
     /**
@@ -176,20 +274,24 @@ abstract class Dropbox_ConsumerAbstract
     {
         // Get the request/access token
         $token = $this->getToken();
-        
-        // Generate a random string for the request
-        $nonce = md5(microtime(true) . uniqid('', true));
-        
-        // Prepare the standard request parameters
-        $params = array(
-            'oauth_consumer_key' => $this->consumerKey,
-            'oauth_token' => $token->oauth_token,
-            'oauth_signature_method' => $this->sigMethod,
-            'oauth_version' => '1.0',
-            // Generate nonce and timestamp if signature method is HMAC-SHA1 
-            'oauth_timestamp' => ($this->sigMethod == 'HMAC-SHA1') ? time() : null,
-            'oauth_nonce' => ($this->sigMethod == 'HMAC-SHA1') ? $nonce : null,
-        );
+        // Prepare the standard request parameters differnt for OAuth1 and OAuth2, we still need OAuth1 to make the request to the upgrade token endpoint
+        if (isset($token->token_type)) {
+	        $params = array(
+	        	'access_token' => $token->oauth_token,
+	        );
+        } else {
+	        // Generate a random string for the request
+	        $nonce = md5(microtime(true) . uniqid('', true));
+	        $params = array(
+	            'oauth_consumer_key' => $this->consumerKey,
+	            'oauth_token' => $token->oauth_token,
+	            'oauth_signature_method' => $this->sigMethod,
+	            'oauth_version' => '1.0',
+	            // Generate nonce and timestamp if signature method is HMAC-SHA1 
+	            'oauth_timestamp' => ($this->sigMethod == 'HMAC-SHA1') ? time() : null,
+	            'oauth_nonce' => ($this->sigMethod == 'HMAC-SHA1') ? $nonce : null,
+	        );
+	    }
     
         // Merge with the additional request parameters
         $params = array_merge($params, $additional);

@@ -919,6 +919,9 @@ class UpdraftPlus_Backup {
 		// Make it available to the filter
 		$jobdata['remotestorage_extrainfo'] = $this->remotestorage_extrainfo;
 		
+		if (!class_exists('UpdraftPlus_Notices')) require_once(UPDRAFTPLUS_DIR.'/includes/updraftplus-notices.php');
+		$ws_advert = UpdraftPlus_Notices::do_notice(false, 'report-plain', true);
+		
 		$body = apply_filters('updraft_report_body',
 			__('Backup of:', 'updraftplus').' '.site_url()."\r\n".
 			"UpdraftPlus ".__('WordPress backup is complete','updraftplus').".\r\n".
@@ -927,7 +930,7 @@ class UpdraftPlus_Backup {
 			$extra_msg.
 			"\r\n".
 			$feed.
-			$updraftplus->wordshell_random_advert(0)."\r\n".
+			$ws_advert."\r\n".
 			$append_log,
 		$final_message, $backup_contains, $updraftplus->errors, $warnings, $jobdata);
 
@@ -1471,7 +1474,7 @@ class UpdraftPlus_Backup {
 							$this->stow("# Approximate rows expected in table: $rows\n");
 							if ($rows > UPDRAFTPLUS_WARN_DB_ROWS) {
 								$manyrows_warning = true;
-								$updraftplus->log(sprintf(__("Table %s has very many rows (%s) - we hope your web hosting company gives you enough resources to dump out that table in the backup", 'updraftplus'), $table, $rows), 'warning', 'manyrows_'.$this->whichdb_suffix.$table);
+								$updraftplus->log(sprintf(__("Table %s has very many rows (%s) - we hope your web hosting company gives you enough resources to dump out that table in the backup", 'updraftplus'), $table, $rows).' '.__('If not, you will need to either remove data from this table, or contact your hosting company to request more resources.', 'updraftplus'), 'warning', 'manyrows_'.$this->whichdb_suffix.$table);
 							}
 						}
 
@@ -1479,7 +1482,15 @@ class UpdraftPlus_Backup {
 						if  ('wp' == $this->whichdb && (!empty($this->table_prefix) && strtolower($this->table_prefix.'sitemeta') == strtolower($table))) {
 							$where = 'meta_key NOT LIKE "updraft_jobdata_%"';
 						} elseif ('wp' == $this->whichdb && (!empty($this->table_prefix) && strtolower($this->table_prefix.'options') == strtolower($table))) {
-							$where = 'option_name NOT LIKE "updraft_jobdata_%" AND option_name NOT LIKE "_site_transient_update_%"';
+							if (strtolower(substr(PHP_OS, 0, 3)) == 'win') {
+								$updraft_jobdata = "'updraft_jobdata_%'";
+								$site_transient_update = "'_site_transient_update_%'";
+							} else {
+								$updraft_jobdata = '"updraft_jobdata_%"';
+								$site_transient_update = '"_site_transient_update_%"';
+							}
+							
+							$where = 'option_name NOT LIKE '.$updraft_jobdata.' AND option_name NOT LIKE '.$site_transient_update.'';
 						} else {
 							$where = '';
 						}
@@ -1614,11 +1625,17 @@ class UpdraftPlus_Backup {
 		$pfile = md5(time().rand()).'.tmp';
 		file_put_contents($this->updraft_dir.'/'.$pfile, "[mysqldump]\npassword=".$this->dbinfo['pass']."\n");
 
-		# Note: escapeshellarg() adds quotes around the string
+		// Note: escapeshellarg() adds quotes around the string
 		if ($where) $where="--where=".escapeshellarg($where);
 
-		$exec = "cd ".escapeshellarg($this->updraft_dir)."; $potsql  --defaults-file=$pfile $where --max_allowed_packet=1M --quote-names --add-drop-table --skip-comments --skip-set-charset --allow-keywords --dump-date --extended-insert --user=".escapeshellarg($this->dbinfo['user'])." --host=".escapeshellarg($this->dbinfo['host'])." ".$this->dbinfo['name']." ".escapeshellarg($table_name);
+		if (strtolower(substr(PHP_OS, 0, 3)) == 'win') {
+			$exec = "cd ".escapeshellarg(str_replace('/', '\\', $this->updraft_dir))." & ";
+		} else {
+			$exec = "cd ".escapeshellarg($this->updraft_dir)."; ";
+		}
 
+		$exec .= "$potsql  --defaults-file=$pfile $where --max_allowed_packet=1M --quote-names --add-drop-table --skip-comments --skip-set-charset --allow-keywords --dump-date --extended-insert --user=".escapeshellarg($this->dbinfo['user'])." --host=".escapeshellarg($this->dbinfo['host'])." ".$this->dbinfo['name']." ".escapeshellarg($table_name);
+		
 		$ret = false;
 		$any_output = false;
 		$writes = 0;
@@ -2883,7 +2900,7 @@ class UpdraftPlus_Backup {
 					$original_size = filesize($zipfile);
 					clearstatcache();
 				} else {
-					$create_code = (defined('ZIPARCHIVE::CREATE')) ? ZIPARCHIVE::CREATE : 1;
+					$create_code = defined('ZIPARCHIVE::CREATE') ? ZIPARCHIVE::CREATE : 1;
 					$opencode = $zip->open($zipfile, $create_code);
 					$original_size = 0;
 				}
@@ -2935,7 +2952,7 @@ class UpdraftPlus_Backup {
 
 		// Always warn of this
 		if (strpos($msg, 'File Size Limit Exceeded') !== false && 'UpdraftPlus_BinZip' == $this->use_zip_object) {
-			$updraftplus->log(sprintf(__('The zip engine returned the message: %s.', 'updraftplus'), 'File Size Limit Exceeded').' <a href="https://updraftplus.com/what-should-i-do-if-i-see-the-message-file-size-limit-exceeded/">'.__('Go here for more information.','updraftplus').'</a>', 'warning', 'zipcloseerror-filesizelimit');
+			$updraftplus->log(sprintf(__('The zip engine returned the message: %s.', 'updraftplus'), 'File Size Limit Exceeded'). __('Go here for more information.','updraftplus').' https://updraftplus.com/what-should-i-do-if-i-see-the-message-file-size-limit-exceeded/', 'warning', 'zipcloseerror-filesizelimit');
 		} elseif ($warn) {
 			$warn_msg = __('A zip error occurred', 'updraftplus').' - ';
 			if (!empty($quota_low)) {

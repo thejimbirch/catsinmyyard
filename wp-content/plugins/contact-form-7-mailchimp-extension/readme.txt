@@ -3,8 +3,8 @@ Contributors: rnzo
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NLNDA3PGPMPRN
 Tags: contact form 7, email, mailing list, createsend, mandrill, renzo, renzo johnson, cme, contact, form, contact form, mail chimp, newsletter, mailchimp, chimpmail
 Requires at least: 4.0
-Tested up to: 4.5.3
-Stable tag: 4.4.0
+Tested up to: 4.6.1
+Stable tag: 4.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,10 @@ Do you have questions or issues with Contact Form 7 MailChimp Extension? Use the
 == Changelog ==
 
 For more information, see [Releases](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension).
+
+= 0.4.31 =
+
+* Updated Tested up to version
 
 = 0.4.29 =
 

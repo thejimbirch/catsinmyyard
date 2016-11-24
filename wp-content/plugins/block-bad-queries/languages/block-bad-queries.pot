@@ -1,10 +1,9 @@
-# Loco Gettext template
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Block Bad Queries (BBQ)\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: Wed Aug 10 2016 09:41:41 GMT-0700 (PDT)\n"
+"POT-Creation-Date: 2016-11-14 23:17+0000\n"
 "POT-Revision-Date: Wed Aug 10 2016 09:41:45 GMT-0700 (PDT)\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
@@ -24,12 +23,24 @@ msgstr ""
 "esc_html_x:1,2c;comments_number_link:2,3;t:1;st:1;trans:1;transChoice:1,2\n"
 "X-Generator: Loco - https://localise.biz/"
 
-#. Name of the plugin
-msgid "Block Bad Queries (BBQ)"
+#: block-bad-queries.php:63
+msgid "Click here to rate and review this plugin at WordPress.org"
 msgstr ""
 
-#. URI of the plugin
-msgid "https://perishablepress.com/block-bad-queries"
+#: block-bad-queries.php:64
+msgid "Rate this plugin&nbsp;&raquo;"
+msgstr ""
+
+#: block-bad-queries.php:80
+msgid "Get BBQ Pro for advanced protection"
+msgstr ""
+
+#: block-bad-queries.php:81
+msgid "Go&nbsp;Pro"
+msgstr ""
+
+#. Name of the plugin
+msgid "Block Bad Queries (BBQ)"
 msgstr ""
 
 #. Description of the plugin
@@ -38,26 +49,14 @@ msgid ""
 "free/basic version of BBQ."
 msgstr ""
 
+#. URI of the plugin
+msgid "https://perishablepress.com/block-bad-queries/"
+msgstr ""
+
 #. Author of the plugin
 msgid "Jeff Starr"
 msgstr ""
 
 #. Author URI of the plugin
-msgid "https://plugin-planet.com"
-msgstr ""
-
-#: /block-bad-queries.php:64
-msgid "Click here to rate and review this plugin on WordPress.org"
-msgstr ""
-
-#: /block-bad-queries.php:65
-msgid "Rate this plugin"
-msgstr ""
-
-#: /block-bad-queries.php:68
-msgid "Get BBQ Pro for advanced protection"
-msgstr ""
-
-#: /block-bad-queries.php:69
-msgid "Go&nbsp;Pro"
+msgid "https://plugin-planet.com/"
 msgstr ""

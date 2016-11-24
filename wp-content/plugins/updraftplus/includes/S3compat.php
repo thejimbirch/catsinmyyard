@@ -667,17 +667,19 @@ class UpdraftPlus_S3_Compat
 	* @param string $bucket Bucket name
 	* @param string $uri Object URI
 	* @param mixed $saveTo Filename or resource to write to
-	* @param boolean resume, if possible
+	* @param mixed $resume - if $saveTo is a resource, then this is either false or the value for a Range: header; otherwise, a boolean, indicating whether to resume if possible.
 	* @return mixed
 	*/
-	// In UpdraftPlus, $saveTo is always a filename
 	public function getObject($bucket, $uri, $saveTo = false, $resume = false)
 	{
 		try {
 			// SaveAs: "Specify where the contents of the object should be downloaded. Can be the path to a file, a resource returned by fopen, or a Guzzle\Http\EntityBodyInterface object." - http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.S3.S3Client.html#_getObject
 
 			$range_header = false;
-			if (file_exists($saveTo)) {
+			if (is_resource($saveTo)) {
+				$fp = $saveTo;
+				if (!is_bool($resume)) $range_header = $resume;
+			} elseif (file_exists($saveTo)) {
 				if ($resume && ($fp = @fopen($saveTo, 'ab')) !== false) {
 					$range_header = "bytes=".filesize($saveTo).'-';
 				} else {

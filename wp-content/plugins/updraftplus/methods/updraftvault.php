@@ -146,7 +146,7 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 					$config['secretkey'] = $response['secretkey'];
 					$config['path'] = $response['path'];
 				} elseif (is_array($response) && isset($response['result']) && ('token_unknown' == $response['result'] || 'site_duplicated' == $response['result'])) {
-					$updraftplus->log("This site appears to not be connected to UpdraftPlus Vault");
+					$updraftplus->log("This site appears to not be connected to UpdraftPlus Vault (".$response['result'].")");
 					$config['accesskey'] = '';
 					$config['secretkey'] = '';
 					$config['path'] = '';

@@ -235,14 +235,6 @@ h3 .thank-you {
 	clear:left;
 }
 
-a .udp-logo {
-	border: 0px;
-	float: right; 
-	height: 150px;
-	width: 150px;
-	margin: 20px 15px 15px 35px;
-}
-
 .dismiss-dash-notice {
 	float: right;
 	position: relative;
@@ -504,13 +496,6 @@ a .udp-logo {
 	font-size: 120% 
 }
 
-.word-shell-advert {
-	max-width: 800px; 
-	font-size: 140%; 
-	line-height: 140%; 
-	padding: 14px;
-}
-
 .memory-limit { 
 	padding:8px; 
 }
@@ -716,6 +701,15 @@ input #backupnow_includefiles_moreoptions {
 	padding: 4px;
 }
 
+#updraft-authenticate-modal {
+	text-align: center;
+	font-size: 16px !important;
+}
+
+#updraft-authenticate-modal p {
+	font-size: 16px;
+}
+
 #updraft_delete_form p {
 	margin-top: 3px; 
 	padding-top: 0;
@@ -827,16 +821,6 @@ input #backupnow_includefiles_moreoptions {
 .directory-permissions {
 	font-size: 110%;
 	font-weight: bold;
-}
-
-.wordshell-advert {
-	margin: 10px 0; 
-	padding: 10px; 
-	font-size: 140%; 
-	background-color: lightYellow; 
-	border-color: #E6DB55; 
-	border: 1px solid; 
-	border-radius: 4px;
 }
 
 .double-warning {
@@ -1466,3 +1450,78 @@ a.btn-get-started {
 	}*/
 }
 /* End Automation Backup Advert by B */
+/* New Responsive Pretty Advanced Settings */
+.expertmode .advanced_settings_container {
+	height: auto;
+	overflow: hidden;
+}
+
+.expertmode .advanced_settings_container .advanced_settings_menu {
+	float: none;
+	border-bottom: 1px solid rgb(204, 204, 204);
+}
+
+.expertmode .advanced_settings_container .advanced_settings_content {
+	padding-top: 5px;
+	float: none;
+	width:auto;
+	overflow: auto;
+}
+
+.expertmode .advanced_settings_container .advanced_settings_content h3 {
+	margin-top: 5px !important;
+}
+
+.expertmode .advanced_settings_container .advanced_settings_content .advanced_tools {
+	display: none;
+}
+.expertmode .advanced_settings_container .advanced_settings_content .site_info {
+	display: block;
+}
+
+.expertmode .advanced_settings_container .advanced_settings_menu .advanced_tools_button {
+	display: inline-block;
+	cursor: pointer;
+	padding: 5px;
+	color: #000000;
+}
+
+.expertmode .advanced_settings_container .advanced_settings_menu .advanced_tools_text {
+	font-size: 16px;
+}
+
+.expertmode .advanced_settings_container .advanced_settings_menu .advanced_tools_button:hover {
+	background-color: #eaeaea;
+}
+
+.expertmode .advanced_settings_container .advanced_settings_menu .active {
+	background-color: #3498db;
+	color:#ffffff;
+}
+
+.expertmode .advanced_settings_container .advanced_settings_menu .active:hover {
+	background-color: #72c5fd;
+	color: #ffffff;
+}
+
+.expertmode .advanced_settings_container .advanced_settings_content input#import_settings {
+	height:auto !important;
+}
+
+@media screen and (min-width: 670px) {
+	.expertmode .advanced_settings_container .advanced_settings_menu {
+		float: left;
+		width: 215px;
+		border-right: 1px solid rgb(204, 204, 204);
+		border-bottom: none;
+	}
+
+	.expertmode .advanced_settings_container .advanced_settings_content {
+		padding-left: 10px;
+		padding-top: 0px;
+	}
+
+	.expertmode .advanced_settings_container .advanced_settings_menu .advanced_tools_button {
+		display: block;
+	}
+}

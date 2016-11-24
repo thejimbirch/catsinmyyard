@@ -12,8 +12,7 @@ function wpt_max_length() {
 			set_transient( 'wpt_twitter_config', $config, 60*60*24 );
 		} else {
 			$config     = json_encode( array( 
-				'with_media' => 115, 
-				'without_media' => 139, 
+				'base_length' => 139, 
 				'http_length' => 23, 
 				'https_length' => 23,
 				'reserved_chars' => 24
@@ -28,8 +27,7 @@ function wpt_max_length() {
 		$short_url_https  = $decoded->short_url_length_https;
 		$reserved_char    = $decoded->characters_reserved_per_media;
 		$values = array( 
-			'with_media' => 139 - $reserved_char, 
-			'without_media' => 139, 
+			'base_length' => 139, 
 			'http_length' => $short_url_length, 
 			'https_length' => $short_url_https,
 			'reserved_chars' => $reserved_char
@@ -38,8 +36,7 @@ function wpt_max_length() {
 	} else {
 		// if config query is invalid, use default values; these may become invalid
 		$values = array( 
-			'with_media' => 115, 
-			'without_media' => 139, 
+			'base_length' => 139, 
 			'http_length' => 23, 
 			'https_length' => 23,
 			'reserved_chars' => 24
@@ -71,9 +68,9 @@ function wpt_filter_urls( $tweet, $post_ID ) {
 
 
 function jd_truncate_tweet( $tweet, $post, $post_ID, $retweet = false, $ref = false ) {
-	// media file occupies 22 characters, need to account for in shortening.
+	// media file no longer needs accounting in shortening. 9/22/2016
 	$maxlength    = wpt_max_length();
-	$length       = ( wpt_post_with_media( $post_ID, $post ) ) ? $maxlength['with_media'] : $maxlength['without_media'];
+	$length       = $maxlength['base_length'];
 	$tweet        = apply_filters( 'wpt_tweet_sentence', $tweet, $post_ID );
 	$tweet        = trim( wpt_custom_shortcodes( $tweet, $post_ID ) );
 	$tweet        = trim( wpt_user_meta_shortcodes( $tweet, $post['authId'] ) );

@@ -33,6 +33,8 @@ class Updraft_Restorer extends WP_Upgrader {
 	
 	private $ud_restore_options;
 	
+	private $restore_this_site = array();
+	
 	private $restore_this_table = array();
 
 	private $line = 0;
@@ -76,6 +78,8 @@ class Updraft_Restorer extends WP_Upgrader {
 		if (isset($info['is_multisite'])) $this->ud_backup_is_multisite = $info['is_multisite'];
 		if (isset($info['created_by_version'])) $this->created_by_version = $info['created_by_version'];
 
+		add_filter('updraftplus_logline', array($this, 'updraftplus_logline'), 10, 5);
+		
 		parent::__construct($skin);
 		$this->init();
 		$this->backup_strings();
@@ -84,6 +88,59 @@ class Updraft_Restorer extends WP_Upgrader {
 
 	public function ud_get_skin() {
 		return $this->skin;
+	}
+	
+	// In future, this can get more sophisticated. For now, things are funnelled through here, giving the future possibility.
+	public function updraftplus_logline($line, $nonce, $level, $uniq_id, $destination) {
+		if ('restore' != $destination) return $line;
+		
+		global $updraftplus;
+		/*
+		
+		// This provides for saving the log to the database. We might prefer a file, though.
+		
+		
+		$restore_log = $updraftplus->jobdata_get('restore_log');
+		if (!is_array($restore_log)) $restore_log = array();
+		
+		$log_object = array(
+			'time' => microtime(true),
+			'level' => $level,
+			'destination' => $destination
+			'message' => $line
+		);
+		
+		if ($uniq_id) {
+			$restore_log[$uniq_id] = $log_object;
+		} else {
+			$restore_log[] = $log_object;
+		}
+		
+		$updraftplus->jobdata_set('restore_log', $restore_log);
+		*/
+		
+		static $logfile_handle;
+		static $opened_log_time;
+		
+		if (empty($logfile_handle)) {
+			$logfile_name = $updraftplus->backups_dir_location()."/log.$nonce-browser.txt";
+			$logfile_handle = fopen($logfile_name, 'a');
+		}
+		
+		if (!empty($logfile_handle)) {
+			$rtime = microtime(true)-$updraftplus->job_time_ms;
+			fwrite($logfile_handle, sprintf("%08.03f", round($rtime, 3))." (R) ".'['.$level.'] '.$line."\n");
+		}
+		
+		if ('warning' == $destination || 'error' == $destination || $uniq_id) {
+			$line = '<strong>'.htmlspecialchars($line).'</strong>';
+		} else {
+			$line = htmlspecialchars($line);
+		}
+
+		echo $line.'<br>';
+
+		return false;
 	}
 	
 	private function backup_strings() {
@@ -279,7 +336,9 @@ class Updraft_Restorer extends WP_Upgrader {
 
 		@set_time_limit(1800);
 
-		$this->skin->feedback('unpack_package');
+		$packsize = round(filesize($backup_dir.$package)/1048576, 1).' Mb';
+		
+		$this->skin->feedback($this->strings['unpack_package'].' ('.basename($package).', '.$packsize.')');
 
 		$upgrade_folder = $wp_filesystem->wp_content_dir() . 'upgrade/';
 		@$wp_filesystem->mkdir($upgrade_folder, octdec($this->calculate_additive_chmod_oct(FS_CHMOD_DIR, 0775)));
@@ -406,9 +465,9 @@ class Updraft_Restorer extends WP_Upgrader {
 			// Correctly restore files in 'others' in no directory that were wrongly backed up in versions 1.4.0 - 1.4.48
 			if (('others' == $type || 'wpcore' == $type) && preg_match('/^([\-_A-Za-z0-9]+\.php)$/i', $file, $matches) && $wpfs->exists($working_dir . "/$file/$file")) {
 				if ('others' == $type) {
-					echo "Found file: $file/$file: presuming this is a backup with a known fault (backup made with versions 1.4.0 - 1.4.48, and sometimes up to 1.6.55 on some Windows servers); will rename to simply $file<br>";
+					$updraftplus->log("Found file: $file/$file: presuming this is a backup with a known fault (backup made with versions 1.4.0 - 1.4.48, and sometimes up to 1.6.55 on some Windows servers); will rename to simply $file", 'notice-restore');
 				} else {
-					echo "Found file: $file/$file: presuming this is a backup with a known fault (backup made with versions before 1.6.55 in certain situations on Windows servers); will rename to simply $file<br>";
+					$updraftplus->log("Found file: $file/$file: presuming this is a backup with a known fault (backup made with versions before 1.6.55 in certain situations on Windows servers); will rename to simply $file", 'notice-restore');
 				}
 				$updraftplus->log("$file/$file: rename to $file");
 				$file = $matches[1];
@@ -702,6 +761,7 @@ class Updraft_Restorer extends WP_Upgrader {
 				$print_last_one = ($last_one) ? "1" : "0";
 // TODO: Also want the timestamp
 				// We don't bother to include info, as that is backup-independent information that can be re-created when needed
+				// TODO: Change to new log style, if ever using
 				echo '<p style="margin: 0px 0px;" class="updraft-ajaxrestore" data-type="'.$type.'" data-lastone="'.$print_last_one.'" data-backupfile="'.esc_attr($backup_file).'">'."\n";
 				$updraftplus->log("Deferring handling of uploads ($backup_file)");
 				echo "$backup_file: ".'<span class="deferprogress">'.__('Deferring...', 'updraftplus').'</span>';
@@ -876,11 +936,10 @@ class Updraft_Restorer extends WP_Upgrader {
 					#return new WP_Error('delete_failed', $this->strings['delete_failed'].' ('.$working_dir.')');
 					$dirlist = $wp_filesystem->dirlist($working_dir, true, true);
 					if (is_array($dirlist)) {
-						echo __('Files found:', 'updraftplus').'<br><ul style="list-style: disc inside;">';
+						$updraftplus->log(__('Files found:', 'updraftplus'), 'notice-restore');
 						foreach ($dirlist as $name => $struc) {
-							echo "<li>".htmlspecialchars($name)."</li>";
+							$updraftplus->log("* $name", 'notice-restore');
 						}
-						echo '</ul>';
 					} else {
 						$updraftplus->log_e('Unable to enumerate files in that directory.');
 					}
@@ -924,7 +983,7 @@ class Updraft_Restorer extends WP_Upgrader {
 				if ($updraftplus->mod_rewrite_unavailable()) {
 					$updraftplus->log("Using Apache, with permalinks (".get_option('permalink_structure').") but no mod_rewrite enabled - enable it to make your permalinks work");
 					$warn_no_rewrite = sprintf(__('You are using the %s webserver, but do not seem to have the %s module loaded.', 'updraftplus'), 'Apache', 'mod_rewrite').' '.sprintf(__('You should enable %s to make any pretty permalinks (e.g. %s) work', 'updraftplus'), 'mod_rewrite', 'http://example.com/my-page/');
-					echo '<p><strong>'.htmlspecialchars($warn_no_rewrite).'</strong></p>';
+					$updraftplus->log($warn_no_rewrite, 'warning-restore');
 				}
 
 			break;
@@ -1279,12 +1338,14 @@ ENDHERE;
 
 	private function pre_sql_actions($import_table_prefix) {
 
+		global $updraftplus;
+
 		$import_table_prefix = apply_filters('updraftplus_restore_set_table_prefix', $import_table_prefix, $this->ud_backup_is_multisite);
 
 		if (!is_string($import_table_prefix)) {
 			$this->maintenance_mode(false);
 			if ($import_table_prefix === false) {
-				echo '<p>'.__('Please supply the requested information, and then continue.', 'updraftplus').'</p>';
+				$updraftplus->log(__('Please supply the requested information, and then continue.', 'updraftplus'), 'notice-restore');
 				return false;
 			} elseif (is_wp_error($import_table_prefix)) {
 				return $import_table_prefix;
@@ -1293,8 +1354,7 @@ ENDHERE;
 			}
 		}
 
-		global $updraftplus;
-		echo $updraftplus->log_e('New table prefix: %s', $import_table_prefix);
+		$updraftplus->log_e('New table prefix: %s', $import_table_prefix);
 
 		return $import_table_prefix;
 
@@ -1318,6 +1378,8 @@ ENDHERE;
 	// The pass-by-reference on $import_table_prefix is due to historical refactoring
 	private function restore_backup_db($working_dir, $working_dir_localpath, &$import_table_prefix) {
 
+		global $updraftplus;
+	
 		do_action('updraftplus_restore_db_pre');
 
 		# This is now a legacy option (at least on the front end), so we should not see it much
@@ -1327,7 +1389,7 @@ ENDHERE;
 
 		# The 'off' check is for badly configured setups - http://wordpress.org/support/topic/plugin-wp-super-cache-warning-php-safe-mode-enabled-but-safe-mode-is-off
 		if (@ini_get('safe_mode') && 'off' != strtolower(@ini_get('safe_mode'))) {
-			echo "<p>".__('Warning: PHP safe_mode is active on your server. Timeouts are much more likely. If these happen, then you will need to manually restore the file via phpMyAdmin or another method.', 'updraftplus')."</p><br/>";
+			$updraftplus->log(__('Warning: PHP safe_mode is active on your server. Timeouts are much more likely. If these happen, then you will need to manually restore the file via phpMyAdmin or another method.', 'updraftplus'), 'notice-restore');
 		}
 
 		$db_basename = 'backup.db.gz';
@@ -1438,8 +1500,11 @@ ENDHERE;
 			$this->create_forbidden = true;
 			# If we can't create, then there's no point dropping
 			$this->drop_forbidden = true;
-			echo '<strong>'.__('Warning:', 'updraftplus').'</strong> ';
-			$updraftplus->log_e('Your database user does not have permission to create tables. We will attempt to restore by simply emptying the tables; this should work as long as a) you are restoring from a WordPress version with the same database structure, and b) Your imported database does not contain any tables which are not already present on the importing site.');
+			
+			$updraftplus->log(__('Your database user does not have permission to create tables. We will attempt to restore by simply emptying the tables; this should work as long as a) you are restoring from a WordPress version with the same database structure, and b) Your imported database does not contain any tables which are not already present on the importing site.', 'updraftplus'), 'warning-restore');
+			
+			$updraftplus->log('Your database user does not have permission to create tables. We will attempt to restore by simply emptying the tables; this should work as long as a) you are restoring from a WordPress version with the same database structure, and b) Your imported database does not contain any tables which are not already present on the importing site.');
+			
 			$updraftplus->log('Error was: '.$this->last_error.' ('.$this->last_error_no.')');
 		} else {
 		
@@ -1467,8 +1532,11 @@ ENDHERE;
 			}
 			if (!$req && ($this->use_wpdb || $this->last_error_no === 1142)) {
 				$this->drop_forbidden = true;
-				echo '<strong>'.__('Warning:','updraftplus').'</strong> ';
-				$updraftplus->log_e('Your database user does not have permission to drop tables. We will attempt to restore by simply emptying the tables; this should work as long as you are restoring from a WordPress version with the same database structure (%s)', ' ('.$this->last_error.', '.$this->last_error_no.')');
+
+				$updraftplus->log(sprintf('Your database user does not have permission to drop tables. We will attempt to restore by simply emptying the tables; this should work as long as you are restoring from a WordPress version with the same database structure (%s)', '('.$this->last_error.', '.$this->last_error_no.')'));
+				
+				$updraftplus->log(sprintf(__('Your database user does not have permission to drop tables. We will attempt to restore by simply emptying the tables; this should work as long as you are restoring from a WordPress version with the same database structure (%s)', 'updraftplus'), '('.$this->last_error.', '.$this->last_error_no.')'), 'warning-restore');
+				
 			}
 		}
 
@@ -1512,37 +1580,38 @@ ENDHERE;
 			if (empty($buffer) || substr($buffer, 0, 1) == '#' || preg_match('/^--(\s|$)/', substr($buffer, 0, 3))) {
 				if ('' == $this->old_siteurl && preg_match('/^\# Backup of: (http(.*))$/', $buffer, $matches)) {
 					$this->old_siteurl = untrailingslashit($matches[1]);
-					$updraftplus->log_e('<strong>Backup of:</strong> %s', htmlspecialchars($this->old_siteurl));
+					$updraftplus->log("Backup of: ".$this->old_siteurl);
+					$updraftplus->log(sprintf(__('Backup of: %s', 'updraftplus'), $this->old_siteurl), 'notice-restore', 'backup-of');
 					do_action('updraftplus_restore_db_record_old_siteurl', $this->old_siteurl);
 
 					$this->save_configuration_bundle();
 
 				} elseif (false === $this->created_by_version && preg_match('/^\# Created by UpdraftPlus version ([\d\.]+)/', $buffer, $matches)) {
 					$this->created_by_version = trim($matches[1]);
-					echo '<strong>'.__('Backup created by:', 'updraftplus').'</strong> '.htmlspecialchars($this->created_by_version).'<br>';
+					$updraftplus->log(__('Backup created by:', 'updraftplus').' '.$this->created_by_version, 'notice-restore', 'created-by');
 					$updraftplus->log('Backup created by: '.$this->created_by_version);
 				} elseif ('' == $this->old_home && preg_match('/^\# Home URL: (http(.*))$/', $buffer, $matches)) {
 					$this->old_home = untrailingslashit($matches[1]);
 					if ($this->old_siteurl && $this->old_home != $this->old_siteurl) {
-						echo '<strong>'.__('Site home:', 'updraftplus').'</strong> '.htmlspecialchars($this->old_home).'<br>';
+						$updraftplus->log(__('Site home:', 'updraftplus').' '.$this->old_home, 'notice-restore', 'site-home');
 						$updraftplus->log('Site home: '.$this->old_home);
 					}
 					do_action('updraftplus_restore_db_record_old_home', $this->old_home);
 				} elseif ('' == $this->old_content && preg_match('/^\# Content URL: (http(.*))$/', $buffer, $matches)) {
 					$this->old_content = untrailingslashit($matches[1]);
-					echo '<strong>'.__('Content URL:', 'updraftplus').'</strong> '.htmlspecialchars($this->old_content).'<br>';
+					$updraftplus->log(__('Content URL:', 'updraftplus').' '.$this->old_content, 'notice-restore', 'content-url');
 					$updraftplus->log('Content URL: '.$this->old_content);
 					do_action('updraftplus_restore_db_record_old_content', $this->old_content);
 				} elseif ('' == $this->old_uploads && preg_match('/^\# Uploads URL: (http(.*))$/', $buffer, $matches)) {
 					$this->old_uploads = untrailingslashit($matches[1]);
-					echo '<strong>'.__('Uploads URL:', 'updraftplus').'</strong> '.htmlspecialchars($this->old_uploads).'<br>';
+					$updraftplus->log(__('Uploads URL:', 'updraftplus').' '.$this->old_uploads, 'notice-restore', 'uploads-url');
 					$updraftplus->log('Uploads URL: '.$this->old_uploads);
 					do_action('updraftplus_restore_db_record_old_uploads', $this->old_uploads);
 				} elseif ('' == $this->old_table_prefix && (preg_match('/^\# Table prefix: (\S+)$/', $buffer, $matches) || preg_match('/^-- Table Prefix: (\S+)$/i', $buffer, $matches))) {
 					# We also support backwpup style:
 					# -- Table Prefix: wp_
 					$this->old_table_prefix = $matches[1];
-					echo '<strong>'.__('Old table prefix:', 'updraftplus').'</strong> '.htmlspecialchars($this->old_table_prefix).'<br>';
+					$updraftplus->log(__('Old table prefix:', 'updraftplus').' '.$this->old_table_prefix, 'notice-restore', 'old-table-prefix');
 					$updraftplus->log("Old table prefix: ".$this->old_table_prefix);
 				} elseif ($gathering_siteinfo && preg_match('/^\# Site info: (\S+)$/', $buffer, $matches)) {
 					if ('end' == $matches[1]) {
@@ -1561,8 +1630,8 @@ ENDHERE;
 					} elseif (preg_match('/^([^=]+)=(.*)$/', $matches[1], $kvmatches)) {
 						$key = $kvmatches[1];
 						$val = $kvmatches[2];
-						echo '<strong>'.__('Site information:','updraftplus').'</strong>'.' '.htmlspecialchars($key).' = '.htmlspecialchars($val).'<br>';
-						$updraftplus->log("Site information: ".$key."=".$val);
+						$updraftplus->log(__('Site information:','updraftplus')." $key = $val", 'notice-restore', 'site-information');
+						$updraftplus->log("Site information: $key=$val");
 						$old_siteinfo[$key]=$val;
 						if ('multisite' == $key) {
 							$this->ud_backup_is_multisite = ($val) ? 1 : 0;
@@ -1587,7 +1656,7 @@ ENDHERE;
 				if ('' != $this->old_table_prefix && $import_table_prefix != $this->old_table_prefix) $sql_line = $updraftplus->str_replace_once($this->old_table_prefix, $import_table_prefix, $sql_line);
 				# Run the SQL command; then set up for the next one.
 				$this->line++;
-				echo __("Split line to avoid exceeding maximum packet size", 'updraftplus')." (".strlen($sql_line)." + ".strlen($buffer)." : ".$this->max_allowed_packet.")<br>";
+				$updraftplus->log(__("Split line to avoid exceeding maximum packet size", 'updraftplus')." (".strlen($sql_line)." + ".strlen($buffer)." : ".$this->max_allowed_packet.")", 'notice-restore');
 				$updraftplus->log("Split line to avoid exceeding maximum packet size (".strlen($sql_line)." + ".strlen($buffer)." : ".$this->max_allowed_packet.")");
 				$do_exec = $this->sql_exec($sql_line, $sql_type, $import_table_prefix);
 				if (is_wp_error($do_exec)) return $do_exec;
@@ -1635,7 +1704,7 @@ ENDHERE;
 				// Legacy, less reliable - in case it was not caught before
 				if ('' == $this->old_table_prefix && preg_match('/^([a-z0-9]+)_.*$/i', $this->table_name, $tmatches)) {
 					$this->old_table_prefix = $tmatches[1].'_';
-					echo '<strong>'.__('Old table prefix:', 'updraftplus').'</strong> '.htmlspecialchars($this->old_table_prefix).'<br>';
+					$updraftplus->log(__('Old table prefix:', 'updraftplus').' '.$this->old_table_prefix, 'notice-restore', 'old-table-prefix');
 					$updraftplus->log("Old table prefix (detected from first table): ".$this->old_table_prefix);
 				}
 
@@ -1661,7 +1730,7 @@ ENDHERE;
 				// Legacy, less reliable - in case it was not caught before. We added it in here (CREATE) as well as in DROP because of SQL dumps which lack DROP statements.
 				if ('' == $this->old_table_prefix && preg_match('/^([a-z0-9]+)_.*$/i', $this->table_name, $tmatches)) {
 					$this->old_table_prefix = $tmatches[1].'_';
-					echo '<strong>'.__('Old table prefix:', 'updraftplus').'</strong> '.htmlspecialchars($this->old_table_prefix).'<br>';
+					$updraftplus->log(__('Old table prefix:', 'updraftplus').' '.$this->old_table_prefix, 'notice-restore', 'old-table-prefix');
 					$updraftplus->log("Old table prefix (detected from creating first table): ".$this->old_table_prefix);
 				}
 
@@ -1727,11 +1796,11 @@ ENDHERE;
 					}
 				}
 
-				echo '<strong>'.sprintf(__('Restoring table (%s)','updraftplus'), $engine).":</strong> ".htmlspecialchars($this->table_name);
-				$logline = "Restoring table ($engine): ".$this->table_name;
+				$print_line = sprintf(__('Processing table (%s)','updraftplus'), $engine).":  ".$this->table_name;
+				$logline = "Processing table ($engine): ".$this->table_name;
 				if ('' != $this->old_table_prefix && $import_table_prefix != $this->old_table_prefix) {
-					if (!isset($this->restore_this_table[$this->table_name]) || $this->restore_this_table[$this->table_name]) {
-						echo ' - '.__('will restore as:', 'updraftplus').' '.htmlspecialchars($this->new_table_name);
+					if ($this->restore_this_table($this->table_name)) {
+						$print_line .= ' - '.__('will restore as:', 'updraftplus').' '.htmlspecialchars($this->new_table_name);
 						$logline .= " - will restore as: ".$this->new_table_name;
 					} else {
 						$logline .= ' - skipping';
@@ -1739,9 +1808,9 @@ ENDHERE;
 					$sql_line = $updraftplus->str_replace_once($this->old_table_prefix, $import_table_prefix, $sql_line);
 				}
 				$updraftplus->log($logline);
+				$updraftplus->log($print_line, 'notice-restore');
 				$restoring_table = $this->new_table_name;
-				echo '<br>';
-				if ($engine_change_message) echo $engine_change_message;
+				if ($engine_change_message) $updraftplus->log($engine_change_message, 'notice-restore');
 
 			} elseif (preg_match('/^\s*(insert into \`?([^\`]*)\`?\s+(values|\())/i', $sql_line, $matches)) {
 				$sql_type = 3;
@@ -1882,26 +1951,72 @@ ENDHERE;
 		global $updraftplus;
 		$logit = substr($sql_line, 0, 100);
 		$updraftplus->log(sprintf("An SQL line that is larger than the maximum packet size and cannot be split was found: %s", '('.strlen($sql_line).', '.$logit.' ...)'));
-		echo '<strong>'.__('Warning:', 'updraftplus').'</strong> '.sprintf(__("An SQL line that is larger than the maximum packet size and cannot be split was found; this line will not be processed, but will be dropped: %s", 'updraftplus'), '('.strlen($sql_line).', '.$this->max_allowed_packet.', '.$logit.' ...)')."<br>";
+		
+		$updraftplus->log(__('Warning:', 'updraftplus').' '.sprintf(__("An SQL line that is larger than the maximum packet size and cannot be split was found; this line will not be processed, but will be dropped: %s", 'updraftplus'), '('.strlen($sql_line).', '.$this->max_allowed_packet.', '.$logit.' ...)'), 'notice-restore');
 	}
 
+	private function restore_this_table($table_name) {
+	
+		global $updraftplus;
+		$unprefixed_table_name = substr($table_name, strlen($this->old_table_prefix));
+	
+		// First, check whether it's a multisite site which we're not restoring. This is stored in restore_this_site (once we know the site).
+		if (!empty($this->ud_multisite_selective_restore)) {
+			if (preg_match('/^(\d+)_.*$/', $unprefixed_table_name, $matches)) {
+				$site_id = $matches[1];
+			
+				if (!isset($this->restore_this_site[$site_id])) {
+					$this->restore_this_site[$site_id] = apply_filters(
+						'updraftplus_restore_this_site',
+						true,
+						$site_id,
+						$unprefixed_table_name,
+						$this->ud_restore_options
+					);
+				}
+				
+				if (false === $this->restore_this_site[$site_id]) {
+					// The first time it's looked into, it gets logged
+					$updraftplus->log_e('Skipping site %s: this table (%s) and others from the site will not be restored', $site_id, $table_name);
+					$this->restore_this_site[$site_id] = 0;
+				}
+				
+				if (!$this->restore_this_site[$site_id]) {
+					return false;
+				}
+				
+			}
+		
+		}
+		
+		// Secondly, if we're still intending to proceed, check the table specifically
+		if (!isset($this->restore_this_table[$table_name])) {
+		
+			$this->restore_this_table[$table_name] = apply_filters(
+				'updraftplus_restore_this_table',
+				true,
+				$unprefixed_table_name,
+				$this->ud_restore_options
+			);
+			
+			if (false === $this->restore_this_table[$table_name]) {
+				// The first time it's looked into, it gets logged
+				$updraftplus->log_e('Skipping table %s: this table will not be restored', $table_name);
+				$this->restore_this_table[$table_name] = 0;
+			}
+			
+		}
+		
+		return $this->restore_this_table[$table_name];
+	}
+	
 	# UPDATE is sql_type=5 (not used in the function, but used in Migrator and so noted here for reference)
 	# $import_table_prefix is only use in one place in this function (long INSERTs), and otherwise need/should not be supplied
 	public function sql_exec($sql_line, $sql_type, $import_table_prefix = '', $check_skipping = true) {
 
 		global $wpdb, $updraftplus;
 
-		if ($check_skipping && !empty($this->table_name)) {
-			if (!isset($this->restore_this_table[$this->table_name])) {
-				// Valid values: true (= yes, restore it); false (= no, don't restore it, and log the fact); 0 (= don't restore, and don't log)
-				$this->restore_this_table[$this->table_name] = apply_filters('updraftplus_restore_this_table', true, substr($this->table_name, strlen($this->old_table_prefix)), $this->ud_restore_options);
-			}
-			if (false === $this->restore_this_table[$this->table_name]) {
-				$updraftplus->log_e('Skipping table %s: this table will not be restored', $this->table_name);
-				$this->restore_this_table[$this->table_name] = 0;
-			}
-			if (!$this->restore_this_table[$this->table_name]) return;
-		}
+		if ($check_skipping && !empty($this->table_name) && !$this->restore_this_table($this->table_name)) return;
 		
 		$ignore_errors = false;
 		# Type 2 = CREATE TABLE
@@ -1962,7 +2077,7 @@ ENDHERE;
 		if (!$req) {
 			if (!$ignore_errors) $this->errors++;
 			$print_err = (strlen($sql_line) > 100) ? substr($sql_line, 0, 100).' ...' : $sql_line;
-			echo sprintf(_x('An error (%s) occurred:', 'The user is being told the number of times an error has happened, e.g. An error (27) occurred', 'updraftplus'), $this->errors)." - ".htmlspecialchars($this->last_error)." - ".__('the database query being run was:','updraftplus').' '.htmlspecialchars($print_err).'<br>';
+			$updraftplus->log(sprintf(_x('An error (%s) occurred:', 'The user is being told the number of times an error has happened, e.g. An error (27) occurred', 'updraftplus'), $this->errors)." - ".$this->last_error." - ".__('the database query being run was:','updraftplus').' '.$print_err, 'notice-restore');
 			$updraftplus->log("An error (".$this->errors.") occurred: ".$this->last_error." - SQL query was (type=$sql_type): ".substr($sql_line, 0, 65536));
 
 			// First command is expected to be DROP TABLE
@@ -2056,25 +2171,25 @@ ENDHERE;
 		if (preg_match('/^([\d+]_)?options$/', substr($table, strlen($import_table_prefix)), $matches)) {
 			// The second prefix here used to have a '!$this->is_multisite' on it (i.e. 'options' table on non-multisite). However, the user_roles entry exists in the main options table on multisite too.
 			if (($this->is_multisite && !empty($matches[1])) || $table == $import_table_prefix.'options') {
-
-				$mprefix = (empty($matches[1])) ? '' : $matches[1];
+			
+				$mprefix = empty($matches[1]) ? '' : $matches[1];
 
 				$new_table_name = $import_table_prefix.$mprefix."options";
 
 				// WordPress has an option name predicated upon the table prefix. Yuk.
 				if ($import_table_prefix != $old_table_prefix) {
 					$updraftplus->log("Table prefix has changed: changing options table field(s) accordingly (".$mprefix."options)");
-					echo sprintf(__('Table prefix has changed: changing %s table field(s) accordingly:', 'updraftplus'),'option').' ';
+					$print_line = sprintf(__('Table prefix has changed: changing %s table field(s) accordingly:', 'updraftplus'),'option').' ';
 					if (false === $wpdb->query("UPDATE $new_table_name SET option_name='${import_table_prefix}".$mprefix."user_roles' WHERE option_name='${old_table_prefix}".$mprefix."user_roles' LIMIT 1")) {
-						echo __('Error','updraftplus');
+						$print_line .= __('Error','updraftplus');
 						$updraftplus->log("Error when changing options table fields: ".$wpdb->last_error);
 					} else {
 						$updraftplus->log("Options table fields changed OK");
-						echo __('OK', 'updraftplus');
+						$print_line .= __('OK', 'updraftplus');
 					}
-					echo '<br>';
+					$updraftplus->log($print_line, 'notice-restore');
 				}
-
+				
 				// Now deal with the situation where the imported database sets a new over-ride upload_path that is absolute - which may not be wanted
 				$new_upload_path = $wpdb->get_row($wpdb->prepare("SELECT option_value FROM ${import_table_prefix}".$mprefix."options WHERE option_name = %s LIMIT 1", 'upload_path'));
 				$new_upload_path = (is_object($new_upload_path)) ? $new_upload_path->option_value : '';
@@ -2091,7 +2206,7 @@ ENDHERE;
 							$updraftplus->log_e("Uploads path (%s) has changed during a migration - resetting (to: %s)", $new_upload_path, $this->prior_upload_path);
 						}
 						if (false === $wpdb->query("UPDATE ${import_table_prefix}".$mprefix."options SET option_value='".esc_sql($this->prior_upload_path)."' WHERE option_name='upload_path' LIMIT 1")) {
-							echo __('Error','updraftplus');
+							$updraftplus->log(__('Error','updraftplus'), 'notice-restore');
 							$updraftplus->log("Error when changing upload path: ".$wpdb->last_error);
 							$updraftplus->log("Failed");
 						}
@@ -2139,7 +2254,8 @@ ENDHERE;
 			// This table is not a per-site table, but per-install
 
 			$updraftplus->log("Table prefix has changed: changing usermeta table field(s) accordingly");
-			echo sprintf(__('Table prefix has changed: changing %s table field(s) accordingly:', 'updraftplus'),'usermeta').' ';
+
+			$print_line = sprintf(__('Table prefix has changed: changing %s table field(s) accordingly:', 'updraftplus'),'usermeta').' ';
 
 			$errors_occurred = false;
 
@@ -2172,12 +2288,12 @@ ENDHERE;
 
 			if ($errors_occurred) {
 				$updraftplus->log("Error when changing usermeta table fields");
-				echo __('Error', 'updraftplus');
+				$print_line .= __('Error', 'updraftplus');
 			} else {
 				$updraftplus->log("Usermeta table fields changed OK");
-				echo __('OK', 'updraftplus');
+				$print_line .= __('OK', 'updraftplus');
 			}
-			echo "<br>";
+			$updraftplus->log($print_line, 'notice-restore');
 
 		}
 
@@ -2224,9 +2340,8 @@ class Updraft_Restorer_Skin extends WP_Upgrader_Skin {
 		if (is_wp_error($error)) {
 			$updraftplus->log_wp_error($error, true);
 		} elseif (is_string($error)) {
-			echo '<strong>';
-			$updraftplus->log_e($error);
-			echo '</strong>';
+			$updraftplus->log($error);
+			$updraftplus->log($error, 'warning-restore');
 		}
 	}
 

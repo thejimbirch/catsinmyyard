@@ -24,7 +24,7 @@ if ( ! function_exists( 'cptch_pro_block' ) ) {
 				</div>
 				<div class="bws_pro_version_tooltip">
 					<div class="bws_info"><?php _e( 'Unlock premium options by upgrading to Pro version', 'captcha' ); ?></div>
-					<a class="bws_button" href="http://bestwebsoft.com/products/captcha/?k=9701bbd97e61e52baa79c58c3caacf6d&pn=75&v=<?php echo $cptch_plugin_info["Version"]; ?>&wp_v=<?php echo $wp_version; ?>" target="_blank" title="Captcha Pro by BestWebSoft Plugin"><?php _e( 'Learn More', 'captcha' ); ?></a>
+					<a class="bws_button" href="http://bestwebsoft.com/products/wordpress/plugins/captcha/?k=9701bbd97e61e52baa79c58c3caacf6d&pn=75&v=<?php echo $cptch_plugin_info["Version"]; ?>&wp_v=<?php echo $wp_version; ?>" target="_blank" title="Captcha Pro by BestWebSoft Plugin"><?php _e( 'Learn More', 'captcha' ); ?></a>
 				</div>
 			</div>
 		<?php }
@@ -66,7 +66,7 @@ if ( ! function_exists( 'cptch_packages_banner' ) ) {
 				</p>
 				<p>
 					<label><input disabled="disabled" class="button-primary" value="<?php _e( 'Install Now', 'captcha' ); ?>" type="submit" /></label>
-					<a class="cptch_add_ons_link" href="http://bestwebsoft.com/products/captcha/addons/" target="_blank"><?php _e( 'Browse packages', 'captcha' ); ?></a>
+					<a class="cptch_add_ons_link" href="http://bestwebsoft.com/products/wordpress/plugins/captcha/addons/" target="_blank"><?php _e( 'Browse packages', 'captcha' ); ?></a>
 				</p>
 			</div>
 		</div>
@@ -231,11 +231,11 @@ if ( ! function_exists( 'cptch_option_tab' ) ) {
 				<td><fieldset><input type="checkbox" disabled="disabled" /></fieldset></td>
 			</tr>
 			<tr>
-				<th scope="row"><?php _e( 'Use general settings', 'captcha' );?></th>
+				<th scope="row"><?php _e( 'Hide from registered users', 'captcha' );?></th>
 				<td><fieldset><input type="checkbox" disabled="disabled" /></fieldset></td>
 			</tr>
 			<tr>
-				<th scope="row"><?php _e( 'Hide from registered users', 'captcha' );?></th>
+				<th scope="row"><?php _e( 'Use general settings', 'captcha' );?></th>
 				<td><fieldset><input type="checkbox" disabled="disabled" /></fieldset></td>
 			</tr>
 			<tr class="cptch_form_option_used_packages">

@@ -30,6 +30,8 @@ class UpdraftPlus_BackupModule_s3 {
 	private $s3_object;
 	private $got_with;
 	protected $quota_used = null;
+	protected $s3_exception;
+	protected $download_chunk_size = 10485760;
 
 	protected function get_config() {
 		global $updraftplus;
@@ -202,9 +204,11 @@ class UpdraftPlus_BackupModule_s3 {
 			case 'eu-west-1':
 				$endpoint = 's3-eu-west-1.amazonaws.com';
 				break;
-			case 'us-west-1':
+			case 'us-east-1':
 				$endpoint = 's3.amazonaws.com';
 				break;
+			case 'us-west-1':
+			case 'us-east-2':
 			case 'us-west-2':
 			case 'ap-southeast-1':
 			case 'ap-southeast-2':
@@ -232,10 +236,10 @@ class UpdraftPlus_BackupModule_s3 {
 
 			$updraftplus->log("Set endpoint: $endpoint");
 
-			if ($region == 'us-west-1') {
-				$obj->useDNSBucketName(true, $bucket_name);
-				return;
-			}
+// 			if ($region == 'us-west-1') {
+// 				$obj->useDNSBucketName(true, $bucket_name);
+// 				return;
+// 			}
 
 			return $obj->setEndpoint($endpoint);
 		}
@@ -243,7 +247,7 @@ class UpdraftPlus_BackupModule_s3 {
 
 	public function backup($backup_array) {
 
-		global $updraftplus, $updraftplus_backup;
+		global $updraftplus;
 
 		$config = $this->get_config();
 
@@ -430,8 +434,12 @@ class UpdraftPlus_BackupModule_s3 {
 			
 			return array('s3_object' => $s3, 's3_orig_bucket_name' => $orig_bucket_name);
 		} else {
-			$updraftplus->log("$whoweare Error: Failed to access bucket $bucket_name.");
-			$updraftplus->log(sprintf(__('%s Error: Failed to access bucket %s. Check your permissions and credentials.', 'updraftplus'),$whoweare, $bucket_name), 'error');
+		
+			$extra_text = empty($this->s3_exception) ? '' : ' '.$this->s3_exception->getMessage().' (line: '.$this->s3_exception->getLine().', file: '.$this->s3_exception->getFile().')';
+			$extra_text_short = empty($this->s3_exception) ? '' : ' '.$this->s3_exception->getMessage();
+		
+			$updraftplus->log("$whoweare Error: Failed to access bucket $bucket_name.".$extra_text);
+			$updraftplus->log(sprintf(__('%s Error: Failed to access bucket %s. Check your permissions and credentials.', 'updraftplus'), $whoweare, $bucket_name).$extra_text_short, 'error');
 		}
 	}
 	
@@ -650,7 +658,7 @@ class UpdraftPlus_BackupModule_s3 {
 
 		$config = $this->get_config();
 		$whoweare = $config['whoweare'];
-		$sse = (empty($config['server_side_encryption'])) ? false : true;
+		$sse = empty($config['server_side_encryption']) ? false : true;
 
 		$s3 = $this->getS3(
 			$config['accesskey'],
@@ -676,11 +684,34 @@ class UpdraftPlus_BackupModule_s3 {
 		if ($bucket_exists) {
 
 			$fullpath = $updraftplus->backups_dir_location().'/'.$file;
+			
+			$file_info = $this->listfiles($file);
+			
+			if (is_array($file_info)) {
+				foreach ($file_info as $finfo) {
+					if ($finfo['name'] == $file) {
+						$file_size = $finfo['size'];
+						break;
+					}
+				}
+			}
+			
+			if (!isset($file_size)) {
+				$updraftplus->log("$whoweare Error: Failed to download $file. Check your permissions and credentials. Retrieved data: ".serialize($file_info));
+				$updraftplus->log(sprintf(__('%s Error: Failed to download %s. Check your permissions and credentials.','updraftplus'),$whoweare, $file), 'error');
+				return false;
+			}
+			
+			return $updraftplus->chunked_download($file, $this, $file_size, true, $s3, $this->download_chunk_size);
+			
+			/*
+			// The code before we switched to chunked downloads. Unfortunately the version of the AWS SDK we have to use for PHP 5.3 compatibility doesn't have callbacks, which makes it possible for multiple downloaders to start at once and over-write each-other.
 			if (!$s3->getObject($bucket_name, $bucket_path.$file, $fullpath, true)) {
 				$updraftplus->log("$whoweare Error: Failed to download $file. Check your permissions and credentials.");
 				$updraftplus->log(sprintf(__('%s Error: Failed to download %s. Check your permissions and credentials.','updraftplus'),$whoweare, $file), 'error');
 				return false;
 			}
+			*/
 			
 		} else {
 			$updraftplus->log("$whoweare Error: Failed to access bucket $bucket_name. Check your permissions and credentials.");
@@ -689,6 +720,37 @@ class UpdraftPlus_BackupModule_s3 {
 		}
 		return true;
 
+	}
+	
+	public function chunked_download($file, $headers, $s3, $fh) {
+
+		global $updraftplus;
+	
+		$resume = false;
+		$config = $this->get_config();
+		$whoweare = $config['whoweare'];
+		
+		$bucket_name = untrailingslashit($config['path']);
+		$bucket_path = "";
+
+		if (preg_match("#^([^/]+)/(.*)$#", $bucket_name, $bmatches)) {
+			$bucket_name = $bmatches[1];
+			$bucket_path = $bmatches[2]."/";
+		}
+	
+		if (is_array($headers) && !empty($headers['Range']) && preg_match('/bytes=(\d+)-(\d+)$/', $headers['Range'], $matches)) {
+			$resume = $headers['Range'];
+		}
+		
+		if (!$s3->getObject($bucket_name, $bucket_path.$file, $fh, $resume)) {
+			$updraftplus->log("$whoweare Error: Failed to download $file. Check your permissions and credentials.");
+			$updraftplus->log(sprintf(__('%s Error: Failed to download %s. Check your permissions and credentials.','updraftplus'),$whoweare, $file), 'error');
+			return false;
+		}
+
+		// This instructs the caller to look at the file pointer's position (i.e. ftell($fh)) to work out how many bytes were written.
+		return true;
+	
 	}
 
 	public function config_print() {
@@ -842,9 +904,8 @@ class UpdraftPlus_BackupModule_s3 {
 				}
 				
 			} catch (Exception $e) {
-				$this->s3_error = $e->getMessage();
+				$this->s3_exception = $e;
 				try {
-
 					if ('s3' == $config['key'] && $this->use_dns_bucket_name($s3, $bucket) && false !== @$s3->getBucket($bucket, $path, null, 1)) {
 						$bucket_exists = true;
 					}
@@ -864,10 +925,10 @@ class UpdraftPlus_BackupModule_s3 {
 							}
 							
 						} else {
-							$this->s3_error = $e->getMessage();
+							$this->s3_exception = $e;
 						}
 					} else {
-						$this->s3_error = $e->getMessage();
+						$this->s3_exception = $e;
 					}
 				}
 			
@@ -945,7 +1006,7 @@ class UpdraftPlus_BackupModule_s3 {
 		
 			printf(__("Failure: We could not successfully access or create such a bucket. Please check your access credentials, and if those are correct then try another bucket name (as another %s user may already have taken your name).",'updraftplus'), $whoweare);
 			
-			if (!empty($this->s3_error)) echo "\n\n".sprintf(__('The error reported by %s was:', 'updraftplus'), $whoweare).' '.$this->s3_error;
+			if (!empty($this->s3_exception)) echo "\n\n".sprintf(__('The error reported by %s was:', 'updraftplus'), $whoweare).' '.$this->s3_exception;
 			if ('s3' == $config['key'] && 'AK' != substr($key, 0, 2)) echo "\n\n".sprintf(__('The AWS access key looks to be wrong (valid %s access keys begin with "AK")', 'updraftplus'), $whoweare);
 		
 		} else {

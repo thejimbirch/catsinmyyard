@@ -2,10 +2,10 @@
 Contributors: nico23
 Donate link: https://nextgenthemes.com/donate/
 Tags: video, responsive, embed, video-embedder, iframe, minimal, lightweight, simplicity, shortcodes, Youtube, Blip, Dailymotion, Videojug, Collegehumor, Veoh, Break, Movieweb, Snotr, Gametrailers, Vimeo, Viddler, Funnyordie, Myspace, Liveleak, Metacafe, Myvideo, Yahoo Screen, Spike
-Requires at least: 3.3.2
+Requires at least: 4.4.0
 Tested up to: 4.6.1
 Stable tag: trunk
-License: GPL 3.0
+License: GPL-3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Easy responsive video embeds via URLs or shortcodes. Perfect drop-in replacement for WordPress' default embeds. Best plugin for videos?
@@ -85,9 +85,9 @@ Make sure to check out the [plugins page](https://nextgenthemes.com/plugins/adva
 
 ### Links ###
 
-[Plugin Page](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/)
-[Documentation](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/Documentation/)
-[GitHub Page](https://github.com/nextgenthemes/advanced-responsive-video-embedder/)
+* [Plugin Page](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/),
+* [Documentation](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/Documentation/),
+* [GitHub Page](https://github.com/nextgenthemes/advanced-responsive-video-embedder/)
 
 
 <h3>Supported Providers</h3>
@@ -169,7 +169,6 @@ Make sure to check out the [plugins page](https://nextgenthemes.com/plugins/adva
 Thanks to the developers of the software used in ARVE
 <ul>
   <li><a href="https://wordpress.org/plugins/shortcode-ui/">Shortcode UI</a></li>
-  <li><a href="http://tgmpluginactivation.com">TGM Plugin Activation</a></li>
   <li><a href="http://sorgalla.com/lity/">Lity Lightbox JavaScript</a> (used in Pro Addon)</li>
 </ul>
 
@@ -191,7 +190,7 @@ Please report it on [nextgenthemes.com/support/](https://nextgenthemes.com/suppo
 
 ### Why are my videos not filling their container? ###
 
-You are most likely use `align`, this plugin has a option for limiting video with with alignment. If you want your videos to fill their containers then you should not use the `align=left/right/center` shortcode attribute or the `arve[align]=` URL parameter. This assumes that you left the 'Video Maximal Width' field on the options page empty (default + recommended)
+You are most likely use `align`, this plugin has a option for limiting video with with alignment. If you want your videos to fill their containers then you should not use the `align` shortcode attribute. This assumes that you left the 'Video Maximal Width' field on the options page empty (default + recommended)
 
 ### Can you add a video provider? ###
 
@@ -205,7 +204,7 @@ This plugin not changes anything to usual HTML `<iframe>` embed codes you have t
 
 This plugins embed is considered as 'custom player' by YouTube so you have to pass the video ID as playlist parameters to make the loop work.
 
-`[youtube id="123456" parameters="loop=1&playlist=123456"]`
+`[arve url="https://www.youtube.com/watch?v=pvRqvX413Ik" parameters="loop=1&playlist=pvRqvX413Ik"]`
 
 
 ## Screenshots ##
@@ -215,6 +214,92 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 3. Features
 
 ## Changelog ##
+
+### 2016-10-29 - 7.9.8 and Pro Addon 3.3.4 ###
+
+* Fix: Fix lightbox thumbnail
+* Improved: CSS
+
+### 2016-10-28 - Pro Addon 3.3.1 ###
+
+* Fix: Fix thumbnails being displayed wrong in IE.
+
+### 2016-10-28 - Pro Addon 3.3.0 ###
+
+* Fix: Restored broken update notifications and semi auto updates.
+
+### 2016-10-28 - 7.9.7 ###
+
+* New: Wistia Support.
+* Improved: Allow HTML in title attribute.
+* Improved: Force more CSS Styles.
+
+### 2016-10-27 - Pro Addon 3.2.9 ###
+
+* Fix: Twitch API failing (needs Client-ID now)
+
+### 2016-10-27 - Pro Addon 3.2.8 ###
+
+* Improved: oembed error message
+* Improved: Skip srcset function for PHP 5.3 and lower
+
+### 2016-10-27 - 7.9.6 ###
+
+* Fix: Thumbnail not correctly applied to <video> tag for self hosted videos.
+* Improved: CSS for self hosted videos.
+* Improved: Enabled detection for rubtube and VK and show them as supported providers, even they where supported as general iframe embeds before.
+
+### 2016-10-25 - Pro Addon 3.2.7 ###
+
+* Fix: 2 clicks needed to play lazyloaded video on desktops
+
+### 2016-10-24 - Pro Addon 3.2.5 ###
+
+* Fix: JavaScript error related to abandoned Script.
+* Fix: Custom Thumbnails not applied.
+
+### 2016-10-24 - 7.9.5 ###
+
+* Fix: Custom Thumbnails not applied.
+* Fix: Shortcode UI script only loaded if the plugin is active.
+
+### 2016-10-23 - 7.9.4 and Pro Addon 3.2.3 ###
+
+* Fix: Multiple issues about the new HTML5 video embedding (still experimental)
+
+### 2016-10-23 - Pro Addon 3.2.2 ###
+
+* Fix: 'Disable Links' not working.
+
+### 2016-10-23 - Pro Addon 3.2.0 ###
+
+* Fix: Issue with lazyload and AJAX.
+* Fix: W3TC issue by using yet another lazyload method. Final this time?
+* Fix: YouTube Thumbnail detection when there are no HD images.
+* Improved: Code used to cache thumbnails, this may improve improve performance.
+* Improved: Lots code restructured and improved.
+* New: New Lazyload mode setting to prevent "two touched needed to play video on mobiles" issue. Its also
+* New: Facebook thumbnail detection.
+
+### 2016-10-23 - 7.9.2 ###
+
+* Fix: Brightcove Autoplay issue.
+* Fix: Liveleak thumbnail detection issues.
+* Fix: Parameters not being added.
+* Fix: Twitch single videos not using https
+* Fix: Vevo marked to require flash to make it work again.
+* Improved: Better dialog with better description and links about the shortcake UI plugin.
+* Improved: Facebook embed method.
+* Improved: Lots code restructured and improved.
+* Improved: Parameters are always possible no matter the provider.
+* Improved: Restructure of the plugin, abandon OOP mostly.
+* Improved: Revive saving of last setting page tab.
+* New: "Image Cache Time" setting on the setting page. Thumbnail URLs form the media gallery can now be cached with transients, that may improve performance.
+* New: Support for self hosted videos (experimental)
+
+### 2016-10-03 - Pro Addon 2.5.2 ###
+
+* Fix: Force button styles to make sure themes styles get overwritten.
 
 ### Pro Addon 2.5.1 beta - 2016-09-21 ###
 
@@ -234,11 +319,7 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 
 * Fix: Youku URL detection and aspect ratio.
 * Improved: `.arve-inner` css class in favor of some more specific classes combining styles.
-* Improved: removed TGMPA class because it was causing horrible isses.
-
-[rant from="unprofessional plugin developper"]
-**Fucking TGMPA class! Holy fuck!!!** the class itself is great, I tought I make it easy for people to install the plugin Shortcake UI that is not even updated on wp.org so I bundled it with the plugin and used the TGMPA class for easy installation and display as recommended. Turns out that people themes have horrible outdated versions of that class and guess what early versions to not check of the class is already defined before defining it causing fatal erros on peoples sites. But that not all, I just had customers site that has a versions that comes with the `if_class_exist` before the class inside a theme with a non-default filename and using my plugin with a up-to date version broke the entire admin with a white screen of death. I told people before to look for php errors about that class, replace that outdated class in themes and plugins and contact their authors. This ends now I am not burdening this shit on users anymore. There is a message when you click the 'Embed Video' that this plugin is needed with a link, thats it! Should have been always this way.
-[/rant]
+* Improved: removed TGMPA class because it was causing horrible issues.
 
 ### Pro Addon 2.4.5 beta - 2016-09-19 ###
 
@@ -250,7 +331,7 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 
 ### Pro Addon 2.4.0 beta - 2016-09-18 ###
 
-* New: Adds Yahoo auto thumnail and title support
+* New: Adds Yahoo auto thumbnail and title support
 
 ### 7.4.1 beta - 2016-09-18 ###
 
@@ -275,8 +356,8 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 
 ### 7.2.13 beta - 2016-09-16 ###
 
-* Fix: Set fitvidsignore class and remove the fitvids container to prevent it from messing with ARVE embeds.
-* Fix: Remove possible width and height paramaeters on iframes to prevent scripts from messing with ARVE embeds.
+* Fix: Set fitvidsignore class and remove the Fitvids container to prevent it from messing with ARVE embeds.
+* Fix: Remove possible width and height parameters on iframes to prevent scripts from messing with ARVE embeds.
 
 ### 7.2.12 beta - 2016-09-16 ###
 

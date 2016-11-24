@@ -104,7 +104,6 @@ class UpdraftPlus {
 		add_filter('itsec_scheduled_external_backup', array($this, 'itsec_scheduled_external_backup'), 999);
 
 		# register_deactivation_hook(__FILE__, array($this, 'deactivation'));
-
 		if (!empty($_POST) && !empty($_GET['udm_action']) && 'vault_disconnect' == $_GET['udm_action'] && !empty($_POST['udrpc_message']) && !empty($_POST['reset_hash'])) {
 			add_action('wp_loaded', array($this, 'wp_loaded_vault_disconnect'), 1);
 		}
@@ -193,7 +192,7 @@ class UpdraftPlus {
 	// Returns the number of bytes free, if it can be detected; otherwise, false
 	// Presently, we only detect CPanel. If you know of others, then feel free to contribute!
 	public function get_hosting_disk_quota_free() {
-		if (!@is_dir('/usr/local/cpanel') || $this->detect_safe_mode() || !function_exists('popen') || (!@is_executable('/usr/local/bin/perl') && !@is_executable('/usr/local/cpanel/3rdparty/bin/perl'))) return false;
+		if (!@is_dir('/usr/local/cpanel') || $this->detect_safe_mode() || !function_exists('popen') || (!@is_executable('/usr/local/bin/perl') && !@is_executable('/usr/local/cpanel/3rdparty/bin/perl')) || (defined('UPDRAFTPLUS_SKIP_CPANEL_QUOTA_CHECK') && UPDRAFTPLUS_SKIP_CPANEL_QUOTA_CHECK)) return false;
 
 		$perl = (@is_executable('/usr/local/cpanel/3rdparty/bin/perl')) ? '/usr/local/cpanel/3rdparty/bin/perl' : '/usr/local/bin/perl';
 
@@ -459,10 +458,11 @@ class UpdraftPlus {
 				// zi followed by 6 characters is the pattern used by /usr/bin/zip on Linux systems. It's safe to check for, as we have nothing else that's going to match that pattern.
 				$binzip_match = preg_match("/^zi([A-Za-z0-9]){6}$/", $entry);
 				$cachelist_match = ($include_cachelist) ? preg_match("/$match-cachelist-.*.tmp$/i", $entry) : false;
+				$browserlog_match = preg_match('/^log\.[0-9a-f]+-browser\.txt$/', $entry);
 				# Temporary files from the database dump process - not needed, as is caught by the catch-all
 				# $table_match = preg_match("/${match}-table-(.*)\.table(\.tmp)?\.gz$/i", $entry);
 				# The gz goes in with the txt, because we *don't* want to reap the raw .txt files
-				if ((preg_match("/$match\.(tmp|table|txt\.gz)(\.gz)?$/i", $entry) || $cachelist_match || $ziparchive_match || $binzip_match || $manifest_match) && is_file($updraft_dir.'/'.$entry)) {
+				if ((preg_match("/$match\.(tmp|table|txt\.gz)(\.gz)?$/i", $entry) || $cachelist_match || $ziparchive_match || $binzip_match || $manifest_match || $browserlog_match) && is_file($updraft_dir.'/'.$entry)) {
 					// We delete if a parameter was specified (and either it is a ZipArchive match or an order to delete of whatever age), or if over 12 hours old
 					if (($match && ($ziparchive_match || $binzip_match || $cachelist_match || $manifest_match || 0 == $older_than) && $now_time-filemtime($updraft_dir.'/'.$entry) >= $older_than) || $now_time-filemtime($updraft_dir.'/'.$entry)>43200) {
 						$this->log("Deleting old temporary file: $entry");
@@ -506,9 +506,14 @@ class UpdraftPlus {
 		return $got_wp_version;
 	}
 
+	/**
+	 * Opens the log file, writes a standardised header, and stores the resulting name and handle in the class variables logfile_name/logfile_handle/opened_log_time (and possibly backup_is_already_complete)
+	 * 
+	 * @param string $nonce - Used in the log file name to distinguish it from other log files. Should be the job nonce.
+	 * @returns void
+	 */
 	public function logfile_open($nonce) {
 
-		//set log file name and open log file
 		$updraft_dir = $this->backups_dir_location();
 		$this->logfile_name =  $updraft_dir."/log.$nonce.txt";
 
@@ -516,13 +521,13 @@ class UpdraftPlus {
 			$seek_to = max((filesize($this->logfile_name) - 340), 1);
 			$handle = fopen($this->logfile_name, 'r');
 			if (is_resource($handle)) {
-				# Returns 0 on success
+				// Returns 0 on success
 				if (0 === @fseek($handle, $seek_to)) {
 					$bytes_back = filesize($this->logfile_name) - $seek_to;
 					# Return to the end of the file
 					$read_recent = fread($handle, $bytes_back);
 					# Move to end of file - ought to be redundant
-					if (false !== strpos($read_recent, 'The backup apparently succeeded') && false !== strpos($read_recent, 'and is now complete')) {
+					if (false !== strpos($read_recent, ') The backup apparently succeeded') && false !== strpos($read_recent, 'and is now complete')) {
 						$this->backup_is_already_complete = true;
 					}
 				}
@@ -533,12 +538,26 @@ class UpdraftPlus {
 		$this->logfile_handle = fopen($this->logfile_name, 'a');
 
 		$this->opened_log_time = microtime(true);
-		$this->log('Opened log file at time: '.date('r').' on '.network_site_url());
+		
+		$this->write_log_header(array($this, 'log'));
+		
+	}
+	
+	/**
+	 * Writes a standardised header to the log file, using the specified logging function, which needs to be compatible with (or to be) UpdraftPlus::log()
+	 * 
+	 * @param callable $logging_function
+	 */
+	public function write_log_header($logging_function) {
+		
 		global $wpdb;
+
+		$updraft_dir = $this->backups_dir_location();
+
+		call_user_func($logging_function, 'Opened log file at time: '.date('r').' on '.network_site_url());
+		
 		$wp_version = $this->get_wordpress_version();
-
 		$mysql_version = $wpdb->db_version();
-
 		$safe_mode = $this->detect_safe_mode();
 
 		$memory_limit = ini_get('memory_limit');
@@ -549,7 +568,7 @@ class UpdraftPlus {
 		@set_time_limit(UPDRAFTPLUS_SET_TIME_LIMIT);
 		$max_execution_time = (int)@ini_get("max_execution_time");
 
-		$logline = "UpdraftPlus WordPress backup plugin (https://updraftplus.com): ".$this->version." WP: ".$wp_version." PHP: ".phpversion()." (".@php_uname().") MySQL: $mysql_version WPLANG: ".get_locale()." Server: ".$_SERVER["SERVER_SOFTWARE"]." safe_mode: $safe_mode max_execution_time: $max_execution_time memory_limit: $memory_limit (used: ${memory_usage}M | ${memory_usage2}M) multisite: ".(is_multisite() ? 'Y' : 'N')." openssl: ".(defined('OPENSSL_VERSION_TEXT') ? OPENSSL_VERSION_TEXT : 'N')." mcrypt: ".(function_exists('mcrypt_encrypt') ? 'Y' : 'N')." LANG: ".getenv('LANG')." ZipArchive::addFile: ";
+		$logline = "UpdraftPlus WordPress backup plugin (https://updraftplus.com): ".$this->version." WP: ".$wp_version." PHP: ".phpversion()." (".PHP_SAPI.", ".@php_uname().") MySQL: $mysql_version WPLANG: ".get_locale()." Server: ".$_SERVER["SERVER_SOFTWARE"]." safe_mode: $safe_mode max_execution_time: $max_execution_time memory_limit: $memory_limit (used: ${memory_usage}M | ${memory_usage2}M) multisite: ".(is_multisite() ? 'Y' : 'N')." openssl: ".(defined('OPENSSL_VERSION_TEXT') ? OPENSSL_VERSION_TEXT : 'N')." mcrypt: ".(function_exists('mcrypt_encrypt') ? 'Y' : 'N')." LANG: ".getenv('LANG')." ZipArchive::addFile: ";
 
 		// method_exists causes some faulty PHP installations to segfault, leading to support requests
 		if (version_compare(phpversion(), '5.2.0', '>=') && extension_loaded('zip')) {
@@ -564,12 +583,12 @@ class UpdraftPlus {
 				$this->log(sprintf(__('The amount of memory (RAM) allowed for PHP is very low (%s Mb) - you should increase it to avoid failures due to insufficient memory (consult your web hosting company for more help)', 'updraftplus'), round($memlim, 1)), 'warning', 'lowram');
 			}
 			if ($max_execution_time>0 && $max_execution_time<20) {
-				$this->log(sprintf(__('The amount of time allowed for WordPress plugins to run is very low (%s seconds) - you should increase it to avoid backup failures due to time-outs (consult your web hosting company for more help - it is the max_execution_time PHP setting; the recommended value is %s seconds or more)', 'updraftplus'), $max_execution_time, 90), 'warning', 'lowmaxexecutiontime');
+				call_user_func($logging_function, sprintf(__('The amount of time allowed for WordPress plugins to run is very low (%s seconds) - you should increase it to avoid backup failures due to time-outs (consult your web hosting company for more help - it is the max_execution_time PHP setting; the recommended value is %s seconds or more)', 'updraftplus'), $max_execution_time, 90), 'warning', 'lowmaxexecutiontime');
 			}
 
 		}
 
-		$this->log($logline);
+		call_user_func($logging_function, $logline);
 
 		$hosting_bytes_free = $this->get_hosting_disk_quota_free();
 		if (is_array($hosting_bytes_free)) {
@@ -577,7 +596,7 @@ class UpdraftPlus {
 			$quota_free = ' / '.sprintf('Free disk space in account: %s (%s used)', round($hosting_bytes_free[3]/1048576, 1)." MB", "$perc %");
 			if ($hosting_bytes_free[3] < 1048576*50) {
 				$quota_free_mb = round($hosting_bytes_free[3]/1048576, 1);
-				$this->log(sprintf(__('Your free space in your hosting account is very low - only %s Mb remain', 'updraftplus'), $quota_free_mb), 'warning', 'lowaccountspace'.$quota_free_mb);
+				call_user_func($logging_function, sprintf(__('Your free space in your hosting account is very low - only %s Mb remain', 'updraftplus'), $quota_free_mb), 'warning', 'lowaccountspace'.$quota_free_mb);
 			}
 		} else {
 			$quota_free = '';
@@ -586,11 +605,11 @@ class UpdraftPlus {
 		$disk_free_space = @disk_free_space($updraft_dir);
 		# == rather than === here is deliberate; support experience shows that a result of (int)0 is not reliable. i.e. 0 can be returned when the real result should be false.
 		if ($disk_free_space == false) {
-			$this->log("Free space on disk containing Updraft's temporary directory: Unknown".$quota_free);
+			call_user_func($logging_function, "Free space on disk containing Updraft's temporary directory: Unknown".$quota_free);
 		} else {
-			$this->log("Free space on disk containing Updraft's temporary directory: ".round($disk_free_space/1048576,1)." MB".$quota_free);
+			call_user_func($logging_function, "Free space on disk containing Updraft's temporary directory: ".round($disk_free_space/1048576, 1)." MB".$quota_free);
 			$disk_free_mb = round($disk_free_space/1048576, 1);
-			if ($disk_free_space < 50*1048576) $this->log(sprintf(__('Your free disk space is very low - only %s Mb remain', 'updraftplus'), round($disk_free_space/1048576, 1)), 'warning', 'lowdiskspace'.$disk_free_mb);
+			if ($disk_free_space < 50*1048576) call_user_func($logging_function, sprintf(__('Your free disk space is very low - only %s Mb remain', 'updraftplus'), round($disk_free_space/1048576, 1)), 'warning', 'lowdiskspace'.$disk_free_mb);
 		}
 
 	}
@@ -616,8 +635,20 @@ class UpdraftPlus {
 		return false;
 	}
 
+	/*
+		$line - the log line
+		$level - the log level: notice, warning, error. If suffixed with a hypen and a destination, then the default destination is changed too.
+		$uniq_id - (string)each of these will only be logged once
+		$skip_dblog - if true, then do not write to the database
+	*/
 	public function log($line, $level = 'notice', $uniq_id = false, $skip_dblog = false) {
 
+		$destination = 'default';
+		if (preg_match('/^([a-z]+)-([a-z]+)$/', $level, $matches)) {
+			$level = $matches[1];
+			$destination = $matches[2];
+		}
+	
 		if ('error' == $level || 'warning' == $level) {
 			if ('error' == $level && 0 == $this->error_count()) $this->log('An error condition has occurred for the first time during this job');
 			if ($uniq_id) {
@@ -629,7 +660,7 @@ class UpdraftPlus {
 			if ('error' == $level) return;
 			# It's a warning
 			$warnings = $this->jobdata_get('warnings');
-			if (!is_array($warnings)) $warnings=array();
+			if (!is_array($warnings)) $warnings = array();
 			if ($uniq_id) {
 				$warnings[$uniq_id] = $line;
 			} else {
@@ -638,7 +669,7 @@ class UpdraftPlus {
 			$this->jobdata_set('warnings', $warnings);
 		}
 
-		if (false === ($line = apply_filters('updraftplus_logline', $line, $this->nonce, $level, $uniq_id))) return;
+		if (false === ($line = apply_filters('updraftplus_logline', $line, $this->nonce, $level, $uniq_id, $destination))) return;
 
 		if ($this->logfile_handle) {
 			# Record log file times relative to the backup start, if possible
@@ -680,13 +711,13 @@ class UpdraftPlus {
 		if (false === $err) return false;
 		if (is_string($err)) {
 			$this->log("Error message: $err");
-			if ($echo) echo sprintf(__('Error: %s', 'updraftplus'), htmlspecialchars($err))."<br>";
+			if ($echo) $this->log(sprintf(__('Error: %s', 'updraftplus'), $err), 'notice-warning');
 			if ($logerror) $this->log($err, 'error');
 			return false;
 		}
 		foreach ($err->get_error_messages() as $msg) {
 			$this->log("Error message: $msg");
-			if ($echo) echo sprintf(__('Error: %s', 'updraftplus'), htmlspecialchars($msg))."<br>";
+			if ($echo) $this->log(sprintf(__('Error: %s', 'updraftplus'), $msg), 'notice-warning');
 			if ($logerror) $this->log($msg, 'error');
 		}
 		$codes = $err->get_error_codes();
@@ -733,9 +764,10 @@ class UpdraftPlus {
 		if (is_wp_error($pre_line)) {
 			$this->log_wp_error($pre_line);
 		} else {
-			# Now run (v)sprintf on it, using any remaining arguments. vsprintf = sprintf but takes an array instead of individual arguments
+			// Now run (v)sprintf on it, using any remaining arguments. vsprintf = sprintf but takes an array instead of individual arguments
 			$this->log(vsprintf($pre_line, $args));
-			echo vsprintf(__($pre_line, 'updraftplus'), $args).'<br>';
+			// This is slightly hackish, in that we have no way to use a different level or destination. In that case, the caller should instead call log() twice with different parameters, instead of using this convenience function.
+			$this->log(vsprintf(__($pre_line, 'updraftplus'), $args), 'notice-restore');
 		}
 	}
 
@@ -765,7 +797,17 @@ class UpdraftPlus {
 
 	}
 
-	// $singletons : whether to upload a file that only has one chunk, or whether instead to return 1 in that case
+	/**
+	 * Method for helping remote storage methods to upload files in chunks without needing to duplicate all the overhead
+	 *
+	 * @param	string	$file	the full path to the file
+	 * @param	object	$caller	the object to call back to do the actual network API calls; needs to have a chunked_upload() method.
+	 * @param	string	$cloudpath	this is passed back to the callback function; within this function, it is used only for logging
+	 * @param	string	$logname	the prefix used on log lines. Also passed back to the callback function.
+	 * @param	integer	$chunk_size	the size, in bytes, of each upload chunk
+	 * @param	integer	$uploaded_size	how many bytes have already been uploaded. This is passed back to the callback function; within this method, it is only used for logging.
+	 * @param	boolean	$singletons	when the file, given the chunk size, would only have one chunk, should that be uploaded (true), or instead should 1 be returned (false) ?
+	*/
 	public function chunked_upload($caller, $file, $cloudpath, $logname, $chunk_size, $uploaded_size, $singletons = false) {
 
 		$fullpath = $this->backups_dir_location().'/'.$file;
@@ -898,12 +940,22 @@ class UpdraftPlus {
 		}
 	}
 
+	/**
+	 * Provides a convenience function allowing remote storage methods to download a file in chunks, without duplicated overhead.
+	 * 
+	 * @param string $file - The basename of the file being downloaded
+	 * @param object $method - This remote storage method object needs to have a chunked_download() method to call back
+	 * @param integer $remote_size - The size, in bytes, of the object being downloaded
+	 * @param boolean $manually_break_up - Whether to break the download into multiple network operations (rather than just issuing a GET with a range beginning at the end of the already-downloaded data, and carrying on until it times out)
+	 * @param * $passback - A value to pass back to the callback function
+	 * @param integer $chunk_size - Break up the download into chunks of this number of bytes. Should be set if and only if $manually_break_up is true.
+	 */
 	public function chunked_download($file, $method, $remote_size, $manually_break_up = false, $passback = null, $chunk_size = 1048576) {
 
 		try {
 
 			$fullpath = $this->backups_dir_location().'/'.$file;
-			$start_offset = (file_exists($fullpath)) ? filesize($fullpath): 0;
+			$start_offset = file_exists($fullpath) ? filesize($fullpath) : 0;
 
 			if ($start_offset >= $remote_size) {
 				$this->log("File is already completely downloaded ($start_offset/$remote_size)");
@@ -911,13 +963,14 @@ class UpdraftPlus {
 			}
 
 			// Some more remains to download - so let's do it
-			if (!$fh = fopen($fullpath, 'a')) {
+			// N.B. We use ftell(), which precludes us from using open in append-only ('a') mode - see https://php.net/manual/en/function.fopen.php
+			if (!($fh = fopen($fullpath, 'c'))) {
 				$this->log("Error opening local file: $fullpath");
 				$this->log($file.": ".__("Error",'updraftplus').": ".__('Error opening local file: Failed to download','updraftplus'), 'error');
 				return false;
 			}
 
-			$last_byte = ($manually_break_up) ? min($remote_size, $start_offset + $chunk_size) : $remote_size;
+			$last_byte = ($manually_break_up) ? min($remote_size, $start_offset + $chunk_size ) : $remote_size;
 
 			# This only affects logging
 			$expected_bytes_delivered_so_far = true;
@@ -934,19 +987,44 @@ class UpdraftPlus {
 					$this->log("$file: local file is status: $start_offset/$remote_size bytes; requesting next chunk (${start_offset}-)");
 				}
 
-				if ($start_offset >0 || $last_byte<$remote_size) {
+				if ($start_offset > 0 || $last_byte<$remote_size) {
 					fseek($fh, $start_offset);
 					// N.B. Don't alter this format without checking what relies upon it
-					$headers['Range'] = "bytes=$start_offset-$last_byte";
+					$last_byte_start = $last_byte - 1;
+					$headers['Range'] = "bytes=$start_offset-$last_byte_start";
 				}
 
-				# The method is free to return as much data as it pleases
-				$ret = $method->chunked_download($file, $headers, $passback);
+				/*
+				* The most common method is for the remote storage module to return a string with the results in it. In that case, the final $fh parameter is unused. However, since not all SDKs have that option conveniently, it is also possible to use the file handle and write directly to that; in that case, the method can either return the number of bytes written, or (boolean)true to infer it from the new file *pointer*.
+				* The method is free to write/return as much data as it pleases.
+				*/
+				$ret = $method->chunked_download($file, $headers, $passback, $fh);
+				if (true === $ret) {
+					clearstatcache();
+					// Some SDKs (including AWS/S3) close the resource
+					// N.B. We use ftell(), which precludes us from using open in append-only ('a') mode - see https://php.net/manual/en/function.fopen.php
+					if (is_resource($fh)) {
+						$ret = ftell($fh);
+					} else {
+						$ret = filesize($fullpath);
+						// fseek returns - on success
+						if (false == ($fh = fopen($fullpath, 'c')) || 0 !== fseek($fh, $ret)) {
+							$this->log("Error opening local file: $fullpath");
+							$this->log($file.": ".__("Error",'updraftplus').": ".__('Error opening local file: Failed to download','updraftplus'), 'error');
+							return false;
+						}
+					}
+					if (is_integer($ret)) $ret -= $start_offset;
+				}
+				
+				// Note that this covers a false code returned either by chunked_download() or by ftell.
 				if (false === $ret) return false;
+				
+				$returned_bytes = is_integer($ret) ? $ret : strlen($ret);
 
-				if (strlen($ret) > $requested_bytes || strlen($ret) < $requested_bytes - 1) $expected_bytes_delivered_so_far = false;
+				if ($returned_bytes > $requested_bytes || $returned_bytes < $requested_bytes - 1) $expected_bytes_delivered_so_far = false;
 
-				if (!fwrite($fh, $ret)) throw new Exception('Write failure (start offset: '.$start_offset.', bytes: '.strlen($ret).'; requested: '.$requested_bytes.')');
+				if (!is_integer($ret) && !fwrite($fh, $ret)) throw new Exception('Write failure (start offset: '.$start_offset.', bytes: '.strlen($ret).'; requested: '.$requested_bytes.')');
 
 				clearstatcache();
 				$start_offset = ftell($fh);
@@ -956,7 +1034,7 @@ class UpdraftPlus {
 
 		} catch(Exception $e) {
 			$this->log('Error ('.get_class($e).') - failed to download the file ('.$e->getCode().', '.$e->getMessage().')');
-			$this->log("$file: ".__('Error - failed to download the file','updraftplus').' ('.$e->getCode().', '.$e->getMessage().')' ,'error');
+			$this->log("$file: ".__('Error - failed to download the file', 'updraftplus').' ('.$e->getCode().', '.$e->getMessage().')' ,'error');
 			return false;
 		}
 
@@ -1005,23 +1083,42 @@ class UpdraftPlus {
 
 		$result = false;
 		foreach (explode(',', UPDRAFTPLUS_MYSQLDUMP_EXECUTABLE) as $potsql) {
+			
 			if (!@is_executable($potsql)) continue;
+			
 			if ($logit) $this->log("Testing: $potsql");
 
-			$exec = "cd ".escapeshellarg($updraft_dir)."; $potsql  --defaults-file=$pfile --max_allowed_packet=1M --quote-names --add-drop-table --skip-comments --skip-set-charset --allow-keywords --dump-date --extended-insert --where=option_name=\\'siteurl\\' --user=".escapeshellarg(DB_USER)." --host=".escapeshellarg(DB_HOST)." ".DB_NAME." ".escapeshellarg($table_name)." >$tmp_file";
-
+			if (strtolower(substr(PHP_OS, 0, 3)) == 'win') {
+				$exec = "cd ".escapeshellarg(str_replace('/', '\\', $updraft_dir))." & ";
+				$siteurl = "'siteurl'";
+				if (false !== strpos($potsql, ' ')) $potsql = '"'.$potsql.'"';
+			} else {
+				$exec = "cd ".escapeshellarg($updraft_dir)."; ";
+				$siteurl = "\\'siteurl\\'";
+				if (false !== strpos($potsql, ' ')) $potsql = "'$potsql'";
+			}
+				
+			$exec .= "$potsql --defaults-file=$pfile --max_allowed_packet=1M --quote-names --add-drop-table --skip-comments --skip-set-charset --allow-keywords --dump-date --extended-insert --where=option_name=$siteurl --user=".escapeshellarg(DB_USER)." --host=".escapeshellarg(DB_HOST)." ".DB_NAME." ".escapeshellarg($table_name)."";
+			
 			$handle = popen($exec, "r");
 			if ($handle) {
-				while (!feof($handle)) {
-					$w = fgets($handle);
-					if ($w && $logit) $this->log("Output: ".trim($w));
+				if (!feof($handle)) {
+					$output = fread($handle, 8192);
+					if ($output && $logit) {
+						$log_output = (strlen($output) > 512) ? substr($output, 0, 512).' (truncated - '.strlen($output).' bytes total)' : $output;
+						$this->log("Output: ".str_replace("\n", '\\n', trim($log_output)));
+					}
+				} else {
+					$output = '';
 				}
 				$ret = pclose($handle);
 				if ($ret !=0) {
-					if ($logit) $this->log("Binary mysqldump: error (code: $ret)");
+					if ($logit) {
+						$this->log("Binary mysqldump: error (code: $ret)");
+					}
 				} else {
-					$dumped = file_get_contents($updraft_dir.'/'.$tmp_file, false, null, 0, 4096);
-					if (stripos($dumped, 'insert into') !== false) {
+// 					$dumped = file_get_contents($updraft_dir.'/'.$tmp_file, false, null, 0, 4096);
+					if (stripos($output, 'insert into') !== false) {
 						if ($logit) $this->log("Working binary mysqldump found: $potsql");
 						$result = $potsql;
 						break;
@@ -1040,7 +1137,7 @@ class UpdraftPlus {
 		return $result;
 	}
 
-	# We require -@ and -u -r to work - which is the usual Linux binzip
+	// We require -@ and -u -r to work - which is the usual Linux binzip
 	public function find_working_bin_zip($logit = true, $cacheit = true) {
 		if ($this->detect_safe_mode()) return false;
 		// The hosting provider may have explicitly disabled the popen or proc_open functions
@@ -1523,6 +1620,7 @@ class UpdraftPlus {
 			$this->log('Terminate: This backup job is already finished (1).');
 			die;
 		} elseif ('backup' == $job_type && !empty($this->backup_is_already_complete)) {
+			$this->jobdata_set('jobstatus', 'finished');
 			$this->log('Terminate: This backup job is already finished (2).');
 			die;
 		}
@@ -1558,6 +1656,12 @@ class UpdraftPlus {
 					$this->log("Based on the available data, we are bringing the resumption interval down to: $resume_interval seconds");
 					$this->jobdata_set('resume_interval', $resume_interval);
 				}
+				// This next condition was added in response to HS#9174, a case where on one resumption, PHP was allowed to run for >3000 seconds - but other than that, up to 500 seconds. As a result, the resumption interval got stuck at a large value, whilst resumptions were only allowed to run for a much smaller amount.
+				// This detects whether our last run was less than half the resume interval,  but was non-trivial (at least 50 seconds - so, indicating it didn't just error out straight away), but with a resume interval of over 300 seconds. In this case, it is reduced.
+			} elseif (isset($time_passed[$prev_resumption]) && $time_passed[$prev_resumption] > 50 && $resume_interval > 300 && $time_passed[$prev_resumption] < $resume_interval/2 && 'clouduploading' == $this->jobdata_get('jobstatus')) {
+				$resume_interval = round($time_passed[$prev_resumption] + 52);
+				$this->log("Time passed on previous resumptions: $timings_string (known: $run_times_known, max: $max_time). Based on the available data, we are bringing the resumption interval down to: $resume_interval seconds");
+				$this->jobdata_set('resume_interval', $resume_interval);
 			}
 
 		}
@@ -2231,7 +2335,7 @@ class UpdraftPlus {
 		# TODO: Make compatible with incremental naming
 		if ($remotescan) {
 			add_action('http_request_args', array($this, 'modify_http_options'));
-			foreach ($this->backup_methods as $method => $desc) {
+			foreach ($this->backup_methods as $method => $method_description) {
 				require_once(UPDRAFTPLUS_DIR.'/methods/'.$method.'.php');
 				$objname = 'UpdraftPlus_BackupModule_'.$method;
 				$obj = new $objname;
@@ -2255,9 +2359,10 @@ class UpdraftPlus {
 						if ('no_settings' == $code || 'no_addon' == $code || 'insufficient_php' == $code || 'no_listing' == $code) continue;
 						$messages[] = array(
 							'method' => $method,
-							'desc' => $desc,
+							'desc' => $method_description,
 							'code' => $code,
-							'message' => $files->get_error_message($code)
+							'message' => $files->get_error_message($code),
+							'data' => $files->get_error_data($code),
 						);
 					}
 				}
@@ -2397,7 +2502,7 @@ class UpdraftPlus {
 				$type = $matches[3];
 				if ('db' == $type) {
 					$index = 0;
-					$type .= empty($matches[4]) ? $matches[4] : '';
+					$type .= !empty($matches[4]) ? $matches[4] : '';
 				} else {
 					$index = (empty($matches[4])) ? '0' : (max((int)$matches[4]-1,0));
 				}
@@ -3250,8 +3355,19 @@ class UpdraftPlus {
 		$opts = UpdraftPlus_Options::get_updraft_option('updraft_dropbox');
 		if (!is_array($opts)) $opts = array();
 		if (!is_array($dropbox)) return $opts;
-		foreach ($dropbox as $key => $value) { $opts[$key] = $value; }
-		if (!empty($opts['folder']) && preg_match('#^https?://(www.)dropbox\.com/home/Apps/UpdraftPlus([^/]*)/(.*)$#i', $opts['folder'], $matches)) $opts['folder'] = $matches[3];
+		if (!empty($opts['tk_access_token']) && empty($opts['appkey']) && !empty($dropbox['appkey'])) {
+			unset($opts['tk_access_token']);
+			unset($opts['folder']);
+			unset($opts['ownername']);
+		}
+		foreach ($dropbox as $key => $value) { 
+			if (null === $value) {
+				unset($opts[$key]);
+			} else {
+				$opts[$key] = $value; 
+			}
+		}
+		if (!empty($opts['folder']) && preg_match('#^https?://(www.)dropbox\.com/home/Apps/UpdraftPlus(.Com)?([^/]*)/(.*)$#i', $opts['folder'], $matches)) $opts['folder'] = $matches[3];
 		return $opts;
 	}
 
@@ -3535,69 +3651,31 @@ class UpdraftPlus {
 		return ($memory_limit >= $memory)?true:false;
 	}
 
-	private function url_start($urls, $url, $https = false) {
+	private function url_start($html_allowed, $url, $https = false) {
 		$proto = ($https) ? 'https' : 'http';
 		if (strpos($url, 'updraftplus.com') !== false){
-			return ($urls) ? "<a href=".apply_filters('updraftplus_com_link',$proto.'://'.$url).">" : "";
+			return $html_allowed ? "<a href=".apply_filters('updraftplus_com_link',$proto.'://'.$url).">" : "";
 		}else{
-			return ($urls) ? "<a href=\"$proto://$url\">" : "";	
+			return $html_allowed ? "<a href=\"$proto://$url\">" : "";	
 		}
 	}
 
-	private function url_end($urls, $url, $https = false) {
+	private function url_end($html_allowed, $url, $https = false) {
 		$proto = ($https) ? 'https' : 'http';
-		return ($urls) ? '</a>' : " ($proto://$url)";
+		return $html_allowed ? '</a>' : " ($proto://$url)";
+	}
+
+	private function translation_needed() {
+		$wplang = get_locale();
+		if (strlen($wplang) < 1 || $wplang == 'en_US' || $wplang == 'en_GB') return false;
+		if (defined('WP_LANG_DIR') && is_file(WP_LANG_DIR.'/plugins/updraftplus-'.$wplang.'.mo')) return false;
+		if (is_file(UPDRAFTPLUS_DIR.'/languages/updraftplus-'.$wplang.'.mo')) return false;
+		return true;
 	}
 
 	public function get_updraftplus_rssfeed() {
 		if (!function_exists('fetch_feed')) require(ABSPATH . WPINC . '/feed.php');
 		return fetch_feed('http://feeds.feedburner.com/updraftplus/');
-	}
-
-	public function wordshell_random_advert($urls) {
-		if (defined('UPDRAFTPLUS_NOADS_B')) return "";
-		$rad = rand(0, 8);
-		switch ($rad) {
-		case 0:
-			return $this->url_start($urls,'updraftplus.com/').__("Want more features or paid, guaranteed support? Check out UpdraftPlus.Com", 'updraftplus').$this->url_end($urls,'updraftplus.com');
-			break;
-		case 1:
-			$wplang = get_locale();
-			if (strlen($wplang)>0 && !is_file(UPDRAFTPLUS_DIR.'/languages/updraftplus-'.$wplang.
-'.mo')) return __('Can you translate? Want to improve UpdraftPlus for speakers of your language?','updraftplus').' '.$this->url_start($urls,'updraftplus.com/translate/')."Please go here for instructions - it is easy.".$this->url_end($urls,'updraftplus.com/translate/');
-
-			return __('UpdraftPlus is on social media - check us out here:','updraftplus').' '.$this->url_start($urls,'twitter.com/updraftplus', true).__('Twitter', 'updraftplus').$this->url_end($urls,'twitter.com/updraftplus', true).' - '.$this->url_start($urls,'facebook.com/updraftplus', true).__('Facebook', 'updraftplus').$this->url_end($urls,'facebook.com/updraftplus', true).' - '.$this->url_start($urls,'plus.google.com/u/0/b/112313994681166369508/112313994681166369508/about', true).__('Google+', 'updraftplus').$this->url_end($urls,'plus.google.com/u/0/b/112313994681166369508/112313994681166369508/about', true).' - '.$this->url_start($urls,'www.linkedin.com/company/updraftplus', true).__('LinkedIn', 'updraftplus').$this->url_end($urls,'www.linkedin.com/company/updraftplus', true);
-			break;
-		case 2:
-			return $this->url_start($urls,'wordshell.net').__("Check out WordShell", 'updraftplus').$this->url_end($urls,'www.wordshell.net')." - ".__('manage WordPress from the command line - huge time-saver', 'updraftplus');
-			break;
-		case 3:
-			return __('Like UpdraftPlus and can spare one minute?','updraftplus').$this->url_start($urls,'wordpress.org/support/view/plugin-reviews/updraftplus#postform').' '.__('Please help UpdraftPlus by giving a positive review at wordpress.org','updraftplus').$this->url_end($urls,'wordpress.org/support/view/plugin-reviews/updraftplus#postform');
-			break;
-		case 4:
-			return $this->url_start($urls,'updraftplus.com/newsletter-signup', true).__("Follow this link to sign up for the UpdraftPlus newsletter.", 'updraftplus').$this->url_end($urls,'updraftplus.com/newsletter-signup', true);
-			break;
-		case 5:
-			if (!defined('UPDRAFTPLUS_NOADS_B')) {
-				return $this->url_start($urls,'updraftplus.com/').__("Need even more features and support? Check out UpdraftPlus Premium",'updraftplus').$this->url_end($urls,'updraftplus.com');
-			} else {
-				return "Thanks for being an UpdraftPlus premium user. Keep visiting ".$this->url_start($urls,'updraftplus.com/')."updraftplus.com".$this->url_end($urls,'updraftplus.com')." to see what's going on.";
-			}
-			break;
-		case 6:
-// 			return "Need custom WordPress services from experts (including bespoke development)?".$this->url_start($urls,'www.simbahosting.co.uk/s3/products-and-services/wordpress-experts/')." Get them from the creators of UpdraftPlus.".$this->url_end($urls,'www.simbahosting.co.uk/s3/products-and-services/wordpress-experts/');
-			return __("Subscribe to the UpdraftPlus blog to get up-to-date news and offers",'updraftplus')." - ".$this->url_start($urls,'updraftplus.com/news/').__("Blog link",'updraftplus').$this->url_end($urls,'updraftplus.com/news/').' - '.$this->url_start($urls,'feeds.feedburner.com/UpdraftPlus').__("RSS link",'updraftplus').$this->url_end($urls,'feeds.feedburner.com/UpdraftPlus');
-			break;
-		case 7:
-			return $this->url_start($urls,'updraftplus.com/').__("Check out UpdraftPlus.Com for help, add-ons and support",'updraftplus').$this->url_end($urls,'updraftplus.com');
-			break;
-// 		case 8:
-// 			return __("Want to say thank-you for UpdraftPlus?",'updraftplus').$this->url_start($urls,'updraftplus.com/shop/', true)." ".__("Please buy our very cheap 'no adverts' add-on.",'updraftplus').$this->url_end($urls,'updraftplus.com/shop/', true);
-// 			break;
-		case 8:
-			return __('UpdraftPlus is on social media - check us out here:','updraftplus').' '.$this->url_start($urls,'twitter.com/updraftplus', true).__('Twitter', 'updraftplus').$this->url_end($urls,'twitter.com/updraftplus', true).' - '.$this->url_start($urls,'facebook.com/updraftplus', true).__('Facebook', 'updraftplus').$this->url_end($urls,'facebook.com/updraftplus', true).' - '.$this->url_start($urls,'plus.google.com/u/0/b/112313994681166369508/112313994681166369508/about', true).__('Google+', 'updraftplus').$this->url_end($urls,'plus.google.com/u/0/b/112313994681166369508/112313994681166369508/about', true).' - '.$this->url_start($urls,'www.linkedin.com/company/updraftplus', true).__('LinkedIn', 'updraftplus').$this->url_end($urls,'www.linkedin.com/company/updraftplus', true);
-			break;
-		}
 	}
 
 	public function analyse_db_file($timestamp, $res, $db_file = false, $header_only = false) {
@@ -3923,7 +4001,7 @@ CREATE TABLE $wpdb->signups (
 	// These are used in 4 places (Feb 2016 - of course, you should re-scan the code to check if relying on this): showing current settings on the debug modal, wiping all current settings, getting a settings bundle to restore when migrating, and for relevant keys in POST-ed data when saving settings over AJAX
 	public function get_settings_keys() {
 	// N.B. updraft_backup_history is not included here, as we don't want that wiped
-		return array('updraft_autobackup_default', 'updraft_dropbox', 'updraft_googledrive', 'updraftplus_tmp_googledrive_access_token', 'updraftplus_dismissedautobackup', 'updraftplus_dismissedexpiry', 'updraftplus_dismisseddashnotice', 'updraft_interval', 'updraft_interval_increments', 'updraft_interval_database', 'updraft_retain', 'updraft_retain_db', 'updraft_encryptionphrase', 'updraft_service', 'updraft_dropbox_appkey', 'updraft_dropbox_secret', 'updraft_googledrive_clientid', 'updraft_googledrive_secret', 'updraft_googledrive_remotepath', 'updraft_ftp', 'updraft_ftp_login', 'updraft_ftp_pass', 'updraft_ftp_remote_path', 'updraft_server_address', 'updraft_dir', 'updraft_email', 'updraft_delete_local', 'updraft_debug_mode', 'updraft_include_plugins', 'updraft_include_themes', 'updraft_include_uploads', 'updraft_include_others', 'updraft_include_wpcore', 'updraft_include_wpcore_exclude', 'updraft_include_more', 'updraft_include_blogs', 'updraft_include_mu-plugins',
+		return array('updraft_autobackup_default', 'updraft_dropbox', 'updraft_googledrive', 'updraftplus_tmp_googledrive_access_token', 'updraftplus_dismissedautobackup', 'dismissed_general_notices_until', 'dismissed_season_notices_until', 'updraftplus_dismissedexpiry', 'updraftplus_dismisseddashnotice', 'updraft_interval', 'updraft_interval_increments', 'updraft_interval_database', 'updraft_retain', 'updraft_retain_db', 'updraft_encryptionphrase', 'updraft_service', 'updraft_dropbox_appkey', 'updraft_dropbox_secret', 'updraft_googledrive_clientid', 'updraft_googledrive_secret', 'updraft_googledrive_remotepath', 'updraft_ftp', 'updraft_ftp_login', 'updraft_ftp_pass', 'updraft_ftp_remote_path', 'updraft_server_address', 'updraft_dir', 'updraft_email', 'updraft_delete_local', 'updraft_debug_mode', 'updraft_include_plugins', 'updraft_include_themes', 'updraft_include_uploads', 'updraft_include_others', 'updraft_include_wpcore', 'updraft_include_wpcore_exclude', 'updraft_include_more', 'updraft_include_blogs', 'updraft_include_mu-plugins',
 		'updraft_include_others_exclude', 'updraft_include_uploads_exclude', 'updraft_lastmessage', 'updraft_googledrive_token', 'updraft_dropboxtk_request_token', 'updraft_dropboxtk_access_token', 'updraft_dropbox_folder', 'updraft_adminlocking', 'updraft_updraftvault', 'updraft_remotesites', 'updraft_migrator_localkeys', 'updraft_central_localkeys', 'updraft_retain_extrarules', 'updraft_googlecloud', 'updraft_include_more_path', 'updraft_split_every', 'updraft_ssl_nossl', 'updraft_backupdb_nonwp', 'updraft_extradbs', 'updraft_combine_jobs_around',
 		'updraft_last_backup', 'updraft_starttime_files', 'updraft_starttime_db', 'updraft_startday_db', 'updraft_startday_files', 'updraft_sftp_settings', 'updraft_s3', 'updraft_s3generic', 'updraft_dreamhost', 'updraft_s3generic_login', 'updraft_s3generic_pass', 'updraft_s3generic_remote_path', 'updraft_s3generic_endpoint', 'updraft_webdav_settings', 'updraft_openstack', 'updraft_bitcasa', 'updraft_copycom', 'updraft_onedrive', 'updraft_azure', 'updraft_cloudfiles', 'updraft_cloudfiles_user', 'updraft_cloudfiles_apikey', 'updraft_cloudfiles_path', 'updraft_cloudfiles_authurl', 'updraft_ssl_useservercerts', 'updraft_ssl_disableverify', 'updraft_s3_login', 'updraft_s3_pass', 'updraft_s3_remote_path', 'updraft_dreamobjects_login', 'updraft_dreamobjects_pass', 'updraft_dreamobjects_remote_path', 'updraft_dreamobjects', 'updraft_report_warningsonly', 'updraft_report_wholebackup', 'updraft_log_syslog', 'updraft_extradatabases');
 	}

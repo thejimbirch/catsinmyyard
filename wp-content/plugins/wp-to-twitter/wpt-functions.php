@@ -498,7 +498,7 @@ function wpt_get_support_form() {
 	// send fields for WP to Twitter
 	$license = ( get_option( 'wpt_license_key' ) != '' ) ? get_option( 'wpt_license_key' ) : 'none';
 	if ( $license != 'none' ) {
-		$valid = ( ( get_option( 'wpt_license_valid' ) == 'true' ) || ( get_option( 'wpt_license_valid' ) == 'active' ) ) ? ' (active)' : ' (inactive)';
+		$valid = ( ( get_option( 'wpt_license_valid' ) == 'true' ) || ( get_option( 'wpt_license_valid' ) == 'active' ) || ( get_option( 'wpt_license_valid' ) == 'valid' ) ) ? ' (active)' : ' (inactive)';
 	} else {
 		$valid = '';
 	}

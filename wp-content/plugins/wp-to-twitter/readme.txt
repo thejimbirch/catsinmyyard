@@ -2,11 +2,11 @@
 Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: twitter, microblogging, su.pr, bitly, yourls, redirect, shortener, post, links, social, sharing, media, tweet
-Requires at least: 4.2
+Requires at least: 4.4
 Tested up to: 4.6
 License: GPLv2 or later
 Text Domain: wp-to-twitter
-Stable tag: 3.2.13
+Stable tag: 3.2.15
 
 Posts a Twitter update when you update your WordPress blog or add a link, with your chosen URL shortening service.
 
@@ -62,11 +62,24 @@ Translating my plug-ins is always appreciated. Work on WP to Twitter translation
 
 = Future =
 
-* Use apply_filters( 'wpt_tweet_sentence', $tweet, $post_ID ) to pass custom taxonomy Tweet formats - Pending WordPress support for taxonomy meta.
-* WP to Twitter timing bug with images?
 * If first #category# is excluded from Tweet, fetch 2nd category in its place? See #1490
-* Remove @mention capabilities; possibly causing app suspensions from Twitter; see https://support.twitter.com/articles/76915#
-* Test with Visual Composer plug-ins for infinite loops; perhaps need to remove actions while in process?
+
+= 3.2.16 =
+
+* Bug fix: missing check to verify array caused AJAX error
+
+= 3.2.15 =
+
+* Bug fix: "Tweet Now" button threw error if selecting main site account [Pro]
+* New action executed when posting to Twitter
+* New debugging point in media retrieval
+
+= 3.2.14 =
+
+* Bug fix: activation status of licenses in WP Tweets Pro misreported in support data
+* Removed longurl.org expander since the service has been shut down.
+* Exclude uploaded media URLs from character counting (WP Tweets Pro)
+* Feature: Support adding custom templates for specific taxonomy terms (WP Tweets Pro)
 
 = 3.2.13 =
 

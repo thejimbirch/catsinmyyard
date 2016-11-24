@@ -285,7 +285,7 @@ if ( ! class_exists( 'Cptch_Whitelist' ) ) {
 				$where =
 						0 == $ip_int
 					?
-						" WHERE `ip` LIKE '%{$this->s}%' OR `ip_to` LIKE '%{$this->s}%' OR `ip_from` LIKE '%{$this->s}%'"
+						" WHERE `ip` LIKE '%{$this->s}%'"
 					:
 						" WHERE ( `ip_from_int` <= {$ip_int} AND `ip_to_int` >= {$ip_int} )";
 			}
@@ -311,7 +311,7 @@ if ( ! class_exists( 'Cptch_Whitelist' ) ) {
 				$where =
 						0 == $ip_int
 					?
-						" WHERE `ip` LIKE '%{$this->s}%' OR `ip_to` LIKE '%{$this->s}%' OR `ip_from` LIKE '%{$this->s}%'"
+						" WHERE `ip` LIKE '%{$this->s}%'"
 					:
 						" WHERE ( `ip_from_int` <= {$ip_int} AND `ip_to_int` >= {$ip_int} )";
 			}
@@ -454,7 +454,7 @@ if ( ! class_exists( 'Cptch_Whitelist' ) ) {
 					'active'          => false,
 					'name'             => 'Limit Attempts by BestWebSoft',
 					'label'            => sprintf( __( 'use the whitelist of %s', 'captcha' ), 'Limit Attempts by BestWebSoft' ),
-					'notice'           => sprintf( __( 'you should install %s to use this functionality', 'captcha' ), '<a href="http://bestwebsoft.com/products/limit-attempts?k=7f52b8ba74b49875aeb687556c04efd8&pn=75&v=' . $cptch_plugin_info["Version"] . '&wp_v=' . $wp_version . '" target="_blank">Limit Attempts by BestWebSoft</a>' ),
+					'notice'           => sprintf( __( 'you should install %s to use this functionality', 'captcha' ), '<a href="http://bestwebsoft.com/products/wordpress/plugins/limit-attempts?k=7f52b8ba74b49875aeb687556c04efd8&pn=75&v=' . $cptch_plugin_info["Version"] . '&wp_v=' . $wp_version . '" target="_blank">Limit Attempts by BestWebSoft</a>' ),
 					'disabled'         => true,
 				);
 			}

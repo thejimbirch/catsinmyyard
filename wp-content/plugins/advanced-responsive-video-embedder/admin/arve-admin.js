@@ -2,9 +2,9 @@
 	'use strict';
 	/*global ajaxurl */
 	/*global sui */
-  /*global alert */
+  /*global tb_show */
+
 	// Options Page
-	//
 	$('.arve-settings-section').each( function() {
 
 		$(this).insertBefore( $(this).parent() );
@@ -23,40 +23,26 @@
 		$(this).remove();
 	});
 
-	// Its hidden!
-	var last_tab_input = $( '#arve_options_main\\[last_options_tab\\]' );
-
-	$('.arve-settings-tabs a').on( 'click', function(e) {
-
-		var target = $(this).attr('data-target');
+	function show_tab( target ) {
 
 		$('.arve-settings-section').show();
 		$( target ).prependTo( '.arve-options-form' );
 		$('.arve-settings-section').not( target ).hide();
-
-		$( last_tab_input ).val( target );
-
 		$('.arve-settings-tabs a').removeClass( 'nav-tab-active' );
-		$(this).addClass( 'nav-tab-active' );
+		$('.arve-settings-tabs a[data-target="' + target + '"]').addClass( 'nav-tab-active' );
+	}
+
+	if ( $( '#arve_options_main\\[last_settings_tab\\]' ).length && $( '#arve_options_main\\[last_settings_tab\\]' ).val().length ) {
+		show_tab( $( '#arve_options_main\\[last_settings_tab\\]' ).val() );
+	}
+
+	$('.arve-settings-tabs a').on( 'click', function(e) {
 
 		e.preventDefault();
+		var target = $(this).attr('data-target');
+		show_tab( target );
+		$( '#arve_options_main\\[last_settings_tab\\]' ).val( target );
 	} );
-
-	/*
-	if( last_tab_input.val() ) {
-
-		var last_tab = last_tab_input.val();
-
-		if( $( last_tab ).length === 0 ) {
-			last_tab = '#arve-settings-section-main';
-		}
-
-		$('.arve-settings-tabs a[data-target='+last_tab+']').addClass( 'nav-tab-active' );
-
-		$( last_tab ).prependTo( '.arve-options-form' );
-		$('.arve-settings-section').not( last_tab ).hide();
-	}
-	*/
 
 	$('[data-arve-image-upload]').click(function(e) {
 		e.preventDefault();
@@ -71,8 +57,6 @@
 			var uploaded_image = image.state().get('selection').first();
 			// We convert uploaded_image to a JSON object to make accessing it easier
 			// Output to the console uploaded_image
-			//console.log(uploaded_image);
-			//console.log( $( this ) );
 			var attachment_id = uploaded_image.toJSON().id;
 			// Let's assign the url value to the input field
 			$( target ).val(attachment_id);
@@ -101,22 +85,6 @@
 		});
 	});
 
-	/*
-	$(window).on( 'keyup', function(e) {
-		if ( e.ctrlKey && e.shiftKey && 'v' === e.key ) {
-			open_arve_dialog();
-		}
-	} );
-	*/
-
-	$( '#arve-btn' ).on( 'click', function(e) {
-		e.preventDefault();
-		if( $( '#arve-btn[data-arve-sui]' ).length ) {
-			open_arve_dialog();
-		} else {
-			alert( 'ARVE needs the "Shortcake (Shortcode UI)" plugin active for this fuctionality, please download this version https://nextgenthemes.com/shortcode-ui-0.7.0-alpha.zip and install from zip. Current wp.org version 0.6.2 has a issue.' );
-		}
-	} );
 
 	function open_arve_dialog() {
 		var arve_shortcode = sui.utils.shortcodeViewConstructor.parseShortcodeString( '[arve]' );
@@ -126,5 +94,22 @@
 			currentShortcode : arve_shortcode
 		}).open();
 	}
+
+	$( '#arve-btn' ).on( 'click', function(e) {
+		e.preventDefault();
+		if( $( '#arve-btn[data-arve-sui]' ).length ) {
+			open_arve_dialog();
+		} else {
+			tb_show( 'ARVE Optional Features', '#TB_inline?inlineId=arve-thickbox' );
+		}
+	} );
+
+	/*
+	$(window).on( 'keyup', function(e) {
+		if ( e.ctrlKey && e.shiftKey && 'v' === e.key ) {
+			open_arve_dialog();
+		}
+	} );
+	*/
 
 }(jQuery));

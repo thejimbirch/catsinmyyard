@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name: Sucuri Security - Auditing, Malware Scanner and Hardening
-Plugin URI: https://wordpress.sucuri.net/
-Description: The <a href="https://sucuri.net/" target="_blank">Sucuri</a> plugin provides the website owner the best Activity Auditing, SiteCheck Remote Malware Scanning, Effective Security Hardening and Post-Hack features. SiteCheck will check for malware, spam, blacklisting and other security issues like .htaccess redirects, hidden eval code, etc. The best thing about it is it's completely free.
-Author: Sucuri, INC
-Version: 1.8.1
+Plugin URI: https://sucuri.net/
+Description: The <a href="https://sucuri.net/" target="_blank">Sucuri</a> plugin provides the website owner the best Audit logging, SiteCheck Remote Malware Scanning, Effective Security Hardening and Post-Hack features. SiteCheck will check for malware, spam, blacklisting and other security issues like .htaccess redirects, hidden eval code, etc. The best thing about it is it's completely free.
+Author: Sucuri, Inc
+Version: 1.8.3
 Author URI: https://sucuri.net
 */
 
@@ -14,9 +14,9 @@ Author URI: https://sucuri.net
  *
  * @package   Sucuri Security
  * @author    Daniel Cid   <dcid@sucuri.net>
- * @copyright Since 2010-2015 Sucuri Inc.
+ * @copyright Since 2010-2016 Sucuri Inc.
  * @license   Released under the GPL - see LICENSE file for details.
- * @link      https://wordpress.sucuri.net/
+ * @link      https://sucuri.net/
  * @since     File available since Release 0.1
  */
 
@@ -65,7 +65,7 @@ define('SUCURISCAN', 'sucuriscan');
 /**
  * Current version of the plugin's code.
  */
-define('SUCURISCAN_VERSION', '1.8.1');
+define('SUCURISCAN_VERSION', '1.8.3');
 
 /**
  * The name of the Sucuri plugin main file.
@@ -439,6 +439,31 @@ class SucuriScan
     }
 
     /**
+     * Throw generic exception instead of silent failure for unit-tests.
+     *
+     * @param  string $message Error or information message.
+     * @param  string $type    Either info or error.
+     * @return void
+     */
+    public static function throwException($message, $type = 'error')
+    {
+        if (defined('SUCURISCAN_THROW_EXCEPTIONS')
+            && SUCURISCAN_THROW_EXCEPTIONS === true
+            && is_string($message)
+            && !empty($message)
+        ) {
+            $code = ($type === 'error' ? 157 : 333);
+            $message = str_replace(
+                '<b>Sucuri:</b>',
+                ($type === 'error' ? 'Error:' : 'Info:'),
+                $message
+            );
+
+            throw new Exception($message, $code);
+        }
+    }
+
+    /**
      * Return name of a variable with the plugin's prefix (if needed).
      *
      * To facilitate the development, you can prefix the name of the key in the
@@ -606,49 +631,9 @@ class SucuriScan
      */
     public static function datastore_folder_path($path = '')
     {
-        $default_dir = 'sucuri';
-        $abspath = self::fixPath(ABSPATH);
+        $datastore = SucuriScanOption::get_option(':datastore_path');
 
-        if (defined('SUCURI_DATA_STORAGE')
-            && file_exists(SUCURI_DATA_STORAGE)
-            && is_dir(SUCURI_DATA_STORAGE)
-        ) {
-            $datastore = SUCURI_DATA_STORAGE;
-        } else {
-            $datastore = SucuriScanOption::get_option(':datastore_path');
-        }
-
-        // Use the uploads folder by default.
-        if (empty($datastore)) {
-            $uploads_path = false;
-
-            // Multisite installations may have different paths.
-            if (function_exists('wp_upload_dir')) {
-                $upload_dir = wp_upload_dir();
-
-                if (isset($upload_dir['basedir'])) {
-                    $uploads_path = rtrim($upload_dir['basedir'], DIRECTORY_SEPARATOR);
-                }
-            }
-
-            if ($uploads_path === false) {
-                if (defined('WP_CONTENT_DIR')) {
-                    $uploads_path = implode(DIRECTORY_SEPARATOR, array(WP_CONTENT_DIR, 'uploads'));
-                } else {
-                    $uploads_path = implode(DIRECTORY_SEPARATOR, array($abspath, 'wp-content', 'uploads'));
-                }
-            }
-
-            $datastore = $uploads_path . DIRECTORY_SEPARATOR . $default_dir;
-            $datastore = self::fixPath($datastore);
-            SucuriScanOption::update_option(':datastore_path', $datastore);
-        }
-
-        // Keep consistency with the directory separator.
-        $final = $datastore . DIRECTORY_SEPARATOR . $path;
-        $final = self::fixPath($final);
-
-        return $final;
+        return self::fixPath($datastore . '/' . $path);
     }
 
     /**
@@ -691,9 +676,7 @@ class SucuriScan
             }
         }
 
-        $wp_version = self::escape($wp_version);
-
-        return $wp_version;
+        return self::escape($wp_version);
     }
 
     /**
@@ -766,6 +749,7 @@ class SucuriScan
     public static function run_scheduled_task()
     {
         SucuriScanEvent::filesystem_scan();
+
         sucuriscan_core_files_data(true);
         sucuriscan_posthack_updates_content(true);
     }
@@ -911,7 +895,7 @@ class SucuriScan
         if (function_exists('get_site_url')) {
             $site_url = get_site_url();
             $pattern = '/([fhtps]+:\/\/)?([^:\/]+)(:[0-9:]+)?(\/.*)?/';
-            $replacement = ( $return_tld === true ) ? '$2' : '$2$3$4';
+            $replacement = ($return_tld === true) ? '$2' : '$2$3$4';
             $domain_name = @preg_replace($pattern, $replacement, $site_url);
 
             return $domain_name;
@@ -987,9 +971,7 @@ class SucuriScan
          * the site as protected by a firewall. A fake key can be used to bypass the DNS
          * checking, but that is not something that will affect us, only the client.
          */
-        if ($status === false
-            && SucuriScanAPI::getCloudproxyKey()
-        ) {
+        if (!$status && SucuriScanAPI::getCloudproxyKey()) {
             $status = true;
         }
 
@@ -1050,9 +1032,7 @@ class SucuriScan
     public static function get_admin_users()
     {
         if (function_exists('get_users')) {
-            $args = array( 'role' => 'administrator' );
-
-            return get_users($args);
+            return get_users(array('role' => 'administrator'));
         }
 
         return false;
@@ -1076,7 +1056,7 @@ class SucuriScan
         if ($users !== false) {
             foreach ($users as $user) {
                 if ($user->user_status === '0') {
-                    $valid_users[ $user->ID ] = sprintf(
+                    $valid_users[$user->ID] = sprintf(
                         '%s - %s',
                         $user->user_login,
                         $user->user_email
@@ -2687,6 +2667,8 @@ class SucuriScanCache extends SucuriScan
         $finfo = $this->getDatastoreContent();
 
         if (!empty($finfo['info'])) {
+            $finfo['info']['fpath'] = $this->datastore_path;
+
             return $finfo['info'];
         }
 
@@ -2869,6 +2851,10 @@ class SucuriScanCache extends SucuriScan
     {
         $finfo = $this->getDatastoreContent();
 
+        if (array_key_exists('entries', $finfo)) {
+            $finfo['entries'] = array();
+        }
+
         return $this->saveNewEntries($finfo);
     }
 }
@@ -2917,7 +2903,7 @@ class SucuriScanOption extends SucuriScanRequest
             'sucuriscan_cloudproxy_apikey' => '',
             'sucuriscan_collect_wrong_passwords' => 'disabled',
             'sucuriscan_comment_monitor' => 'disabled',
-            'sucuriscan_datastore_path' => '',
+            'sucuriscan_datastore_path' => dirname(self::optionsFilePath()),
             'sucuriscan_dismiss_setup' => 'disabled',
             'sucuriscan_dns_lookups' => 'enabled',
             'sucuriscan_email_subject' => 'Sucuri Alert, :domain, :event',
@@ -2936,7 +2922,7 @@ class SucuriScanOption extends SucuriScanRequest
             'sucuriscan_lastlogin_redirection' => 'enabled',
             'sucuriscan_logs4report' => 500,
             'sucuriscan_maximum_failed_logins' => 30,
-            'sucuriscan_notify_available_updates' => 'enabled',
+            'sucuriscan_notify_available_updates' => 'disabled',
             'sucuriscan_notify_bruteforce_attack' => 'disabled',
             'sucuriscan_notify_failed_login' => 'enabled',
             'sucuriscan_notify_plugin_activated' => 'disabled',
@@ -2978,9 +2964,6 @@ class SucuriScanOption extends SucuriScanRequest
             'sucuriscan_verify_ssl_cert' => 'false',
             'sucuriscan_xhr_monitor' => 'disabled',
         );
-
-        $fpath = self::optionsFilePath();
-        $defaults['sucuriscan_datastore_path'] = dirname($fpath);
 
         return $defaults;
     }
@@ -3049,6 +3032,41 @@ class SucuriScanOption extends SucuriScanRequest
     }
 
     /**
+     * Check if the settings will be stored in the database.
+     *
+     * Since version 1.7.18 the plugin started using plain text files to store
+     * its settings as a security measure to reduce the scope of the attacks
+     * against the database and to simplify the management of the settings for
+     * multisite installations. Some users complained about this and suggested
+     * to create an option to allow them to keep using the database instead of
+     * plain text files.
+     *
+     * We will not add an explicit option in the settings page, but users can go
+     * around this defining a constant in the configuration file named
+     * "SUCURI_SETTINGS_IN" with value "database" to force the plugin to store
+     * its settings in the database instead of the plain text files.
+     *
+     * @return boolean True if the settings will be stored in the database.
+     */
+    public static function settingsInDatabase()
+    {
+        return (bool) (
+            defined('SUCURI_SETTINGS_IN')
+            && SUCURI_SETTINGS_IN === 'database'
+        );
+    }
+
+    /**
+     * Check if the settings will be stored in a plain text file.
+     *
+     * @return boolean True if the settings will be stored in a file.
+     */
+    public static function settingsInTextFile()
+    {
+        return (bool) (self::settingsInDatabase() === false);
+    }
+
+    /**
      * Returns path of the options storage.
      *
      * Returns the absolute path of the file that will store the options
@@ -3061,7 +3079,10 @@ class SucuriScanOption extends SucuriScanRequest
      */
     public static function optionsFilePath()
     {
-        $folder = WP_CONTENT_DIR . '/uploads/sucuri';
+        $content_dir = defined('WP_CONTENT_DIR')
+            ? rtrim(WP_CONTENT_DIR, '/')
+            : ABSPATH . '/wp-content';
+        $folder = $content_dir . '/uploads/sucuri';
 
         if (defined('SUCURI_DATA_STORAGE')
             && file_exists(SUCURI_DATA_STORAGE)
@@ -3070,7 +3091,7 @@ class SucuriScanOption extends SucuriScanRequest
             $folder = SUCURI_DATA_STORAGE;
         }
 
-        return $folder . '/sucuri-settings.php';
+        return self::fixPath($folder . '/sucuri-settings.php');
     }
 
     /**
@@ -3209,7 +3230,10 @@ class SucuriScanOption extends SucuriScanRequest
             $option = self::variable_prefix($option);
             $options[$option] = $value;
 
-            return self::writeNewOptions($options);
+            // Skip if user wants to use the database.
+            if (self::settingsInTextFile() && self::writeNewOptions($options)) {
+                return true;
+            }
         }
 
         if (function_exists('update_option')) {
@@ -5355,16 +5379,19 @@ class SucuriScanAPI extends SucuriScanOption
             }
 
             $output = curl_exec($curl);
-            $headers = curl_getinfo($curl);
+            $header = curl_getinfo($curl);
+            $errors = curl_error($curl);
 
             curl_close($curl);
 
-            if (array_key_exists('http_code', $headers)
-                && $headers['http_code'] === 200
+            if (array_key_exists('http_code', $header)
+                && $header['http_code'] === 200
                 && !empty($output)
             ) {
                 return $output;
             }
+
+            SucuriScan::throwException($errors);
         }
 
         return false;
@@ -6578,7 +6605,6 @@ class SucuriScanAPI extends SucuriScanOption
  */
 class SucuriScanMail extends SucuriScanOption
 {
-
     /**
      * Check whether the email notifications will be sent in HTML or Plain/Text.
      *
@@ -6654,7 +6680,12 @@ class SucuriScanMail extends SucuriScanOption
              * @var boolean
              */
             if (SucuriScanOption::is_enabled(':use_wpmail')) {
-                $mail_sent = wp_mail($email, $subject, $message, $headers);
+                try {
+                    $mail_sent = wp_mail($email, $subject, $message, $headers);
+                }
+                catch (Exception $e) {
+                    $mail_sent = false;
+                }
             } else {
                 $headers = implode("\r\n", $headers);
                 $mail_sent = @mail($email, $subject, $message, $headers);
@@ -6662,6 +6693,7 @@ class SucuriScanMail extends SucuriScanOption
 
             if ($mail_sent) {
                 $emails_sent_num = (int) self::get_option(':emails_sent');
+
                 self::update_option(':emails_sent', $emails_sent_num + 1);
                 self::update_option(':last_email_at', time());
 
@@ -7196,7 +7228,7 @@ class SucuriScanTemplate extends SucuriScanRequest
         foreach ($allowed_values as $option_name => $option_label) {
             $options .= sprintf(
                 "<option %s value='%s'>%s</option>\n",
-                ($option_name === $selected_val ? 'selected="selected"' : ''),
+                ("$option_name" === "$selected_val" ? 'selected="selected"' : ''),
                 SucuriScan::escape($option_name),
                 SucuriScan::escape($option_label)
             );
@@ -7823,35 +7855,20 @@ class SucuriScanInterface
             @mkdir($directory, 0755, true);
         }
 
-        if (@preg_match(';/uploads/$;', $directory)) {
-            SucuriScanOption::delete_option(':datastore_path');
-            SucuriScanInterface::error('Uploads directory must not be used as the data store path.');
-        } elseif (file_exists($directory)) {
+        if (file_exists($directory)) {
             // Create last-logins datastore file.
             sucuriscan_lastlogins_datastore_exists();
 
             // Create a htaccess file to deny access from all.
-            @file_put_contents(
-                $directory . '/.htaccess',
-                "Order Deny,Allow\nDeny from all\n",
-                LOCK_EX
-            );
+            if (!SucuriScanHardening::is_hardened($directory)) {
+                SucuriScanHardening::harden_directory($directory);
+            }
 
             // Create an index.html to avoid directory listing.
             @file_put_contents(
                 $directory . '/index.html',
                 '<!-- Prevent the directory listing. -->',
                 LOCK_EX
-            );
-        } else {
-            SucuriScanOption::delete_option(':datastore_path');
-            SucuriScanInterface::error(
-                'Data folder does not exists and could not be created. Try to <a href="' .
-                SucuriScanTemplate::getUrl('settings') . '">click this link</a> to see
-                if the plugin is able to fix this error automatically, if this message
-                reappears you will need to either change the location of the directory from
-                the plugin general settings page or create this directory manually and give
-                it write permissions: <code>' . $directory . '</code>'
             );
         }
     }
@@ -7962,19 +7979,7 @@ class SucuriScanInterface
 
         // Display the HTML notice to the current user.
         if ($display_notice === true && !empty($message)) {
-            if (defined('SUCURISCAN_THROW_EXCEPTIONS')
-                && SUCURISCAN_THROW_EXCEPTIONS === true
-            ) {
-                $number = (string) crc32($type);
-                $code = (int) substr($number, 0, 3);
-                $message = str_replace(
-                    '<b>Sucuri:</b>',
-                    ($type === 'error' ? 'Error:' : 'Info:'),
-                    $message
-                );
-
-                throw new Exception($message, $code);
-            }
+            SucuriScan::throwException($message, $type);
 
             echo SucuriScanTemplate::getSection(
                 'notification-admin',
@@ -8035,7 +8040,10 @@ class SucuriScanInterface
             '/wp-admin/plugins.php',
         );
 
-        if ($page && array_key_exists($page, $sucuriscan_pages)) {
+        if ($page
+            && is_array($sucuriscan_pages)
+            && array_key_exists($page, $sucuriscan_pages)
+        ) {
             return true;
         }
 
@@ -8209,11 +8217,30 @@ function sucuriscan_scanner_page()
     $cache = new SucuriScanCache('sitecheck');
     $scan_results = $cache->get('scan_results', SUCURISCAN_SITECHECK_LIFETIME, 'array');
     $report_results = (bool) ($scan_results && !empty($scan_results));
+    $nonce = SucuriScanInterface::check_nonce();
 
-    if (SucuriScanInterface::check_nonce()
-        && SucuriScanRequest::post(':malware_scan', '1')
-    ) {
+    // Retrieve SiteCheck scan results if user submits the form.
+    if ($nonce && SucuriScanRequest::post(':malware_scan')) {
         $report_results = true;
+    }
+
+    /**
+     * Retrieve SiteCheck results from custom domain.
+     *
+     * To facilitate the debugging of the code we will allow the existence of a
+     * GET parameter that will force the plugin to scan a specific website
+     * instead of the website where the plugin is running. Since this will be a
+     * semi-hidden feature we can bypass some actions like the recycling of the
+     * data returned by a previous scan.
+     *
+     * Usage: Add "&s=TLD" where TLD is a WordPress or non-WordPress website.
+     */
+    if ($nonce && SucuriScanRequest::get('s')) {
+        $info = $cache->getDatastoreInfo();
+        $report_results = true;
+        $scan_results = false;
+
+        @unlink($info['fpath']);
     }
 
     if ($report_results === true) {
@@ -8254,9 +8281,14 @@ function sucuriscan_scanner_ajax()
  */
 function sucuriscan_sitecheck_info($scan_results = array())
 {
-    $clean_domain = SucuriScan::get_domain();
+    $tld = SucuriScan::get_domain();
+
+    if ($custom = SucuriScanRequest::get('s')) {
+        $tld = SucuriScan::escape($custom);
+    }
+
     $params = array(
-        'ScannedDomainName' => $clean_domain,
+        'ScannedDomainName' => $tld,
         'ScannerResults.CssClass' => '',
         'ScannerResults.Content' => '',
         'WebsiteDetails.CssClass' => '',
@@ -8272,13 +8304,13 @@ function sucuriscan_sitecheck_info($scan_results = array())
 
     // If the results are not cached, then request a new scan and store in cache.
     if ($scan_results === false) {
-        $scan_results = SucuriScanAPI::getSitecheckResults($clean_domain);
+        $scan_results = SucuriScanAPI::getSitecheckResults($tld);
 
         // Check for error messages in the request's response.
         if (is_string($scan_results)) {
             if (@preg_match('/^ERROR:(.*)/', $scan_results, $error_m)) {
                 SucuriScanInterface::error(
-                    'The site <code>' . SucuriScan::escape($clean_domain) . '</code>'
+                    'The site <code>' . SucuriScan::escape($tld) . '</code>'
                     . ' was not scanned: ' . SucuriScan::escape($error_m[1])
                 );
             } else {
@@ -8432,6 +8464,7 @@ function sucuriscan_sitecheck_website_details($scan_results = false, $params = a
 function sucuriscan_sitecheck_general_information($scan_results = false, $secvars = array())
 {
     $possible_keys = array(
+        'SITE' => 'Website',
         'DOMAIN' => 'Domain Scanned',
         'IP' => 'Site IP Address',
         'HOSTING' => 'Hosting Company',
@@ -9241,8 +9274,9 @@ class SucuriScanHardening extends SucuriScan
                 $rules_str = implode("\n", $deny_rules);
                 $content = str_replace($rules_str, '', $content);
                 $written = @file_put_contents($fpath, $content);
+                $trimmed = trim($content);
 
-                if (filesize($fpath) === 0) {
+                if (!filesize($fpath) || empty($trimmed)) {
                     @unlink($fpath);
                 }
 
@@ -9337,7 +9371,7 @@ class SucuriScanHardening extends SucuriScan
 
         if (file_exists($htaccess)) {
             if (is_writable($htaccess)) {
-                $rules = self::whitelist_rule($file);
+                $rules = "\n" . self::whitelist_rule($file);
                 @file_put_contents($htaccess, $rules, FILE_APPEND);
             } else {
                 throw new Exception('Access control file is not writable');
@@ -9358,6 +9392,8 @@ class SucuriScanHardening extends SucuriScan
             $content = file_get_contents($htaccess);
             $rules = self::whitelist_rule($file);
             $content = str_replace($rules, '', $content);
+            $content = rtrim($content) . "\n";
+
             @file_put_contents($htaccess, $content);
         }
     }
@@ -9366,9 +9402,7 @@ class SucuriScanHardening extends SucuriScan
     {
         $htaccess = self::htaccess($folder);
 
-        if (file_exists($htaccess)
-            && is_readable($htaccess)
-        ) {
+        if (file_exists($htaccess) && is_readable($htaccess)) {
             $content = file_get_contents($htaccess);
 
             if (@preg_match_all('/<Files (\S+)>/', $content, $matches)) {
@@ -10267,6 +10301,7 @@ function sucuriscan_audit_logs_ajax()
     if (SucuriScanRequest::post('form_action') == 'get_audit_logs') {
         $response = array();
         $response['count'] = 0;
+        $response['content'] = '';
         $response['enable_report'] = false;
 
         // Initialize the values for the pagination.
@@ -10339,7 +10374,7 @@ function sucuriscan_audit_logs_ajax()
             $response['count'] = $counter_i;
 
             if ($total_items > 1) {
-                $max_pages = ceil($audit_logs->total_entries / $max_per_page);
+                $max_pages = ceil($audit_logs['total_entries'] / $max_per_page);
 
                 if ($max_pages > SUCURISCAN_MAX_PAGINATION_BUTTONS) {
                     $max_pages = SUCURISCAN_MAX_PAGINATION_BUTTONS;
@@ -11299,19 +11334,34 @@ function sucuriscan_posthack_updates_content($send_email = false)
 
         foreach ($updates as $data) {
             $css_class = ($counter % 2 == 0) ? '' : 'alternate';
-            $response .= SucuriScanTemplate::getSnippet(
-                'posthack-updates',
-                array(
-                    'Update.CssClass' => $css_class,
-                    'Update.IconType' => 'plugins',
-                    'Update.Extension' => SucuriScan::excerpt($data->Name, 35),
-                    'Update.Version' => $data->Version,
-                    'Update.NewVersion' => $data->update->new_version,
-                    'Update.TestedWith' => "WordPress\x20" . $data->update->tested,
-                    'Update.ArchiveUrl' => $data->update->package,
-                    'Update.MarketUrl' => $data->update->url,
-                )
+            $params = array(
+                'Update.CssClass' => $css_class,
+                'Update.IconType' => 'plugins',
+                'Update.Extension' => SucuriScan::excerpt($data->Name, 35),
+                'Update.Version' => $data->Version,
+                'Update.NewVersion' => 'Unknown',
+                'Update.TestedWith' => 'Unknown',
+                'Update.ArchiveUrl' => 'Unknown',
+                'Update.MarketUrl' => 'Unknown',
             );
+
+            if (property_exists($data->update, 'new_version')) {
+                $params['Update.NewVersion'] = $data->update->new_version;
+            }
+
+            if (property_exists($data->update, 'tested')) {
+                $params['Update.TestedWith'] = "WordPress\x20" . $data->update->tested;
+            }
+
+            if (property_exists($data->update, 'package')) {
+                $params['Update.ArchiveUrl'] = $data->update->package;
+            }
+
+            if (property_exists($data->update, 'url')) {
+                $params['Update.MarketUrl'] = $data->update->url;
+            }
+
+            $response .= SucuriScanTemplate::getSnippet('posthack-updates', $params);
             $counter++;
         }
     }
@@ -12934,7 +12984,7 @@ function sucuriscan_settings_general_apikey($nonce)
     $display_manual_key_form = (bool) (SucuriScanRequest::post(':recover_key') !== false);
 
     if ($nonce) {
-        if (!empty($_POST)) {
+        if (!empty($_POST) && SucuriScanOption::settingsInTextFile()) {
             $fpath = SucuriScanOption::optionsFilePath();
 
             if (!is_writable($fpath)) {
@@ -13022,47 +13072,53 @@ function sucuriscan_settings_general_apikey($nonce)
 function sucuriscan_settings_general_datastorage($nonce)
 {
     $params = array();
+    $files = array(
+        '', /* <root> */
+        'auditqueue',
+        'blockedusers',
+        'failedlogins',
+        'ignorescanning',
+        'integrity',
+        'lastlogins',
+        'oldfailedlogins',
+        'plugindata',
+        'settings',
+        'sitecheck',
+        'trustip',
+    );
 
-    // Update the datastore path (if the new directory exists).
-    if ($nonce) {
-        $directory = SucuriScanRequest::post(':datastore_path');
-
-        if ($directory) {
-            $current = SucuriScanOption::datastore_folder_path();
-
-            // Try to create the new directory (if possible).
-            if (!file_exists($directory)) {
-                @mkdir($directory, 0755, true);
-            }
-
-            // Check if the directory is writable and move all the logs.
-            if (file_exists($directory)) {
-                if (is_writable($directory)) {
-                    $message = 'Datastore path set to <code>' . $directory . '</code>';
-
-                    SucuriScanOption::update_option(':datastore_path', $directory);
-                    SucuriScanEvent::report_info_event($message);
-                    SucuriScanEvent::notify_event('plugin_change', $message);
-                    SucuriScanInterface::info($message);
-
-                    if (file_exists($current)) {
-                        $newpath = SucuriScanOption::datastore_folder_path();
-
-                        // Some file systems do not work correctly with trailing separators.
-                        $current = rtrim($current, '/');
-                        $newpath = rtrim($newpath, '/');
-                        @rename($current, $newpath);
-                    }
-                } else {
-                    SucuriScanInterface::error('The new directory path is not writable.');
-                }
-            } else {
-                SucuriScanInterface::error('The directory path specified does not exists.');
-            }
-        }
-    }
-
+    $counter = 0;
+    $params['DataStorage.Files'] = '';
     $params['DatastorePath'] = SucuriScanOption::get_option(':datastore_path');
+
+    foreach ($files as $name) {
+        $counter++;
+        $fname = ($name ? sprintf('sucuri-%s.php', $name) : '');
+        $fpath = SucuriScan::datastore_folder_path($fname);
+        $exists = (file_exists($fpath) ? 'Yes' : 'No');
+        $iswritable = (is_writable($fpath) ? 'Yes' : 'No');
+        $css_class = ($counter % 2 === 0) ? 'alternate' : '';
+        $disabled = 'disabled="disabled"';
+
+        if ($exists === 'Yes' && $iswritable === 'Yes') {
+            $disabled = ''; /* Allow file deletion */
+        }
+
+        // Remove unnecessary parts from the file path.
+        $fpath = str_replace(ABSPATH, '/', $fpath);
+
+        $params['DataStorage.Files'] .= SucuriScanTemplate::getSnippet(
+            'settings-datastorage-files',
+            array(
+                'DataStorage.CssClass' => $css_class,
+                'DataStorage.Fname' => $fname,
+                'DataStorage.Fpath' => $fpath,
+                'DataStorage.Exists' => $exists,
+                'DataStorage.IsWritable' => $iswritable,
+                'DataStorage.DisabledInput' => $disabled,
+            )
+        );
+    }
 
     return SucuriScanTemplate::getSection('settings-general-datastorage', $params);
 }
@@ -13551,6 +13607,7 @@ function sucuriscan_settings_corefiles_cache($nonce)
     return SucuriScanTemplate::getSection('settings-corefiles-cache', $params);
 }
 
+if (!class_exists('SucuriScanSiteCheck')) {
 class SucuriScanSiteCheck extends SucuriScanSettings
 {
     public static function isEnabled()
@@ -13642,6 +13699,7 @@ class SucuriScanSiteCheck extends SucuriScanSettings
 
         return SucuriScanTemplate::getSection('settings-sitecheck-timeout', $params);
     }
+}
 }
 
 /**

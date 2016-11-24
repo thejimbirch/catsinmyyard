@@ -90,7 +90,7 @@ if ( ! class_exists( 'Cptch_Package_Loader' ) ) {
 							<label>
 								<input class="button-primary cptch_install_disabled" name="cptch_install_package_submit" type="submit" value="<?php _e( 'Install Now', 'captcha' ); ?>" />
 							</label>
-							<a class="cptch_add_ons_link" href="http://bestwebsoft.com/products/captcha/addons/" target="_blank"><?php _e( 'Browse packages', 'captcha' ); ?></a>
+							<a class="cptch_add_ons_link" href="http://bestwebsoft.com/products/wordpress/plugins/captcha/addons/" target="_blank"><?php _e( 'Browse packages', 'captcha' ); ?></a>
 						</p>
 						<?php wp_nonce_field( $this->basename, 'cptch_load_package' ); ?>
 					</fieldset>
@@ -129,14 +129,19 @@ if ( ! class_exists( 'Cptch_Package_Loader' ) ) {
 			check_admin_referer( $this->basename, 'cptch_load_package' );
 
 			$error_part  = __( "Error during package uploading", 'captcha' ) . ':&nbsp;';
-			$zip_formats = array( 'application/zip', 'application/x-zip', 'application/x-zip-compressed' );
+			$zip_formats = array( 'application/zip', 'application/x-zip', 'application/x-zip-compressed', 'application/octet-stream' );
 			$max_size    = wp_max_upload_size();
 			$file        = $_FILES[ 'cptch_packages' ];
+			$is_zip = (
+				in_array( $file['type'], $zip_formats ) &&
+				'.zip' == strtolower( substr ( $file['name'], -4 ) ) &&
+				'PK' == file_get_contents( $file['tmp_name'], FALSE, NULL, 0, 2)
+			) ? true : false;
 
 			/* Archive verification before uploading */
 			if ( ! is_uploaded_file( $file['tmp_name'] ) )
 				$this->error = $error_part . __( "check your archive", 'captcha' ) . '.';
-			elseif ( ! in_array( $file['type'], $zip_formats ) )
+			elseif ( ! $is_zip )
 				$this->error = $error_part . __( "file format should be ZIP-archive", 'captcha' ) . '.';
 			elseif ( $file['size'] > $max_size )
 				$this->error = $error_part . __( "file size should not exceed", 'captcha' ) . $this->get_human_readeble_file_size( $max_size ) . '.';
@@ -234,9 +239,9 @@ if ( ! class_exists( 'Cptch_Package_Loader' ) ) {
 			if ( $remove_package ) {
 				$this->remove( $this->packages_dir );
 				if ( ! $this->error ) {
-					$packages_message = sprintf( _n( 'One package and', '%s packages and', $this->result[0], 'captcha' ), $this->result[0] );
-					$images_message   = sprintf( _n( 'one image', '%s images', $this->result[1], 'captcha' ), $this->result[1] );
-					$this->message    = "{$packages_message}&nbsp;{$images_message}&nbsp;" . __( 'have been updated or added to the database', 'captcha' ) . '.';
+					$packages_message = sprintf( _n( 'One package has been updated or added to the database', '%s packages have been updated or added to the database', $this->result[0], 'captcha' ), $this->result[0] );
+					$images_message   = sprintf( _n( 'One image has been updated or added to the database', '%s images have been updated or added to the database', $this->result[1], 'captcha' ), $this->result[1] );
+					$this->message    = "{$packages_message}<br>{$images_message}";
 				}
 			}
 		}

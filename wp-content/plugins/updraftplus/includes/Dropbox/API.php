@@ -12,6 +12,7 @@ class UpdraftPlus_Dropbox_API
 {
     // API Endpoints
     const API_URL     = 'https://api.dropbox.com/1/';
+    const API_URL_V2  = 'https://api.dropboxapi.com/2/';
     const CONTENT_URL = 'https://api-content.dropbox.com/1/';
     
     /**

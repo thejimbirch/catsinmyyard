@@ -284,17 +284,11 @@ if ( ! function_exists( 'wpt_shorten_url' ) ) { // prep work for future plug-in 
 		return wpt_expand_url( $short_url );
 	}
 	
+	/** 
+	 * LongUrl.org was taken off line; this no longer works.
+	 */
 	function wpt_expand_url( $short_url ) {
-		$short_url = urlencode( $short_url );
-		$decoded   = wpt_remote_json( "http://api.longurl.org/v2/expand?format=json&url=" . $short_url );
-		if ( isset( $decoded['long-url'] ) ) {
-			$url = $decoded['long-url'];
-		} else {
-			$url = $short_url;
-		}
-
-		return $url;
-		//return $short_url;
+		return $short_url;
 	}
 	
 	function jd_expand_yourl( $short_url, $remote ) {

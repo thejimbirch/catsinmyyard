@@ -2,7 +2,7 @@
 
 if (!defined('UPDRAFTPLUS_DIR')) die('No access.');
 
-// This files is included during plugins_loaded
+// This file is included during plugins_loaded
 
 // Load the listener class that we rely on to pick up messages
 if (!class_exists('UpdraftPlus_UpdraftCentral_Listener')) require_once('listener.php');
@@ -536,11 +536,16 @@ class UpdraftPlus_UpdraftCentral_Main {
 	
 	public function debugtools_dashboard() {
 	?>
-		<h3><?php _e('UpdraftCentral (Remote Control)', 'updraftplus'); ?></h3>
-		<div id="updraftcentral_keys">
-			<?php echo $this->get_keys_table() ?>
-			<?php echo $this->create_key_markup() ?>
-			<?php echo $this->create_log_markup() ?>
+		<div class="advanced_tools updraft_central">
+			<h3><?php _e('UpdraftCentral (Remote Control)', 'updraftplus'); ?></h3>
+			<p>
+				<?php echo __('UpdraftCentral enables control of your WordPress sites (including management of backups and updates) from a central dashboard.', 'updraftplus').' <a href="https://updraftcentral.com">'.__('Read more about it here.', 'updraftplus').'</a>'; ?>
+			</p>
+			<div id="updraftcentral_keys">
+				<?php echo $this->get_keys_table() ?>
+				<?php echo $this->create_key_markup() ?>
+				<?php echo $this->create_log_markup() ?>
+			</div>
 		</div>
 	<?php
 	}

@@ -1,5 +1,91 @@
 ## Changelog ##
 
+### 2016-10-29 - 7.9.8 and Pro Addon 3.3.4 ###
+
+* Fix: Fix lightbox thumbnail
+* Improved: CSS
+
+### 2016-10-28 - Pro Addon 3.3.1 ###
+
+* Fix: Fix thumbnails being displayed wrong in IE.
+
+### 2016-10-28 - Pro Addon 3.3.0 ###
+
+* Fix: Restored broken update notifications and semi auto updates.
+
+### 2016-10-28 - 7.9.7 ###
+
+* New: Wistia Support.
+* Improved: Allow HTML in title attribute.
+* Improved: Force more CSS Styles.
+
+### 2016-10-27 - Pro Addon 3.2.9 ###
+
+* Fix: Twitch API failing (needs Client-ID now)
+
+### 2016-10-27 - Pro Addon 3.2.8 ###
+
+* Improved: oembed error message
+* Improved: Skip srcset function for PHP 5.3 and lower
+
+### 2016-10-27 - 7.9.6 ###
+
+* Fix: Thumbnail not correctly applied to <video> tag for self hosted videos.
+* Improved: CSS for self hosted videos.
+* Improved: Enabled detection for rubtube and VK and show them as supported providers, even they where supported as general iframe embeds before.
+
+### 2016-10-25 - Pro Addon 3.2.7 ###
+
+* Fix: 2 clicks needed to play lazyloaded video on desktops
+
+### 2016-10-24 - Pro Addon 3.2.5 ###
+
+* Fix: JavaScript error related to abandoned Script.
+* Fix: Custom Thumbnails not applied.
+
+### 2016-10-24 - 7.9.5 ###
+
+* Fix: Custom Thumbnails not applied.
+* Fix: Shortcode UI script only loaded if the plugin is active.
+
+### 2016-10-23 - 7.9.4 and Pro Addon 3.2.3 ###
+
+* Fix: Multiple issues about the new HTML5 video embedding (still experimental)
+
+### 2016-10-23 - Pro Addon 3.2.2 ###
+
+* Fix: 'Disable Links' not working.
+
+### 2016-10-23 - Pro Addon 3.2.0 ###
+
+* Fix: Issue with lazyload and AJAX.
+* Fix: W3TC issue by using yet another lazyload method. Final this time?
+* Fix: YouTube Thumbnail detection when there are no HD images.
+* Improved: Code used to cache thumbnails, this may improve improve performance.
+* Improved: Lots code restructured and improved.
+* New: New Lazyload mode setting to prevent "two touched needed to play video on mobiles" issue. Its also
+* New: Facebook thumbnail detection.
+
+### 2016-10-23 - 7.9.2 ###
+
+* Fix: Brightcove Autoplay issue.
+* Fix: Liveleak thumbnail detection issues.
+* Fix: Parameters not being added.
+* Fix: Twitch single videos not using https
+* Fix: Vevo marked to require flash to make it work again.
+* Improved: Better dialog with better description and links about the shortcake UI plugin.
+* Improved: Facebook embed method.
+* Improved: Lots code restructured and improved.
+* Improved: Parameters are always possible no matter the provider.
+* Improved: Restructure of the plugin, abandon OOP mostly.
+* Improved: Revive saving of last setting page tab.
+* New: "Image Cache Time" setting on the setting page. Thumbnail URLs form the media gallery can now be cached with transients, that may improve performance.
+* New: Support for self hosted videos (experimental)
+
+### 2016-10-03 - Pro Addon 2.5.2 ###
+
+* Fix: Force button styles to make sure themes styles get overwritten.
+
 ### Pro Addon 2.5.1 beta - 2016-09-21 ###
 
 * New: Thumbnail support for Liveleak.
@@ -18,7 +104,7 @@
 
 * Fix: Youku URL detection and aspect ratio.
 * Improved: `.arve-inner` css class in favor of some more specific classes combining styles.
-* Improved: removed TGMPA class because it was causing horrible isses.
+* Improved: removed TGMPA class because it was causing horrible issues.
 
 ### Pro Addon 2.4.5 beta - 2016-09-19 ###
 
@@ -30,7 +116,7 @@
 
 ### Pro Addon 2.4.0 beta - 2016-09-18 ###
 
-* New: Adds Yahoo auto thumnail and title support
+* New: Adds Yahoo auto thumbnail and title support
 
 ### 7.4.1 beta - 2016-09-18 ###
 
@@ -55,8 +141,8 @@
 
 ### 7.2.13 beta - 2016-09-16 ###
 
-* Fix: Set fitvidsignore class and remove the fitvids container to prevent it from messing with ARVE embeds.
-* Fix: Remove possible width and height paramaeters on iframes to prevent scripts from messing with ARVE embeds.
+* Fix: Set fitvidsignore class and remove the Fitvids container to prevent it from messing with ARVE embeds.
+* Fix: Remove possible width and height parameters on iframes to prevent scripts from messing with ARVE embeds.
 
 ### 7.2.12 beta - 2016-09-16 ###
 

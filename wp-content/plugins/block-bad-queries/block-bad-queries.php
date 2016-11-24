@@ -10,9 +10,9 @@
 	Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsult
 	Donate link: http://m0n.co/donate
 	Requires at least: 4.1
-	Tested up to: 4.6
-	Stable tag: trunk
-	Version: 20160810
+	Tested up to: 4.7
+	Stable tag: 20161114
+	Version: 20161114
 	Text Domain: block-bad-queries
 	Domain Path: /languages
 	License: GPLv2 or later
@@ -55,28 +55,40 @@ function bbq_core() {
 }
 add_action('plugins_loaded', 'bbq_core');
 
-function bbq_links($links, $file) {
+function bbq_meta_links($links, $file) {
 	
 	if ($file == plugin_basename(__FILE__)) {
 		
-		$rate_url   = 'http://wordpress.org/support/view/plugin-reviews/'. basename(dirname(__FILE__)) .'?rate=5#postform';
-		$rate_title = esc_html__('Click here to rate and review this plugin on WordPress.org', 'block-bad-queries');
-		$rate_text  = esc_html__('Rate this plugin', 'block-bad-queries');
+		$rate_url   = 'https://wordpress.org/support/plugin/block-bad-queries/reviews/?rate=5#new-post';
+		$rate_title = esc_attr__('Click here to rate and review this plugin at WordPress.org', 'block-bad-queries');
+		$rate_text  = esc_html__('Rate this plugin&nbsp;&raquo;', 'block-bad-queries');
 		
-		$bbq_url   = 'https://plugin-planet.com/bbq-pro/?plugin';
-		$bbq_title = esc_html__('Get BBQ Pro for advanced protection', 'block-bad-queries');
-		$bbq_text  = esc_html__('Go&nbsp;Pro', 'block-bad-queries');
-		$bbq_style = 'padding:1px 5px;color:#fff;background:#feba12;border-radius:1px;';
+		$links[] = '<a target="_blank" href="'. $rate_url .'" title="'. $rate_title .'">'. $rate_text .'</a>';
 		
-		$links[]  = '<a target="_blank" href="'. $rate_url .'" title="'. $rate_title .'">'. $rate_text .'</a>';
-		$links[]  = '<a target="_blank" href="'. $bbq_url .'" title="'. $bbq_title .'" style="'. $bbq_style .'">'. $bbq_text .'</a>';
-	
 	}
 	
 	return $links;
 	
 }
-add_filter('plugin_row_meta', 'bbq_links', 10, 2);
+add_filter('plugin_row_meta', 'bbq_meta_links', 10, 2);
+
+function bbq_action_links($links, $file) {
+	
+	if ($file == plugin_basename(__FILE__)) {
+		
+		$pro_url   = 'https://plugin-planet.com/bbq-pro/?plugin';
+		$pro_title = esc_attr__('Get BBQ Pro for advanced protection', 'block-bad-queries');
+		$pro_text  = esc_html__('Go&nbsp;Pro', 'block-bad-queries');
+		$pro_style = 'padding:1px 5px 2px 5px;color:#fff;background:#feba12;border-radius:1px;';
+		
+		$links[] = '<a target="_blank" href="'. $pro_url .'" title="'. $pro_title .'" style="'. $pro_style .'">'. $pro_text .'</a>';
+		
+	}
+	
+	return $links;
+	
+}
+add_filter('plugin_action_links', 'bbq_action_links', 10, 2);
 
 function bbq_languages() {
 	

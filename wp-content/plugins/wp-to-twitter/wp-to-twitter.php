@@ -3,7 +3,7 @@
 Plugin Name: WP to Twitter
 Plugin URI: http://www.joedolson.com/wp-to-twitter/
 Description: Posts a Tweet when you update your WordPress blog or post a link, using your URL shortening service. Rich in features for customizing and promoting your Tweets.
-Version: 3.2.13
+Version: 3.2.16
 Author: Joseph Dolson
 Text Domain: wp-to-twitter
 Domain Path: /lang
@@ -44,8 +44,7 @@ require_once( plugin_dir_path( __FILE__ ) . '/wpt-widget.php' );
 require_once( plugin_dir_path( __FILE__ ) . '/wpt-rate-limiting.php' );
 
 global $wpt_version;
-$wpt_version = "3.2.13";
-
+$wpt_version = "3.2.16";
 
 // Create a helper function for easy SDK access.
 function wtt_fs() {
@@ -1175,12 +1174,12 @@ function wpt_add_twitter_inner_box( $post ) {
 		if ( $status == 'publish' && ( current_user_can( 'wpt_tweet_now' ) || current_user_can( 'manage_options' ) ) ) {
 			?>
 			<div class='tweet-buttons'>
-				<button class='tweet button-primary'
+				<button type='button' class='tweet button-primary'
 				        data-action='tweet'><?php _e( 'Tweet Now', 'wp-to-twitter' ); ?></button>
 				<?php if ( function_exists( 'wpt_pro_exists' ) && wpt_pro_exists() ) { ?>
-					<button class='tweet schedule button-secondary' data-action='schedule'
+					<button type='button' class='tweet schedule button-secondary' data-action='schedule'
 					        disabled><?php _e( 'Schedule', 'wp-to-twitter' ); ?></button>
-					<button class='time button-secondary'>
+					<button type='button' class='time button-secondary'>
 						<span class="dashicons dashicons-clock" aria-hidden="true"><span
 								class="screen-reader-text"><?php _e( 'Set Date/Time', 'wp-to-twitter' ); ?></span></span>
 					</button>
@@ -1451,9 +1450,9 @@ function wpt_ajax_tweet() {
 		echo "Invalid Security Check";
 		die;
 	}
-	$action       = ( $_REQUEST['tweet_action'] == 'tweet' ) ? 'tweet' : 'schedule';
-	$authors      = ( isset( $_REQUEST['tweet_auth'] ) && $_REQUEST['tweet_auth'] != null ) ? $_REQUEST['tweet_auth'] : false;
-	$upload      = ( isset( $_REQUEST['tweet_upload'] ) && $_REQUEST['tweet_upload'] != null ) ? $_REQUEST['tweet_upload'] : 1;
+	$action  = ( $_REQUEST['tweet_action'] == 'tweet' ) ? 'tweet' : 'schedule';
+	$authors = ( isset( $_REQUEST['tweet_auth'] ) && $_REQUEST['tweet_auth'] != null ) ? $_REQUEST['tweet_auth'] : false;
+	$upload  = ( isset( $_REQUEST['tweet_upload'] ) && $_REQUEST['tweet_upload'] != null ) ? $_REQUEST['tweet_upload'] : 1;
 	$current_user = wp_get_current_user();
 	if ( function_exists( 'wpt_pro_exists' ) && wpt_pro_exists() ) {
 		if ( wtt_oauth_test( $current_user->ID, 'verify' ) ) {
@@ -1466,8 +1465,9 @@ function wpt_ajax_tweet() {
 		$auth    = false;
 		$user_ID = $current_user->ID;
 	}
+
 	$authors = ( is_array( $authors ) && !empty( $authors ) ) ? $authors : array( $auth );
-	
+		
 	if ( current_user_can( 'wpt_can_tweet' ) ) {
 		$options        = get_option( 'wpt_post_types' );
 		$post_ID        = intval( $_REQUEST['tweet_post_id'] );
@@ -1481,9 +1481,12 @@ function wpt_ajax_tweet() {
 		$print_schedule = date_i18n( get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' ), $schedule );
 		$offset         = ( 60 * 60 * get_option( 'gmt_offset' ) );
 		$schedule       = $schedule - $offset;
-		$media          = ( $upload == 1 ) ? false: true; // this is correct; the boolean logic is reversed. Blah.
+		$media          = ( $upload == 1 ) ? false: true; // this is correct; the boolean logic is reversed. Blah.		
 		
 		foreach( $authors as $auth ) {
+			
+			$auth = ( $auth == 'main' ) ? false : $auth;
+			
 			switch ( $action ) {
 				case 'tweet' :
 					jd_doTwitterAPIPost( $sentence, $auth, $post_ID, $media );
@@ -1808,6 +1811,7 @@ function wpt_twit( $id ) {
 		return;
 	} // is there any reason to accept any other status?
 	
+	// This is an issue only until the release of WP 4.7
 	remove_action( 'save_post', 'wpt_twit', 15 );
 	wpt_twit_instant( $id );
 	add_action( 'save_post', 'wpt_twit', 15 );

@@ -31,7 +31,7 @@ if ( ! function_exists( 'cptch_get_default_options' ) ) {
 			'wrong_answer'                 => __( 'Please enter a valid CAPTCHA value.', 'captcha' ),
 			'time_limit_off'               => __( 'Time limit is exhausted. Please enter a CAPTCHA value again.', 'captcha' ),
 			'time_limit_off_notice'        => __( 'Time limit is exhausted. Please reload the CAPTCHA.', 'captcha' ),
-			'whitelist_message'            => __( 'You are in the whitelist', 'captcha' ),
+			'whitelist_message'            => __( 'You are in the whitelist.', 'captcha' ),
 			'load_via_ajax'                => false,
 			'use_limit_attempts_whitelist' => false,
 			'display_settings_notice'      => 1,
@@ -229,7 +229,8 @@ if ( ! function_exists( 'cptch_parse_options' ) ) {
 if ( ! function_exists( 'cptch_merge_recursive' ) ) {
 	function cptch_merge_recursive( $base, $replacement ) {
 
-		if ( ! is_array( $base ) )
+		/* array_keys( $replacement ) == range( 0, count( $replacement ) - 1 ) - checking if array is numerical */
+		if ( ! is_array( $base ) || empty( $replacement ) || array_keys( $replacement ) == range( 0, count( $replacement ) - 1 ) )
 			return $replacement;
 
 		foreach ( $replacement as $key => $value ) {
@@ -337,7 +338,7 @@ if ( ! function_exists( 'cptch_get_plugin' ) ) {
 if ( ! function_exists( 'cptch_get_plugin_link' ) ) {
 	function cptch_get_plugin_link( $plugin ) {
 		global $wp_version, $cptch_plugin_info;
-		$bws_link = "http://bestwebsoft.com/products/%1s/?k=%2s&pn=72&v={$cptch_plugin_info["Version"]}&wp_v={$wp_version}/";
+		$bws_link = "http://bestwebsoft.com/products/wordpress/plugins/%1s/?k=%2s&pn=72&v={$cptch_plugin_info["Version"]}&wp_v={$wp_version}/";
 		switch ( $plugin ) {
 			case 'contact-form-plugin/contact_form.php':
 			case 'contact-form-pro/contact_form_pro.php':

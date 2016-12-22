@@ -2,7 +2,7 @@
 /*
 Plugin Name: Responsive Lightbox
 Description: Responsive Lightbox allows users to view larger versions of images and galleries in a lightbox (overlay) effect optimized for mobile devices.
-Version: 1.6.9
+Version: 1.6.10
 Author: dFactory
 Author URI: http://www.dfactory.eu/
 Plugin URI: http://www.dfactory.eu/plugins/responsive-lightbox/
@@ -36,7 +36,7 @@ include_once( RESPONSIVE_LIGHTBOX_PATH . 'includes/class-settings.php' );
  * Responsive Lightbox class.
  *
  * @class Responsive_Lightbox
- * @version	1.6.9
+ * @version	1.6.10
  */
 class Responsive_Lightbox {
 
@@ -145,9 +145,17 @@ class Responsive_Lightbox {
 				'timeout'					=> 4000,
 				'pagination'				=> true,
 				'pagination_type'			=> 'thumbnails'
+			),
+			'featherlight'	 	=> array(
+				'open_speed'				=> 250,
+				'close_speed'				=> 250,
+				'close_on_click'			=> 'background',
+				'close_on_esc'				=> true,
+				'gallery_fade_in'			=> 100,
+				'gallery_fade_out'			=> 300
 			)
 		),
-		'version'		 => '1.6.9'
+		'version'		 => '1.6.10'
 	);
 	public $options = array();
 	private $notices = array();
@@ -186,7 +194,7 @@ class Responsive_Lightbox {
 		}
 
 		// update plugin version
-		update_option( 'responsive_lightbox_version', $this->defaults['version'], '', 'no' );
+		update_option( 'responsive_lightbox_version', $this->defaults['version'], false );
 
 		$this->options['settings'] = array_merge( $this->defaults['settings'], ( ($array = get_option( 'responsive_lightbox_settings' ) ) === false ? array() : $array ) );
 
@@ -651,6 +659,39 @@ class Responsive_Lightbox {
 					'timeout'	 				=> $this->options['configuration']['tosrus']['timeout'],
 					'pagination'	 			=> $this->get_boolean_value( $this->options['configuration']['tosrus']['pagination'] ),
 					'paginationType'	 		=> $this->options['configuration']['tosrus']['pagination_type']
+					)
+				);
+				
+				break;
+				
+			case 'featherlight' :
+
+				wp_register_script(
+					'responsive-lightbox-featherlight', plugins_url( 'assets/featherlight/featherlight.min.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'], ($this->options['settings']['loading_place'] === 'header' ? false : true )
+				);
+				wp_register_style(
+					'responsive-lightbox-featherlight', plugins_url( 'assets/featherlight/featherlight.min.css', __FILE__ ), array(), $this->defaults['version']
+				);
+				wp_register_script(
+					'responsive-lightbox-featherlight-gallery', plugins_url( 'assets/featherlight/featherlight.gallery.min.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'], ($this->options['settings']['loading_place'] === 'header' ? false : true )
+				);
+				wp_register_style(
+					'responsive-lightbox-featherlight-gallery', plugins_url( 'assets/featherlight/featherlight.gallery.min.css', __FILE__ ), array(), $this->defaults['version']
+				);
+				
+				$scripts[] = 'responsive-lightbox-featherlight';
+				$styles[] = 'responsive-lightbox-featherlight';
+				$scripts[] = 'responsive-lightbox-featherlight-gallery';
+				$styles[] = 'responsive-lightbox-featherlight-gallery';
+	
+				$args = array_merge(
+					$args, array(
+					'openSpeed'				=> $this->options['configuration']['featherlight']['open_speed'],
+					'closeSpeed'			=> $this->options['configuration']['featherlight']['close_speed'],
+					'closeOnClick'			=> $this->options['configuration']['featherlight']['close_on_click'],
+					'closeOnEsc'			=> $this->get_boolean_value( $this->options['configuration']['featherlight']['close_on_esc'] ),
+					'galleryFadeIn'			=> $this->options['configuration']['featherlight']['gallery_fade_in'],
+					'galleryFadeOut'		=> $this->options['configuration']['featherlight']['gallery_fade_out']
 					)
 				);
 				

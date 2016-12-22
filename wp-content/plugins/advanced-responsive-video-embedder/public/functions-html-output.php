@@ -126,7 +126,7 @@ function arve_arve_embed_container( $html, $atts, $lity_container = false ) {
 	}
 
 	if( ! empty( $atts['aspect_ratio'] ) ) {
-		$attr['style'] = sprintf( 'padding-bottom: %F%% !important;', arve_aspect_ratio_to_padding( $atts['aspect_ratio'] ) );
+		$attr['style'] = sprintf( 'padding-bottom: %F%% !important;', arve_aspect_ratio_to_percentage( $atts['aspect_ratio'] ) );
 	} elseif ( 'html5' == $atts['provider'] ) {
 		$attr['style'] = 'height: auto !important; padding: 0 !important';
 	}
@@ -188,43 +188,76 @@ function arve_video_or_iframe( $atts ) {
 	}
 }
 
-	/**
-	 *
-	 *
-	 * @since    2.6.0
-	 */
+/**
+ *
+ *
+ * @since    2.6.0
+ */
 function arve_create_iframe_tag( $atts ) {
 
 	$options    = arve_get_options();
 	$properties = arve_get_host_properties();
-
-	#d($arve);
 
 	$iframe_attr = array(
 		'allowfullscreen' => '',
 		'class'       => 'arve-iframe fitvidsignore',
 		'frameborder' => '0',
 		'name'        => $atts['iframe_name'],
-		'sandbox'     => empty( $atts['iframe_sandbox'] ) ? 'allow-scripts allow-same-origin allow-popups' : $atts['iframe_sandbox'],
 		'scrolling'   => 'no',
 		'src'         => $atts['iframe_src'],
-		'height'      => is_feed() ? 480 : false,
-		'width'       => is_feed() ? 853 : false,
+
+		'width'       => ! empty( $atts['width'] )  ? $atts['width']  : false,
+		'height'      => ! empty( $atts['height'] ) ? $atts['height'] : false,
 	);
 
-	if ( ! empty( $properties[ $atts['provider'] ]['requires_flash'] ) ) {
-		$iframe_attr['sandbox'] = false;
+	if ( null === $atts['disable_flash'] ) {
+		$atts['disable_flash'] = ! empty( $properties[ $atts['provider'] ]['requires_flash'] ) ? true : false;
+	}
+
+	if ( $atts['disable_flash'] ) {
+		$iframe_attr['sandbox'] = empty( $atts['iframe_sandbox'] ) ? 'allow-scripts allow-same-origin allow-popups' : $atts['iframe_sandbox'];
 	}
 
 	if ( in_array( $atts['mode'], array( 'lazyload', 'lazyload-lightbox', 'link-lightbox' ) ) ) {
 		$lazyload_iframe_attr = arve_prefix_array_keys( 'data-', $iframe_attr );
 
-		$iframe = sprintf( '<span class="arve-lazyload"%s></span>', arve_attr( $lazyload_iframe_attr ) );
+		$output = sprintf( '<span class="arve-lazyload"%s></span>', arve_attr( $lazyload_iframe_attr ) );
 	} else {
-		$iframe = sprintf( '<iframe%s></iframe>', arve_attr( $iframe_attr ) );
+		$output = sprintf( '<iframe%s></iframe>', arve_attr( $iframe_attr ) );
 	}
 
-	return $iframe;
+	return apply_filters( 'arve_iframe_tag', $output, $atts, $iframe_attr );
+}
+
+function arve_create_video_tag( $atts ) {
+
+	$sources_html = '';
+
+	if ( in_array( $atts['mode'], array( 'lazyload', 'lazyload-lightbox' ) ) ) {
+		$atts['autoplay'] = null;
+	}
+
+	$video_attr = array(
+		'autoplay' => in_array( $atts['mode'], array( 'lazyload', 'lazyload-lightbox', 'link-lightbox' ) ) ? false : $atts['autoplay'],
+		'class'    => 'arve-video fitvidsignore',
+		'controls' => $atts['controls'],
+		'loop'     => $atts['loop'],
+		'poster'   => isset( $atts['img_src'] ) ? $atts['img_src'] : false,
+		'preload'  => $atts['preload'],
+		'src'      => isset( $atts['video_src'] ) ? $atts['video_src'] : false,
+
+		'width'    => ! empty( $atts['width'] )  ? $atts['width'] :  false,
+		'height'   => ! empty( $atts['height'] ) ? $atts['height'] : false,
+	);
+
+	$output = sprintf(
+		'<video%s>%s%s</video>',
+		arve_attr( $video_attr, 'video' ),
+		$atts['video_sources_html'],
+		$atts['video_tracks']
+	);
+
+	return apply_filters( 'arve_video_tag', $output, $atts, $video_attr );
 }
 
 function arve_error( $message ) {
@@ -245,42 +278,6 @@ function arve_print_styles() {
 
     echo '<style type="text/css">' . $css . "</style>\n";
   }
-}
-
-function arve_create_video_tag( $atts ) {
-
-	$soures_html = '';
-
-	if ( in_array( $atts['mode'], array( 'lazyload', 'lazyload-lightbox' ) ) ) {
-		$atts['autoplay'] = null;
-	}
-
-	$video_attr = array(
-		'autoplay' => $atts['autoplay'],
-		'class'    => 'arve-video',
-		'controls' => $atts['controls'],
-		'loop'     => $atts['loop'],
-		'poster'   => isset( $atts['img_src'] ) ? $atts['img_src'] : false,
-		'preload'  => $atts['preload'],
-		'src'      => isset( $atts['video_src'] ) ? $atts['video_src'] : false,
-
-		'width'    => is_feed() ? 853 : false,
-		'height'   => is_feed() ? 480 : false,
-	);
-
-	if ( isset( $atts['video_sources'] ) ) {
-
-		foreach ( $atts['video_sources'] as $key => $value ) {
-			$soures_html .= sprintf( '<source type="%s" src="%s">', $key, $value );
-		}
-	}
-
-	return sprintf(
-		'<video%s>%s%s</video>',
-		arve_attr( $video_attr, 'video' ),
-		$soures_html,
-		$atts['video_tracks']
-	);
 }
 
 function arve_output_errors( $atts ) {

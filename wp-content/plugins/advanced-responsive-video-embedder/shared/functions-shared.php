@@ -45,220 +45,220 @@ function arve_get_options() {
 
 function arve_get_settings_definitions() {
 
-		$options         = arve_get_options();
-		$supported_modes = arve_get_supported_modes();
-		$properties      = arve_get_host_properties();
+	$options         = arve_get_options();
+	$supported_modes = arve_get_supported_modes();
+	$properties      = arve_get_host_properties();
 
-		foreach ( $properties as $provider => $values ) {
+	foreach ( $properties as $provider => $values ) {
 
-			if( ! empty( $values['auto_thumbnail'] ) && $values['auto_thumbnail'] ) {
-				$auto_thumbs[] = $values['name'];
-			}
-			if( ! empty( $values['auto_title'] ) && $values['auto_title'] ) {
-				$auto_title[] = $values['name'];
-			}
-			if( ! empty( $values['embed_url'] ) ) {
-				$embed_code_only[] = $values['name'];
-			}
+		if( ! empty( $values['auto_thumbnail'] ) ) {
+			$auto_thumbs[] = $values['name'];
 		}
-
-		$auto_thumbs      = implode( ', ', $auto_thumbs );
-		$auto_title       = implode( ', ', $auto_title );
-		$embed_code_only  = implode( ', ', $embed_code_only );
-
-		if ( in_array( $options['mode'], $supported_modes ) ) {
-			$current_mode_name = $supported_modes[ $options['mode'] ];
-		} else {
-			$current_mode_name = $options['mode'];
+		if( ! empty( $values['auto_title'] ) ) {
+			$auto_title[] = $values['name'];
 		}
-
-		return array(
-			array(
-				'hide_from_settings' => true,
-				'attr'  => 'url',
-				'label' => esc_html__( 'URL / Embed Code', ARVE_SLUG ),
-				'type'  => 'text',
-				'meta'  => array(
-					'placeholder' => esc_attr__( 'Video URL / iframe Embed Code', ARVE_SLUG ),
-				),
-				'description' => sprintf(
-					__('Post the URL of the video here. For %s and any unlisted <a href="%s">unlisted</a> video hosts paste their iframe embed codes in here (providers embeds need to be responsive).', ARVE_SLUG ),
-					$embed_code_only,
-					'https://nextgenthemes.com/advanced-responsive-video-embedder-pro/#video-host-support'
-				)
-			),
-			array(
-				'attr'    => 'mode',
-				'label'   => esc_html__( 'Mode', ARVE_SLUG ),
-				'type'    => 'select',
-				'options' =>
-					array( '' => sprintf( esc_html__( 'Default (current setting: %s)', ARVE_SLUG ), $current_mode_name ) ) +
-					arve_get_supported_modes(),
-			),
-			array(
-				'attr'  => 'align',
-				'label' => esc_html__('Alignment', ARVE_SLUG ),
-				'type'  => 'select',
-				'options' => array(
-					'' => sprintf( esc_html__( 'Default (current setting: %s)', ARVE_SLUG ), $options['align'] ),
-					'none'   => esc_html__( 'None', ARVE_SLUG ),
-					'left'   => esc_html__( 'Left', ARVE_SLUG ),
-					'right'  => esc_html__( 'Right', ARVE_SLUG ),
-					'center' => esc_html__( 'center', ARVE_SLUG ),
-				),
-			),
-			array(
-				'attr'  => 'promote_link',
-				'label' => esc_html__( 'ARVE Link', ARVE_SLUG ),
-				'type'  => 'select',
-				'options' => array(
-					'' => sprintf(
-						__( 'Default (current setting: %s)', ARVE_SLUG ),
-						( $options['promote_link'] ) ? esc_html__( 'Yes', ARVE_SLUG ) : esc_html__( 'No', ARVE_SLUG )
-					),
-					'yes' => esc_html__( 'Yes', ARVE_SLUG ),
-					'no'  => esc_html__( 'No', ARVE_SLUG ),
-				),
-				'description'  => esc_html__( "Shows a small 'ARVE' link below the videos. Be the most awesome person and help promoting this plugin.", ARVE_SLUG ),
-			),
-			array(
-				'hide_from_settings' => true,
-				'attr'  => 'thumbnail',
-				'label' => esc_html__( 'Thumbnail', ARVE_SLUG ),
-				'type'  => 'attachment',
-				'libraryType' => array( 'image' ),
-				'addButton'   => esc_html__( 'Select Image', 'shortcode-ui' ),
-				'frameTitle'  => esc_html__( 'Select Image', 'shortcode-ui' ),
-				'description' => sprintf( esc_html__( 'Preview image for Lazyload modes, always used for SEO. The Pro Addon is able to get them from %s automatically.', ARVE_SLUG ), $auto_thumbs ),
-			),
-			array(
-				'hide_from_settings' => true,
-				'attr'  => 'title',
-				'label' => esc_html__('Title', ARVE_SLUG),
-				'type'  => 'text',
-				'description' => sprintf( esc_html__( 'Used for SEO, is visible on top of thumbnails in Lazyload modes, is used as link text in link-lightbox mode. The Pro Addon is able to get them from %s automatically.', ARVE_SLUG ), $auto_title ),
-			),
-			array(
-				'hide_from_settings' => true,
-				'attr'  => 'description',
-				'label' => esc_html__('Description', ARVE_SLUG),
-				'type'  => 'text',
-				'meta'  => array(
-					'placeholder' => __( 'Description for SEO', ARVE_SLUG ),
-				)
-			),
-			array(
-				'hide_from_settings' => true,
-				'attr'  => 'upload_date',
-				'label' => esc_html__( 'Upload Date', ARVE_SLUG ),
-				'type'  => 'text',
-				'meta'  => array(
-					'placeholder' => __( 'Upload Date for SEO, ISO 8601 format', ARVE_SLUG ),
-				)
-			),
-			array(
-				'attr'  => 'autoplay',
-				'label' => esc_html__('Autoplay', ARVE_SLUG ),
-				'type'  => 'select',
-				'options' => array(
-					'' => sprintf(
-						__( 'Default (current setting: %s)', ARVE_SLUG ),
-						( $options['autoplay'] ) ? esc_html__( 'Yes', ARVE_SLUG ) : esc_html__( 'No', ARVE_SLUG )
-					),
-					'yes' => esc_html__( 'Yes', ARVE_SLUG ),
-					'no'  => esc_html__( 'No', ARVE_SLUG ),
-				),
-				'description' => esc_html__( 'Autoplay videos in normal mode, has no effect on lazyload modes.', ARVE_SLUG ),
-			),
-			array(
-				'hide_from_sc'   => true,
-				'attr'  => 'video_maxwidth',
-				'label'       => esc_html__('Maximal Width', ARVE_SLUG),
-				'type'        =>  'number',
-				'description' => esc_html__( 'Optional, if not set your videos will be the maximum size of the container they are in. If your content area has a big width you might want to set this. Must be 100+ to work.', ARVE_SLUG ),
-			),
-			array(
-				'hide_from_settings' => true,
-				'attr'  => 'maxwidth',
-				'label' => esc_html__('Maximal Width', ARVE_SLUG),
-				'type'  =>  'number',
-				'meta'  => array(
-					'placeholder' => esc_attr__( 'in px - leave empty to use settings', ARVE_SLUG),
-				),
-			),
-			array(
-				'hide_from_sc'   => true,
-				'attr'  => 'align_maxwidth',
-				'label' => esc_html__('Align Maximal Width', ARVE_SLUG),
-				'type'  => 'number',
-				'description' => esc_attr__( 'In px, Needed! Must be 100+ to work.', ARVE_SLUG ),
-			),
-			array(
-				'hide_from_settings' => true,
-				'attr'  => 'aspect_ratio',
-				'label' => __('Aspect Ratio', ARVE_SLUG),
-				'type'  => 'text',
-				'meta'  => array(
-					'placeholder' => __( 'Custom aspect ratio like 4:3, 21:9 ... Leave empty for default.', ARVE_SLUG),
-				),
-			),
-			array(
-				'hide_from_settings' => true,
-				'attr'  => 'parameters',
-				'label' => esc_html__('Parameters', ARVE_SLUG),
-				'type'  => 'text',
-				'meta'  => array(
-					'placeholder' => __( 'provider specific parameters', ARVE_SLUG ),
-				),
-				'description' => sprintf( __( 'Note there are also general settings for this. This values get merged with the settings values. Example for YouTube <code>fs=0&start=30</code>. For reference: <a target="_blank" href="https://developers.google.com/youtube/player_parameters">Youtube Parameters</a>, <a target="_blank" href="http://www.dailymotion.com/doc/api/player.html#parameters">Dailymotion Parameters</a>, <a target="_blank" href="https://developer.vimeo.com/player/embedding">Vimeo Parameters</a>.', ARVE_SLUG ), 'TODO settings page link' ),
-			),
-			array(
-				'hide_from_sc'   => true,
-				'attr'  => 'wp_image_cache_time',
-				'label' => esc_html__('Image Cache Time', ARVE_SLUG),
-				'type'  => 'number',
-				'description' => __( '(seconds) This plugin uses WordPress transients to cache video thumbnail URLS. This setting defines how long image URLs from the media Gallery are being stored before running WPs fuctions again to request them. For example: hour - 3600, day - 86400, week - 604800.', ARVE_SLUG),
-			),
-			array(
-				'hide_from_sc'   => true,
-				'attr'  => 'wp_video_override',
-				'label' => esc_html__('Take over [video]', ARVE_SLUG ),
-				'type'  => 'select',
-				'options' => array(
-					'yes' => esc_html__( 'Yes', ARVE_SLUG ),
-					'no'  => esc_html__( 'No', ARVE_SLUG ),
-				),
-				'description' => esc_html__( "Take over WP's default [video] shortcode for HTML5 files.", ARVE_SLUG ),
-			),
-			array(
-				'hide_from_settings' => true,
-				'attr'  => 'mp4',
-				'label' => esc_html__('mp4', ARVE_SLUG),
-				'type'  => 'url',
-				'meta'  => array(
-					'placeholder' => __( '.mp4 file url for HTML5 video', ARVE_SLUG ),
-				),
-			),
-			array(
-				'hide_from_settings' => true,
-				'attr'  => 'webm',
-				'label' => esc_html__('webm', ARVE_SLUG),
-				'type'  => 'url',
-				'meta'  => array(
-					'placeholder' => __( '.webm file url for HTML5 video', ARVE_SLUG ),
-				),
-			),
-			array(
-				'hide_from_settings' => true,
-				'attr'  => 'ogv',
-				'label' => esc_html__('ogv', ARVE_SLUG),
-				'type'  => 'url',
-				'meta'  => array(
-					'placeholder' => __( '.ogv file for self hosted video', ARVE_SLUG ),
-				),
-			),
-		);
+		if( ! empty( $values['requires_src'] ) ) {
+			$embed_code_only[] = $values['name'];
+		}
 	}
+
+	$auto_thumbs      = implode( ', ', $auto_thumbs );
+	$auto_title       = implode( ', ', $auto_title );
+	$embed_code_only  = implode( ', ', $embed_code_only );
+
+	if ( in_array( $options['mode'], $supported_modes ) ) {
+		$current_mode_name = $supported_modes[ $options['mode'] ];
+	} else {
+		$current_mode_name = $options['mode'];
+	}
+
+	return array(
+		array(
+			'hide_from_settings' => true,
+			'attr'  => 'url',
+			'label' => esc_html__( 'URL / Embed Code', ARVE_SLUG ),
+			'type'  => 'text',
+			'meta'  => array(
+				'placeholder' => esc_attr__( 'Video URL / iframe Embed Code', ARVE_SLUG ),
+			),
+			'description' => sprintf(
+				__( 'Post the URL of the video here. For %s and any <a href="%s">unlisted</a> video hosts paste their iframe embed codes or its src URL in here (providers embeds need to be responsive).', ARVE_SLUG ),
+				$embed_code_only,
+				'https://nextgenthemes.com/advanced-responsive-video-embedder-pro/#video-host-support'
+			)
+		),
+		array(
+			'attr'    => 'mode',
+			'label'   => esc_html__( 'Mode', ARVE_SLUG ),
+			'type'    => 'select',
+			'options' =>
+				array( '' => sprintf( esc_html__( 'Default (current setting: %s)', ARVE_SLUG ), $current_mode_name ) ) +
+				arve_get_supported_modes(),
+		),
+		array(
+			'attr'  => 'align',
+			'label' => esc_html__('Alignment', ARVE_SLUG ),
+			'type'  => 'select',
+			'options' => array(
+				'' => sprintf( esc_html__( 'Default (current setting: %s)', ARVE_SLUG ), $options['align'] ),
+				'none'   => esc_html__( 'None', ARVE_SLUG ),
+				'left'   => esc_html__( 'Left', ARVE_SLUG ),
+				'right'  => esc_html__( 'Right', ARVE_SLUG ),
+				'center' => esc_html__( 'center', ARVE_SLUG ),
+			),
+		),
+		array(
+			'attr'  => 'promote_link',
+			'label' => esc_html__( 'ARVE Link', ARVE_SLUG ),
+			'type'  => 'select',
+			'options' => array(
+				'' => sprintf(
+					__( 'Default (current setting: %s)', ARVE_SLUG ),
+					( $options['promote_link'] ) ? esc_html__( 'Yes', ARVE_SLUG ) : esc_html__( 'No', ARVE_SLUG )
+				),
+				'yes' => esc_html__( 'Yes', ARVE_SLUG ),
+				'no'  => esc_html__( 'No', ARVE_SLUG ),
+			),
+			'description'  => esc_html__( "Shows a small 'ARVE' link below the videos. Be the most awesome person and help promoting this plugin.", ARVE_SLUG ),
+		),
+		array(
+			'hide_from_settings' => true,
+			'attr'  => 'thumbnail',
+			'label' => esc_html__( 'Thumbnail', ARVE_SLUG ),
+			'type'  => 'attachment',
+			'libraryType' => array( 'image' ),
+			'addButton'   => esc_html__( 'Select Image', 'shortcode-ui' ),
+			'frameTitle'  => esc_html__( 'Select Image', 'shortcode-ui' ),
+			'description' => sprintf( esc_html__( 'Preview image for Lazyload modes, always used for SEO. The Pro Addon is able to get them from %s automatically.', ARVE_SLUG ), $auto_thumbs ),
+		),
+		array(
+			'hide_from_settings' => true,
+			'attr'  => 'title',
+			'label' => esc_html__('Title', ARVE_SLUG),
+			'type'  => 'text',
+			'description' => sprintf( esc_html__( 'Used for SEO, is visible on top of thumbnails in Lazyload modes, is used as link text in link-lightbox mode. The Pro Addon is able to get them from %s automatically.', ARVE_SLUG ), $auto_title ),
+		),
+		array(
+			'hide_from_settings' => true,
+			'attr'  => 'description',
+			'label' => esc_html__('Description', ARVE_SLUG),
+			'type'  => 'text',
+			'meta'  => array(
+				'placeholder' => __( 'Description for SEO', ARVE_SLUG ),
+			)
+		),
+		array(
+			'hide_from_settings' => true,
+			'attr'  => 'upload_date',
+			'label' => esc_html__( 'Upload Date', ARVE_SLUG ),
+			'type'  => 'text',
+			'meta'  => array(
+				'placeholder' => __( 'Upload Date for SEO, ISO 8601 format', ARVE_SLUG ),
+			)
+		),
+		array(
+			'attr'  => 'autoplay',
+			'label' => esc_html__('Autoplay', ARVE_SLUG ),
+			'type'  => 'select',
+			'options' => array(
+				'' => sprintf(
+					__( 'Default (current setting: %s)', ARVE_SLUG ),
+					( $options['autoplay'] ) ? esc_html__( 'Yes', ARVE_SLUG ) : esc_html__( 'No', ARVE_SLUG )
+				),
+				'yes' => esc_html__( 'Yes', ARVE_SLUG ),
+				'no'  => esc_html__( 'No', ARVE_SLUG ),
+			),
+			'description' => esc_html__( 'Autoplay videos in normal mode, has no effect on lazyload modes.', ARVE_SLUG ),
+		),
+		array(
+			'hide_from_sc'   => true,
+			'attr'  => 'video_maxwidth',
+			'label'       => esc_html__('Maximal Width', ARVE_SLUG),
+			'type'        =>  'number',
+			'description' => esc_html__( 'Optional, if not set your videos will be the maximum size of the container they are in. If your content area has a big width you might want to set this. Must be 100+ to work.', ARVE_SLUG ),
+		),
+		array(
+			'hide_from_settings' => true,
+			'attr'  => 'maxwidth',
+			'label' => esc_html__('Maximal Width', ARVE_SLUG),
+			'type'  =>  'number',
+			'meta'  => array(
+				'placeholder' => esc_attr__( 'in px - leave empty to use settings', ARVE_SLUG),
+			),
+		),
+		array(
+			'hide_from_sc'   => true,
+			'attr'  => 'align_maxwidth',
+			'label' => esc_html__('Align Maximal Width', ARVE_SLUG),
+			'type'  => 'number',
+			'description' => esc_attr__( 'In px, Needed! Must be 100+ to work.', ARVE_SLUG ),
+		),
+		array(
+			'hide_from_settings' => true,
+			'attr'  => 'aspect_ratio',
+			'label' => __('Aspect Ratio', ARVE_SLUG),
+			'type'  => 'text',
+			'meta'  => array(
+				'placeholder' => __( 'Custom aspect ratio like 4:3, 21:9 ... Leave empty for default.', ARVE_SLUG),
+			),
+		),
+		array(
+			'hide_from_settings' => true,
+			'attr'  => 'parameters',
+			'label' => esc_html__('Parameters', ARVE_SLUG),
+			'type'  => 'text',
+			'meta'  => array(
+				'placeholder' => __( 'provider specific parameters', ARVE_SLUG ),
+			),
+			'description' => sprintf( __( 'Note there are also general settings for this. This values get merged with the settings values. Example for YouTube <code>fs=0&start=30</code>. For reference: <a target="_blank" href="https://developers.google.com/youtube/player_parameters">Youtube Parameters</a>, <a target="_blank" href="http://www.dailymotion.com/doc/api/player.html#parameters">Dailymotion Parameters</a>, <a target="_blank" href="https://developer.vimeo.com/player/embedding">Vimeo Parameters</a>.', ARVE_SLUG ), 'TODO settings page link' ),
+		),
+		array(
+			'hide_from_sc'   => true,
+			'attr'  => 'wp_image_cache_time',
+			'label' => esc_html__('Image Cache Time', ARVE_SLUG),
+			'type'  => 'number',
+			'description' => __( '(seconds) This plugin uses WordPress transients to cache video thumbnail URLS. This setting defines how long image URLs from the media Gallery are being stored before running WPs fuctions again to request them. For example: hour - 3600, day - 86400, week - 604800.', ARVE_SLUG),
+		),
+		array(
+			'hide_from_sc'   => true,
+			'attr'  => 'wp_video_override',
+			'label' => esc_html__('Take over [video]', ARVE_SLUG ),
+			'type'  => 'select',
+			'options' => array(
+				'yes' => esc_html__( 'Yes', ARVE_SLUG ),
+				'no'  => esc_html__( 'No', ARVE_SLUG ),
+			),
+			'description' => esc_html__( "Take over WP's default [video] shortcode for HTML5 files.", ARVE_SLUG ),
+		),
+		array(
+			'hide_from_settings' => true,
+			'attr'  => 'mp4',
+			'label' => esc_html__('mp4', ARVE_SLUG),
+			'type'  => 'url',
+			'meta'  => array(
+				'placeholder' => __( '.mp4 file url for HTML5 video', ARVE_SLUG ),
+			),
+		),
+		array(
+			'hide_from_settings' => true,
+			'attr'  => 'webm',
+			'label' => esc_html__('webm', ARVE_SLUG),
+			'type'  => 'url',
+			'meta'  => array(
+				'placeholder' => __( '.webm file url for HTML5 video', ARVE_SLUG ),
+			),
+		),
+		array(
+			'hide_from_settings' => true,
+			'attr'  => 'ogv',
+			'label' => esc_html__('ogv', ARVE_SLUG),
+			'type'  => 'url',
+			'meta'  => array(
+				'placeholder' => __( '.ogv file for HTML5 video', ARVE_SLUG ),
+			),
+		),
+	);
+}
 
 	/**
 	 *
@@ -312,8 +312,8 @@ function arve_get_host_properties() {
 			'default_params' => 'nologo=1',
 			'auto_thumbnail' => true,
 			'tests' => array(
-				array( 'url' => 'https://alugha.com/1/videos/youtube-54m1YfEuYU8',                'id' =>  'youtube-54m1YfEuYU8' ),
-				array( 'url' => 'https://alugha.com/videos/7cab9cd7-f64a-11e5-939b-c39074d29b86', 'id' =>  '7cab9cd7-f64a-11e5-939b-c39074d29b86' ),
+				array( 'url' => 'https://alugha.com/1/videos/youtube-54m1YfEuYU8',                'id' => 'youtube-54m1YfEuYU8' ),
+				array( 'url' => 'https://alugha.com/videos/7cab9cd7-f64a-11e5-939b-c39074d29b86', 'id' => '7cab9cd7-f64a-11e5-939b-c39074d29b86' ),
 			)
 		),
 		'archiveorg' => array(
@@ -349,13 +349,14 @@ function arve_get_host_properties() {
 			)
 		),
 		'brightcove'   => array(
-			'regex'          => 'https?://(?:players|link)\.brightcove\.net/([^" ]+)',
-			'embed_url'      => 'https://players.brightcove.net/%s',
-			'requires_src'  => true,
+			'regex'          => 'https?://(?:players|link)\.brightcove\.net/(?<account_id>[0-9]+)[.?/a-z_]+videoId=(?<id>[0-9]+)',
+			'embed_url'      => 'https://players.brightcove.net/%s/default_default/index.html?videoId=%s',
+			'requires_src'   => true,
 			'tests' => array(
 				array(
 					'url' => 'http://players.brightcove.net/1160438696001/default_default/index.html?videoId=4587535845001',
-					'id'  =>                               '1160438696001/default_default/index.html?videoId=4587535845001'
+					'id'  =>                                                                                 4587535845001,
+					'account_id' =>                         1160438696001,
 				),
 			),
 		),
@@ -445,7 +446,7 @@ function arve_get_host_properties() {
 		'facebook' => array(
 			# https://www.facebook.com/TheKillingsOfTonyBlair/videos/vb.551089058285349/562955837098671/?type=2&theater
 			#<iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FTheKillingsOfTonyBlair%2Fvideos%2Fvb.551089058285349%2F562955837098671%2F%3Ftype%3D2%26theater&width=500&show_text=false&height=280&appId" width="500" height="280" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
-			'regex'             => '(' . $s . 'facebook\.com/[-a-z0-9]+/videos/[a-z.0-9/]+)',
+			'regex'             => '(' . $s . 'facebook\.com/[-.a-z0-9]+/videos/[a-z.0-9/]+)',
 			'url_encode_id'     => true,
 			'embed_url'         => 'https://www.facebook.com/plugins/video.php?href=%s',
 			#'embed_url'         => 'https://www.facebook.com/video/embed?video_id=%s',
@@ -475,7 +476,7 @@ function arve_get_host_properties() {
 		),
 		'gametrailers' => array(
 			'requires_src'    => true,
-			'auto_thumbnail'   => false,
+			'auto_thumbnail'  => false,
 			'test_ids' => array(
 				'797121a1-4685-4ecc-9388-72a88b0ef8da',
 			)
@@ -492,6 +493,7 @@ function arve_get_host_properties() {
 			 ),
 			)
 		),
+    #https://cdnapisec.kaltura.com/p/243342/sp/24334200/embedIframeJs/uiconf_id/20540612/partner_id/243342?iframeembed=true&playerId=kaltura_player&entry_id=1_sf5ovm7u&flashvars[streamerType]=auto" width="560" height="395" allowfullscreen webkitallowfullscreen mozAllowFullScreen frameborder="0"></iframe>
 		'kickstarter' => array(
 			'regex'          => $s . 'kickstarter\.com/projects/([0-9a-z\-]+/[-0-9a-z\-]+)',
 			'embed_url'      => 'https://www.kickstarter.com/projects/%s/widget/video.html',
@@ -830,7 +832,10 @@ function arve_get_host_properties() {
 				array(
 					'url'          => 'https://youtu.be/dqLyB5srdGI',
 					'id'           =>                 'dqLyB5srdGI',
-					'oembed_img'   => 'https://i.ytimg.com/vi/dqLyB5srdGI/hqdefault.jpg'
+				),
+				array(
+					'url' => 'https://www.youtube.com/watch?v=-fEo3kgHFaw',
+					'id'  =>                                 '-fEo3kgHFaw',
 				),
 				array(
 					'url'          => 'http://www.youtube.com/watch?v=vrXgLhkv21Y',
@@ -844,7 +849,12 @@ function arve_get_host_properties() {
 				),
 				array(
 					'url' => 'http://www.youtube.com/watch?v=GjL82KUHVb0&list=PLI46g-I12_9qGBq-4epxOay0hotjys5iA&index=10', # The index part will be ignored
-					'id'  =>                                'GjL82KUHVb0&list=PLI46g-I12_9qGBq-4epxOay0hotjys5iA' ),
+					'id'  =>                                'GjL82KUHVb0&list=PLI46g-I12_9qGBq-4epxOay0hotjys5iA'
+				),
+				array(
+					'url' => 'https://youtu.be/b8m9zhNAgKs?list=PLI_7Mg2Z_-4I-W_lI55D9lBUkC66ftHMg',
+					'id'  =>                  'b8m9zhNAgKs?list=PLI_7Mg2Z_-4I-W_lI55D9lBUkC66ftHMg'
+				),
 			),
 			'specific_tests' => array(
 				__('URL from youtu.be shortener', ARVE_SLUG),
@@ -1005,9 +1015,20 @@ function arve_get_host_properties() {
 			),
 		),
 		'youtubelist' => array(
+			'regex'          => $s . 'youtube\.com/(?:embed/videoseries|playlist)\?list=([-a-z0-9]+)',
 			'name'           => 'YouTube Playlist',
 			'embed_url'      => 'http://www.youtube.com/embed/videoseries?list=%s',
 			'auto_thumbnail' => true,
+			'tests' => array(
+				array(
+					'url' => 'https://www.youtube.com/playlist?list=PL3Esg-ZzbiUmeSKBAQ3ej1hQxDSsmnp-7',
+					'id'  =>                                       'PL3Esg-ZzbiUmeSKBAQ3ej1hQxDSsmnp-7'
+				),
+				array(
+					'url' => 'https://www.youtube.com/embed/videoseries?list=PLMUvgtCRyn-6obmhiDS4n5vYQN3bJRduk',
+					'id'  =>                                                'PLMUvgtCRyn-6obmhiDS4n5vYQN3bJRduk',
+				)
+			)
 		),
 		'html5' => array(
 			'name' => 'HTML5 Video (in testing)',

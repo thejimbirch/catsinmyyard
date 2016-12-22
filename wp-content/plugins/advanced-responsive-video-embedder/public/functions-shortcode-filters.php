@@ -1,4 +1,21 @@
 <?php
+
+function arve_filter_atts_set_fixed_dimensions( $atts ) {
+
+  $width = 480;
+
+	if( empty( $atts['aspect_ratio'] ) ) {
+		$ratio = 56.25;
+	} else {
+		$ratio = (float) arve_aspect_ratio_to_percentage( $atts['aspect_ratio'] );
+	}
+
+	$atts['width']  = $width;
+	$atts['height'] = ( $width / 100 ) * $ratio;
+
+	return $atts;
+}
+
 function arve_filter_atts_sanitise( $atts ) {
 
   if ( ! empty( $atts['src'] ) ) {
@@ -19,18 +36,41 @@ function arve_filter_atts_sanitise( $atts ) {
   return $atts;
 }
 
+function arve_filter_atts_missing_attribute_check( $atts ) {
+
+  # Old shortcodes
+  if ( ! array_key_exists( 'url' , $atts ) ) {
+    return $atts;
+  }
+
+  $required_attributes   = arve_get_html5_attributes();
+  $required_attributes[] = 'url';
+
+  $array = array_intersect_key( $atts, array_flip( $required_attributes ) );
+
+  if( count( array_filter( $array ) ) != count( $array ) ) {
+    $atts['missing_atts_error'] = arve_error( sprintf(
+      esc_html__( 'The [arve] shortcode needs one of this attributes %s', ARVE_SLUG ),
+      implode( $required_attributes ) )
+    );
+  }
+
+  return $atts;
+}
+
 function arve_filter_atts_validate( $atts ) {
 
   if ( ! empty( $atts['url'] ) && ! arve_validate_url( $atts['url'] ) ) {
     $atts['url'] = new WP_Error( 'thumbnail', sprintf( __( '<code>%s</code> is not a valid url', ARVE_SLUG ), esc_html( $atts['url'] ) ) );
   }
 
-  $atts['align']        = arve_validate_align( $atts['align'], $atts['provider'] );
-  $atts['mode']         = arve_validate_mode( $atts['mode'], $atts['provider'] );
-  $atts['autoplay']     = arve_validate_bool( $atts['autoplay'],  'autoplay' );
-  $atts['arve_link']    = arve_validate_bool( $atts['arve_link'], 'arve_link' );
-  $atts['loop']         = arve_validate_bool( $atts['loop'],      'loop' );
-  $atts['controls']     = arve_validate_bool( $atts['controls'],  'controls' );
+  $atts['align']         = arve_validate_align( $atts['align'], $atts['provider'] );
+  $atts['mode']          = arve_validate_mode( $atts['mode'],   $atts['provider'] );
+  $atts['autoplay']      = arve_validate_bool( $atts['autoplay'],  'autoplay' );
+  $atts['arve_link']     = arve_validate_bool( $atts['arve_link'], 'arve_link' );
+  $atts['loop']          = arve_validate_bool( $atts['loop'],      'loop' );
+  $atts['controls']      = arve_validate_bool( $atts['controls'],  'controls' );
+  $atts['disable_flash'] = arve_validate_bool( $atts['disable_flash'], 'disable_flash' );
 
   $atts['maxwidth']     = (int) $atts['maxwidth'];
   $atts['maxwidth']     = (int) arve_maxwidth_when_aligned( $atts['maxwidth'], $atts['align'] );
@@ -45,7 +85,7 @@ function arve_filter_atts_generate_embed_id( $atts ) {
 
 	foreach ( array( 'id', 'mp4', 'm4v', 'webm', 'ogv', 'url', 'webtorrent' ) as $att ) {
 
-		if ( ! empty( $atts[ $att ] ) ) {
+		if ( ! empty( $atts[ $att ] ) && is_string( $atts[ $att ] ) ) {
 
 			$atts['embed_id'] = preg_replace( '/[^-a-zA-Z0-9]+/', '', $atts[ $att ] );
 			$atts['embed_id'] = str_replace(
@@ -114,6 +154,11 @@ function arve_filter_atts_detect_provider_and_id_from_url( $atts ) {
 			$atts['id']       = $matches[1];
 			$atts['provider'] = $provider;
 
+      if ( ! empty( $matches['id'] ) && ! empty( $matches['account_id'] ) ) {
+        $atts['id']         = $matches['id'];
+        $atts['account_id'] = $matches['account_id'];
+      }
+
 			return $atts;
 		}
 
@@ -122,13 +167,77 @@ function arve_filter_atts_detect_provider_and_id_from_url( $atts ) {
 	return $atts;
 }
 
+function arve_filter_atts_detect_query_args( $atts ) {
+
+  if( empty( $atts['url'] ) ) {
+    return $atts;
+  }
+
+  $to_extract = array(
+    'brightcove' => array( 'videoId', 'something' ),
+  );
+
+  foreach ( $to_extract as $provider => $parameters ) {
+
+    if( $provider != $atts['provider'] ) {
+      return $atts;
+    }
+
+    $query_array = arve_url_query_array( $atts['url'] );
+
+    foreach ( $parameters as $key => $parameter ) {
+
+      $att_name = $atts['provider'] . "_$parameter";
+
+      if( empty( $query_array[ $parameter ] ) ) {
+        $atts[ $att_name ] = new WP_Error( $att_name, "$parameter not found in URL" );
+      } else {
+        $atts[ $att_name ] = $query_array[ $parameter ];
+      }
+    }
+  }
+
+  return $atts;
+}
+
+function arve_filter_atts_detect_youtube_playlist( $atts ) {
+
+  if(
+    'youtube' != $atts['provider'] ||
+    ( empty( $atts['url'] ) && empty( $atts['id'] ) )
+  ) {
+    return $atts;
+  }
+
+  if( empty( $atts['url'] ) ) {
+    # Not a url but it will work
+    $url = str_replace( array( '&list=', '&amp;list=' ), '?list=', $atts['id'] );
+  } else {
+    $url = $atts['url'];
+  }
+
+  $query_array = arve_url_query_array( $url );
+
+  if( empty( $query_array['list'] ) ) {
+    return $atts;
+  }
+
+  $atts['id'] = strtok( $atts['id'], '?' );
+  $atts['id'] = strtok( $atts['id'], '&' );
+
+  $atts['youtube_playlist_id'] = $query_array['list'];
+  $atts['parameters']         .= 'list=' . $query_array['list'];
+
+  return $atts;
+}
+
 function arve_filter_atts_detect_html5( $atts ) {
 
   if( ! empty( $atts['provider'] ) && 'html5' != $atts['provider'] ) {
     return $atts;
 	}
 
-	$html5_extensions = array( 'm4v', 'mp4', 'ogv',	'webm' );
+	$html5_extensions = arve_get_html5_attributes();
 
 	foreach ( $html5_extensions as $ext ) :
 
@@ -154,6 +263,15 @@ function arve_filter_atts_detect_html5( $atts ) {
 	}
 
   $atts['provider'] = 'html5';
+  $atts['video_sources_html'] = '';
+
+  if ( isset( $atts['video_sources'] ) ) {
+
+		foreach ( $atts['video_sources'] as $key => $value ) {
+			$atts['video_sources_html'] .= sprintf( '<source type="%s" src="%s">', $key, $value );
+		}
+	}
+
 	return $atts;
 }
 

@@ -3,8 +3,8 @@ Contributors: dfactory
 Donate link: http://www.dfactory.eu/
 Tags: gallery, images, lightbox, links, photos, template, theme, photo, image, picture, slideshow, modal, overlay, YouTube, Vimeo, video, videos
 Requires at least: 4.0
-Tested up to: 4.6
-Stable tag: 1.6.9
+Tested up to: 4.7
+Stable tag: 1.6.10
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -18,7 +18,7 @@ For more information, check out plugin page at [dFactory](http://www.dfactory.eu
 
 = Features include: =
 
-* Select from 6 responsive lightbox scripts (SwipeBox, prettyPhoto, FancyBox, Nivo Lightbox, Image Lightbox, Tos "R" Us)
+* Select from 7 responsive lightbox scripts (SwipeBox, prettyPhoto, FancyBox, Nivo Lightbox, Image Lightbox, Tos "R" Us, Featherlight)
 * Automatically add lightbox to WordPress image galleries
 * Automatically add lightbox to WordPress image links
 * Automatically add lightbox to WordPress video links (YouTube, Vimeo)
@@ -35,14 +35,14 @@ For more information, check out plugin page at [dFactory](http://www.dfactory.eu
 * Filter hook for embeddding different scripts based on any custom conditions (page, post, category, user id, etc.)
 * .pot file for translations included
 
-= Available Extensions: =
-
-* [Justified Gallery](https://www.dfactory.eu/products/justified-gallery/)
-* [Masonry Image Gallery](https://www.dfactory.eu/products/masonry-image-gallery/)
-* [Lightcase Lightbox](https://www.dfactory.eu/products/lightcase-lightbox/)
-* [PhotoSwipe Lightbox](https://www.dfactory.eu/products/photoswipe-lightbox/)
-* [Strip Lightbox](https://www.dfactory.eu/products/strip-lightbox/)
-
+> <strong>Premium Extensions:</strong>
+> [Justified Gallery](https://www.dfactory.eu/products/justified-gallery/)
+> [Masonry Image Gallery](https://www.dfactory.eu/products/masonry-image-gallery/)
+> [Slider Gallery](https://www.dfactory.eu/products/slider-gallery/)
+> [Lightcase Lightbox](https://www.dfactory.eu/products/lightcase-lightbox/)
+> [PhotoSwipe Lightbox](https://www.dfactory.eu/products/photoswipe-lightbox/)
+> [Lightgallery Lightbox](https://www.dfactory.eu/products/lightgallery-lightbox/)
+> [Strip Lightbox](https://www.dfactory.eu/products/strip-lightbox/)
 
 == Installation ==
 
@@ -60,6 +60,11 @@ No questions yet.
 2. screenshot-2.jpg
 
 == Changelog ==
+
+= 1.6.10 =
+* New: Featherlight lightbox script
+* New: [Lightgallery Lightbox](https://www.dfactory.eu/products/lightgallery-lightbox/) premium extension
+* New: [Slider Gallery](https://www.dfactory.eu/products/slider-gallery/) premium extension
 
 = 1.6.9 =
 * New: [PhotoSwipe Lightbox](https://www.dfactory.eu/products/photoswipe-lightbox/) premium extension
@@ -277,6 +282,7 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.6.9 =
-* New: [PhotoSwipe Lightbox](https://www.dfactory.eu/products/photoswipe-lightbox/) premium extension
-* Fix: data-rel attribute missing in multiline links
+= 1.6.10 =
+* New: Featherlight lightbox script 
+* New: [Lightgallery Lightbox](https://www.dfactory.eu/products/lightgallery-lightbox/) premium extension 
+* New: [Slider Gallery](https://www.dfactory.eu/products/slider-gallery/) premium extension 

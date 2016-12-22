@@ -185,7 +185,8 @@ class WPSEO_Metabox extends WPSEO_Meta {
 	}
 
 	/**
-	 * Adds the Yoast SEO meta box to the edit boxes in the edit post / page  / cpt pages.
+	 * Adds the Yoast SEO meta box to the edit boxes in the edit post, page,
+	 * attachment, and custom post types pages.
 	 */
 	public function add_meta_box() {
 		$post_types = get_post_types( array( 'public' => true ) );
@@ -198,6 +199,11 @@ class WPSEO_Metabox extends WPSEO_Meta {
 						$product_title .= ' Premium';
 					}
 
+					if ( null !== get_current_screen() ) {
+						$screen_id = get_current_screen()->id;
+						add_filter( "postbox_classes_{$screen_id}_wpseo_meta", array( $this, 'wpseo_metabox_class' ) );
+					}
+
 					add_meta_box( 'wpseo_meta', $product_title, array(
 						$this,
 						'meta_box',
@@ -205,6 +211,18 @@ class WPSEO_Metabox extends WPSEO_Meta {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Adds CSS classes to the meta box.
+	 *
+	 * @param array $classes An array of postbox CSS classes.
+	 *
+	 * @return array
+	 */
+	public function wpseo_metabox_class( $classes ) {
+		$classes[] = 'yoast wpseo-metabox';
+		return $classes;
 	}
 
 	/**
@@ -447,7 +465,8 @@ class WPSEO_Metabox extends WPSEO_Meta {
 
 			<p><a target='_blank' class='wpseo-metabox-go-to' href='%s'>%s</a></p>
 		</div>",
-			__( 'You\'re not getting the benefits of Yoast SEO Premium yet. If you had Yoast SEO Premium, you could use its awesome features:', 'wordpress-seo' ),
+			/* translators: %1$s expands to Yoast SEO Premium. */
+			sprintf( __( 'You\'re not getting the benefits of %1$s yet. If you had %1$s, you could use its awesome features:', 'wordpress-seo' ), 'Yoast SEO Premium' ),
 			__( 'Redirect manager', 'wordpress-seo' ),
 			__( 'Create and manage redirects within your WordPress install.', 'wordpress-seo' ),
 			__( 'Multiple focus keywords', 'wordpress-seo' ),
@@ -457,7 +476,8 @@ class WPSEO_Metabox extends WPSEO_Meta {
 			__( 'Premium support', 'wordpress-seo' ),
 			__( 'Gain access to our 24/7 support team.', 'wordpress-seo' ),
 			'https://yoa.st/pe-buy-premium',
-			__( 'Get Yoast SEO Premium now!', 'wordpress-seo' ),
+			/* translators: %s expands to Yoast SEO Premium. */
+			sprintf( __( 'Get %s now!', 'wordpress-seo' ), 'Yoast SEO Premium' ),
 			'https://yoa.st/pe-premium-page',
 			__( 'More info', 'wordpress-seo' )
 			);
@@ -878,7 +898,7 @@ class WPSEO_Metabox extends WPSEO_Meta {
 			wp_localize_script( WPSEO_Admin_Asset_Manager::PREFIX . 'shortcode-plugin', 'wpseoShortcodePluginL10n', $this->localize_shortcode_plugin_script() );
 
 			wp_localize_script( WPSEO_Admin_Asset_Manager::PREFIX . 'metabox', 'wpseoAdminL10n', WPSEO_Help_Center::get_translated_texts() );
-			wp_localize_script( WPSEO_Admin_Asset_Manager::PREFIX . 'metabox', 'wpseoSelect2Locale', WPSEO_Utils::get_language( get_locale() ) );
+			wp_localize_script( WPSEO_Admin_Asset_Manager::PREFIX . 'metabox', 'wpseoSelect2Locale', WPSEO_Utils::get_language( WPSEO_Utils::get_user_locale() ) );
 
 			if ( post_type_supports( get_post_type(), 'thumbnail' ) ) {
 				$asset_manager->enqueue_style( 'featured-image' );

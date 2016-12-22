@@ -17,13 +17,6 @@ function arve_extract_url( changed, collection, shortcode ) {
 		return;
 	}
 
-	short_val =       val.replace( '://www.youtube.com/watch?v=', '://youtu.be/' );
-	short_val = short_val.replace( '://www.dailymotion.com/video/', '://dai.ly/' );
-
-	if( short_val !== val ) {
-		input.val( short_val ).trigger( 'input' );
-	}
-
 	if( val.match(/src="([^"]+)/) ) {
 
 		var test_url = val.match(/src="([^"]+)/),
@@ -32,7 +25,6 @@ function arve_extract_url( changed, collection, shortcode ) {
 		input.val( only_url ).trigger( 'input' );
 	}
 }
-wp.shortcake.hooks.addAction( 'arve.url', arve_extract_url );
 
 function arve_mode_select_listener( changed, collection, shortcode ) {
 
@@ -77,4 +69,6 @@ function arve_mode_select_listener( changed, collection, shortcode ) {
 		hide_title.$el.hide();
 	}
 }
+
 wp.shortcake.hooks.addAction( 'arve.mode', arve_mode_select_listener );
+wp.shortcake.hooks.addAction( 'arve.url', arve_extract_url );

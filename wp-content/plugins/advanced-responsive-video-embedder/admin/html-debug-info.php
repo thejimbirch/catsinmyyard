@@ -1,9 +1,9 @@
 <textarea style="font-family: monospace; width: 100%" rows="25">
-Web Browser and version you see the issue in:
+Web Browser version you see the issue in:
 
-Link to test page on live site with the issue (no not change after posting):
+Link to test page on live site with the issue (do not change after posting):
 
-Shortcode(s) or URL(s) you used fro embedding and have problems with:
+Shortcode(s) or URL(s) you used for embedding and have problems with:
 
 Detailed Description of the issue:
 

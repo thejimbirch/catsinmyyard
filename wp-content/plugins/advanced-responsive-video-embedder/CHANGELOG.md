@@ -1,5 +1,64 @@
 ## Changelog ##
 
+### 2016-12-17 - 8.0.1
+
+* Fix: `undefined function is_plugin_active()` error caused by some plugins
+* Improved: Show actual meaningful message if PHP is lower then the required 5.3. Bluehost (oh proud wp.org recommended host) seems to show customers a **wrong** php version in the config and lets them hang on insecure end of life versions.
+
+### 2016-12-09 - Pro Addon 3.6.8
+
+* Fix: Wrongly tagged version.
+
+### 2016-12-07 - Pro Addon 3.6.7
+
+* Fix: Some thumbnails not loading.
+
+### 2016-12-07 - 8.0.0
+
+* Fix: 'Take over [video] shortcode' option not working. (Always acted as on, default is off)
+* Fix: [video] override putting out a error for not reason.
+* Improved code: Dropped 2 micro classes in favor for antonymous functions.
+
+### 2016-12-07 - Pro Addon 3.6.6
+
+* Improved: Load the CSS always in the `<head>`, this enables to change its CSS with the new CSS customizer in WP 4.7 and may also fix issues with caching plugins.
+
+### 2016-11-30 - 7.9.23
+
+* Fix: Ending up with wrong URLs by disabling auto shortening of URLs when pasting them into the shortcode-ui dialog.
+* Improved: Enable SSL verify for API calls.
+* Improved: License action return messages.
+
+### 2016-11-30 - Pro Addon 3.6.4 ###
+
+* Fix: Autoplay without setting
+
+### 2016-11-30 - 7.9.21
+
+* Fix: Fatal error.
+
+### 2016-11-29 - Pro Addon 3.6.4 ###
+
+* Improved: Licensing field removed from the pro options tab (now in main plugin). This enables resetting pro options settings without deleting license key.
+* Fix: Autoplay not applied property.
+* Fix: HTML5 not autoplaying in lightbox.
+* Improved: New default option for inview lazyload is 'On iOS, Android and Desktops when no thumbnail is found'.
+* Improved: New installations will show a message guiding users to activation screen.
+
+### 2016-11-29 - 7.9.19
+
+* Fix: 'Embed Video' Button not working with Advanced Custom Fields (Possibly fixed other 3rd party editor plugins compatibility issues as well) Thanks to David Trenear!
+* Fix: Facebook URL detection for usernames with dots in them.
+* Fix: Invisible HTML5 Lazyload-lightbox videos
+* Fix: Shortcode UI script enqueued to early causing JS erros on admin pages.
+* Improved: Error messages for missing mandatory attributes.
+* Improved: Moved some code logic of the pro addon out of the main plugin.
+* New: `disable_flash` parameter mainly for unlisted providers will be treated as general iframe embeds. With set to true this will enable you to use the 'disable_links' feature of the pro plugin.
+* New: Filters for new cool things coming up
+* New: License page, relocated options page
+* New: YouTube URL detection for playlists without starting video `https://www.youtube.com/playlist?list=PL3Esg-ZzbiUmeSKBAQ3ej1hQxDSsmnp-7`
+* Possible Fix: Videos displayed to small in some Browsers
+
 ### 2016-10-29 - 7.9.8 and Pro Addon 3.3.4 ###
 
 * Fix: Fix lightbox thumbnail

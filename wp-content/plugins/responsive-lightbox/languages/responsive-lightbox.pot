@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Responsive Lightbox\n"
-"POT-Creation-Date: 2016-12-06 22:56+0100\n"
+"POT-Creation-Date: 2017-01-13 12:18+0100\n"
 "PO-Revision-Date: 2015-05-12 12:06+0100\n"
 "Last-Translator: Bartosz Arendt <info@dfactory.eu>\n"
 "Language-Team: dFactory <info@dfactory.eu>\n"
@@ -962,12 +962,11 @@ msgid "Need support?"
 msgstr ""
 
 #: ../includes/class-settings.php:1006
+#, php-format
 msgid ""
-"If you are having problems with this plugin, please talk about them in the"
-msgstr ""
-
-#: ../includes/class-settings.php:1006
-msgid "Support forum"
+"If you are having problems with this plugin, please browse it's <a href=\"%s"
+"\" target=\"_blank\">Documentation</a> or talk about them in the <a href=\"%s"
+"\" target=\"_blank\">Support forum</a>"
 msgstr ""
 
 #: ../includes/class-settings.php:1008

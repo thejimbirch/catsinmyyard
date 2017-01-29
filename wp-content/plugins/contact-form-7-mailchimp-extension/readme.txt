@@ -1,9 +1,9 @@
 === Contact Form 7 MailChimp Extension ===
 Contributors: rnzo
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NLNDA3PGPMPRN
+Donate link: https://www.paypal.me/renzojohnson
 Tags: contact form 7, email, mailing list, createsend, mandrill, renzo, renzo johnson, cme, contact, form, contact form, mail chimp, newsletter, mailchimp, chimpmail
 Requires at least: 4.0
-Tested up to: 4.6.1
+Tested up to: 4.8
 Stable tag: 4.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -23,13 +23,13 @@ Integrate Contact Form 7 with [MailChimp](http://renzojohnson.com/contributions/
 * Double opt-in - confirmation email send to subscribers
 * [Opt-in checkbox](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension/mailchimp-opt-in-checkbox) - add the chance to opt-in/opt-out
 * Support for [custom fields](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension/mailchimp-custom-fields)
-* Latest MailChimp API
+* Latest MailChimp API V3
 * Constantly updated
 
 = Please note*** =
 
-* Support for groups - coming soon
-* Support for segments - coming soon
+* Support for groups - coming soon (Feb 2017)
+* Support for segments - coming soon (Feb 2017)
 
 = Requirements =
 
@@ -78,37 +78,20 @@ Do you have questions or issues with Contact Form 7 MailChimp Extension? Use the
 
 For more information, see [Releases](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension).
 
-= 0.4.31 =
+= 0.4.36 =
 
-* Updated Tested up to version
+* Updated doc links
 
-= 0.4.29 =
+= 0.4.34 =
 
-* Updated help docs
+* Tested up to WP 4.8
+* killed a bug generated in the last release
 
-= 0.4.28 =
 
-* Updated help docs
+= 0.4.33 =
 
-= 0.4.26 =
+* Improved debugger
 
-* Fixed 'Notice: Undefined index:'
-
-= 0.4.25 =
-
-* Fixed a conflict with Contact Form 7 AutoResponder Addon Plugin
-
-= 0.4.22 =
-
-* Added a debug feature.
-
-= 0.4.21 =
-
-* Preping for new features
-
-= 0.4.20 =
-
-* Updated documentation for [MailChimp Custom fields](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension/mailchimp-custom-fields).
 
 = 0.4.8 =
 

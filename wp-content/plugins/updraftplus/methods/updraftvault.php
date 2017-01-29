@@ -31,7 +31,7 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 				break;
 		}
 	}
-
+	
 	public function get_opts() {
 		global $updraftplus;
 		$opts = $updraftplus->get_job_option('updraft_updraftvault');
@@ -50,7 +50,13 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 		$this->vault_config = $config;
 	}
 
-	protected function get_config() {
+	/**
+	 * Gets the UpdraftVault configuration and credentials
+	 *
+	 * @return array An array containing the Amazon S3 credentials (accesskey, secretkey, etc.)
+	 *				 along with some configuration values.
+	 */
+	public function get_config() {
 
 		global $updraftplus;
 
@@ -77,6 +83,8 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 		if (!is_array($opts) || empty($opts['token']) || empty($opts['email'])) {
 			// Not connected
 			$updraftplus->log("UpdraftPlus Vault: this site has not been connected - check your settings");
+			$config['error'] = array('message' => 'site_not_connected', 'values' => array());
+			
 			$this->vault_config = $config;
 			$updraftplus->jobdata_set('updraftvault_config', $config);
 			return $config;
@@ -147,6 +155,8 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 					$config['path'] = $response['path'];
 				} elseif (is_array($response) && isset($response['result']) && ('token_unknown' == $response['result'] || 'site_duplicated' == $response['result'])) {
 					$updraftplus->log("This site appears to not be connected to UpdraftPlus Vault (".$response['result'].")");
+					$config['error'] = array('message' => 'site_not_connected', 'values' => array($response['result']));
+					
 					$config['accesskey'] = '';
 					$config['secretkey'] = '';
 					$config['path'] = '';
@@ -160,22 +170,28 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 						if (!empty($response['message'])) $msg .= " (".$response['message'].")";
 						if (!empty($response['data'])) $msg .= " (".json_encode($response['data']).")";
 						$updraftplus->log($msg);
+						$config['error'] = array('message' => 'general_error_response', 'values' => array($msg));
+						
 // 						if ('token_unknown' == $response['result']) {
 // 						} elseif ('db_error' == $response['result']) {
 // 						} elseif ('url_error' == $response['result']) {
 // 						}
 					} else {
 						$updraftplus->log("Received response, but it was not in the expected format: ".substr(wp_remote_retrieve_body($getconfig), 0, 100).' ...');
+						$config['error'] = array('message' => 'unexpected_format', 'values' => array(substr(wp_remote_retrieve_body($getconfig), 0, 100).' ...'));
 					}
 				}
 			} else {
 				$updraftplus->log("Unexpected HTTP response code (please try again later): ".$response_code);
+				$config['error'] = array('message' => 'unexpected_http_response', 'values' => array($response_code));
 			}
 		} elseif (is_wp_error($getconfig)) {
 			$updraftplus->log_wp_error($getconfig);
+			$config['error'] = array('message' => 'general_error_response', 'values' => array($getconfig));
 		} else {
 			if (!isset($getconfig['accesskey'])) {
 				$updraftplus->log("Vault: wp_remote_post returned a result that was not understood (".gettype($getconfig).")");
+				$config['error'] = array('message' => 'result_not_understood', 'values' => array(gettype($getconfig)));
 			}
 		}
 

@@ -1,5 +1,5 @@
 <?php
-/*  Copyright 2013-2015 Renzo Johnson (email: renzojohnson at gmail.com)
+/*  Copyright 2013-2017 Renzo Johnson (email: renzojohnson at gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,10 +32,3 @@ function wpcf7_mce_admin_enqueue_scripts() {
 add_action( 'admin_print_scripts', 'wpcf7_mce_admin_enqueue_scripts' );
 
 
-/* Custom ajax loader */
-function wpcf7_mce_ajax_loader() {
-
-	return  SPARTAN_MCE_PLUGIN_URL . '/assets/images/fading-squares.gif';
-
-}
-add_filter('wpcf7_ajax_loader', 'wpcf7_mce_ajax_loader');

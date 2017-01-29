@@ -4,8 +4,8 @@
  * OAuth storage handler using WordPress options
  * This can only be used if you have a WordPress environment loaded, such that the (get|update|delete)_option functions are available
  * See an example usage in http://wordpress.org/extend/plugins/updraftplus
- * @author David Anderson <david@wordshell.net>
- * @link http://wordshell.net
+ * @author David Anderson <david@updraftplus.com>
+ * @link https://updraftplus.com
  * @package Dropbox\Oauth
  * @subpackage Storage
  */

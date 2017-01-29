@@ -2,7 +2,7 @@
 /*
 Plugin Name: Responsive Lightbox
 Description: Responsive Lightbox allows users to view larger versions of images and galleries in a lightbox (overlay) effect optimized for mobile devices.
-Version: 1.6.10
+Version: 1.6.11
 Author: dFactory
 Author URI: http://www.dfactory.eu/
 Plugin URI: http://www.dfactory.eu/plugins/responsive-lightbox/
@@ -12,7 +12,7 @@ Text Domain: responsive-lightbox
 Domain Path: /languages
 
 Responsive Lightbox
-Copyright (C) 2013-2016, Digital Factory - info@digitalfactory.pl
+Copyright (C) 2013-2017, Digital Factory - info@digitalfactory.pl
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -36,7 +36,7 @@ include_once( RESPONSIVE_LIGHTBOX_PATH . 'includes/class-settings.php' );
  * Responsive Lightbox class.
  *
  * @class Responsive_Lightbox
- * @version	1.6.10
+ * @version	1.6.11
  */
 class Responsive_Lightbox {
 
@@ -155,7 +155,7 @@ class Responsive_Lightbox {
 				'gallery_fade_out'			=> 300
 			)
 		),
-		'version'		 => '1.6.10'
+		'version'		 => '1.6.11'
 	);
 	public $options = array();
 	private $notices = array();
@@ -584,7 +584,7 @@ class Responsive_Lightbox {
 					'responsive-lightbox-nivo', plugins_url( 'assets/nivo/nivo-lightbox.min.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'], ($this->options['settings']['loading_place'] === 'header' ? false : true ), $this->defaults['version']
 				);
 				wp_register_style(
-					'responsive-lightbox-nivo', plugins_url( 'assets/nivo/nivo-lightbox.css', __FILE__ ), array(), $this->defaults['version']
+					'responsive-lightbox-nivo', plugins_url( 'assets/nivo/nivo-lightbox.min.css', __FILE__ ), array(), $this->defaults['version']
 				);
 				wp_register_style(
 					'responsive-lightbox-nivo-default', plugins_url( 'assets/nivo/themes/default/default.css', __FILE__ ), array(), $this->defaults['version']

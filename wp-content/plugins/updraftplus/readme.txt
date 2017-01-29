@@ -2,10 +2,10 @@
 Contributors: Backup with UpdraftPlus, DavidAnderson, DNutbourne, aporter, snightingale
 Tags: backup, backups, restore, amazon backup, s3 backup, dropbox backup, google drive backup, rackspace cloud files, rackspace backup, dreamhost, dreamobjects backup, ftp backup, webdav backup, google cloud storage, onedrive, azure, back up, multisite, restoration, sftp backup, ftps, scp backup, migrate, duplicate, copy, mysql backup, database backup, db backups, website backup, wordpress backup, full backup, openstack backup, sicherung
 Requires at least: 3.2
-Tested up to: 4.6
-Stable tag: 1.12.29
+Tested up to: 4.7
+Stable tag: 1.12.32
 Author URI: https://updraftplus.com
-Donate link: http://david.dw-perspective.org.uk/donate
+Donate link: https://david.dw-perspective.org.uk/donate
 License: GPLv3 or later
 
 Backup and restoration made easy. Complete backups; manual or scheduled (backup to S3, Dropbox, Google Drive, Rackspace, FTP, SFTP, email + others).
@@ -14,7 +14,7 @@ Backup and restoration made easy. Complete backups; manual or scheduled (backup 
 
 <a href="https://updraftplus.com">UpdraftPlus</a> simplifies backups (and restoration). Backup into the cloud (Amazon S3 (or compatible), Dropbox, Google Drive, Rackspace Cloud, DreamObjects, FTP, Openstack Swift, UpdraftPlus Vault and email) and restore with a single click. Backups of files and database can have separate schedules. The paid version also backs up to Microsoft OneDrive, Microsoft Azure, Google Cloud Storage, SFTP, SCP, and WebDAV.
 
-<strong>Top-quality:</strong> UpdraftPlus is the highest-ranking backup plugin on wordpress.org, with <strong>over 800,000 currently active installs</strong>. Widely tested and reliable, this is the world's #1 most popular and mostly highly rated scheduled backup plugin. Millions of backups completed!
+<strong>Top-quality:</strong> UpdraftPlus is the highest-ranking backup plugin on wordpress.org, with <strong>over a million currently active installs</strong>. Widely tested and reliable, this is the world's #1 most popular and mostly highly rated scheduled backup plugin. Millions of backups completed!
 
 [vimeo https://vimeo.com/154870690]
 
@@ -34,7 +34,7 @@ Backup and restoration made easy. Complete backups; manual or scheduled (backup 
 * Debug mode - full logging of the backup
 * Internationalised (translations welcome - see below)
 * <a href="https://updraftplus.com">Premium version and support available (including free remote backup storage) - https://updraftplus.com</a>
-* Supported on all current PHP versions (5.2 - 7.0)
+* Supported on all current PHP versions (5.2 - 7.1)
 
 From our <a href="https://www.youtube.com/user/UpdraftPlus/videos">YouTube channel</a>, here's how to install:
 
@@ -125,11 +125,45 @@ Thanks for asking; yes, we've got a few. Check out this profile page - https://p
 
 The <a href="https://updraftplus.com/news/">UpdraftPlus backup blog</a> is the best place to learn in more detail about any important changes.
 
-N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.12.24 of the free version correspond to changes made in 2.12.24.x of the paid version.
+N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.12.32 of the free version correspond to changes made in 2.12.32.x of the paid version.
+
+= 1.12.32 - 26/Jan/2017 =
+
+* FEATURE: Add UpdraftCentral (https://updraftcentral.com) UpdraftVault listener
+* FEATURE: Encryption and decryption is now chunked, meaning that large databases of any size can be encrypted without being prevented by memory limits
+* FIX: Fix a bug whereby if a backup set containing a manual "more files" element was imported via a remote scan, then an error would show concerning it when attempting to restore.
+* FIX: On certain combinations of changing the "more files to back up" settings, these changes might not be reflected in the "Backup Now" dialog without a page reload
+* FIX: Remove a PHP 5.5+-only construction that crept into 1.12.31
+* TWEAK: Allow UpdraftCentral command classes to provide commands via the __call method
+* TWEAK: Move the existing backups table into the templating system
+* TWEAK: When trying to restore before cleaning up a previous restore, the detailed error message shown needed tweaking
+* TWEAK: Some refactoring of the dashboard JavaScript, to abstract/harmonise all AJAX calls
+* TWEAK: Removed the triple click and replaced it with standard double click
+* TWEAK: Some refactoring of the UpdraftCentral command interface, to facilitate reduction of duplicated dashboard control code
+* TWEAK: One less HTTP round-trip when deleting from the dashboard
+* TWEAK: Updated advanced tools to allow UpdraftCentral to use wipe settings and export / import
+* TWEAK: Revamped the 'Premium / Extensions' tab in the free version
+* TWEAK: Work around HTTP 400 error from Dropbox on servers with several-year old version of curl, caused by bad interaction between curl and Dropbox over a specific header
+* TWEAK: Add a notice advising of WP-Optimize (https://wordpress.org/plugins/wp-optimize/) to the available notices
+* TWEAK: Prevent an unwanted PHP log notice when using Google Drive
+* TWEAK: More file directories are now added using a directory browser
+* TWEAK: Update plugin update checker library (paid versions) to version 3.1, which fixes some PHP 7 issues
+
+= 1.12.30 - 23/Dec/2016 =
+
+* FIX: Fix a Dropbox APIv2 issue where paths containing certain characters were incorrectly being encoded
+* FEATURE: Add UpdraftCentral (https://updraftcentral.com) comment-control and advanced tools listeners 
+* TWEAK: Starting an operation to retrieve a remote backup from UpdraftCentral succeeded, but gave a UI error in UC when doing so
+* TWEAK: Fix a Dropbox APIv2 issue where Team storage displayed an incorrect value
+* TWEAK: Support for the new AWS S3 Canada Central 1 and London regions
+* TWEAK: Some re-factoring of the settings page output code for easier maintenance
+* TWEAK: Some re-factoring of the notices code, to allow re-use in other projects
+* TWEAK: Make sure that a UpdraftCentral_Commands class is available before loading any external command classes, so that they can rely on its presence
 
 1.12.29 - 22/Nov/2016
 
 * FIX: Fix a PHP error in the notices code (regression in 1.12.28)
+* FIX: Manual database search and replace now outputs logged operation information (regression in 1.12.28)
 
 1.12.28 - 21/Nov/2016
 
@@ -360,4 +394,4 @@ We recognise and thank the following for code and/or libraries used and/or modif
 
 
 == Upgrade Notice ==
-* 1.12.29: Minor Dropbox APIv2 tweaks, plus some internal structure improvements. Fix for PHP error logged in 1.12.28.
+* 1.12.32: Can now control UpdraftVault from UpdraftCentral. Database decryption now more friendly when memory is low. Internal organisation improvements. Many tweaks and small fixes. Fix PHP 5.5+-ism that crept into 1.12.31.

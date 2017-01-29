@@ -920,7 +920,8 @@ class UpdraftPlus_Backup {
 		$jobdata['remotestorage_extrainfo'] = $this->remotestorage_extrainfo;
 		
 		if (!class_exists('UpdraftPlus_Notices')) require_once(UPDRAFTPLUS_DIR.'/includes/updraftplus-notices.php');
-		$ws_advert = UpdraftPlus_Notices::do_notice(false, 'report-plain', true);
+		global $updraftplus_notices;
+		$ws_advert = $updraftplus_notices->do_notice(false, 'report-plain', true);
 		
 		$body = apply_filters('updraft_report_body',
 			__('Backup of:', 'updraftplus').' '.site_url()."\r\n".

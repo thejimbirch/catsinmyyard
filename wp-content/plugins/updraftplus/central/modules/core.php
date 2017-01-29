@@ -55,9 +55,8 @@ class UpdraftCentral_Core_Commands extends UpdraftCentral_Commands {
 			return $this->_generic_error_response('user_unknown');
 		}
 	}
-	
+
 	public function phpinfo() {
-	
 		$phpinfo = $this->_get_phpinfo_array();
 		
 		if (!empty($phpinfo)){
@@ -65,35 +64,9 @@ class UpdraftCentral_Core_Commands extends UpdraftCentral_Commands {
 		}
 		
 		return $this->_generic_error_response('phpinfo_fail');
-
 	}
 	
-	// https://secure.php.net/phpinfo
-	private function _get_phpinfo_array() {
-		ob_start();
-		phpinfo(11);
-		$phpinfo = array('phpinfo' => array());
 
-		if (preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', ob_get_clean(), $matches, PREG_SET_ORDER)){
-			foreach($matches as $match){
-			if(strlen($match[1])){
-				$phpinfo[$match[1]] = array();
-			}elseif(isset($match[3])){
-			$keys1 = array_keys($phpinfo);
-			$phpinfo[end($keys1)][$match[2]] = isset($match[4]) ? array($match[3], $match[4]) : $match[3];
-			} else {
-				$keys1 = array_keys($phpinfo);
-				$phpinfo[end($keys1)][] = $match[2];     
-			
-			}
-		
-			}
-			return $phpinfo;
-		}
-
-		return false;
-		
-	}
 		
 	// This is intended to be short-lived. Hence, there's no intention other than that it is random and only used once - only the most recent one is valid.
 	public function _get_autologin_key($user_id) {
@@ -125,5 +98,64 @@ class UpdraftCentral_Core_Commands extends UpdraftCentral_Commands {
 			)
 		));
 	}
+
+	//This calls the WP_Action within WP
+	public function call_wordpress_action($data){
+		if (false === ($updraftplus_admin = $this->_load_ud_admin())) return $this->_generic_error_response('no_updraftplus');
+
+		$response = $updraftplus_admin->call_wp_action($data);
+
+		if(empty($data["wpaction"])){
+			return $this->_generic_error_response("error", "no command sent");
+		}
+		
+		return $this->_response(array(
+			"response" => $response['response'],
+			"status" => $response['status'],
+			"log" => $response['log']
+		));
+	}
+
+	public function count($entity){
+		if (false === ($updraftplus_admin = $this->_load_ud_admin())) return $this->_generic_error_response('no_updraftplus');
+
+		$response = $updraftplus_admin->get_disk_space_used($entity);
+
+		return $this->_response($response);
+	}
 	
+
+	/*Private Functions*/
+
+	// https://secure.php.net/phpinfo
+	private function _get_phpinfo_array() {
+		ob_start();
+		phpinfo(INFO_GENERAL|INFO_CREDITS|INFO_MODULES);
+		$phpinfo = array('phpinfo' => array());
+
+		if (preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', ob_get_clean(), $matches, PREG_SET_ORDER)){
+			foreach($matches as $match){
+			if(strlen($match[1])){
+				$phpinfo[$match[1]] = array();
+			}elseif(isset($match[3])){
+			$keys1 = array_keys($phpinfo);
+			$phpinfo[end($keys1)][$match[2]] = isset($match[4]) ? array($match[3], $match[4]) : $match[3];
+			} else {
+				$keys1 = array_keys($phpinfo);
+				$phpinfo[end($keys1)][] = $match[2];     
+			
+			}
+		
+			}
+			return $phpinfo;
+		}
+		return false;
+	}
+
+	private function _load_ud_admin() {
+		if (!defined('UPDRAFTPLUS_DIR') || !is_file(UPDRAFTPLUS_DIR.'/admin.php')) return false;
+		require_once(UPDRAFTPLUS_DIR.'/admin.php');
+		global $updraftplus_admin;
+		return $updraftplus_admin;
+	}
 }

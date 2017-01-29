@@ -29,6 +29,8 @@ if (!empty($button_link) && !empty($button_meta)) {
 		_e('Sign up', 'updraftplus');
 	} elseif ($button_meta == 'go_there') {
 		_e('Go there', 'updraftplus');
+	} else {
+		_e('Read more', 'updraftplus');
 	}
 
 	echo ' - '.$link;

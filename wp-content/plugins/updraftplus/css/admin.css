@@ -324,21 +324,46 @@ h3 .thank-you {
 	#updraft_webdav_host_error {
 		color: red;
 	}
+	/* More files jstree styles */
+	#updraft_more_files_container {
+		position: relative;
+		display: none;
+		height:300px;
+		width:100%;
+		border: 1px dotted;
+		margin-bottom: 5px;
+	}
+
+	#updraft_jstree_buttons {
+		position: absolute;
+		top: 0;
+		right: 0;
+	}
+
+	#updraft_jstree_container {
+		height:100%;
+		width:100%;
+		overflow: auto;
+	}
+
+	#updraft_more_files_container button {
+		height:22px;
+		line-height: 20px;
+	}
+
+	#updraft_jstree_confirm, #updraft_jstree_cancel {
+		display: none;
+	}
 	
 	.updraftplus-morefiles-row-delete {
 		cursor: pointer;
 		color: red;
-		font-size: 100%;
-		font-weight: bold;
-		border: 0px;
-		border-radius: 3px;
-		padding: 2px;
-		margin: 0 6px;
+		font-size: 23px !important;
 	}
-	.updraftplus-morefiles-row-delete:hover {
+
+	.updraftplus-morefiles-row-edit {
 		cursor: pointer;
-		color: white;
-		background: red;
+		font-size: 24px !important;
 	}
 
 	#updraft-wrap .form-table th {
@@ -433,7 +458,29 @@ h3 .thank-you {
 		border: 1px solid black;
 		border-collapse: collapse;
 		font-size: 120%;
-		background-color: white;
+		background-color: white; 
+		text-align: center;
+	}
+	.updraft_feat_table p {
+		padding: 0px 10px;
+		margin: 5px 0px;
+		font-size: 16px;
+	}
+	.updraft_feat_table h4 {
+		margin: 5px 0px;
+	}
+	.updraft_feat_table .dashicons {
+		width: 25px;
+		height: 25px;
+		font-size: 25px;
+		line-height: 1;
+	}
+	.updraft_feat_table .dashicons-yes, .updraft_feat_table .updraft-yes {
+		color:green;
+	}
+
+	.updraft_feat_table .dashicons-no-alt, .updraft_feat_table .updraft-no {
+		color:red;
 	}
 	.updraft_tick_cell{
 		text-align: center;
@@ -480,6 +527,19 @@ h3 .thank-you {
 		line-height: 140%;
 		padding: 14px;
 		clear:left;
+	}
+
+	.udp-premium-image {
+		display: none;
+		
+	}
+
+	@media screen and (min-width: 720px) {
+		.udp-premium-image {
+			display: block;
+			float: left;
+			padding-right: 5px;
+		}
 	}
 
 /* End stuff already in admin.php */
@@ -1506,6 +1566,10 @@ a.btn-get-started {
 
 .expertmode .advanced_settings_container .advanced_settings_content input#import_settings {
 	height:auto !important;
+}
+
+div#updraft-wrap a {
+	cursor: pointer !important;
 }
 
 @media screen and (min-width: 670px) {

@@ -36,10 +36,10 @@ abstract class UpdraftCentral_Commands {
 	}
 	
 	final protected function _response($data = null, $code = 'rpcok') {
-		return apply_filters('updraftplus_remotecontrol_response', array(
+		return array(
 			'response' => $code,
 			'data' => $data
-		), $data, $code);
+		);
 	}
 	
 	final protected function _generic_error_response($code = 'central_unspecified', $data = null) {
@@ -51,5 +51,4 @@ abstract class UpdraftCentral_Commands {
 			'rpcerror'
 		);
 	}
-	
 }

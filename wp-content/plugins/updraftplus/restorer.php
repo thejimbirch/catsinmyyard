@@ -320,6 +320,15 @@ class Updraft_Restorer extends WP_Upgrader {
 	}
 
 	// This returns a wp_filesystem location (and we musn't change that, as we must retain compatibility with the class parent)
+	
+	/**
+	 * This returns a wp_filesystem location (and we musn't change that, as we must retain compatibility with the class parent)
+	 * along with unpacking the encrypted db file and checking its contents before going off and restoring the Db
+	 * @param  string  $package        The file name of the encrypted File
+	 * @param  boolean $delete_package the file can be removed before going off to the restore stage (this is just incase the user dont want to proceed)
+	 * @param  boolean $type           
+	 * @return string                  Returns success or Fail depending on errors and restors DB
+	 */
 	public function unpack_package($package, $delete_package = true, $type = false) {
 
 		global $wp_filesystem, $updraftplus;
@@ -367,20 +376,22 @@ class Updraft_Restorer extends WP_Upgrader {
 
 			if (!$encryption) return new WP_Error('no_encryption_key', __('Decryption failed. The database file is encrypted, but you have no encryption key entered.', 'updraftplus'));
 
-			$plaintext = $updraftplus->decrypt(false, $encryption, $wp_filesystem->get_contents($backup_dir.$package));
+			//function decrypt
+			$decrypted_file = $updraftplus->decrypt($backup_dir.$package, $encryption);
 
-			if ($plaintext) {
+			if (is_array($decrypted_file)) {
 				$this->skin->feedback('decrypted_database');
-				if (!$wp_filesystem->put_contents($working_dir.'/backup.db.gz', $plaintext)) {
+				if (!copy($decrypted_file['fullpath'], $working_dir.'/backup.db.gz')) {
 					return new WP_Error('write_failed', __('Failed to write out the decrypted database to the filesystem','updraftplus'));
+				}else{
+					unlink($decrypted_file['fullpath']);
 				}
 			} else {
 				return new WP_Error('decryption_failed', __('Decryption failed. The most likely cause is that you used the wrong key.','updraftplus'));
 			}
 		} else {
-
-			if (preg_match('/\.sql$/i', $package)) { 
-				if (!$wp_filesystem->copy($backup_dir.$package, $working_dir.'/backup.db')) {
+		      if (preg_match('/\.sql$/i', $package)) {  
+		        if (!$wp_filesystem->copy($backup_dir.$package, $working_dir.'/backup.db')) { 
 					if ( $wp_filesystem->errors->get_error_code() ) { 
 						foreach ( $wp_filesystem->errors->get_error_messages() as $message ) show_message($message); 
 					}
@@ -403,12 +414,12 @@ class Updraft_Restorer extends WP_Upgrader {
 		}
 
 		// Once extracted, delete the package if required (non-recursive, is a file)
+		// if ($delete_package) $wp_filesystem->delete($decrypted_file['fullpath'], false, true);
 		if ($delete_package) $wp_filesystem->delete($backup_dir.$package, false, true);
 
 		$updraftplus->log("Database successfully unpacked");
 
 		return $working_dir;
-
 	}
 
 	// For moving files out of a directory into their new location

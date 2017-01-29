@@ -12,7 +12,9 @@
 
 		echo '<p><strong>'.__('UpdraftCentral', 'updraftplus').'</strong> <br>'.__('UpdraftCentral is a powerful remote control plugin for WordPress that allows you to control all your UpdraftPlus installs and backups from one central location.', 'updraftplus').' '.__('You can even use it to centrally manage and update all themes, plugins and WordPress core on all your sites without logging into them!','updraftplus').' <a href="https://wordpress.org/plugins/updraftcentral/">'.__('Download it for free from WordPress.org', 'updraftplus').'</a> / <a href="'.apply_filters('updraftplus_com_link', "https://updraftplus.com/updraftcentral/").'">'.__('Explore our Cloud and Premium versions.', 'updraftplus').'</a></p>';
 		
-		echo '<p><strong>'.__('More Quality Plugins', 'updraftplus').'</strong> <br><a href="https://www.simbahosting.co.uk/s3/shop/">'.__('Premium WooCommerce plugins', 'updraftplus').'</a> | <a href="https://wordpress.org/plugins/two-factor-authentication/">'.__('Free two-factor security plugin', 'updraftplus').'</a> | <a href="https://wordpress.org/plugins/wp-optimize/">'.__('WP-Optimize (free)', 'updraftplus').'</a></p>';
+		echo '<p><strong>'.__('WP-Optimize', 'updraftplus').'</strong> <br>'.__("When you've backed up your database, we recommend you install our WP-Optimize plugin to streamline it for better website performance.","updraftplus").' <a href="https://wordpress.org/plugins/wp-optimize/">'.__('WP-Optimize (free)', 'updraftplus').'</a></p>';
+
+		echo '<p><strong>'.__('More Quality Plugins', 'updraftplus').'</strong> <br><a href="https://www.simbahosting.co.uk/s3/shop/">'.__('Premium WooCommerce plugins', 'updraftplus').'</a> | <a href="https://wordpress.org/plugins/two-factor-authentication/">'.__('Free two-factor security plugin', 'updraftplus').'</a></p>';
 		
 	?>
 	

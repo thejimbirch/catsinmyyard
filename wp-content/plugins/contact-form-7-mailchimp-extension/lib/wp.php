@@ -1,5 +1,5 @@
 <?php
-/*  Copyright 2013-2015 Renzo Johnson (email: renzojohnson at gmail.com)
+/*  Copyright 2013-2017 Renzo Johnson (email: renzojohnson at gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,11 +16,16 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+
+
+
+
 function mce_updts ( $update, $item ) {
     $plugins = array (
         'blocks',
         'contact-form-7-campaign-monitor-extension',
         'contact-form-7-mailchimp-extension',
+        'integrate-contact-form-7-and-aweber',
     );
     if ( in_array( $item->slug, $plugins ) ) {
         return true;
@@ -29,5 +34,12 @@ function mce_updts ( $update, $item ) {
     }
 }
 add_filter( 'auto_update_plugin', 'mce_updts', 10, 2 );
+
+
+
+
+
+
+
 
 

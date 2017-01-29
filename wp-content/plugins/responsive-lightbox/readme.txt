@@ -1,10 +1,10 @@
 === Responsive Lightbox by dFactory ===
 Contributors: dfactory
 Donate link: http://www.dfactory.eu/
-Tags: gallery, images, lightbox, links, photos, template, theme, photo, image, picture, slideshow, modal, overlay, YouTube, Vimeo, video, videos
+Tags: gallery, images, lightbox, photos, theme, photo, image, picture, slideshow, modal, overlay, video, videos
 Requires at least: 4.0
-Tested up to: 4.7
-Stable tag: 1.6.10
+Tested up to: 4.7.1
+Stable tag: 1.6.11
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -36,6 +36,7 @@ For more information, check out plugin page at [dFactory](http://www.dfactory.eu
 * .pot file for translations included
 
 > <strong>Premium Extensions:</strong>
+> [Photo & Art bundle](https://www.dfactory.eu/products/photo-art-bundle/)
 > [Justified Gallery](https://www.dfactory.eu/products/justified-gallery/)
 > [Masonry Image Gallery](https://www.dfactory.eu/products/masonry-image-gallery/)
 > [Slider Gallery](https://www.dfactory.eu/products/slider-gallery/)
@@ -60,6 +61,10 @@ No questions yet.
 2. screenshot-2.jpg
 
 == Changelog ==
+
+= 1.6.11 =
+* Tweak: Added plugin documentation link
+* Tweak: Nivo lightbox update to 1.3.1
 
 = 1.6.10 =
 * New: Featherlight lightbox script
@@ -282,7 +287,6 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.6.10 =
-* New: Featherlight lightbox script 
-* New: [Lightgallery Lightbox](https://www.dfactory.eu/products/lightgallery-lightbox/) premium extension 
-* New: [Slider Gallery](https://www.dfactory.eu/products/slider-gallery/) premium extension 
+= 1.6.11 =
+* Tweak: Added plugin documentation link
+* Tweak: Nivo lightbox update to 1.3.1

@@ -54,12 +54,6 @@ class UpdraftPlus {
 
 	public function __construct() {
 
-		// Bitcasa support is deprecated
-		if (is_file(UPDRAFTPLUS_DIR.'/addons/bitcasa.php')) $this->backup_methods['bitcasa'] = 'Bitcasa';
-		
-		// Copy.Com will be closed on 1st May 2016
-		if (is_file(UPDRAFTPLUS_DIR.'/addons/copycom.php')) $this->backup_methods['copycom'] = 'Copy.Com';
-
 		// Initialisation actions - takes place on plugin load
 
 		if ($fp = fopen(UPDRAFTPLUS_DIR.'/updraftplus.php', 'r')) {
@@ -417,8 +411,25 @@ class UpdraftPlus {
 			@define('APP_GCAL_DISABLE', true);
 		}
 		
-		if (file_exists(UPDRAFTPLUS_DIR.'/central/bootstrap.php')) require_once(UPDRAFTPLUS_DIR.'/central/bootstrap.php');
+		if (file_exists(UPDRAFTPLUS_DIR.'/central/bootstrap.php')) {
+			add_action('updraftplus_remotecontrol_command_classes', array($this, 'updraftplus_remotecontrol_command_classes'));
+			add_action('updraftcentral_command_class_wanted', array($this, 'updraftcentral_command_class_wanted'));
+			require_once(UPDRAFTPLUS_DIR.'/central/bootstrap.php');
+		}
 		
+	}
+	
+	// Register our class
+	public function updraftplus_remotecontrol_command_classes($command_classes) {
+		if (is_array($command_classes)) $command_classes['updraftplus'] = 'UpdraftCentral_UpdraftPlus_Commands';
+		return $command_classes;
+	}
+	
+	// Load the class when required
+	public function updraftcentral_command_class_wanted($command_php_class) {
+		if ('UpdraftCentral_UpdraftPlus_Commands' == $command_php_class) {
+			require_once(UPDRAFTPLUS_DIR.'/includes/class-updraftcentral-updraftplus-commands.php');
+		}
 	}
 	
 	// Cleans up temporary files found in the updraft directory (and some in the site root - pclzip)
@@ -1043,9 +1054,15 @@ class UpdraftPlus {
 		return true;
 	}
 
-	public function decrypt($fullpath, $key, $ciphertext = false) {
+	/**
+	 * This will decrypt an encryped db file
+	 * @param  string  $fullpath   This is the full path to the encrypted file location
+	 * @param  string  $key        This is the key (satling) to be used when decrypting
+	 * @param  boolean $to_temporary_file Use if the resulting file is not intended to be kept
+	 * @return array               This bring back an array of full decrypted path
+	 */
+	public function decrypt($fullpath, $key, $to_temporary_file = false) {
 		$this->ensure_phpseclib('Crypt_Rijndael', 'Crypt/Rijndael');
-		$rijndael = new Crypt_Rijndael();
 		if (defined('UPDRAFTPLUS_DECRYPTION_ENGINE')) {
 			if ('openssl' == UPDRAFTPLUS_DECRYPTION_ENGINE) {
 				$rijndael->setPreferredEngine(CRYPT_ENGINE_OPENSSL);
@@ -1055,8 +1072,86 @@ class UpdraftPlus {
 				$rijndael->setPreferredEngine(CRYPT_ENGINE_INTERNAL);
 			}
 		}
+		
+		//open file to read
+		if (false === ($file_handle = fopen($fullpath, 'rb'))) return false;
+
+		$decrypted_path = dirname($fullpath).'/decrypt_'.basename($fullpath).'.tmp';
+		//open new file from new path
+		if (false === ($decrypted_handle = fopen($decrypted_path, 'wb+'))) return false;
+
+		//setup encryption
+		$rijndael = new Crypt_Rijndael();
 		$rijndael->setKey($key);
-		return (false == $ciphertext) ? $rijndael->decrypt(file_get_contents($fullpath)) : $rijndael->decrypt($ciphertext);
+		$rijndael->disablePadding();
+		$rijndael->enableContinuousBuffer();
+
+		$file_size = filesize($fullpath);
+		$bytes_decrypted = 0;
+		$buffer_size = defined('UPDRAFTPLUS_CRYPT_BUFFER_SIZE') ? UPDRAFTPLUS_CRYPT_BUFFER_SIZE : 2097152;
+
+		//loop around the file
+		while ($bytes_decrypted < $file_size) {
+			//read buffer sized amount from file
+			if (false === ($file_part = fread($file_handle, $buffer_size))) return false;
+			//check to ensure padding is needed before decryption
+			$length = strlen($file_part);
+			if ($length % 16 != 0) {
+				$pad = 16 - ($length % 16);
+				$file_part = str_pad($file_part, $length + $pad, chr($pad));
+// 				$file_part = str_pad($file_part, $length + $pad, chr(0));
+			}
+			
+			$decrypted_data = $rijndael->decrypt($file_part);
+			
+			$is_last_block = ($bytes_decrypted + strlen($decrypted_data) >= $file_size);
+			
+			$write_bytes = min($file_size - $bytes_decrypted, strlen($decrypted_data));
+			if ($is_last_block) {
+				$is_padding = false;
+				$last_byte = ord(substr($decrypted_data, -1, 1));
+				if ($last_byte < 16) {
+					$is_padding = true;
+					for ($j = 1 ; $j<=$last_byte; $j++) {
+						if (substr($decrypted_data, -$j, 1) != chr($last_byte)) $is_padding = false;
+					}
+				}
+				if ($is_padding) {
+					$write_bytes -= $last_byte;
+				}
+			}
+			
+			if (false === fwrite($decrypted_handle, $decrypted_data, $write_bytes)) return false;
+			$bytes_decrypted += $buffer_size;
+		}
+		 
+		//close the main file handle
+		fclose($decrypted_handle);
+		//close original file
+		fclose($file_handle);
+		
+		//remove the crypt extension from the end as this causes issues when opening
+		$fullpath_new = preg_replace('/\.crypt$/', '', $fullpath, 1);
+		// //need to replace original file with tmp file
+		
+		$fullpath_basename = basename($fullpath_new);
+		
+		if ($to_temporary_file) {
+			return array(
+				'fullpath' 	=> $decrypted_path,
+				'basename' => $fullpath_basename
+			);
+		}
+		
+		if (false === rename($decrypted_path, $fullpath_new)) return false;
+
+		//need to send back the new decrypted path
+		$decrypt_return = array(
+			'fullpath' 	=> $fullpath_new,
+			'basename' => $fullpath_basename
+		);
+
+		return $decrypt_return;
 	}
 
 	public function detect_safe_mode() {
@@ -2133,6 +2228,10 @@ class UpdraftPlus {
 			if ('' == $serv || 'none' == $serv) continue;
 			include_once(UPDRAFTPLUS_DIR.'/methods/'.$serv.'.php');
 			$cclass = 'UpdraftPlus_BackupModule_'.$serv;
+			if (!class_exists($cclass)) {
+				error_log("UpdraftPlus: backup class does not exist: $cclass");
+				continue;
+			}
 			$obj = new $cclass;
 
 			if (method_exists($cclass, 'get_credentials')) {
@@ -2338,6 +2437,10 @@ class UpdraftPlus {
 			foreach ($this->backup_methods as $method => $method_description) {
 				require_once(UPDRAFTPLUS_DIR.'/methods/'.$method.'.php');
 				$objname = 'UpdraftPlus_BackupModule_'.$method;
+				if (!class_exists($objname)) {
+					error_log("UpdraftPlus: backup class does not exist: $objname");
+					continue;
+				}
 				$obj = new $objname;
 				if (!method_exists($obj, 'listfiles')) continue;
 				$files = $obj->listfiles('backup_');
@@ -2693,7 +2796,7 @@ class UpdraftPlus {
 				foreach ($err->get_error_messages() as $msg) {
 					echo '<li>'.htmlspecialchars($msg).'<li>';
 				}
-			} elseif (is_array($err) && 'error' == $err['level']) {
+			} elseif (is_array($err) && ('error' == $err['level'] || 'warning' == $err['level'])) {
 				echo  "<li>".htmlspecialchars($err['message'])."</li>";
 			} elseif (is_string($err)) {
 				echo  "<li>".htmlspecialchars($err)."</li>";
@@ -3433,6 +3536,12 @@ class UpdraftPlus {
 		return $updraft_dir;
 	}
 
+	/**
+	 * This function creates the correct header when download files
+	 * @param  string $fullpath   This is the full path to the encrypted file
+	 * @param  string $encryption This is the key (salting) used to decrypt the file
+	 * @return heder              This will download the fila when via the browser
+	 */
 	private function spool_crypted_file($fullpath, $encryption) {
 		if ('' == $encryption) $encryption = UpdraftPlus_Options::get_updraft_option('updraft_encryptionphrase');
 		if ('' == $encryption) {
@@ -3440,12 +3549,20 @@ class UpdraftPlus {
 			_e("Decryption failed. The database file is encrypted, but you have no encryption key entered.", 'updraftplus');
 			$this->log('Decryption of database failed: the database file is encrypted, but you have no encryption key entered.', 'error');
 		} else {
-			$ciphertext = $this->decrypt($fullpath, $encryption);
-			if ($ciphertext) {
+
+
+			//now decrypt the file and return array
+			$decrypted_file = $this->decrypt($fullpath, $encryption, true);
+
+			//check to ensure there is a response back
+			if (is_array($decrypted_file)) {
 				header('Content-type: application/x-gzip');
-				header("Content-Disposition: attachment; filename=\"".substr(basename($fullpath), 0, -6)."\";");
-				header("Content-Length: ".strlen($ciphertext));
-				print $ciphertext;
+				header("Content-Disposition: attachment; filename=\"".$decrypted_file['basename']."\";");
+				header("Content-Length: ".filesize($decrypted_file['fullpath']));
+				readfile($decrypted_file['fullpath']);
+
+				//need to remove the file as this is no longer needed on the local server
+				unlink($decrypted_file['fullpath']);
 			} else {
 				header('Content-type: text/plain');
 				echo __("Decryption failed. The most likely cause is that you used the wrong key.", 'updraftplus')." ".__('The decryption key used:', 'updraftplus').' '.$encryption;
@@ -3713,19 +3830,16 @@ class UpdraftPlus {
 				return array($mess, $warn, $err, $info);
 			}
 
-			$ciphertext = $this->decrypt($db_file, $encryption);
+			$decrypted_file = $this->decrypt($db_file, $encryption);
 
-			if ($ciphertext) {
-				$new_db_file = $updraft_dir.'/'.basename($db_file, '.crypt');
-				if (!file_put_contents($new_db_file, $ciphertext)) {
-					$err[] = __('Failed to write out the decrypted database to the filesystem.','updraftplus');
-					return array($mess, $warn, $err, $info);
-				}
-				$db_file = $new_db_file;
+			if (is_array($decrypted_file)) {
+				$db_file = $decrypted_file['fullpath'];
 			} else {
 				$err[] = __('Decryption failed. The most likely cause is that you used the wrong key.','updraftplus');
 				return array($mess, $warn, $err, $info);
 			}
+
+
 		}
 
 		# Even the empty schema when gzipped comes to 1565 bytes; a blank WP 3.6 install at 5158. But we go low, in case someone wants to share single tables.
@@ -3926,6 +4040,10 @@ CREATE TABLE $wpdb->signups (
 			}
 		}
 
+		// //need to make sure that we reset the file back to .crypt before clean temp files
+		// $db_file = $decrypted_file['fullpath'].'.crypt';
+		// unlink($decrypted_file['fullpath']);
+		
 		return array($mess, $warn, $err, $info);
 
 	}

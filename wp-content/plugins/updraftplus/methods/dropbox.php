@@ -155,7 +155,10 @@ class UpdraftPlus_BackupModule_dropbox {
 					} else {
 						$total_quota = max($body->allocation->allocated, 1);
 						$used = $body->used;
-						$available_quota =$total_quota - $used;
+						/* check here to see if the account is a team account and if so use the other used value
+						This will give us their total usage including their individual account and team account */
+						if (isset($body->allocation->used)) $used = $body->allocation->used;
+						$available_quota = $total_quota - $used;
 						$message = "Dropbox quota usage: used=".round($used/1048576,1)." MB, total=".round($total_quota/1048576,1)." MB, available=".round($available_quota/1048576,1)." MB";
 					}
 				}
@@ -641,6 +644,9 @@ class UpdraftPlus_BackupModule_dropbox {
 					} else {
 						$total_quota = max($body->allocation->allocated, 1);
 						$used = $body->used;
+						/* check here to see if the account is a team account and if so use the other used value
+						This will give us their total usage including their individual account and team account */
+						if (isset($body->allocation->used)) $used = $body->allocation->used;
 						$available_quota =$total_quota - $used;
 						$used_perc = round($used*100/$total_quota, 1);
 						$message .= ' <br>'.sprintf(__('Your %s quota usage: %s %% used, %s available','updraftplus'), 'Dropbox', $used_perc, round($available_quota/1048576, 1).' MB');

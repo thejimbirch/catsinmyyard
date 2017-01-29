@@ -3,7 +3,7 @@
   Plugin Name: Contact Form 7 MailChimp Extension
   Plugin URI: http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension
 
-  Copyright 2013-2015 Renzo Johnson (email: renzojohnson at gmail.com)
+  Copyright 2013-2017 Renzo Johnson (email: renzojohnson at gmail.com)
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,9 +21,16 @@
 */
 
 
+.mce-main-fields .description {
+  display: block;
+  color: #777;
+  padding-left: 0.7em;
+}
+
+
 a.helping-field {
-  font-size: 13px;
-  line-height: 1.2em;
+  // font-size: smaller;
+  // line-height: 1.2em;
   font-weight: bold;
   padding-left: 4px;
   padding-right: 20px;
@@ -125,7 +132,7 @@ li#MailChimp-Extension-tab {
   background: rgba(255, 255, 255, 0.5) url('../images/postal-marks.png') center top no-repeat;
 }
 
-div#MailChimp-Extension .metabox-holder {
+div#MailChimp-Extension {
   background: url('../images/postmark-mailchimp.png') right top no-repeat;
 }
 
@@ -133,10 +140,11 @@ div#MailChimp-Extension .metabox-holder {
   max-width: 100%;
 }
 
-.description.s-small {
-  font-size: 12px;
-  line-height: 1.25em;
-  margin-top: 0;
+.description p {
+  font-size: 12px !important;
+  line-height: 1.25em !important;
+  margin-top: 0 !important;
+  font-style: italic !important;
 }
 
 .p-hr {
@@ -235,4 +243,10 @@ span.invalid {
   line-height: 1.48em;
   font-weight: bold;
   color: #454545;
+}
+
+.mc-code {
+  font-size: 12px;
+  color: #888;
+  // font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
 }

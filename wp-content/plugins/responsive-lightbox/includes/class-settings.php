@@ -1003,7 +1003,7 @@ class Responsive_Lightbox_Settings {
 					<h3 class="hndle">' . __( 'Responsive Lightbox', 'responsive-lightbox' ) . ' ' . Responsive_Lightbox()->defaults['version'] . '</h3>
 					<div class="inside">
 						<h4 class="inner">' . __( 'Need support?', 'responsive-lightbox' ) . '</h4>
-						<p class="inner">' . __( 'If you are having problems with this plugin, please talk about them in the', 'responsive-lightbox' ) . ' <a href="http://www.dfactory.eu/support/?utm_source=responsive-lightbox-settings&utm_medium=link&utm_campaign=support" target="_blank" title="' . __( 'Support forum', 'responsive-lightbox' ) . '">' . __( 'Support forum', 'responsive-lightbox' ) . '</a></p>
+						<p class="inner">' . sprintf( __( 'If you are having problems with this plugin, please browse it\'s <a href="%s" target="_blank">Documentation</a> or talk about them in the <a href="%s" target="_blank">Support forum</a>', 'responsive-lightbox' ), 'https://www.dfactory.eu/docs/responsive-lightbox/?utm_source=responsive-lightbox-settings&utm_medium=link&utm_campaign=docs', 'https://www.dfactory.eu/support/?utm_source=responsive-lightbox-settings&utm_medium=link&utm_campaign=support' ) . '</p>
 						<hr />
 						<h4 class="inner">' . __( 'Do you like this plugin?', 'responsive-lightbox' ) . '</h4>
 						<p class="inner"><a href="http://wordpress.org/support/view/plugin-reviews/responsive-lightbox" target="_blank" title="' . __( 'Rate it 5', 'responsive-lightbox' ) . '">' . __( 'Rate it 5', 'responsive-lightbox' ) . '</a> ' . __( 'on WordPress.org', 'responsive-lightbox' ) . '<br />' .

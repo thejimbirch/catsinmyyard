@@ -3,13 +3,13 @@
 Plugin Name: Contact Form 7: Accessible Defaults
 Plugin URI: http://www.joedolson.com/
 Description: Sets up an accessible default form when using Contact Form 7. 
-Version: 1.1.3
+Version: 1.1.4
 Author: Joseph Dolson
 Author URI: http://www.joedolson.com/
 Text Domain: contact-form-7-accessible-defaults
 Domain Path: /lang/
 */
-/*  Copyright 2015-2016  Joseph C Dolson  (email : plugins@joedolson.com)
+/*  Copyright 2015-2017  Joseph C Dolson  (email : plugins@joedolson.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,6 +68,7 @@ function cf7adf_template( $template, $prop ) {
 					. '    [text postal id:postal]</p>' . "\n\n"
 					. '<p><label for="country">' . __( 'Country', 'contact-form-7-accessible-defaults' )  . '</label><br />' . "\n"
 					. '    [text country id:country]</p>' . "\n\n"
+					. '<p>[checkbox mailing use_label_element "Add me to your mailing list!"]</p>' . "\n\n"					
 					. '</fieldset>' . "\n\n"					
 					. '<p><label for="your-message">' . __( 'Your Message', 'contact-form-7-accessible-defaults' ) . '</label><br />' . "\n"
 					. '    [textarea your-message id:your-message] </p>' . "\n\n";
@@ -152,7 +153,8 @@ function cf7adf_template( $template, $prop ) {
 									. "\n" . '[city]'
 									. "\n" . '[state]'		
 									. "\n" . '[postal]' 
-									. "\n" . '[country]' . "\n\n"	
+									. "\n" . '[country]' . "\n"	
+									. "\n" . '[mailing]' . "\n\n"
 						. __( 'Message Body:', 'contact-form-7-accessible-defaults' )
 								. "\n" . '[your-message]' . "\n\n"
 						. '--' . "\n"

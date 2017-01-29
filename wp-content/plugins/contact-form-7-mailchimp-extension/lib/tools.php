@@ -1,5 +1,5 @@
 <?php
-/*  Copyright 2013-2015 Renzo Johnson (email: renzojohnson at gmail.com)
+/*  Copyright 2013-2017 Renzo Johnson (email: renzojohnson at gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ function mce_author() {
 
 	$author_pre = 'Contact form 7 Mailchimp extension by ';
 	$author_name = 'Renzo Johnson';
-	$author_url = 'http://renzojohnson.com';
+	$author_url = '//renzojohnson.com';
 	$author_title = 'Renzo Johnson - Web Developer';
 
 	$mce_author = '<p style="display: none !important">';
@@ -88,8 +88,8 @@ if ( !is_admin() ) {
         add_filter( 'wpcf7_form_tag', 'mce_getRefererPage' );
 }
 
-define( 'MCE_URL', 'http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension' );
-define( 'MCE_AUTH', 'http://renzojohnson.com' );
+define( 'MCE_URL', '//renzojohnson.com/contributions/contact-form-7-mailchimp-extension' );
+define( 'MCE_AUTH', '//renzojohnson.com' );
 define( 'MCE_AUTH_COMM', '<!-- campaignmonitor extension by Renzo Johnson -->' );
 define( 'SPARTAN_MCE_NAME', 'Campaign Monitor Extension' );
 

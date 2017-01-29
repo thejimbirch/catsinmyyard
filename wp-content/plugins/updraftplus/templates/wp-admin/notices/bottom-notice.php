@@ -31,6 +31,8 @@
 						_e('Sign up', 'updraftplus');
 					} elseif ($button_meta == 'go_there') {
 						_e('Go there', 'updraftplus');
+					} else {
+						_e('Read more', 'updraftplus');
 					}
 				?></a>
 			<?php } ?>

@@ -14,6 +14,11 @@ Simple way to integrate MailChimp mailing lists to Contact Form 7. Save your sub
 
 Integrate Contact Form 7 with [MailChimp](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension). Automatically add form submissions to predetermined lists in MailChimp, using its latest API. This MailChimp Extension supports multiple mailing lists and API Keys.
 
+> <strong>Mailchimp Extension Support</strong><br>
+> Active support is not always provided for the <a href="http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension" rel="friend">Contact Form 7 MailChimp Extension</a> on the WordPress.org forums. One-on-one email support is available to people who email the <a href="http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension" rel="friend">Mailchimp Extension developer</a>.
+>
+> <strong>Bug Reports</strong><br>
+> Bug reports for the Contact Form 7 MailChimp Extension are welcome in the <a href="http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension" rel="friend">Wordpress developers</a> website.
 
 = Key Features =
 
@@ -28,8 +33,8 @@ Integrate Contact Form 7 with [MailChimp](http://renzojohnson.com/contributions/
 
 = Please note*** =
 
-* Support for groups - coming soon (Feb 2017)
-* Support for segments - coming soon (Feb 2017)
+* Support for groups - coming soon
+* Support for segments - coming soon
 
 = Requirements =
 
@@ -77,6 +82,10 @@ Do you have questions or issues with Contact Form 7 MailChimp Extension? Use the
 == Changelog ==
 
 For more information, see [Releases](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension).
+
+= 0.4.37 =
+
+* Added [mail-tag] list to help users
 
 = 0.4.36 =
 

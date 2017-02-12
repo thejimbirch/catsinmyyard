@@ -1,10 +1,10 @@
 === Responsive Lightbox by dFactory ===
 Contributors: dfactory
 Donate link: http://www.dfactory.eu/
-Tags: gallery, images, lightbox, photos, theme, photo, image, picture, slideshow, modal, overlay, video, videos
+Tags: gallery, images, lightbox, photos, theme, photo, image, picture, slideshow, modal, overlay, video
 Requires at least: 4.0
-Tested up to: 4.7.1
-Stable tag: 1.6.11
+Tested up to: 4.7.2
+Stable tag: 1.6.12
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -61,6 +61,9 @@ No questions yet.
 2. screenshot-2.jpg
 
 == Changelog ==
+
+= 1.6.12 =
+* Fix: WooCommerce single product image lightbox
 
 = 1.6.11 =
 * Tweak: Added plugin documentation link
@@ -287,6 +290,5 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.6.11 =
-* Tweak: Added plugin documentation link
-* Tweak: Nivo lightbox update to 1.3.1
+= 1.6.12 =
+* Fix: WooCommerce single product image lightbox

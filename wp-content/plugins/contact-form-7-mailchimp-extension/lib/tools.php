@@ -94,4 +94,45 @@ define( 'MCE_AUTH_COMM', '<!-- campaignmonitor extension by Renzo Johnson -->' )
 define( 'SPARTAN_MCE_NAME', 'Campaign Monitor Extension' );
 
 
+function mc_get_latest_item(){
+    $args = array(
+            'post_type'         => 'wpcf7_contact_form',
+            'posts_per_page'    => -1,
+            'fields'            => 'ids',
+        );
+    // Get Highest Value from CF7Forms
+    $form = max(get_posts($args));
+    $out = '';
+    if (!empty($form)) {
+        $out .= $form;
+    }
+    return $out;
+}
+
+
+function wpcf7_form_mce_tags() {
+  $manager = WPCF7_FormTagsManager::get_instance();
+  $form_tags = $manager->get_scanned_tags();
+  return $form_tags;
+}
+
+
+function mce_mail_tags() {
+
+  $listatags = wpcf7_form_mce_tags();
+  $tag_submit = array_pop($listatags);
+  $tagInfo = '';
+
+    foreach($listatags as $tag){
+
+      $tagInfo .= '<span class="mailtag code used">[' . $tag['name'].']</span>';
+
+    }
+
+  return $tagInfo;
+
+}
+
+
+
 

@@ -21,14 +21,14 @@ function mce_error() {
 
   if( !file_exists(WP_PLUGIN_DIR.'/contact-form-7/wp-contact-form-7.php') ) {
 
-    $mce_error_out = '<div class="error" id="messages"><p>';
+    $mce_error_out = '<div id="message" class="error is-dismissible"><p>';
     $mce_error_out .= __('The Contact Form 7 plugin must be installed for the <b>MailChimp Extension</b> to work. <b><a href="'.admin_url('plugin-install.php?tab=plugin-information&plugin=contact-form-7&from=plugins&TB_iframe=true&width=600&height=550').'" class="thickbox" title="Contact Form 7">Install Contact Form 7  Now.</a></b>', 'mce_error');
     $mce_error_out .= '</p></div>';
     echo $mce_error_out;
 
   } else if ( !class_exists( 'WPCF7') ) {
 
-    $mce_error_out = '<div class="error" id="messages"><p>';
+    $mce_error_out = '<div id="message" class="error is-dismissible"><p>';
     $mce_error_out .= __('The Contact Form 7 is installed, but <strong>you must activate Contact Form 7</strong> below for the <b>MailChimp Extension</b> to work.','mce_error');
     $mce_error_out .= '</p></div>';
     echo $mce_error_out;
@@ -38,3 +38,12 @@ function mce_error() {
 
 }
 add_action('admin_notices', 'mce_error');
+
+
+function mce_act_redirect( $plugin ) {
+  if( $plugin == SPARTAN_MCE_PLUGIN_BASENAME ) {
+    exit( wp_redirect( admin_url( 'admin.php?page=wpcf7&post='.mc_get_latest_item().'&active-tab=4' ) ) );
+  }
+}
+add_action( 'activated_plugin', 'mce_act_redirect' );
+

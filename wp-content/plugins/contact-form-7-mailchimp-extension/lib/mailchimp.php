@@ -18,7 +18,6 @@
 
 
 require_once( SPARTAN_MCE_PLUGIN_DIR . '/lib/activate.php' );
-// require_once( SPARTAN_MCE_PLUGIN_DIR . '/lib/admin.php' );
 require_once( SPARTAN_MCE_PLUGIN_DIR . '/lib/enqueue.php' );
 require_once( SPARTAN_MCE_PLUGIN_DIR . '/lib/tools.php' );
 require_once( SPARTAN_MCE_PLUGIN_DIR . '/lib/mch-debug-logger.php' );

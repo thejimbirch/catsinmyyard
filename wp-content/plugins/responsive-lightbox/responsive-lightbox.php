@@ -2,7 +2,7 @@
 /*
 Plugin Name: Responsive Lightbox
 Description: Responsive Lightbox allows users to view larger versions of images and galleries in a lightbox (overlay) effect optimized for mobile devices.
-Version: 1.6.11
+Version: 1.6.12
 Author: dFactory
 Author URI: http://www.dfactory.eu/
 Plugin URI: http://www.dfactory.eu/plugins/responsive-lightbox/
@@ -36,7 +36,7 @@ include_once( RESPONSIVE_LIGHTBOX_PATH . 'includes/class-settings.php' );
  * Responsive Lightbox class.
  *
  * @class Responsive_Lightbox
- * @version	1.6.11
+ * @version	1.6.12
  */
 class Responsive_Lightbox {
 
@@ -155,7 +155,7 @@ class Responsive_Lightbox {
 				'gallery_fade_out'			=> 300
 			)
 		),
-		'version'		 => '1.6.11'
+		'version'		 => '1.6.12'
 	);
 	public $options = array();
 	private $notices = array();
@@ -761,6 +761,30 @@ class Responsive_Lightbox {
 	 */
 	private function get_boolean_value( $option ) {
 		return ( $option == true ? 1 : 0 );
+	}
+	
+	/**
+	 * Helper: convert hex color to rgb color.
+	 * 
+	 * @param type $color
+	 * @return array
+	 */
+	public function hex2rgb( $color ) {
+		if ( $color[0] == '#' ) {
+			$color = substr( $color, 1 );
+		}
+		if ( strlen( $color ) == 6 ) {
+			list( $r, $g, $b ) = array( $color[0] . $color[1], $color[2] . $color[3], $color[4] . $color[5] );
+		} elseif ( strlen( $color ) == 3 ) {
+			list( $r, $g, $b ) = array( $color[0] . $color[0], $color[1] . $color[1], $color[2] . $color[2] );
+		} else {
+			return false;
+		}
+		$r = hexdec( $r );
+		$g = hexdec( $g );
+		$b = hexdec( $b );
+
+		return array( $r, $g, $b );
 	}
 
 }

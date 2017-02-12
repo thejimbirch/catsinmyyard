@@ -50,14 +50,16 @@ function wpcf7_mch_add_mailchimp($args) {
 
 
 function resetlogfile_mce() {
+
   if ( isset( $_REQUEST['mce_reset_log'] ) ) {
 
     $mch_debug_logger = new mch_Debug_Logger();
 
     $mch_debug_logger->reset_mch_log_file( 'log.txt' );
     $mch_debug_logger->reset_mch_log_file( 'log-cron-job.txt' );
-    echo '<div id="message" class="updated fade"><p>Debug log files have been reset!</p></div>';
+    echo '<div id="message" class="updated is-dismissible"><p>Debug log files have been reset!</p></div>';
   }
+
 }
 
 
@@ -151,10 +153,10 @@ function wpcf7_mch_subscribe($obj) {
 
   $submission = WPCF7_Submission::get_instance();
 
-  $logfileEnabled = $cf7_mch['logfileEnabled'];
-  $logfileEnabled = ( is_null( $logfileEnabled ) ) ? false : $logfileEnabled;
+  // $logfileEnabled = $cf7_mch['logfileEnabled'];
+  // $logfileEnabled = ( is_null( $logfileEnabled ) ) ? false : $logfileEnabled;
 
-  // $logfileEnabled = isset($cf7_mch['logfileEnabled']) && !is_null($cf7_mch['logfileEnabled']) ? $cf7_mch['logfileEnabled'] : false;
+  $logfileEnabled = isset($cf7_mch['logfileEnabled']) && !is_null($cf7_mch['logfileEnabled']) ? $cf7_mch['logfileEnabled'] : false;
 
 
   if( $cf7_mch ) {

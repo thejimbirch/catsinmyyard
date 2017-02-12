@@ -157,7 +157,6 @@ article header h1 a {
 }
 
 /* Header */
-
 .navbar > .container .navbar-brand {
     margin-left: 0;
 }
@@ -337,7 +336,12 @@ article header h1 a {
     float: right;
 }
 
-.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus {
+.pagination > .active > a,
+.pagination > .active > span,
+.pagination > .active > a:hover,
+.pagination > .active > span:hover,
+.pagination > .active > a:focus,
+.pagination > .active > span:focus {
     background-color: #e400f0;
     border-color: #e400f0;
 }
@@ -435,4 +439,23 @@ footer .col-sm-12 {
 
 .instagram-pics li:last-child {
     margin-bottom: 20px;
+}
+
+/* Responsive Video */
+.embed-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.embed-container iframe,
+.embed-container object,
+.embed-container embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }

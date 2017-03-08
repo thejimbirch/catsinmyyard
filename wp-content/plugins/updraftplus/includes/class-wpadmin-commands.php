@@ -285,8 +285,8 @@ class UpdraftPlus_WPAdmin_Commands extends UpdraftPlus_Commands {
 	}
 	
 	public function check_overdue_crons() {
-		$how_many_overdue = $this->_updraftplus_admin()->howmany_overdue_crons();
-		return ($how_many_overdue >= 4)  ? array('m' => $this->show_admin_warning_overdue_crons($how_many_overdue)) : array();
+		$how_many_overdue = $this->_updraftplus_admin->howmany_overdue_crons();
+		return ($how_many_overdue >= 4)  ? array('m' => $this->_updraftplus_admin->show_admin_warning_overdue_crons($how_many_overdue)) : array();
 	}
 	
 	public function whichdownloadsneeded($params) {

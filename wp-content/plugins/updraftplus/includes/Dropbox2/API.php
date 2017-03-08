@@ -170,7 +170,7 @@ class UpdraftPlus_Dropbox_API {
                 /*
                     Set firstCommit to true so that the upload session start endpoint is called.
                  */
-                $firstCommit = true;
+                $firstCommit = (0 == $offset);
                 
                 // Read from the file handle until EOF, uploading each chunk
                 while ($data = fread($handle, $this->chunkSize)) {
@@ -179,11 +179,22 @@ class UpdraftPlus_Dropbox_API {
                     $this->OAuth->setInFile($data);
 
                     if ($firstCommit) {
-                        $params = array('close' => false, 'api_v2' => true, 'content_upload' => true);
+                        $params = array(
+							'close' => false,
+							'api_v2' => true,
+							'content_upload' => true
+						);
                         $response = $this->fetch('POST', self::CONTENT_URL_V2, 'files/upload_session/start', $params);
                         $firstCommit = false;
                     } else {
-                        $params = array('cursor' => array('session_id' => $uploadID, 'offset' => $offset), 'api_v2' => true, 'content_upload' => true);
+                        $params = array(
+							'cursor' => array(
+								'session_id' => $uploadID,
+								'offset' => $offset
+							),
+							'api_v2' => true,
+							'content_upload' => true
+						);
                         $response = $this->append_upload($params, false);
                     }
                     
@@ -206,7 +217,18 @@ class UpdraftPlus_Dropbox_API {
                 
                 // Complete the chunked upload
                 $filename = (is_string($filename)) ? $filename : basename($file);
-                $params = array('cursor' => array('session_id' => $uploadID, 'offset' => $offset), 'commit' => array('path' => '/' . $this->encodePath($path . $filename), 'mode' => 'add'), 'api_v2' => true, 'content_upload' => true);
+                $params = array(
+					'cursor' => array(
+						'session_id' => $uploadID,
+						'offset' => $offset
+					),
+					'commit' => array(
+						'path' => '/' . $this->encodePath($path . $filename),
+						'mode' => 'add'
+					),
+					'api_v2' => true,
+					'content_upload' => true
+				);
                 $response = $this->append_upload($params, true);
                 return $response;
             } else {
@@ -362,11 +384,12 @@ class UpdraftPlus_Dropbox_API {
     /**
      * Returns metadata for all files and folders that match the search query
      * @param mixed $query The search string. Must be at least 3 characters long
-     * @param string $path The path to the folder you want to search in
-     * @param integer $limit Maximum number of results to return (1-1000)
+     * @param string [$path=''] The path to the folder you want to search in
+     * @param integer [$limit=1000] Maximum number of results to return (1-1000)
+     * @param integer [$start=0] Result number to start from
      * @return array
      */
-    public function search($query, $path = '', $limit = 1000) {
+    public function search($query, $path = '', $limit = 1000, $start = 0) {
         $call = '2/files/search';
         $path = $this->encodePath($path);
         // APIv2 requires that the path match this regex: String(pattern="(/(.|[\r\n])*)?|(ns:[0-9]+(/.*)?)")
@@ -374,6 +397,7 @@ class UpdraftPlus_Dropbox_API {
         $params = array(
             'path' => $path,
             'query' => $query,
+            'start' => $start,
             'max_results' => ($limit < 1) ? 1 : (($limit > 1000) ? 1000 : (int) $limit),
             'api_v2' => true,
         );

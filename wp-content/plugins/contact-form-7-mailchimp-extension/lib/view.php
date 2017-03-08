@@ -152,19 +152,36 @@ function vc_utm() {
 
 
 
-    <p class="p-author"><a type="button" aria-expanded="false" class="mce-trigger a-support ">Show advanced settings</a> &nbsp; <a class="cme-triggerxxx a-support ">Get System Information</a></p>
+    <p class="p-author"><a type="button" aria-expanded="false" class="mce-trigger a-support ">Show advanced settings</a> &nbsp; <a class="cme-trigger-sys a-support ">Get System Information</a></p>
 
   <script>
-  jQuery(".cme-triggerxxx").click(function() {
-    jQuery( "#togglex" ).slideToggle(250);
-  });
+    jQuery(".cme-trigger-sys").click(function() {
+
+      jQuery( "#toggle-sys" ).slideToggle(250);
+
+    });
+
+    function toggleDiv() {
+
+      setTimeout(function () {
+          jQuery(".mce-cta").slideToggle(450);
+      }, 9000);
+
+    }
+    toggleDiv();
+
   </script>
     <?php include SPARTAN_MCE_PLUGIN_DIR . '/lib/system.php'; ?>
     <!-- <hr class="p-hr"> -->
 
-    <div class="dev-cta">
-      <p><span alt="f488" class="dashicons dashicons-megaphone red-icon"> </span> Hello. My name is Renzo Johnson, I <span alt="f487" class="dashicons dashicons-heart red-icon"> </span> WordPress and I develop this tiny FREE plugin to help users like you. I drink copious amounts of coffee to keep me running longer <span alt="f487" class="dashicons dashicons-smiley red-icon"> </span>. If you've found this plugin useful, please consider making a donation.</p>
-      <p>Would you like to <a class="button-primary" href="//www.paypal.me/renzojohnson" target="_blank">buy me a coffee?</a></p>
+    <div class="dev-cta mce-cta welcome-panel" style="display: none;">
+
+    <div class="welcome-panel-content">
+
+      <p class="about-description">Hello. My name is Renzo, I <span alt="f487" class="dashicons dashicons-heart red-icon"> </span> WordPress and I develop this tiny FREE plugin to help users like you. I drink copious amounts of coffee to keep me running longer <span alt="f487" class="dashicons dashicons-smiley red-icon"> </span>. If you've found this plugin useful, please consider making a donation.</p><br>
+      <p class="about-description">Would you like to <a class="button-primary" href="//www.paypal.me/renzojohnson" target="_blank">buy me a coffee?</a></p>
+
+    </div>
 
     </div>
 

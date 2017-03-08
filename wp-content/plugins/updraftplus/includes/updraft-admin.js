@@ -119,7 +119,7 @@ function updraft_remote_storage_tab_activation(the_method){
  */
 function updraft_check_overduecrons() {
 	updraft_send_command('check_overdue_crons', function(data, response) {
-		if (response.hasOwnProperty('m')) {
+		if (response && response.hasOwnProperty('m')) {
 			jQuery('#updraft-insert-admin-warning').html(response.m);
 		}
 	}, { alert_on_error: false });
@@ -262,6 +262,26 @@ function backupnow_whichfiles_checked(onlythesefileentities){
 	});
 // 	console.log(onlythesefileentities);
 	return onlythesefileentities;
+}
+
+/**
+ * a method to get all the selected table values from the backup now modal
+ * @param  {[String]} onlythesetableentities an empty string to append values to
+ * @return {[String]} a string that contains the values of all selected table entities and the database the belong to
+ */
+function backupnow_whichtables_checked(onlythesetableentities){
+	var send_list = false;
+	jQuery('#backupnow_database_moreoptions input[type="checkbox"]').each(function(index) {
+		if (!jQuery(this).is(':checked')) { send_list = true; return; }
+	});
+
+	onlythesetableentities = jQuery("input[name^='updraft_include_tables_']").serializeArray();
+
+	if (send_list) {
+		return onlythesetableentities;
+	} else {
+		return true;
+	}
 }
 
 function updraft_deleteallselected() {
@@ -417,7 +437,12 @@ var updraft_backupnow_nonce = '';
 var updraft_activejobslist_backupnownonce_only = 0;
 var updraft_inpage_hasbegun = 0;
 
-function updraft_backupnow_inpage_go(success_callback, onlythisfileentity, extradata) {
+function updraft_backupnow_inpage_go(success_callback, onlythisfileentity, extradata, backupnow_nodb, backupnow_nofiles, backupnow_nocloud) {
+	
+	backupnow_nodb = ('undefined' === typeof backupnow_nodb) ? 0 : backupnow_nodb;
+	backupnow_nofiles = ('undefined' === typeof backupnow_nofiles) ? 0 : backupnow_nofiles;
+	backupnow_nocloud = ('undefined' === typeof backupnow_nocloud) ? 0 : backupnow_nocloud;
+	
 	// N.B. This function should never be called on the UpdraftPlus settings page - it is assumed we are elsewhere. So, it is safe to fake the console-focussing parameter.
 	updraft_console_focussed_tab = 1;
 	updraft_inpage_success_callback = success_callback;
@@ -433,7 +458,7 @@ function updraft_backupnow_inpage_go(success_callback, onlythisfileentity, extra
 	jQuery('#updraft_inpage_backup').show();
 	updraft_activejobslist_backupnownonce_only = 1;
 	updraft_inpage_hasbegun = 0;
-	updraft_backupnow_go(0, 0, 0, onlythisfileentity, extradata, updraftlion.automaticbackupbeforeupdate);
+	updraft_backupnow_go(backupnow_nodb, backupnow_nofiles, backupnow_nocloud, onlythisfileentity, extradata, updraftlion.automaticbackupbeforeupdate, '');
 }
 
 function updraft_activejobs_update(force) {
@@ -812,8 +837,10 @@ function updraft_check_same_times() {
 }
 
 // Visit the site in the background every 3.5 minutes - ensures that backups can progress if you've got the UD settings page open
-setInterval(function() {jQuery.get(updraft_siteurl+'/wp-cron.php');}, 210000);
-
+if ('undefined' !== typeof updraft_siteurl) {
+	setInterval(function() {jQuery.get(updraft_siteurl+'/wp-cron.php');}, 210000);
+}
+	
 function updraft_activejobs_delete(jobid) {
 	updraft_send_command('activejobs_delete', jobid, function(resp) {
 		if (resp.ok == 'Y') {
@@ -1089,7 +1116,17 @@ function updraft_downloader_status_update(base, backup_timestamp, what, findex, 
 	return cancel_repeat;
 }
 
-function updraft_backupnow_go(backupnow_nodb, backupnow_nofiles, backupnow_nocloud, onlythesefileentities, extradata, label) {
+/**
+ * function that sets up a ajax call to start a backup
+ * @param  {[Bool]} backupnow_nodb         a boolean value to check if the database should be backed up
+ * @param  {[Bool]} backupnow_nofiles      a boolean value to check if any files should be backed up
+ * @param  {[Bool]} backupnow_nocloud      a boolean value to check if the backup should be uploaded to cloud storage
+ * @param  {[String]} onlythesefileentities  a csv list of file entities to be backed up
+ * @param  {[String]} onlythesetableentities a csv list of table entities to be backed up
+ * @param  {[Array]} extradata              any extra data to be added
+ * @param  {[String]} label                  a optional label to be added to a backup
+ */
+function updraft_backupnow_go(backupnow_nodb, backupnow_nofiles, backupnow_nocloud, onlythesefileentities, extradata, label, onlythesetableentities) {
 
 	jQuery('#updraft_backup_started').html('<em>'+updraftlion.requeststart+'</em>').slideDown('');
 	setTimeout(function() {jQuery('#updraft_backup_started').fadeOut('slow');}, 75000);
@@ -1104,6 +1141,10 @@ function updraft_backupnow_go(backupnow_nodb, backupnow_nofiles, backupnow_noclo
 	
 	if ('' != onlythesefileentities) {
 		params.onlythisfileentity = onlythesefileentities;
+	}
+
+	if ('' != onlythesetableentities) {
+		params.onlythesetableentities = onlythesetableentities;
 	}
 	
 	updraft_send_command('backupnow', params, function(resp) {
@@ -1229,6 +1270,11 @@ console.log(response);
 	$('#backupnow_includefiles_showmoreoptions').click(function(e) {
 		e.preventDefault();
 		$('#backupnow_includefiles_moreoptions').toggle();
+	});
+
+	$('#backupnow_database_showmoreoptions').click(function(e) {
+		e.preventDefault();
+		$('#backupnow_database_moreoptions').toggle();
 	});
 	
 	$('#updraft-navtab-backups-content a.updraft_diskspaceused_update').click(function(e) {
@@ -1620,6 +1666,18 @@ console.log(response);
 		var backupnow_nofiles = jQuery('#backupnow_includefiles').is(':checked') ? 0 : 1;
 		var backupnow_nocloud = jQuery('#backupnow_includecloud').is(':checked') ? 0 : 1;
 		
+		var onlythesetableentities = backupnow_whichtables_checked('');
+
+		if ('' == onlythesetableentities && 0 == backupnow_nodb) {
+			alert(updraftlion.notableschosen);
+			jQuery('#backupnow_includefiles_moreoptions').show();
+			return;
+		}
+
+		if (typeof onlythesetableentities === 'boolean') {
+			onlythesetableentities = null;
+		}
+
 		var onlythesefileentities = backupnow_whichfiles_checked('');
 
 		if ('' == onlythesefileentities && 0 == backupnow_nofiles) {
@@ -1641,7 +1699,7 @@ console.log(response);
 			});
 		}, 1700);
 		
-		updraft_backupnow_go(backupnow_nodb, backupnow_nofiles, backupnow_nocloud, onlythesefileentities, '', jQuery('#backupnow_label').val());
+		updraft_backupnow_go(backupnow_nodb, backupnow_nofiles, backupnow_nocloud, onlythesefileentities, '', jQuery('#backupnow_label').val(), onlythesetableentities);
 	};
 	backupnow_modal_buttons[updraftlion.cancel] = function() { jQuery(this).dialog("close"); };
 	
@@ -1875,7 +1933,30 @@ console.log(response);
 		});
 
 		uploader.bind('Error', function(up, error) {
-			alert(updraftlion.uploaderr+' (code '+error.code+') : '+error.message+' '+updraftlion.makesure);
+
+			console.log(error);
+			
+			var err_makesure;
+			if(error.code == "-200"){
+				err_makesure = '\n'+updraftlion.makesure2;
+			} else {
+				err_makesure = updraftlion.makesure;
+			}
+			
+			var msg = updraftlion.uploaderr+' (code '+error.code+') : '+error.message;
+			
+			if (error.hasOwnProperty('status') && error.status) {
+				msg += ' ('+updraftlion.http_code+' '+error.status+')';
+			}
+			
+			if (error.hasOwnProperty('response')) {
+				console.log('UpdraftPlus: plupload error: '+error.response);
+				if (error.response.length < 100) msg += ' '+updraftlion.error+' '+error.response+'\n';
+			}
+			
+			msg += ' '+err_makesure;
+			
+			alert(msg);
 		});
 
 		// a file was uploaded 
@@ -2213,7 +2294,12 @@ jQuery(document).ready(function($){
 		});
 		
 		uploader.bind('Error', function(up, error) {
-			alert(updraftlion.uploaderr+' (code '+error.code+") : "+error.message+" "+updraftlion.makesure);
+			if(error.code == "-200"){
+				err_makesure = '\n'+updraftlion.makesure2;
+			} else {
+				err_makesure = updraftlion.makesure;
+			}
+			alert(updraftlion.uploaderr+' (code '+error.code+") : "+error.message+" "+err_makesure);
 		});
 		
 		// a file was uploaded 

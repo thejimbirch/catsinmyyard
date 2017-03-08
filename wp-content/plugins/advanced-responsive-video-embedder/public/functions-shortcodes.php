@@ -7,7 +7,7 @@ function arve_shortcode_arve( $input_atts, $content = null, $arve_shortcode = tr
   $properties = arve_get_host_properties();
   $input_atts = (array) $input_atts;
 
-  $pairs = apply_filters( 'arve_shortcode_pairs', array(
+  $pairs = array(
     'align'         => $options['align'],
     'arve_link'     => arve_bool_to_shortcode_string( $options['promote_link'] ),
     'aspect_ratio'  => null,
@@ -39,7 +39,7 @@ function arve_shortcode_arve( $input_atts, $content = null, $arve_shortcode = tr
     'provider' => null,
     # deprecated, title should be used
     'link_text' => null,
-  ) );
+  );
 
   for ( $n = 1; $n <= ARVE_NUM_TRACKS; $n++ ) {
 
@@ -58,7 +58,7 @@ function arve_shortcode_arve( $input_atts, $content = null, $arve_shortcode = tr
     }
   }
 
-  $atts = shortcode_atts( $pairs, $input_atts, 'arve' );
+  $atts = shortcode_atts( apply_filters( 'arve_shortcode_pairs', $pairs ), $input_atts, 'arve' );
 
   $html['debug_info'] = arve_get_debug_info( $atts, $input_atts );
 
@@ -171,13 +171,10 @@ function arve_shortcode_arve_supported_list() {
   unset( $providers['dailymotionlist'] );
   unset( $providers['iframe'] );
 
-  $lis = '';
+  $list = '';
+  $list .= '*   ' . $values['name'];
 
-  foreach ( $providers as $key => $values ) {
-    $lis .= sprintf( '<li>%s</li>', esc_html( $values['name'] ) );
-  }
-
-  return '<ol>'. $lis . '<li><a href="https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/documentation/#general-iframe-embedding">All providers with responsive iframe embed codes</a></li></ol>';
+  return '<textarea style="width=100" rows="33">'. $lis . '</textarea>';
 }
 
 function arve_shortcode_arve_params() {

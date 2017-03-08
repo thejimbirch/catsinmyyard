@@ -1253,6 +1253,9 @@ class UpdraftPlus {
 			# Test it, see if it is compatible with Info-ZIP
 			# If you have another kind of zip, then feel free to tell me about it
 			@mkdir($updraft_dir.'/binziptest/subdir1/subdir2', 0777, true);
+
+			if (!file_exists($updraft_dir.'/binziptest/subdir1/subdir2')) return false;
+			
 			file_put_contents($updraft_dir.'/binziptest/subdir1/subdir2/test.html', '<html><body><a href="https://updraftplus.com">UpdraftPlus is a great backup and restoration plugin for WordPress.</a></body></html>');
 			@unlink($updraft_dir.'/binziptest/test.zip');
 			if (is_file($updraft_dir.'/binziptest/subdir1/subdir2/test.html')) {
@@ -3973,6 +3976,8 @@ class UpdraftPlus {
 						}
 						$old_siteinfo[$key]=$val;
 					}
+				} elseif (preg_match('/^\# Skipped tables: (.*)$/', $buffer, $matches)) {
+					$skipped_tables = explode(',', $matches[1]);
 				}
 
 			} elseif (preg_match('/^\s*create table \`?([^\`\(]*)\`?\s*\(/i', $buffer, $matches)) {
@@ -4021,7 +4026,7 @@ CREATE TABLE $wpdb->site (
 CREATE TABLE $wpdb->sitemeta (
 CREATE TABLE $wpdb->signups (
 */
-
+		if (!isset($skipped_tables)) $skipped_tables = array();
 		$missing_tables = array();
 		if ($old_table_prefix) {
 			if (!$header_only) {
@@ -4030,8 +4035,18 @@ CREATE TABLE $wpdb->signups (
 						$missing_tables[] = $table;
 					}
 				}
+
+				foreach ($missing_tables as $key => $value) {
+					if (in_array($old_table_prefix.$value, $skipped_tables)) {
+						unset($missing_tables[$key]);
+					}
+				}
+
 				if (count($missing_tables)>0) {
 					$warn[] = sprintf(__('This database backup is missing core WordPress tables: %s', 'updraftplus'), implode(', ', $missing_tables));
+				}
+				if (count($skipped_tables)>0) {
+					$warn[] = sprintf(__('This database backup has the following WordPress tables excluded: %s', 'updraftplus'), implode(', ', $skipped_tables));
 				}
 			}
 		} else {
@@ -4122,6 +4137,68 @@ CREATE TABLE $wpdb->signups (
 		return array('updraft_autobackup_default', 'updraft_dropbox', 'updraft_googledrive', 'updraftplus_tmp_googledrive_access_token', 'updraftplus_dismissedautobackup', 'dismissed_general_notices_until', 'dismissed_season_notices_until', 'updraftplus_dismissedexpiry', 'updraftplus_dismisseddashnotice', 'updraft_interval', 'updraft_interval_increments', 'updraft_interval_database', 'updraft_retain', 'updraft_retain_db', 'updraft_encryptionphrase', 'updraft_service', 'updraft_dropbox_appkey', 'updraft_dropbox_secret', 'updraft_googledrive_clientid', 'updraft_googledrive_secret', 'updraft_googledrive_remotepath', 'updraft_ftp', 'updraft_ftp_login', 'updraft_ftp_pass', 'updraft_ftp_remote_path', 'updraft_server_address', 'updraft_dir', 'updraft_email', 'updraft_delete_local', 'updraft_debug_mode', 'updraft_include_plugins', 'updraft_include_themes', 'updraft_include_uploads', 'updraft_include_others', 'updraft_include_wpcore', 'updraft_include_wpcore_exclude', 'updraft_include_more', 'updraft_include_blogs', 'updraft_include_mu-plugins',
 		'updraft_include_others_exclude', 'updraft_include_uploads_exclude', 'updraft_lastmessage', 'updraft_googledrive_token', 'updraft_dropboxtk_request_token', 'updraft_dropboxtk_access_token', 'updraft_dropbox_folder', 'updraft_adminlocking', 'updraft_updraftvault', 'updraft_remotesites', 'updraft_migrator_localkeys', 'updraft_central_localkeys', 'updraft_retain_extrarules', 'updraft_googlecloud', 'updraft_include_more_path', 'updraft_split_every', 'updraft_ssl_nossl', 'updraft_backupdb_nonwp', 'updraft_extradbs', 'updraft_combine_jobs_around',
 		'updraft_last_backup', 'updraft_starttime_files', 'updraft_starttime_db', 'updraft_startday_db', 'updraft_startday_files', 'updraft_sftp_settings', 'updraft_s3', 'updraft_s3generic', 'updraft_dreamhost', 'updraft_s3generic_login', 'updraft_s3generic_pass', 'updraft_s3generic_remote_path', 'updraft_s3generic_endpoint', 'updraft_webdav_settings', 'updraft_openstack', 'updraft_bitcasa', 'updraft_copycom', 'updraft_onedrive', 'updraft_azure', 'updraft_cloudfiles', 'updraft_cloudfiles_user', 'updraft_cloudfiles_apikey', 'updraft_cloudfiles_path', 'updraft_cloudfiles_authurl', 'updraft_ssl_useservercerts', 'updraft_ssl_disableverify', 'updraft_s3_login', 'updraft_s3_pass', 'updraft_s3_remote_path', 'updraft_dreamobjects_login', 'updraft_dreamobjects_pass', 'updraft_dreamobjects_remote_path', 'updraft_dreamobjects', 'updraft_report_warningsonly', 'updraft_report_wholebackup', 'updraft_log_syslog', 'updraft_extradatabases');
+	}
+
+	/**
+	 * A function that works through the array passed to it and gets a list of all the tables from that database and puts the information in an array ready to be parsed and output to html.
+	 * @param  [array]  $dbsinfo an array that contains information about each database, the default 'wp' array is just an empty array, but other entries can be added so that this method can get tables from other databases the array structure for this would be array('wp' => array(), 'TestDB' => array('host' => '', 'user' => '', 'pass' => '', 'name' => '', 'prefix' => ''))
+	 * note that the extra tables array key must match the database name in the array 
+	 * @return [array] returns an array of databases and their table names
+	 */
+	public function get_database_tables($dbsinfo = array('wp' => array())) {
+
+		global $wpdb;
+
+		if (!class_exists('UpdraftPlus_Database_Utility')) require_once(UPDRAFTPLUS_DIR.'/includes/class-database-utility.php');
+
+		$dbhandle = '';
+		$db_tables_array = array();
+
+		foreach ($dbsinfo as $key => $value) {
+			if ('wp' == $key) {
+				# The table prefix after being filtered - i.e. what filters what we'll actually back up
+				$table_prefix = $this->get_table_prefix(true);
+				# The unfiltered table prefix - i.e. the real prefix that things are relative to
+				$table_prefix_raw = $this->get_table_prefix(false);
+				$dbinfo['host'] = DB_HOST;
+				$dbinfo['name'] = DB_NAME;
+				$dbinfo['user'] = DB_USER;
+				$dbinfo['pass'] = DB_PASSWORD;
+				$dbhandle = $wpdb;
+			} else {
+				$dbhandle = new UpdraftPlus_WPDB_OtherDB_Utility($dbsinfo[$key]['user'], $dbsinfo[$key]['pass'], $dbsinfo[$key]['name'], $dbsinfo[$key]['host']);
+				if (!empty($dbhandle->error)) {
+					return $this->log_wp_error($dbhandle->error);
+				}
+				$table_prefix = $dbsinfo[$key]['prefix'];
+				$table_prefix_raw = $dbsinfo[$key]['prefix'];
+			}
+
+			// SHOW FULL - so that we get to know whether it's a BASE TABLE or a VIEW
+			$all_tables = $dbhandle->get_results("SHOW FULL TABLES", ARRAY_N);
+
+			if (empty($all_tables) && !empty($dbhandle->last_error)) {
+				$all_tables = $dbhandle->get_results("SHOW TABLES", ARRAY_N);
+				$all_tables = array_map(create_function('$a', 'return array("name" => $a[0], "type" => "BASE TABLE");'), $all_tables);
+			} else {
+				$all_tables = array_map(create_function('$a', 'return array("name" => $a[0], "type" => $a[1]);'), $all_tables);
+			}
+
+			# If this is not the WP database, then we do not consider it a fatal error if there are no tables
+			if ('wp' == $key && 0 == count($all_tables)) {
+				return $this->log_wp_error("No tables found in wp database.");
+				die;
+			}
+
+			// Put the options table first
+			$updraftplus_database_utility = new UpdraftPlus_Database_Utility($key, $table_prefix_raw, $dbhandle);
+			usort($all_tables, array($updraftplus_database_utility, 'backup_db_sorttables'));
+
+			$all_table_names = array_map(create_function('$a', 'return $a["name"];'), $all_tables);
+			$db_tables_array[$key] = $all_table_names;
+		}
+
+		return $db_tables_array;
 	}
 
 }

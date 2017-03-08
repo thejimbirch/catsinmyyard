@@ -646,10 +646,15 @@ h3 .thank-you {
 	font-size: 120%;
 }
 
-input #backupnow_includefiles_moreoptions {
+#backupnow_includefiles_moreoptions, #backupnow_database_moreoptions {
 	margin: 4px 16px 6px; 
 	border: 1px dotted; 
 	padding: 6px 10px;
+}
+
+#backupnow_database_moreoptions {
+	max-height: 250px;
+	overflow: auto;
 }
 
 .form-table #updraft_activejobsrow .minimum-height{

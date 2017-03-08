@@ -22,7 +22,7 @@
 
 <div id="sys-dev">
 
-  <div id="togglex" class="highlight" style="margin-top: 1em; margin-bottom: 1em; display: none;">
+  <div id="toggle-sys" class="highlight" style="margin-top: 1em; margin-bottom: 1em; display: none;">
     <h3>Debugger - System Info</h3>
     <pre><code><?php
 

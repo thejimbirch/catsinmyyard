@@ -79,19 +79,31 @@ function mce_referer() {
 function mce_getRefererPage( $form_tag ) {
 
   if ( $form_tag['name'] == 'referer-page' ) {
-          $form_tag['values'][] = $_SERVER['HTTP_REFERER'];
+
+    $form_tag['values'][] = $_SERVER['HTTP_REFERER'];
+
   }
+
   return $form_tag;
+
 }
 
+
+
 if ( !is_admin() ) {
-        add_filter( 'wpcf7_form_tag', 'mce_getRefererPage' );
+
+  add_filter( 'wpcf7_form_tag', 'mce_getRefererPage' );
+
 }
+
+
 
 define( 'MCE_URL', '//renzojohnson.com/contributions/contact-form-7-mailchimp-extension' );
 define( 'MCE_AUTH', '//renzojohnson.com' );
 define( 'MCE_AUTH_COMM', '<!-- campaignmonitor extension by Renzo Johnson -->' );
-define( 'SPARTAN_MCE_NAME', 'Campaign Monitor Extension' );
+define( 'MCE_NAME', 'MailChimp Contact Form 7 Extension' );
+define( 'MCE_SETT', admin_url( 'admin.php?page=wpcf7&post='.mc_get_latest_item().'&active-tab=4' ) );
+define( 'MCE_DON', 'https://www.paypal.me/renzojohnson' );
 
 
 function mc_get_latest_item(){

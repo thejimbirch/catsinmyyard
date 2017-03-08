@@ -99,15 +99,17 @@ class UpdraftPlus_Admin {
 				$clientid = UpdraftPlus_Options::get_updraft_option('updraft_googledrive_clientid', '');
 				$token = UpdraftPlus_Options::get_updraft_option('updraft_googledrive_token', '');
 			} else {
-				$clientid = $opts['clientid'];
+				$clientid = empty($opts['clientid']) ? '' : $opts['clientid'];
 				$token = (empty($opts['token'])) ? '' : $opts['token'];
 			}
 			if (!empty($clientid) && empty($token)) add_action('all_admin_notices', array($this,'show_admin_warning_googledrive'));
+			unset($token);
+			unset($clientid);
 		}
 		if ('googlecloud' === $service || (is_array($service) && in_array('googlecloud', $service))) {
 			$opts = UpdraftPlus_Options::get_updraft_option('updraft_googlecloud');
 			if (!empty($opts)) {
-				$clientid = $opts['clientid'];
+				$clientid = empty($opts['clientid']) ? '' : $opts['clientid'];
 				$token = (empty($opts['token'])) ? '' : $opts['token'];
 			}
 			if (!empty($clientid) && empty($token)) add_action('all_admin_notices', array($this,'show_admin_warning_googlecloud'));
@@ -569,6 +571,7 @@ class UpdraftPlus_Admin {
 			'enteremailhere' => esc_attr(__('To send to more than one address, separate each address with a comma.', 'updraftplus')),
 			'excludedeverything' => __('If you exclude both the database and the files, then you have excluded everything!', 'updraftplus'),
 			'nofileschosen' => __('You have chosen to backup files, but no file entities have been selected', 'updraftplus'),
+			'notableschosen' => __('You have chosen to backup a database, but no tables have been selected', 'updraftplus'),
 			'restoreproceeding' => __('The restore operation has begun. Do not press stop or close your browser until it reports itself as having finished.', 'updraftplus'),
 			'unexpectedresponse' => __('Unexpected response:', 'updraftplus'),
 			'servererrorcode' => __('The web server returned an error code (try again, or check your web server logs)', 'updraftplus'),
@@ -670,6 +673,8 @@ class UpdraftPlus_Admin {
 			'complete' => __('Complete', 'updraftplus'),
 			'remote_delete_limit' => defined('UPDRAFTPLUS_REMOTE_DELETE_LIMIT') ? UPDRAFTPLUS_REMOTE_DELETE_LIMIT : 15,
 			'remote_files_deleted' => __('remote files deleted', 'updraftplus'),
+			'http_code' => __('HTTP code:', 'updraftplus'),
+			'makesure2' => __('The file failed to upload. Please check the following:', 'updraftplus')."\n\n - ".__('Any settings in your .htaccess or web.config file that affects the maximum upload or post size.', 'updraftplus')."\n - ".__('The available memory on the server.', 'updraftplus')."\n - ".__('That you are attempting to upload a zip file previously created by UpdraftPlus.', 'updraftplus')."\n\n".__('Further information may be found in the browser JavaScript console, and the server PHP error logs.', 'updraftplus'),
 		) );
 	}
 
@@ -925,7 +930,10 @@ class UpdraftPlus_Admin {
 		$stage = empty($_REQUEST['stage']) ? '' : $_REQUEST['stage'];
 
 		// This call may not actually return, depending upon what mode it is called in
-		echo json_encode($this->do_updraft_download_backup($findex, $_REQUEST['type'], $_REQUEST['timestamp'], $stage));
+		$result = $this->do_updraft_download_backup($findex, $_REQUEST['type'], $_REQUEST['timestamp'], $stage);
+		
+		// In theory, if a response was already sent, then Connection: close has been issued, and a Content-Length. However, in https://updraftplus.com/forums/topic/pclzip_err_bad_format-10-invalid-archive-structure/ a browser ignores both of these, and then picks up the second output and complains.
+		if (empty($results['already_closed'])) echo json_encode($result);
 		
 		die();
 	}
@@ -1041,7 +1049,7 @@ class UpdraftPlus_Admin {
 				call_user_func($close_connection_callable, $msg);
 			} else {
 				$updraftplus->close_browser_connection(json_encode($msg));
-			}	
+			}
 			
 			$is_downloaded = false;
 			add_action('http_request_args', array($updraftplus, 'modify_http_options'));
@@ -1084,7 +1092,7 @@ class UpdraftPlus_Admin {
 		if (!$debug_mode) @unlink($updraftplus->logfile_name);
 
 		// The browser connection was possibly already closed, but not necessarily
-		return array('result' => $result);
+		return array('result' => $result, 'already_closed' => $needs_downloading);
 
 	}
 
@@ -1115,7 +1123,8 @@ class UpdraftPlus_Admin {
 	// This is used as a callback
 	public function _updraftplus_background_operation_started($msg) {
 		global $updraftplus;
-		$updraftplus->close_browser_connection(json_encode($msg));
+		// The extra spaces are because of a bug seen on one server in handling of non-ASCII characters; see HS#11739
+		$updraftplus->close_browser_connection(json_encode($msg).'        ');
 	}
 	
 	public function updraft_ajax_handler() {
@@ -1742,7 +1751,7 @@ class UpdraftPlus_Admin {
 			echo json_encode(array('e' => sprintf(__("Backup directory (%s) is not writable, or does not exist.", 'updraftplus'), $updraft_dir).' '.__('You will find more information about this in the Settings section.', 'updraftplus')));
 			exit;
 		}
-
+		
 		add_filter('upload_dir', array($this, 'upload_dir'));
 		add_filter('sanitize_file_name', array($this, 'sanitize_file_name'));
 		// handle file upload
@@ -2179,7 +2188,7 @@ class UpdraftPlus_Admin {
 		</div>
 
 		<div id="updraft-navtab-expert-content"<?php if (4 != $tabflag) echo ' class="updraft-hidden"'; ?> style="<?php if (4 != $tabflag) echo 'display:none;'; ?>">
-			<?php $this->settings_advanced_tools($backup_disabled); ?>
+			<?php $this->settings_advanced_tools(); ?>
 		</div>
 
 		<div id="updraft-navtab-addons-content"<?php if (5 != $tabflag) echo ' class="updraft-hidden"'; ?> style="<?php if (5 != $tabflag) echo 'display:none;'; ?>">
@@ -2253,16 +2262,25 @@ class UpdraftPlus_Admin {
 
 		$ret = '';
 
-		$ret .= '<p>
-			<input type="checkbox" id="backupnow_includedb" checked="checked"> <label for="backupnow_includedb">'.__("Include the database in the backup", 'updraftplus').'</label><br>';
+		$ret .= '<p><input type="checkbox" id="backupnow_includedb" checked="checked"> <label for="backupnow_includedb">'.__("Include the database in the backup", 'updraftplus').'</label> ';
+
+		$ret .= '(<a href="#" id="backupnow_database_showmoreoptions">...</a>)<br>';
+
+		$ret .= '<div id="backupnow_database_moreoptions" class="updraft-hidden" style="display:none;">';
+
+		$premium_link = apply_filters('updraftplus_com_link','https://updraftplus.com/landing/updraftplus-premium');
+
+		$free_ret = '<em>'.__('All WordPress tables will be backed up.', 'updraftplus').' <a href="'.$premium_link.'">'. __('With UpdraftPlus Premium, you can choose to backup non-WordPress tables, backup only specified tables, and backup other databases too.','updraftplus').'</a></em>';
+
+		$ret .= apply_filters('updraft_backupnow_database_showmoreoptions', $free_ret, '') . '</p>';
+
+		$ret .= '</div>';
 			
-		$ret .= '<input type="checkbox" id="backupnow_includefiles" checked="checked"> <label for="backupnow_includefiles">'.__("Include any files in the backup", 'updraftplus').'</label> (<a href="#" id="backupnow_includefiles_showmoreoptions">...</a>)<br>';
+		$ret .= '<p><input type="checkbox" id="backupnow_includefiles" checked="checked"> <label for="backupnow_includefiles">'.__("Include any files in the backup", 'updraftplus').'</label> (<a href="#" id="backupnow_includefiles_showmoreoptions">...</a>)<br>';
 
-		$ret .= '<div id="backupnow_includefiles_moreoptions" class="updraft-hidden" style="display:none;"><em>'.__('Your saved settings also affect what is backed up - e.g. files excluded.', 'updraftplus').'</em><br>'.$this->files_selector_widgetry('backupnow_files_', false, 'sometimes').'</div>';
-		
+		$ret .= '<div id="backupnow_includefiles_moreoptions" class="updraft-hidden" style="display:none;"><em>'.__('Your saved settings also affect what is backed up - e.g. files excluded.', 'updraftplus').'</em><br>'.$this->files_selector_widgetry('backupnow_files_', false, 'sometimes').'</div></p>';
+
 		$ret .= '<span id="backupnow_remote_container">'.$this->backup_now_remote_message().'</span>';
-
-		$ret .= '</p>';
 
 		$ret .= apply_filters('updraft_backupnow_modal_afteroptions', '', '');
 
@@ -3996,6 +4014,8 @@ ENDHERE;
 	// http_get will allow the HTTP Fetch execute available in advanced tools
 	public function http_get($uri = null, $curl = false) {
 
+		if (!preg_match('/^https?/', $uri)) return json_encode(array('e' => 'Non-http URL specified'));
+	
 		if ($curl) {
 			if (!function_exists('curl_exec')) {
 				return json_encode(array('e' => 'No Curl installed'));

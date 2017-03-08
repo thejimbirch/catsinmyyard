@@ -291,23 +291,35 @@ class UpdraftPlus_BackupModule_dropbox {
 		$searchpath = '/'.untrailingslashit(apply_filters('updraftplus_dropbox_modpath', ''));
 
 		try {
-			$search = $dropbox->search($match, $searchpath);
+			/* Some users could have a large amount of backups, the max search is 1000 entries we should continue to search until there are no more entries to bring back. */
+			$start = 0;
+			$matches = array();
+
+			while (true) {
+				$search = $dropbox->search($match, $searchpath, 1000, $start);
+				if (empty($search['code']) || 200 != $search['code']) return new WP_Error('response_error', sprintf(__('%s returned an unexpected HTTP response: %s', 'updraftplus'), 'Dropbox', $search['code']), $search['body']);
+
+				if (empty($search['body'])) return array();
+
+				if (isset($search['body']->matches) && is_array($search['body']->matches)) {
+					$matches = array_merge($matches, $search['body']->matches);
+				} elseif (is_array($search['body'])) {
+					$matches = $search['body'];
+				} else {
+					break;
+				}
+
+				if (isset($search['body']->more) && true == $search['body']->more && isset($search['body']->start)) {
+					$start = $search['body']->start;
+				} else {
+					break;
+				}
+			}
+
 		} catch (Exception $e) {
 			$updraftplus->log('Dropbox error: '.$e->getMessage().' (line: '.$e->getLine().', file: '.$e->getFile().')');
 			// The most likely cause of a search_error is specifying a non-existent path, which should just result in an empty result set.
 // 			return new WP_Error('search_error', $e->getMessage());
-			return array();
-		}
-
-		if (empty($search['code']) || 200 != $search['code']) return new WP_Error('response_error', sprintf(__('%s returned an unexpected HTTP response: %s', 'updraftplus'), 'Dropbox', $search['code']), $search['body']);
-
-		if (empty($search['body'])) return array();
-
-		if (isset($search['body']->matches) && is_array($search['body']->matches)) {
-			$matches = $search['body']->matches;
-		} elseif (is_array($search['body'])) {
-			$matches = $search['body'];
-		} else {
 			return array();
 		}
 

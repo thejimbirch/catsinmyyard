@@ -223,27 +223,29 @@ span.invalid {
 
 }
 
+
+
 .dev-cta {
-  background-color: #fff;
-  /*border: 2px solid #e5e5e5;*/
-  padding: 0.6em 0.6em 0.5em 0.8em;
-  font-size: 12px;
-  line-height: 1.48em;
-  /*border-radius: 3px;*/
-  margin-top: 2.5em;
-  border-left: 4px solid #46b450;
+  margin-top: 35px;
+  padding: 40px 10px 30px;
 
-  -webkit-box-shadow: 0 1px 1px 0 rgba( 0, 0, 0, 0.1 );
-  box-shadow: 0 1px 1px 0 rgba( 0, 0, 0, 0.1 );
-  /*margin: 5px 15px 2px;*/
 }
 
-.dev-cta p {
-  font-size: 12px;
-  line-height: 1.48em;
-  font-weight: bold;
-  color: #454545;
+.dev-cta:before {
+    display: block;
+    position: absolute;
+    right: 0;
+    left: 0;
+    background: #fff url('../images/newsletter-stripe.svg') repeat-x;
+    background-size: 70px 9px;
+    width: 100%;
+    height: 9px;
+    content: '';
+    top: 0;
+    z-index: 9999999;
 }
+
+
 
 .mc-code {
   font-size: 12px;

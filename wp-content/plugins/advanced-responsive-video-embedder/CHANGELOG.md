@@ -1,4 +1,19 @@
+
 ## Changelog ##
+
+### 2017-03-03 - 8.0.9
+
+* Fix: Admin page error for messing file.
+
+### 2017-03-02 - 8.0.8
+
+* Improved: Updated EDD Plugin Updater class
+
+### 2017-02-24 - 8.0.7
+
+* Fix: Options not correctly put in debug-info.
+* Improved: Make License input fields a bit wider.
+* Improved: Some small code improvements.
 
 ### 2017-02-12 - 8.0.5
 

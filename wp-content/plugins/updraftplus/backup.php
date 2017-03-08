@@ -52,6 +52,9 @@ class UpdraftPlus_Backup {
 	// Used when deciding to use the 'store' or 'deflate' zip storage method
 	private $extensions_to_not_compress = array();
 
+	// Append to this any skipped tables
+	private $skipped_tables;
+
 	public function __construct($backup_files, $altered_since = -1) {
 
 		global $updraftplus;
@@ -1455,6 +1458,20 @@ class UpdraftPlus_Backup {
 
 					if (!apply_filters('updraftplus_backup_table', true, $table, $this->table_prefix, $whichdb, $dbinfo)) {
 						$updraftplus->log("Skipping table (filtered): $table");
+						if (empty($this->skipped_tables)) $this->skipped_tables = array();
+
+						// whichdb could be an int in which case to get the name of the database and the array key use the name from dbinfo
+						if ('wp' !== $whichdb) {
+							$key = $dbinfo['name'];
+						} else {
+							$key = $whichdb;
+						}
+
+						if (empty($this->skipped_tables[$key])) $this->skipped_tables[$key] = '';
+						if ('' != $this->skipped_tables[$key]) $this->skipped_tables[$key] .= ',';
+						$this->skipped_tables[$key] .= $table;
+
+						$total_tables--;
 					} else {
 
 						$db_temp_file = $this->updraft_dir.'/'.$table_file_prefix.'.tmp.gz';
@@ -1738,7 +1755,7 @@ class UpdraftPlus_Backup {
 			}
 		
 			// Comment in SQL-file
-			$this->stow("\n\n# " . sprintf("Data contents of $description %s",$updraftplus->backquote($table)) . "\n\n");
+			$this->stow("\n\n# " . sprintf("Data contents of $description %s", $updraftplus->backquote($table)) . "\n\n");
 
 		}
 
@@ -1789,7 +1806,7 @@ class UpdraftPlus_Backup {
 			do {
 				@set_time_limit(UPDRAFTPLUS_SET_TIME_LIMIT);
 
-				$table_data = $this->wpdb_obj->get_results("SELECT * FROM $table $where LIMIT {$row_start}, {$row_inc}", ARRAY_A);
+				$table_data = $this->wpdb_obj->get_results("SELECT * FROM ".$updraftplus->backquote($table)." $where LIMIT {$row_start}, {$row_inc}", ARRAY_A);
 				$entries = 'INSERT INTO ' . $updraftplus->backquote($dump_as_table) . ' VALUES ';
 				//    \x08\\x09, not required
 				if($table_data) {
@@ -1925,6 +1942,15 @@ class UpdraftPlus_Backup {
 		$this->stow("# Generated: ".date("l j. F Y H:i T")."\n");
 		$this->stow("# Hostname: ".$this->dbinfo['host']."\n");
 		$this->stow("# Database: ".$updraftplus->backquote($this->dbinfo['name'])."\n");
+
+		if (!empty($this->skipped_tables)) {
+			if ('wp' == $this->whichdb) {
+				$this->stow("# Skipped tables: " . $this->skipped_tables[$this->whichdb]."\n");
+			} elseif (isset($this->skipped_tables[$this->dbinfo['name']])) {
+				$this->stow("# Skipped tables: " . $this->skipped_tables[$this->dbinfo['name']]."\n");
+			}
+		}
+		
 		$this->stow("# --------------------------------------------------------\n");
 
 		if (@constant("DB_CHARSET")) {
@@ -1989,6 +2015,8 @@ class UpdraftPlus_Backup {
 				$updraftplus->log("Entity excluded by configuration option (extension): ".basename($fullpath));
 			} elseif (!empty($this->excluded_prefixes) && $this->is_entity_excluded_by_prefix($fullpath)) {
 				$updraftplus->log("Entity excluded by configuration option (prefix): ".basename($fullpath));
+			} elseif (apply_filters('updraftplus_exclude_file', false, $fullpath)) {
+				$updraftplus->log("Entity excluded by filter: ".basename($fullpath));
 			} elseif (is_readable($fullpath)) {
 				$mtime = filemtime($fullpath);
 				$key = ($fullpath == $original_fullpath) ? ((2 == $startlevels) ? $use_path_when_storing : $this->basename($fullpath)) : $use_path_when_storing.'/'.$this->basename($fullpath);
@@ -2008,6 +2036,12 @@ class UpdraftPlus_Backup {
 				$updraftplus->log("Skip directory (UpdraftPlus backup directory): $use_path_when_storing");
 				return true;
 			}
+			
+			if (apply_filters('updraftplus_exclude_directory', false, $fullpath)) {
+				$updraftplus->log("Skip filtered directory: $use_path_when_storing");
+				return true;
+			}
+			
 			if (file_exists($fullpath.'/.donotbackup')) {
 				$updraftplus->log("Skip directory (.donotbackup file found): $use_path_when_storing");
 				return true;
@@ -2036,6 +2070,8 @@ class UpdraftPlus_Backup {
 								$updraftplus->log("Entity excluded by configuration option (extension): $use_stripped");
 							} elseif (!empty($this->excluded_prefixes) && $this->is_entity_excluded_by_prefix($e)) {
 								$updraftplus->log("Entity excluded by configuration option (prefix): $use_stripped");
+							} elseif (apply_filters('updraftplus_exclude_file', false, $deref)) {
+								$updraftplus->log("Entity excluded by filter: $use_stripped");
 							} else {
 								$mtime = filemtime($deref);
 								if ($mtime > 0 && $mtime > $if_altered_since) {
@@ -2067,6 +2103,8 @@ class UpdraftPlus_Backup {
 							$updraftplus->log("Entity excluded by configuration option (extension): $use_stripped");
 						} elseif (!empty($this->excluded_prefixes) && $this->is_entity_excluded_by_prefix($e)) {
 							$updraftplus->log("Entity excluded by configuration option (prefix): $use_stripped");
+						} elseif (apply_filters('updraftplus_exclude_file', false, $fullpath.'/'.$e)) {
+							$updraftplus->log("Entity excluded by filter: $use_stripped");
 						} else {
 							$mtime = filemtime($fullpath.'/'.$e);
 							if ($mtime > 0 && $mtime > $if_altered_since) {

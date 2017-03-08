@@ -32,3 +32,12 @@ function wpcf7_mce_admin_enqueue_scripts() {
 add_action( 'admin_print_scripts', 'wpcf7_mce_admin_enqueue_scripts' );
 
 
+
+function mce_admin_scripts() {
+
+  wp_register_style( 'wpcf7-mce-wp-admin-css', SPARTAN_MCE_PLUGIN_URL . '/assets/css/mce-admin.css', array(), SPARTAN_MCE_VERSION, 'all' );
+
+  wp_enqueue_style( 'wpcf7-mce-wp-admin-css' );
+
+}
+add_action( 'admin_enqueue_scripts', 'mce_admin_scripts' );

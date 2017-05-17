@@ -5,6 +5,165 @@ add_action( 'admin_init', 'nextgenthemes_activation_notices' );
 add_action( 'admin_init', 'nextgenthemes_register_settings' );
 add_action( 'admin_menu', 'nextgenthemes_menus' );
 
+function nextgenthemes_admin_install_search_url( $search_term ) {
+
+	$path = "plugin-install.php?s={$search_term}&tab=search&type=term";
+
+	if ( is_multisite() ) {
+		return network_admin_url( $path );
+	} else {
+		return admin_url( $path );
+	}
+}
+function nextgenthemes_ads_page() { ?>
+<style>
+	body {
+	  background: hsl(210, 13%, 16%);
+	}
+	#wpcontent {
+		padding: 0;
+	}
+	#wpbody-content {
+		/* padding-bottom: 2rem; */
+	}
+	#wpfooter {
+		display: none;
+	}
+	#nextgenthemes-ads {
+		padding: 1.7rem;
+		column-width: 40rem;
+		column-gap: 1.7rem;
+	}
+	@media only screen and (max-device-width: 400px) {
+
+		#nextgenthemes-ads {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
+	#nextgenthemes-ads,
+	#nextgenthemes-ads * {
+		box-sizing: border-box;
+	}
+	#nextgenthemes-ads::after {
+	  content: "";
+	  display: table;
+	  clear: both;
+	}
+	#nextgenthemes-ads {
+		color: white;
+	}
+	#nextgenthemes-ads h1,
+	#nextgenthemes-ads h2,
+	#nextgenthemes-ads h3 {
+		color: inherit;
+		margin-left: 2rem;
+		margin-right: 1.7rem;
+	}
+	#nextgenthemes-ads h1 {
+		line-height: 1;
+	}
+	#nextgenthemes-ads img {
+	  width: 100%;
+		height: auto;
+	}
+	#nextgenthemes-ads > a {
+		text-decoration: none;
+		position: relative;
+		display: inline-block;
+		width: 100%;
+	  background-color: hsl(210, 13%, 13%);
+		border: 1px solid hsl(207, 48%, 30%);
+		transition: box-shadow .3s, background-color .3s, border-color .3s;
+		color: #eee;
+		font-size: 1.05rem;
+		margin-bottom: 2rem;
+		line-height: 1.4;
+	}
+	#nextgenthemes-ads > a:hover {
+		background-color: hsl(210, 13%, 10%);
+		box-shadow: 0 0 10px hsla(207, 48%, 50%, 1);
+		border-color: hsl(207, 48%, 40%);
+	}
+	#nextgenthemes-ads p {
+		margin-left: 2rem;
+		margin-right: 1.7rem;
+		font-size: 1.2rem;
+	}
+	#nextgenthemes-ads ol {
+		margin-left: 2.5rem;
+		margin-right: .7rem;
+	}
+	#nextgenthemes-ads > a > span {
+		position: absolute;
+		padding: .6rem 1rem;
+		right: 0px;
+		bottom: 0px;
+		font-size: 2rem;
+		color: white;
+		background-color: hsl(207, 48%, 30%);
+		border-top-left-radius: 3px;
+		//transform: rotate(3deg);
+	}
+	#nextgenthemes-ads figure {
+		margin: 1rem;
+	}
+</style>
+<?php $img_dir = plugin_dir_url( __FILE__ ) . 'product-images/'; ?>
+<div id="nextgenthemes-ads">
+
+	<?php if ( ! defined( 'ARVE_PRO_VERSION' ) ) : ?>
+		<a href="https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/">
+			<figure><img src="<?php echo $img_dir; ?>arve.svg" alt"ARVE"></figure>
+			<h1>^ Pro Addon</h1>
+			<ol>
+				<li><strong>Feel good about yourself</strong><br>for supporting my long time work on this plugin. Tons of hours, weekends … always worked on improving it 4+ years.</li>
+				<li><strong>Disable links in embeds (killer feature!)</strong><br>For example: Clicking on a title in a YouTube embed will not open a new popup/tab/window. <strong>Prevent video hosters to lead your visitors away from your site!</strong> Note this also breaks sharing functionality and is not possible when the provider requires flash. Right click on links still works.</li>
+				<li><strong>Lazyload mode</strong><br>Make your site load <strong>faster</strong> by loading only a image instead of the entire video player on pageload.  </li>
+				<li><strong>Lazyload -&gt; Lightbox</strong><br>Shows the Video in a Lightbox after clicking a preview image</li>
+				<li><strong>Link -&gt; Lightbox</strong><br>Use simple links as triggers for lightboxed videos</li>
+				<li>Show the latest video of a YouTube channel by using the channel URL (updated/cached hourly)</li>
+				<li>Automatic or custom thumbnail images</li>
+				<li>Automatic or custom titles on top of your thumbnails</li>
+				<li>&#39;Grow on click&#39; feature</li>
+				<li>3 hover styles</li>
+				<li>2 play icon styles to choose from</li>
+				<li>Responsive thumbnails using cutting edge HTML5 technology</li>
+			</ol>
+			<span>Paid</span>
+		</a>
+	<?php endif; ?>
+
+	<?php if ( ! defined( 'ARVE_AMP_VERSION' ) ) : ?>
+		<a href="https://nextgenthemes.com/plugins/arve-accelerated-mobile-pages-addon/">
+		  <figure><img src="<?php echo $img_dir; ?>arve.svg" alt"ARVE"></figure>
+			<h3>^ AMP Addon</h3>
+			<ol>
+				<li>Requires the gratis plugins ARVE and AMP</li>
+				<li>Makes ARVE ready for Accelerated Mobile Pages (AMP)</li>
+				<li>It will display videos embedded with ARVE on AMP pages correctly</li>
+				<li>No options, just works</li>
+				<li>It creates &lt;amp-youtube&gt;, &lt;amp-vimeo&gt;, &lt;amp-dailymotion&gt; elements</li>
+				<li>For all other video hosts supported by ARVE &lt;amp-iframe&gt; element is used</li>
+				<li>HTML5 video files are also supported with &lt;amp-video&gt;</li>
+			</ol>
+			<span>Paid</span>
+		</a>
+	<?php endif; ?>
+
+	<?php if ( ! is_plugin_active( 'regenerate-thumbnails-reminder/regenerate-thumbnails-reminder.php' ) ) : ?>
+		<a href="<?php echo nextgenthemes_admin_install_search_url( 'Regenerate+Thumbnails+Reminder' ); ?>">
+		  <h1>Regenerate Thumbnails Reminder</h1>
+			<p>Get a reminder when you change your thumbnail sizes to regenerate them. Note Thumbnails sizes change automatically if you swtich themes.</p>
+			<span>Free</span>
+		</a>
+	<?php endif; ?>
+
+</div>
+
+<?php
+}
+
 function nextgenthemes_activation_notices() {
 
 	$products = nextgenthemes_get_products();
@@ -28,7 +187,7 @@ function nextgenthemes_get_products() {
 	$products = array(
 		'arve_pro' => array(
 			'name'    => 'Advanced Responsive Video Embedder Pro',
-	    'type'    => 'plugin',
+			'type'    => 'plugin',
 			'author'  => 'Nicolas Jonas',
 			'url'     => 'https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/',
 		),
@@ -98,9 +257,9 @@ function nextgenthemes_menus() {
  		__( 'Nextgenthemes', ARVE_SLUG ), # Menu Tile
  		'manage_options',                 # capability
  		'nextgenthemes',                  # menu-slug
- 		'__return_empty_string',          # function
-		'dashicons-admin-settings',       # icon_url
-		null                              # position
+ 		'nextgenthemes_ads_page',         # function
+		'dashicons-video-alt3',           # icon_url
+		'80.892'                          # position
  	);
 
 	/*
@@ -375,24 +534,36 @@ function nextgenthemes_api_action( $item_name, $key, $action ) {
 		wp_die( 'invalid action' );
 	}
 
-	// Data to send to the API
-	$api_params = array(
-		'edd_action' => $action . '_license',
-		'license'    => sanitize_text_field( $key ),
-		'item_name'  => urlencode( $item_name ),
-		'url'        => home_url(),
+	$wp_remote_args = array(
+		'timeout'   => 15,
+		'sslverify' => true,
+		'body'      => array(
+			'edd_action' => $action . '_license',
+			'license'    => sanitize_text_field( $key ),
+			'item_name'  => urlencode( $item_name ),
+			'url'        => home_url(),
+		)
 	);
 
-	$response = wp_remote_post( 'https://nextgenthemes.com', array( 'timeout' => 15, 'sslverify' => true, 'body' => $api_params ) );
+	$response = wp_remote_post( 'https://nextgenthemes.com', $wp_remote_args );
+	$response_code = wp_remote_retrieve_response_code( $response );
 
-	// make sure the response came back okay
-	if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+	# retry with wp_remote_GET
+	if ( 200 !== $response_code ) {
+		$response = wp_remote_get( 'https://nextgenthemes.com', $wp_remote_args );
+		$response_code = wp_remote_retrieve_response_code( $response );
+	}
 
-		if ( is_wp_error( $response ) ) {
-			$message = $response->get_error_message();
-		} else {
-			$message = __( 'An error occurred, please try again.', ARVE_SLUG );
-		}
+	if ( 200 !== $response_code ) {
+
+		$message = sprintf(
+			__( 'Error: Response code should be 200 but was: %s.', ARVE_SLUG ),
+			$response_code
+		);
+
+	} elseif ( is_wp_error( $response ) ) {
+
+		$message = $response->get_error_message();
 
 	} else {
 
@@ -431,14 +602,18 @@ function nextgenthemes_api_action( $item_name, $key, $action ) {
 					$message = sprintf( __( 'This appears to be an invalid license key for %s.', ARVE_SLUG ), $item_name );
 					break;
 
-				case 'no_activations_left':
+				case 'no_activations_left' :
 
 					$message = __( 'Your license key has reached its activation limit.', ARVE_SLUG );
 					break;
 
 				default :
 
-					$message = __( 'An error occurred, please try again.', ARVE_SLUG );
+					$message = sprintf(
+						__( 'Error: %s.', ARVE_SLUG ),
+						$license_data->error
+					);
+
 					break;
 			}
 

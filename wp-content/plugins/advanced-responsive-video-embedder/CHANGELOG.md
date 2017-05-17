@@ -1,57 +1,145 @@
 
 ## Changelog ##
 
-### 2017-03-03 - 8.0.9
+* [ARVE Pro addon changelog](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/changelog/)
+* [ARVE AMP addon changelog](https://nextgenthemes.com/plugins/arve-amp/)
+
+### 2017-05-17 - 8.6.3 ###
+
+* Fixed issue with width and height attributes
+
+### 2017-05-17 - 8.6.2 ###
+
+* Fixed license activation issues.
+
+### 2017-05-10 - 8.6.1 ###
+
+* Minor code change.
+
+### 2017-05-10 - 8.6.0 ###
+
+* New: `controlslist` shortcode attribute and option to control the Chrome HTML5 player `nodownload` is default, it hides the download button on the player.
+
+### 2017-05-05 - 8.5.2 ###
+
+* Improved: Embed Liveleak with https. Remove the default parameter.
+
+### 2017-05-05 - 8.5.1 ###
+
+* Improved: Mark Liveleak that it not requires flash anymore. This makes the 'disable links' option of the Pro Addon possible. Becomes very handy as Liveleak annoyingly opens new tabs when clicking outside the play button.
+
+### 2017-05-04 - 8.5.0 ###
+
+* New: playsinline, and muted attributes for HTML5 video.
+* Data attributes are no longer prefixed with -arve and various other code improvements.
+
+### 2017-05-01 - 8.4.2 ###
+
+* Code improvements for addons.
+
+### 2017-04-30 - 8.4.1 ###
+
+* Fix password protected videos on vimeo (sandbox allow-forms)
+
+### 2017-04-25 - 8.4.0 ###
+
+* Improved: The 'Take over [video]' option was renamed to 'Use ARVE for HTML5 video embeds' and is now enabled by default. (It never only was the shortcode but also HTML5 video file URLs on their own lines)
+* New: Support for embedding Dropbox hosted HTML5 video files (mp4, webm, ogv). Needs the 'Use ARVE for HTML5 video embeds' to be activated. (Beta feature)
+* Fix: YouTube only playlist URLs embedded without https.
+
+### 2017-04-11 - 8.3.1 ###
+
+* Fix: Global CSS id was not correctly added.
+
+### 2017-04-10 - 8.2.5 ###
+
+* Fix: Some Brightcove URLs were not correctly detected.
+* Improved: Better automated tests and some minor code enhancements.
+* Improved: Some texts, new link to the settings page below parameter field.
+* Improved: How aspect ratio is handled for HTML 5 video. If not set (default) the browser will detect it based on the video file that is embedded.
+* Improved: Gives the aligned videos a top margin of `0.4em` to try to align them better with text.
+* Improved: The 'by ARVE' promotion links do now open in a new tab/window.
+
+### 2017-03-27 - 8.2.4 ###
+
+* Fixed: YouTube cards generate a youtube-nocookie.com url to a channel when the -nocookie.url is used to embedding. tltr; This is actually a YouTube bug but this is fixed in ARVE now by using the normal YouTube url for embeds. I like the additional 'privacy' it provides by not setting cookies as long as the user not plays a video. But considering this is not the first time YouTube has bugs related to this feature, I switched this back and forth in the past, I am considering just not using it anymore.
+
+### 2017-03-25 - 8.2.3 ###
+
+* Fixed: 'Disable links' feature from the Pro Addon was not working.
+* Some minor code improvements.
+
+### 2017-03-20 - 8.2.2 ###
+
+* Moved the ARVE menu below the settings menu (where most plugins are), sorry xberg. I got complaints about global menus and I like to keep the global Nextgenthemes menu but 2 global menus is a bit to much. I have given the Nextgenthemes menu a video icon now. I hope this is a good compromise.
+* Improved: Finished the German translation.
+* Improved: Made the ARVE Pro promotion on the settings menu close-able, hopefully less people get offended.
+
+### 2017-03-20 - 8.2.0 ###
+
+* Fixed: Plugin action links on installed plugin screen
+* Fixed: CSS specificity issues by adding a `id="arve"` to the entire document and based all the CSS on `#arve`. This will end a long time battle with themes styles without using bad practices. If you have custom styles overwriting ARVE CSS you may need to increase specificity (or use `!important`).
+* Improved: styles and scripts and now served minified unless `WP_DEBUG` is set.
+* Improved: styles are now only loaded (to the bottom) when there is a video on the page.
+* Improved: Settings title is now 'Advanced Responsive Video Embedder Settings' again rather then just ARVE.
+
+### 2017-03-12 - 8.1.1 ###
+
+* Improved: Added ARVE to menu below plugins so it can be easy found.
+* Improved: Used `wp_add_inline_style` function for inline styles.
+* Removed some code that is not needed.
+
+### 2017-03-03 - 8.0.9 ###
 
 * Fix: Admin page error for messing file.
 
-### 2017-03-02 - 8.0.8
+### 2017-03-02 - 8.0.8 ###
 
 * Improved: Updated EDD Plugin Updater class
 
-### 2017-02-24 - 8.0.7
+### 2017-02-24 - 8.0.7 ###
 
 * Fix: Options not correctly put in debug-info.
 * Improved: Make License input fields a bit wider.
 * Improved: Some small code improvements.
 
-### 2017-02-12 - 8.0.5
+### 2017-02-12 - 8.0.5 ###
 
 * Fix: Small size of lightbox when using the [Pro Addon](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/).
 
-### 2017-02-11 - 8.0.4
+### 2017-02-11 - 8.0.4 ###
 
 * CSS improved
 * Updated Addon Updater Class
 
-### 2017-01-03 - 8.0.2
+### 2017-01-03 - 8.0.2 ###
 
 * Fix: Errors on settings page when Pro Addon is not installed.
 
-### 2016-12-17 - 8.0.1
+### 2016-12-17 - 8.0.1 ###
 
 * Fix: `undefined function is_plugin_active()` error caused by some plugins
 * Improved: Show actual meaningful message if PHP is lower then the required 5.3. Bluehost (oh proud wp.org recommended host) seems to show customers a **wrong** php version in the config and lets them hang on insecure end of life versions.
 
-### 2016-12-09 - Pro Addon 3.6.8
+### 2016-12-09 - Pro Addon 3.6.8 ###
 
 * Fix: Wrongly tagged version.
 
-### 2016-12-07 - Pro Addon 3.6.7
+### 2016-12-07 - Pro Addon 3.6.7 ###
 
 * Fix: Some thumbnails not loading.
 
-### 2016-12-07 - 8.0.0
+### 2016-12-07 - 8.0.0 ###
 
 * Fix: 'Take over [video] shortcode' option not working. (Always acted as on, default is off)
 * Fix: [video] override putting out a error for not reason.
 * Improved code: Dropped 2 micro classes in favor for antonymous functions.
 
-### 2016-12-07 - Pro Addon 3.6.6
+### 2016-12-07 - Pro Addon 3.6.6 ###
 
 * Improved: Load the CSS always in the `<head>`, this enables to change its CSS with the new CSS customizer in WP 4.7 and may also fix issues with caching plugins.
 
-### 2016-11-30 - 7.9.23
+### 2016-11-30 - 7.9.23 ###
 
 * Fix: Ending up with wrong URLs by disabling auto shortening of URLs when pasting them into the shortcode-ui dialog.
 * Improved: Enable SSL verify for API calls.
@@ -61,7 +149,7 @@
 
 * Fix: Autoplay without setting
 
-### 2016-11-30 - 7.9.21
+### 2016-11-30 - 7.9.21 ###
 
 * Fix: Fatal error.
 

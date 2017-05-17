@@ -74,14 +74,17 @@ Do you have questions or issues with Contact Form 7 MailChimp Extension? Use the
 10. [Mailchimp Contact Form](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension)
 11. [MailChimp Custom fields](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension/mailchimp-custom-fields)
 
-== Screenshots ==
-
-1. mailchimp-contact-form-screenshot-1.png
-2. mailchimp-contact-form-screenshot-2.png
-
 == Changelog ==
 
 For more information, see [Releases](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension).
+
+= 0.4.42 =
+
+* Fixed TagsManager error
+
+= 0.4.41 =
+
+* Fixed reported PHP error
 
 = 0.4.38 =
 
@@ -123,3 +126,7 @@ For more information, see [Releases](http://renzojohnson.com/contributions/conta
 
 * Release version
 
+== Screenshots ==
+
+1. mailchimp-contact-form-screenshot-1.png
+2. mailchimp-contact-form-screenshot-2.png

@@ -1,3 +1,4 @@
+
 ## Installation ##
 
 Please refer to [codex.wordpress.org/Managing_Plugins#Automatic_Plugin_Installation](https://codex.wordpress.org/Managing_Plugins#Automatic_Plugin_Installation).
@@ -6,7 +7,7 @@ Please refer to [codex.wordpress.org/Managing_Plugins#Automatic_Plugin_Installat
 
 ### I have a problem ... ###
 
-Please report it on [nextgenthemes.com/support/](https://nextgenthemes.com/support/) **and plaese not on the wordpess.org forums, thanks.**
+Please report it on [nextgenthemes.com/support/](https://nextgenthemes.com/support/) **and please do not on the wordpess.org forums, thanks.**
 
 ### How to get the pro version working? ###
 
@@ -15,7 +16,7 @@ Please report it on [nextgenthemes.com/support/](https://nextgenthemes.com/suppo
 
 ### Why are my videos not filling their container? ###
 
-You are most likely use `align`, this plugin has a option for limiting video with with alignment. If you want your videos to fill their containers then you should not use the `align` shortcode attribute. This assumes that you left the 'Video Maximal Width' field on the options page empty (default + recommended)
+You are most likely use `align`, this plugin has a option for limiting video width with alignment. If you want your videos to fill their containers then you should not use the `align` shortcode attribute. This assumes that you left the 'Video Maximal Width' field on the options page empty.
 
 ### Can you add a video provider? ###
 
@@ -33,6 +34,7 @@ This plugins embed is considered as 'custom player' by YouTube so you have to pa
 
 ## Screenshots ##
 
-1. Main Options
-2. Pro Options
-3. Features
+1. Shortcode dialog
+2. Main Options
+2. URL Parameter Options
+3. Pro Options

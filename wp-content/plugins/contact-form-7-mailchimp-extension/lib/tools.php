@@ -96,14 +96,17 @@ if ( !is_admin() ) {
 
 }
 
+add_action( 'init', 'mce_init_constants' );
+function mce_init_constants(){
 
+  define( 'MCE_URL', '//renzojohnson.com/contributions/contact-form-7-mailchimp-extension' );
+  define( 'MCE_AUTH', '//renzojohnson.com' );
+  define( 'MCE_AUTH_COMM', '<!-- campaignmonitor extension by Renzo Johnson -->' );
+  define( 'MCE_NAME', 'MailChimp Contact Form 7 Extension' );
+  define( 'MCE_SETT', admin_url( 'admin.php?page=wpcf7&post='.mc_get_latest_item().'&active-tab=4' ) );
+  define( 'MCE_DON', 'https://www.paypal.me/renzojohnson' );
 
-define( 'MCE_URL', '//renzojohnson.com/contributions/contact-form-7-mailchimp-extension' );
-define( 'MCE_AUTH', '//renzojohnson.com' );
-define( 'MCE_AUTH_COMM', '<!-- campaignmonitor extension by Renzo Johnson -->' );
-define( 'MCE_NAME', 'MailChimp Contact Form 7 Extension' );
-define( 'MCE_SETT', admin_url( 'admin.php?page=wpcf7&post='.mc_get_latest_item().'&active-tab=4' ) );
-define( 'MCE_DON', 'https://www.paypal.me/renzojohnson' );
+}
 
 
 function mc_get_latest_item(){
@@ -123,7 +126,8 @@ function mc_get_latest_item(){
 
 
 function wpcf7_form_mce_tags() {
-  $manager = WPCF7_FormTagsManager::get_instance();
+  // $manager = WPCF7_FormTagsManager::get_instance();
+  $manager = class_exists('WPCF7_FormTagsManager') ? WPCF7_FormTagsManager::get_instance() : WPCF7_ShortcodeManager::get_instance(); // ff cf7 46. and earlier
   $form_tags = $manager->get_scanned_tags();
   return $form_tags;
 }

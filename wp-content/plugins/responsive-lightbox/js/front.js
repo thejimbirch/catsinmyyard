@@ -53,19 +53,35 @@
 
 	rl_view_image = function ( script, url ) {
 	    $.event.trigger( {
-		type: 'doLightboxViewImage',
-		script: script,
-		url: url
+			type: 'doLightboxViewImage',
+			script: script,
+			url: url
 	    } );
 	}
 
 	rl_hide_image = function ( script, url ) {
 	    $.event.trigger( {
-		type: 'doLightboxHideImage',
-		script: script,
-		url: url
+			type: 'doLightboxHideImage',
+			script: script,
+			url: url
 	    } );
 	}
+
+	// WooCommerce 3.0+ compatibility
+	setTimeout( function() {
+		var flex = $( '.flex-viewport' );
+
+		if ( rlArgs.woocommerce_gallery === '1' && flex.length ) {
+			$( '.zoomImg' ).css( 'cursor', 'pointer' );
+
+			$( document ).on( 'click', '.flex-active-slide .zoomImg', function ( e ) {
+				e.preventDefault();
+				e.stopPropagation();
+
+				flex.find( '.flex-active-slide a[data-rel]' ).trigger( 'click' );
+			} );
+		}
+	}, 10 );
 
 	switch ( script ) {
 

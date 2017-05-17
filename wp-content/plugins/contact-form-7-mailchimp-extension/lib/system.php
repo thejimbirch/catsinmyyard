@@ -160,7 +160,10 @@
   $return .= 'Max Input Vars:           ' . ini_get( 'max_input_vars' ) . "\n";
   $return .= 'Display Errors:           ' . ( ini_get( 'display_errors' ) ? 'On (' . ini_get( 'display_errors' ) . ')' : 'N/A' ) . "\n";
   $return .= 'Display Errors:           ' . ( ini_get( 'display_errors' ) ? 'On (' . ini_get( 'display_errors' ) . ')' : 'N/A' ) . "\n";
-  $return .= 'Host:                     ' . gethostname() . "\n";
+  if ( strtok(phpversion(),'.') >= 5.3) {
+    // php >= 5
+    $return .= 'Host:                     ' . gethostname() . "\n";
+  }
   $return .= 'HHost:                    ' . $_SERVER['HTTP_HOST'] . "\n";
   $return .= 'SName:                    ' . $_SERVER['SERVER_NAME'] . "\n";
   $return .= 'allow_url_fopen:          ' . ini_get( 'allow_url_fopen' ) . "\n";

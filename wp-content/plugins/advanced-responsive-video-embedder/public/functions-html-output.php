@@ -1,12 +1,21 @@
 <?php
 
+function arve_html_id( $html_attr ) {
+
+	if( ! arve_contains( $html_attr, 'id=' ) ) {
+		$html_attr .= ' id="arve"';
+	}
+
+	return $html_attr;
+}
+
 function arve_get_var_dump( $var ) {
 	ob_start();
 	var_dump( $var );
 	return ob_get_clean();
 };
 
-function arve_get_debug_info( $atts, $input_atts ) {
+function arve_get_debug_info( $input_html, $atts, $input_atts ) {
 
 	$html = '';
 
@@ -24,17 +33,29 @@ function arve_get_debug_info( $atts, $input_atts ) {
 		$show_options_debug = false;
 	}
 
-	if ( ! empty( $_GET['arve-debug-arg'] ) ) {
+	$pre_style = ''
+		. 'background-color: #111;'
+		. 'color: #eee;'
+		. 'font-size: 15px;'
+		. 'white-space: pre-wrap;'
+		. 'word-wrap: break-word;';
+
+	if ( ! empty( $_GET['arve-debug-attr'] ) ) {
 		$html .= sprintf(
-			'<pre>arg[%s]: %s</pre>',
-			esc_html( $_GET['arve-debug-arg'] ),
-			arve_get_var_dump( $atts[ $_GET['arve-debug-arg'] ] )
+			'<pre style="%s">attr[%s]: %s</pre>',
+			esc_attr( $pre_style ),
+			esc_html( $_GET['arve-debug-attr'] ),
+			arve_get_var_dump( $atts[ $_GET['arve-debug-attr'] ] )
 		);
 	}
 
-	if ( isset( $_GET['arve-debug'] ) ) {
-		$html .= sprintf( '<pre>$atts: %s</pre>', arve_get_var_dump( $input_atts ) );
-		$html .= sprintf( '<pre>$arve: %s</pre>', arve_get_var_dump( $atts ) );
+	if ( isset( $_GET['arve-debug-atts'] ) ) {
+		$html .= sprintf( '<pre style="%s">$atts: %s</pre>', esc_attr( $pre_style ), arve_get_var_dump( $input_atts ) );
+		$html .= sprintf( '<pre style="%s">$arve: %s</pre>', esc_attr( $pre_style ), arve_get_var_dump( $atts ) );
+	}
+
+	if ( isset( $_GET['arve-debug-html'] ) ) {
+		$html .= sprintf( '<pre style="%s"">%s</pre>', esc_attr( $pre_style ), esc_html( $input_html ) );
 	}
 
 	return $html;
@@ -72,7 +93,7 @@ function arve_build_meta_html( $atts ) {
 						'src'             => $atts['img_src'],
 						'srcset'          => ! empty( $atts['img_srcset'] ) ? $atts['img_srcset'] : false,
 						#'sizes'    => '(max-width: 700px) 100vw, 1280px',
-						'alt'             => __( 'Video Thumbnail', 'advanced-responsive-video-embedder' ),
+						'alt'             => __( 'Video Thumbnail', ARVE_SLUG ),
 					) )
 				);
 
@@ -106,85 +127,55 @@ function arve_build_promote_link_html( $arve_link ) {
 
 	if ( $arve_link ) {
 		return sprintf(
-			'<a href="%s" title="%s" class="arve-promote-link">%s</a>',
+			'<a href="%s" title="%s" class="arve-promote-link" target="_blank">%s</a>',
 			esc_url( 'https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/' ),
-			esc_attr( __('Embedded with ARVE Advanced Responsive Video Embedder WordPress plugin', 'advanced-responsive-video-embedder') ),
-			esc_html__( 'ARVE', 'advanced-responsive-video-embedder' )
+			esc_attr( __( 'Embedded with ARVE Advanced Responsive Video Embedder WordPress plugin', ARVE_SLUG) ),
+			esc_html__( 'ARVE', ARVE_SLUG )
 		);
 	}
 
 	return '';
 }
 
-function arve_arve_embed_container( $html, $atts, $lity_container = false ) {
+function arve_arve_embed_container( $html, $atts ) {
 
 	$attr['class'] = 'arve-embed-container';
 
-	if ( $lity_container ) {
-		$attr['id']     = 'lity-' . $atts['embed_id'];
-		$attr['class'] .= ' arve-lity-container lity-hide';
-	}
-
-	if( ! empty( $atts['aspect_ratio'] ) ) {
-		$attr['style'] = sprintf( 'padding-bottom:%F%%', arve_aspect_ratio_to_percentage( $atts['aspect_ratio'] ) );
-	} elseif ( 'html5' == $atts['provider'] ) {
+	if ( false === $atts['aspect_ratio'] ) {
 		$attr['style'] = 'height:auto;padding:0';
+	} else {
+		$attr['style'] = sprintf( 'padding-bottom:%F%%', arve_aspect_ratio_to_percentage( $atts['aspect_ratio'] ) );
 	}
 
-	return sprintf( '<span%s>%s</span>', arve_attr( $attr ), $html );
+	return sprintf( '<div%s>%s</div>', arve_attr( $attr ), $html );
 }
 
-function arve_arve_wrapper( $output, $atts ) {
+function arve_arve_wrapper( $html, $atts ) {
 
-	$wrapper_class = sprintf(
-		'arve-wrapper%s%s%s',
-		empty( $atts['hover_effect'] ) ? '' : ' arve-hover-effect-' . $atts['hover_effect'],
-		empty( $atts['align'] )        ? '' : ' align' . $atts['align'],
-		( 'link-lightbox' == $atts['mode'] ) ? ' arve-hidden' : ''
-	);
-
-	$attr = array(
-		'id'                   => $atts['embed_id'],
-		'class'                => $wrapper_class,
-		'data-arve-grow'       => ( 'lazyload' === $atts['mode'] && $atts['grow'] ) ? '' : null,
-		'data-arve-mode'       => $atts['mode'],
-		'data-arve-provider'   => $atts['provider'],
-		'data-arve-webtorrent' => empty( $atts['webtorrent'] ) ? false : $atts['webtorrent'],
-		'data-arve-autoplay'   => ( 'webtorrent' == $atts['provider'] && $atts['autoplay'] ) ? true : false,
-		'data-arve-controls'   => ( 'webtorrent' == $atts['provider'] && $atts['controls'] ) ? true : false,
-		#'data-arve-maxwidth'  => empty( $atts['maxwidth'] ) ? false : sprintf( '%dpx',             $atts['maxwidth'] ),
-		'style'                => empty( $atts['maxwidth'] ) ? false : sprintf( 'max-width: %dpx;', $atts['maxwidth'] ),
-		// Schema.org
-		'itemscope' => '',
-		'itemtype'  => 'http://schema.org/VideoObject',
-	);
+	$element = ( 'link-lightbox' == $atts['mode'] ) ? 'span' : 'div';
 
 	return sprintf(
 		'<%s%s>%s</%s>',
-		( 'link-lightbox' == $atts['mode'] ) ? 'span' : 'div',
-		arve_attr( $attr ),
-		$output,
-		( 'link-lightbox' == $atts['mode'] ) ? 'span' : 'div'
+		$element,
+		arve_attr( $atts['wrapper_attr'] ),
+		$html,
+		$element
 	);
 }
 
 function arve_video_or_iframe( $atts ) {
 
-	if ( 'veoh' == $atts['provider'] ) {
+	switch( $atts['provider'] ) {
 
-		return arve_create_object( $atts );
-
-	} elseif ( 'html5' == $atts['provider'] ) {
-
-		return arve_create_video_tag( $atts );
-
-	} elseif( 'webtorrent' == $atts['provider'] ) {
-
-		return '<div class="arve-webtorrent-progress-bar"></div>';
-
-	} else {
-
-		return arve_create_iframe_tag( $atts );
+		case 'veoh':
+			return arve_create_object( $atts );
+			break;
+		case 'html5':
+			return arve_create_video_tag( $atts );
+			break;
+		default:
+			return arve_create_iframe_tag( $atts );
+			break;
 	}
 }
 
@@ -193,71 +184,30 @@ function arve_video_or_iframe( $atts ) {
  *
  * @since    2.6.0
  */
-function arve_create_iframe_tag( $atts ) {
+function arve_create_iframe_tag( $a ) {
 
-	$options    = arve_get_options();
-	$properties = arve_get_host_properties();
-
-	$iframe_attr = array(
-		'allowfullscreen' => '',
-		'class'       => 'arve-iframe fitvidsignore',
-		'frameborder' => '0',
-		'name'        => $atts['iframe_name'],
-		'scrolling'   => 'no',
-		'src'         => $atts['iframe_src'],
-
-		'width'       => ! empty( $atts['width'] )  ? $atts['width']  : false,
-		'height'      => ! empty( $atts['height'] ) ? $atts['height'] : false,
-	);
-
-	if ( null === $atts['disable_flash'] ) {
-		$atts['disable_flash'] = ! empty( $properties[ $atts['provider'] ]['requires_flash'] ) ? true : false;
-	}
-
-	if ( $atts['disable_flash'] ) {
-		$iframe_attr['sandbox'] = empty( $atts['iframe_sandbox'] ) ? 'allow-scripts allow-same-origin allow-popups' : $atts['iframe_sandbox'];
-	}
-
-	if ( in_array( $atts['mode'], array( 'lazyload', 'lazyload-lightbox', 'link-lightbox' ) ) ) {
-		$lazyload_iframe_attr = arve_prefix_array_keys( 'data-', $iframe_attr );
-
-		$output = sprintf( '<span class="arve-lazyload"%s></span>', arve_attr( $lazyload_iframe_attr ) );
+	if ( in_array( $a['mode'], array( 'lazyload', 'lazyload-lightbox', 'link-lightbox' ) ) ) {
+		$html = sprintf(
+			'<span class="arve-lazyload"%s></span>',
+			arve_attr( arve_prefix_array_keys( 'data-', $a['iframe_attr'] ) )
+		);
 	} else {
-		$output = sprintf( '<iframe%s></iframe>', arve_attr( $iframe_attr ) );
+		$html = sprintf( '<iframe%s></iframe>', arve_attr( $a['iframe_attr'] ) );
 	}
 
-	return apply_filters( 'arve_iframe_tag', $output, $atts, $iframe_attr );
+	return apply_filters( 'arve_iframe_tag', $html, $a, $a['iframe_attr'] );
 }
 
-function arve_create_video_tag( $atts ) {
+function arve_create_video_tag( $a ) {
 
-	$sources_html = '';
-
-	if ( in_array( $atts['mode'], array( 'lazyload', 'lazyload-lightbox' ) ) ) {
-		$atts['autoplay'] = null;
-	}
-
-	$video_attr = array(
-		'autoplay' => in_array( $atts['mode'], array( 'lazyload', 'lazyload-lightbox', 'link-lightbox' ) ) ? false : $atts['autoplay'],
-		'class'    => 'arve-video fitvidsignore',
-		'controls' => $atts['controls'],
-		'loop'     => $atts['loop'],
-		'poster'   => isset( $atts['img_src'] ) ? $atts['img_src'] : false,
-		'preload'  => $atts['preload'],
-		'src'      => isset( $atts['video_src'] ) ? $atts['video_src'] : false,
-
-		'width'    => ! empty( $atts['width'] )  ? $atts['width'] :  false,
-		'height'   => ! empty( $atts['height'] ) ? $atts['height'] : false,
-	);
-
-	$output = sprintf(
+	$html = sprintf(
 		'<video%s>%s%s</video>',
-		arve_attr( $video_attr, 'video' ),
-		$atts['video_sources_html'],
-		$atts['video_tracks']
+		arve_attr( $a['video_attr'] ),
+		$a['video_sources_html'],
+		$a['video_tracks_html']
 	);
 
-	return apply_filters( 'arve_video_tag', $output, $atts, $video_attr );
+	return apply_filters( 'arve_video_tag', $html, $a, $a['video_attr'] );
 }
 
 function arve_error( $message ) {
@@ -267,17 +217,6 @@ function arve_error( $message ) {
 		__('<abbr title="Advanced Responsive Video Embedder">ARVE</abbr> Error:', ARVE_SLUG ),
 		$message
 	);
-}
-
-function arve_print_styles() {
-
-  $options = arve_get_options();
-
-  if ( (int) $options["video_maxwidth"] > 0 ) {
-    $css = sprintf( '.arve-wrapper{max-width:%dpx;}', $options['video_maxwidth'] );
-
-    echo '<style type="text/css">' . $css . "</style>\n";
-  }
 }
 
 function arve_output_errors( $atts ) {

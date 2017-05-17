@@ -73,7 +73,7 @@ class UpdraftPlus_Options {
 			// $action = -1, $name = "_wpnonce", $referer = true , $echo = true 
 			wp_nonce_field("updraft-options-group-options", '_wpnonce', false);
 
-			$remove_query_args = array('state', 'action', 'updraftcopycomparms', 'oauth_verifier');
+			$remove_query_args = array('state', 'action', 'oauth_verifier');
 
 			// wp_unslash() does not exist until after WP 3.5
 			if (function_exists('wp_unslash')) {
@@ -116,8 +116,6 @@ class UpdraftPlus_Options {
 		register_setting('updraft-options-group', 'updraft_dreamobjects');
 		register_setting('updraft-options-group', 'updraft_s3generic');
 		register_setting('updraft-options-group', 'updraft_cloudfiles');
-		register_setting('updraft-options-group', 'updraft_bitcasa', array($updraftplus, 'bitcasa_checkchange'));
-		register_setting('updraft-options-group', 'updraft_copycom', array($updraftplus, 'copycom_checkchange'));
 		register_setting('updraft-options-group', 'updraft_openstack');
 		register_setting('updraft-options-group', 'updraft_dropbox', array($updraftplus, 'dropbox_checkchange'));
 		register_setting('updraft-options-group', 'updraft_googledrive', array($updraftplus, 'googledrive_checkchange'));
@@ -125,8 +123,8 @@ class UpdraftPlus_Options {
 		register_setting('updraft-options-group', 'updraft_azure', array($updraftplus, 'azure_checkchange'));
 		register_setting('updraft-options-group', 'updraft_googlecloud', array($updraftplus, 'googlecloud_checkchange'));
 
-		register_setting('updraft-options-group', 'updraft_sftp_settings');
-		register_setting('updraft-options-group', 'updraft_webdav_settings', array($updraftplus, 'construct_webdav_url'));
+		register_setting('updraft-options-group', 'updraft_sftp');
+		register_setting('updraft-options-group', 'updraft_webdav', array($updraftplus, 'construct_webdav_url'));
 
 		register_setting('updraft-options-group', 'updraft_ssl_nossl', 'absint');
 		register_setting('updraft-options-group', 'updraft_log_syslog', 'absint');

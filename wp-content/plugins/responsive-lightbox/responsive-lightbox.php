@@ -2,7 +2,7 @@
 /*
 Plugin Name: Responsive Lightbox
 Description: Responsive Lightbox allows users to view larger versions of images and galleries in a lightbox (overlay) effect optimized for mobile devices.
-Version: 1.6.12
+Version: 1.7.0
 Author: dFactory
 Author URI: http://www.dfactory.eu/
 Plugin URI: http://www.dfactory.eu/plugins/responsive-lightbox/
@@ -31,12 +31,13 @@ define( 'RESPONSIVE_LIGHTBOX_REL_PATH', dirname( plugin_basename( __FILE__ ) ) .
 
 include_once( RESPONSIVE_LIGHTBOX_PATH . 'includes/class-frontend.php' );
 include_once( RESPONSIVE_LIGHTBOX_PATH . 'includes/class-settings.php' );
+include_once( RESPONSIVE_LIGHTBOX_PATH . 'includes/class-widgets.php' );
 
 /**
  * Responsive Lightbox class.
  *
  * @class Responsive_Lightbox
- * @version	1.6.12
+ * @version	1.7.0
  */
 class Responsive_Lightbox {
 
@@ -50,6 +51,8 @@ class Responsive_Lightbox {
 			'force_custom_gallery'			=> false,
 			'woocommerce_gallery_lightbox'	=> false,
 			'videos'						=> true,
+			'widgets'						=> false,
+			'comments'						=> false,
 			'image_links'					=> true,
 			'image_title'					=> 'default',
 			'images_as_gallery'				=> false,
@@ -62,6 +65,16 @@ class Responsive_Lightbox {
 			'update_notice'					=> true
 		),
 		'configuration'	 => array(
+			'swipebox'		 => array(
+				'animation'					=> 'css',
+				'force_png_icons'			=> false,
+				'hide_close_mobile'			=> false,
+				'remove_bars_mobile'		=> false,
+				'hide_bars'					=> true,
+				'hide_bars_delay'			=> 5000,
+				'video_max_width'			=> 1080,
+				'loop_at_end'				=> false
+			),
 			'prettyphoto'	 => array(
 				'animation_speed'			=> 'normal',
 				'slideshow'					=> false,
@@ -84,16 +97,6 @@ class Responsive_Lightbox {
 				'overlay_gallery'			=> true,
 				'keyboard_shortcuts'		=> true,
 				'social'					=> false
-			),
-			'swipebox'		 => array(
-				'animation'					=> 'css',
-				'force_png_icons'			=> false,
-				'hide_close_mobile'			=> false,
-				'remove_bars_mobile'		=> false,
-				'hide_bars'					=> true,
-				'hide_bars_delay'			=> 5000,
-				'video_max_width'			=> 1080,
-				'loop_at_end'				=> false
 			),
 			'fancybox'		 => array(
 				'modal'						=> false,
@@ -155,7 +158,7 @@ class Responsive_Lightbox {
 				'gallery_fade_out'			=> 300
 			)
 		),
-		'version'		 => '1.6.12'
+		'version'		 => '1.7.0'
 	);
 	public $options = array();
 	private $notices = array();
@@ -209,6 +212,7 @@ class Responsive_Lightbox {
 		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'front_scripts_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts_styles' ) );
+		add_action( 'sidebar_admin_setup', array( $this, 'sidebar_admin_setup' ) );
 		add_action( 'admin_init', array( $this, 'update_notices' ) );
 		add_action( 'admin_print_scripts', array( $this, 'admin_inline_js' ), 999 );
 
@@ -296,7 +300,7 @@ class Responsive_Lightbox {
 	 * Load textdomain
 	 */
 	public function load_textdomain() {
-		load_plugin_textdomain( 'responsive-lightbox', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+		load_plugin_textdomain( 'responsive-lightbox', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 	}
 	
 	/**
@@ -428,16 +432,18 @@ class Responsive_Lightbox {
 	 */
 	public function admin_scripts_styles( $page ) {
 		if ( $page === 'settings_page_responsive-lightbox' ) {
-			
 			wp_register_script(
 				'responsive-lightbox-admin', plugins_url( 'js/admin.js', __FILE__ ), array( 'jquery', 'wp-color-picker' ), $this->defaults['version']
 			);
 			wp_enqueue_script( 'responsive-lightbox-admin' );
 
 			wp_localize_script(
-				'responsive-lightbox-admin', 'rlArgs', array(
-				'resetSettingsToDefaults'	 => __( 'Are you sure you want to reset these settings to defaults?', 'responsive-lightbox' ),
-				'resetScriptToDefaults'		 => __( 'Are you sure you want to reset this script settings to defaults?', 'responsive-lightbox' ),
+				'responsive-lightbox-admin',
+				'rlArgs',
+				array(
+					'resetSettingsToDefaults'	=> __( 'Are you sure you want to reset these settings to defaults?', 'responsive-lightbox' ),
+					'resetScriptToDefaults'		=> __( 'Are you sure you want to reset this script settings to defaults?', 'responsive-lightbox' ),
+					'resetGalleryToDefaults'	=> __( 'Are you sure you want to reset this gallery settings to defaults?', 'responsive-lightbox' )
 				)
 			);
 
@@ -448,6 +454,32 @@ class Responsive_Lightbox {
 			);
 			wp_enqueue_style( 'responsive-lightbox-admin' );
 		}
+	}
+
+	/**
+	 * Enqueue admin widget scripts.
+	 */
+	public function sidebar_admin_setup() {
+		wp_enqueue_media();
+
+		wp_enqueue_script( 'responsive-lightbox-admin-widgets', plugins_url( 'js/admin-widgets.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'] );
+
+		wp_localize_script(
+			'responsive-lightbox-admin-widgets',
+			'rlArgs',
+			array(
+				'textRemoveImage'		=> __( 'Remove image', 'responsive-lightbox' ),
+				'textSelectImages'		=> __( 'Select images', 'responsive-lightbox' ),
+				'textSelectImage'		=> __( 'Select image', 'responsive-lightbox' ),
+				'textUseImages'			=> __( 'Use these images', 'responsive-lightbox' ),
+				'textUseImage'			=> __( 'Use this image', 'responsive-lightbox' )
+			)
+		);
+
+		wp_register_style(
+			'responsive-lightbox-admin', plugins_url( 'css/admin.css', __FILE__ ), array(), $this->defaults['version']
+		);
+		wp_enqueue_style( 'responsive-lightbox-admin' );
 	}
 
 	/**
@@ -735,9 +767,31 @@ class Responsive_Lightbox {
 		if ( ! empty( $args['script'] ) && ! empty( $args['selector'] ) && apply_filters( 'rl_lightbox_conditional_loading', $contitional_scripts ) != false ) {
 
 			wp_register_script( 'responsive-lightbox', plugins_url( 'js/front.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'], ( $this->options['settings']['loading_place'] === 'header' ? false : true ) );
-			
+
+			$args['woocommerce_gallery'] = 0;
+
+			if ( class_exists( 'WooCommerce' ) ) {
+				global $woocommerce;
+
+				if ( ! empty( Responsive_Lightbox()->options['settings']['default_woocommerce_gallery'] ) && Responsive_Lightbox()->options['settings']['default_woocommerce_gallery'] !== 'default' ) {
+					if ( Responsive_Lightbox()->options['settings']['woocommerce_gallery_lightbox'] === true ) {
+						if ( version_compare( $woocommerce->version, '3.0', ">=" ) ) {
+							$args['woocommerce_gallery'] = 1;
+						}
+					}
+				// default gallery?
+				} else {
+					// replace default WooCommerce lightbox?
+					if ( Responsive_Lightbox()->options['settings']['woocommerce_gallery_lightbox'] === true ) {
+						if ( version_compare( $woocommerce->version, '3.0', ">=" ) ) {
+							$args['woocommerce_gallery'] = 1;
+						}
+					}
+				}
+			}
+
 			$scripts[] = 'responsive-lightbox';
-			
+
 			// enqueue scripts
 			if ( $scripts && is_array( $scripts ) ) {
 				foreach ( $scripts as $script ) {

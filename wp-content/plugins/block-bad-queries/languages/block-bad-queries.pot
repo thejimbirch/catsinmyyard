@@ -1,52 +1,91 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Block Bad Queries (BBQ)\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-14 23:17+0000\n"
-"POT-Revision-Date: Wed Aug 10 2016 09:41:45 GMT-0700 (PDT)\n"
+"POT-Creation-Date: 2017-03-23 00:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: \n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
 "Language: \n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-Basepath: .\n"
-"X-Poedit-SearchPath-0: .\n"
-"X-Poedit-KeywordsList: _:1;gettext:1;dgettext:2;ngettext:1,2;dngettext:2,3;"
-"__:1;_e:1;_c:1;_n:1,2;_n_noop:1,2;_nc:1,2;__ngettext:1,2;__ngettext_noop:1,2;"
-"_x:1,2c;_ex:1,2c;_nx:1,2,4c;_nx_noop:1,2,3c;_n_js:1,2;_nx_js:1,2,3c;"
-"esc_attr__:1;esc_html__:1;esc_attr_e:1;esc_html_e:1;esc_attr_x:1,2c;"
-"esc_html_x:1,2c;comments_number_link:2,3;t:1;st:1;trans:1;transChoice:1,2\n"
 "X-Generator: Loco - https://localise.biz/"
 
-#: block-bad-queries.php:63
-msgid "Click here to rate and review this plugin at WordPress.org"
+#: bbq-settings.php:29
+msgid "Plugin Information"
 msgstr ""
 
-#: block-bad-queries.php:64
-msgid "Rate this plugin&nbsp;&raquo;"
+#: bbq-settings.php:32
+msgid "BBQ Version"
 msgstr ""
 
-#: block-bad-queries.php:80
-msgid "Get BBQ Pro for advanced protection"
+#: bbq-settings.php:34
+msgid "Upgrade to BBQ Pro"
 msgstr ""
 
-#: block-bad-queries.php:81
-msgid "Go&nbsp;Pro"
+#: bbq-settings.php:49
+msgid "Thanks for using the free version of "
 msgstr ""
 
 #. Name of the plugin
+#: bbq-settings.php:50
 msgid "Block Bad Queries (BBQ)"
+msgstr ""
+
+#: bbq-settings.php:51
+msgid ""
+"The free version is completely plug-&amp;-play, protecting your site "
+"automatically with no settings required."
+msgstr ""
+
+#: bbq-settings.php:58
+msgid ""
+"Upgrade your site security with advanced protection and complete control. "
+msgstr ""
+
+#: bbq-settings.php:59
+msgid "BBQ Pro: Advanced WordPress Firewall"
+msgstr ""
+
+#: bbq-settings.php:64
+msgid "Get BBQ Pro &raquo;"
+msgstr ""
+
+#: bbq-settings.php:92
+msgid "Visit the BBQ plugin page"
+msgstr ""
+
+#: bbq-settings.php:93
+msgid "Settings"
+msgstr ""
+
+#: bbq-settings.php:98
+msgid "Get BBQ Pro for advanced protection"
+msgstr ""
+
+#: bbq-settings.php:99
+msgid "Go&nbsp;Pro"
+msgstr ""
+
+#: bbq-settings.php:118
+msgid "Click here to rate and review this plugin at WordPress.org"
+msgstr ""
+
+#: bbq-settings.php:119
+msgid "Rate this plugin&nbsp;&raquo;"
+msgstr ""
+
+#: bbq-settings.php:132 bbq-settings.php:143
+msgid "Block Bad Queries"
 msgstr ""
 
 #. Description of the plugin
 msgid ""
-"Automatically protects WordPress against malicious URL requests. This is the "
-"free/basic version of BBQ."
+"BBQ is a super fast firewall that automatically protects WordPress against "
+"malicious URL requests."
 msgstr ""
 
 #. URI of the plugin

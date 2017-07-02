@@ -2,23 +2,42 @@
 /*
 	Plugin Name: Block Bad Queries (BBQ)
 	Plugin URI: https://perishablepress.com/block-bad-queries/
-	Description: Automatically protects WordPress against malicious URL requests. This is the free/basic version of BBQ.
-	Tags: security, protect, firewall, php, eval, malicious, url, request, blacklist
-	Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests.
+	Description: BBQ is a super fast firewall that automatically protects WordPress against malicious URL requests.
+	Tags: firewall, security, protect, lockdown, blacklist,  hack, eval, http, malicious, query, request, secure, spam, whitelist
+	Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests. For advanced protection check out BBQ Pro.
 	Author: Jeff Starr
 	Author URI: https://plugin-planet.com/
 	Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsult
-	Donate link: http://m0n.co/donate
+	Donate link: https://m0n.co/donate
 	Requires at least: 4.1
-	Tested up to: 4.7
-	Stable tag: 20161114
-	Version: 20161114
+	Tested up to: 4.8
+	Stable tag: 20170322
+	Version: 20170322
 	Text Domain: block-bad-queries
 	Domain Path: /languages
 	License: GPLv2 or later
 */
 
+/*
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	Get a copy of the GNU General Public License: http://www.gnu.org/licenses/
+*/
+
 if (!defined('ABSPATH')) die();
+
+if (!defined('BBQ_VERSION')) define('BBQ_VERSION', '20170322');
+if (!defined('BBQ_FILE'))    define('BBQ_FILE', plugin_basename(__FILE__));
+if (!defined('BBQ_DIR'))     define('BBQ_DIR',  plugin_dir_path(__FILE__));
+if (!defined('BBQ_URL'))     define('BBQ_URL',  plugin_dir_url(__FILE__));
 
 function bbq_core() {
 	
@@ -55,48 +74,6 @@ function bbq_core() {
 }
 add_action('plugins_loaded', 'bbq_core');
 
-function bbq_meta_links($links, $file) {
-	
-	if ($file == plugin_basename(__FILE__)) {
-		
-		$rate_url   = 'https://wordpress.org/support/plugin/block-bad-queries/reviews/?rate=5#new-post';
-		$rate_title = esc_attr__('Click here to rate and review this plugin at WordPress.org', 'block-bad-queries');
-		$rate_text  = esc_html__('Rate this plugin&nbsp;&raquo;', 'block-bad-queries');
-		
-		$links[] = '<a target="_blank" href="'. $rate_url .'" title="'. $rate_title .'">'. $rate_text .'</a>';
-		
-	}
-	
-	return $links;
-	
-}
-add_filter('plugin_row_meta', 'bbq_meta_links', 10, 2);
-
-function bbq_action_links($links, $file) {
-	
-	if ($file == plugin_basename(__FILE__)) {
-		
-		$pro_url   = 'https://plugin-planet.com/bbq-pro/?plugin';
-		$pro_title = esc_attr__('Get BBQ Pro for advanced protection', 'block-bad-queries');
-		$pro_text  = esc_html__('Go&nbsp;Pro', 'block-bad-queries');
-		$pro_style = 'padding:1px 5px 2px 5px;color:#fff;background:#feba12;border-radius:1px;';
-		
-		$links[] = '<a target="_blank" href="'. $pro_url .'" title="'. $pro_title .'" style="'. $pro_style .'">'. $pro_text .'</a>';
-		
-	}
-	
-	return $links;
-	
-}
-add_filter('plugin_action_links', 'bbq_action_links', 10, 2);
-
-function bbq_languages() {
-	
-	load_plugin_textdomain('block-bad-queries', false, basename(dirname(__FILE__)) .'/languages/');
-	
-}
-add_action('plugins_loaded', 'bbq_languages');
-
 function bbq_response() {
 	
 	header('HTTP/1.1 403 Forbidden');
@@ -106,3 +83,5 @@ function bbq_response() {
 	exit;
 	
 }
+
+if (is_admin()) require_once BBQ_DIR .'bbq-settings.php';

@@ -2,6 +2,7 @@
 
 function arve_sc_filter_attr( $a ) {
 
+	$wrapper_id = null;
 	$align_class = empty( $a['align'] ) ? '' : ' align' . $a['align'];
 
 	foreach ( array( 'id', 'mp4', 'm4v', 'webm', 'ogv', 'url', 'webtorrent' ) as $att ) {
@@ -66,7 +67,7 @@ function arve_sc_filter_attr( $a ) {
 			$iframe_src .= '#t=' . (int) $a['start'];
 		}
 
-		$iframe_sandbox = 'allow-scripts allow-same-origin allow-popups';
+		$iframe_sandbox = 'allow-scripts allow-same-origin allow-presentation allow-popups';
 
 		if ( 'vimeo' == $a['provider'] ) {
 			$iframe_sandbox .= ' allow-forms';

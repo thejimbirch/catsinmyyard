@@ -1,18 +1,18 @@
 === Contact Form 7 MailChimp Extension ===
 Contributors: rnzo
 Donate link: https://www.paypal.me/renzojohnson
-Tags: contact form 7, email, mailing list, createsend, mandrill, renzo, renzo johnson, cme, contact, form, contact form, mail chimp, newsletter, mailchimp, chimpmail
+Tags: mailchimp, chimpmail, mailchimp form, mailchimp list, newsletter
 Requires at least: 4.0
-Tested up to: 4.8
+Tested up to: 4.9
 Stable tag: 4.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Simple way to integrate MailChimp mailing lists to Contact Form 7. Save your subscribers in a proper mailing list.
+MailChimp for Wordpress. Simple way to integrate MailChimp mailing lists to Contact Form 7. Save your subscribers in a proper mailing list.
 
 == Description ==
 
-Integrate Contact Form 7 with [MailChimp](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension). Automatically add form submissions to predetermined lists in MailChimp, using its latest API. This MailChimp Extension supports multiple mailing lists and API Keys.
+MailChimp for Wordpress. Integrate Contact Form 7 with [MailChimp](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension). Automatically add form submissions to predetermined lists in MailChimp, using its latest API. This MailChimp Extension supports multiple mailing lists and API Keys.
 
 > <strong>Mailchimp Extension Support</strong><br>
 > Active support is not always provided for the <a href="http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension" rel="friend">Contact Form 7 MailChimp Extension</a> on the WordPress.org forums. One-on-one email support is available to people who email the <a href="http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension" rel="friend">Mailchimp Extension developer</a>.

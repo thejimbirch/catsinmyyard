@@ -21,7 +21,8 @@ class Responsive_Lightbox_Frontend {
 		add_filter( 'post_gallery', array( $this, 'gallery_attributes' ), 1000 );
 		add_filter( 'the_content', array( $this, 'add_links_lightbox_selector' ) );
 		add_filter( 'the_content', array( $this, 'add_videos_lightbox_selector' ) );
-		add_filter( 'the_content', array( $this, 'add_custom_gallery_lightbox_selector' ), 2000, 2 );
+		add_filter( 'the_content', array( $this, 'add_custom_gallery_lightbox_selector' ), 2000 );
+		add_filter( 'post_gallery', array( $this, 'add_custom_gallery_lightbox_selector' ), 2000 );
 		add_filter( 'wp_get_attachment_link', array( $this, 'add_gallery_lightbox_selector' ), 1000, 6 );
 		add_filter( 'woocommerce_single_product_image_html', array( $this, 'woocommerce_single_product_image_html' ), 100 );
 		add_filter( 'woocommerce_single_product_image_thumbnail_html', array( $this, 'woocommerce_single_product_image_thumbnail_html' ), 100 );
@@ -140,11 +141,9 @@ class Responsive_Lightbox_Frontend {
 	 */
 	public function add_custom_gallery_lightbox_selector( $content ) {
 		if ( Responsive_Lightbox()->options['settings']['force_custom_gallery'] ) {
-
 			preg_match_all( '/<a(.*?)href=(?:\'|")([^<]*?).(bmp|gif|jpeg|jpg|png)(?:\'|")(.*?)>/i', $content, $links );
 
 			if ( isset( $links[0] ) ) {
-
 				foreach ( $links[0] as $id => $link ) {
 					// gallery image title
 					$title = '';
@@ -171,14 +170,16 @@ class Responsive_Lightbox_Frontend {
 						// do not modify this link
 						if ( $result[1] === 'norl' )
 							continue;
-						
+
 						$content = str_replace( $link, preg_replace( '/(?:data-rel)=(?:\'|")(.*?)(?:\'|")/', 'data-rel="' . Responsive_Lightbox()->options['settings']['selector'] . '-gallery-' . base64_encode( $result[1] ) . '"' . ( ! empty ( $title ) ? ' title="' . esc_attr( $title ) . '"' : '' ) . ( Responsive_Lightbox()->options['settings']['script'] === 'imagelightbox' ? ' data-imagelightbox="' . $id . '"' : '' ), $link ), $content );
 					} elseif ( preg_match( '/<a.*?(?:rel)=(?:\'|")(.*?)(?:\'|").*?>/', $link, $result ) === 1 ) {
 						// do not modify this link
 						if ( $result[1] === 'norl' )
 							continue;
-						
+
 						$content = str_replace( $link, preg_replace( '/(?:rel)=(?:\'|")(.*?)(?:\'|")/', 'data-rel="' . Responsive_Lightbox()->options['settings']['selector'] . '-gallery-' . base64_encode( $result[1] ) . '"' . ( ! empty ( $title ) ? ' title="' . esc_attr( $title ) . '"' : '' ) . ( Responsive_Lightbox()->options['settings']['script'] === 'imagelightbox' ? ' data-imagelightbox="' . $id . '"' : '' ), $link ), $content );
+					} else {
+						$content = str_replace( $link, '<a' . $links[1][$id] . ' href="' . $links[2][$id] . '.' . $links[3][$id] . '" data-rel="' . Responsive_Lightbox()->options['settings']['selector'] . '-gallery-' . base64_encode( $this->gallery_no ) . '"' . ( ! empty ( $title ) ? ' title="' . esc_attr( $title ) . '"' : '' ) . ( Responsive_Lightbox()->options['settings']['script'] === 'imagelightbox' ? ' data-imagelightbox="' . $id . '"' : '' ) . $links[4][$id] . '>', $content );
 					}
 				}
 			}

@@ -2,17 +2,19 @@
 
 Plugin Name: Block Bad Queries (BBQ)
 Plugin URI: https://perishablepress.com/block-bad-queries/
-Description: Automatically protects WordPress against malicious URL requests. This is the free/basic version of BBQ.
-Tags: blacklist, eval, firewall, hack, http, lockdown, malicious, protect, query, request, security, secure, spam, whitelist
+Description: BBQ is a super fast firewall that automatically protects WordPress against malicious URL requests.
+Tags: firewall, security, protect, lockdown, blacklist,  hack, eval, http, malicious, query, request, secure, spam, whitelist
 Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests. For advanced protection check out BBQ Pro.
 Author: Jeff Starr
 Author URI: https://plugin-planet.com/
 Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsult
-Donate link: http://m0n.co/donate
+Donate link: https://m0n.co/donate
 Requires at least: 4.1
-Tested up to: 4.7
-Stable tag: 20161114
-Version: 20161114
+Tested up to: 4.8
+Stable tag: 20170322
+Version: 20170322
+Text Domain: block-bad-queries
+Domain Path: /languages
 License: GPLv2 or later
 
 The fastest firewall plugin for WordPress.
@@ -32,6 +34,9 @@ The fastest firewall plugin for WordPress.
 * Born of speed and simplicity, no frills
 * 100% focused on security and performance
 * Blocks a wide range of malicious requests
+* Blocks directory traversal attacks
+* Blocks executable file uploads
+* Blocks SQL injection attacks
 * Based on the [5G/6G Firewall](https://perishablepress.com/6g/)
 * Scans all incoming traffic and blocks bad requests
 * Scans all types of requests: GET, POST, PUT, DELETE, etc.
@@ -87,12 +92,22 @@ The Pro version of BBQ is just as fast and simple to use, but is much more power
 
 **What other security plugins do you recommend?**
 
-I recently recorded a video tutorial series for Lynda.com on [how to secure WordPress sites](http://m0n.co/securewp). That's a good place to learn more about the best techniques and WP plugins for protecting your site against threats.
+I recently recorded a video tutorial series for Lynda.com on [how to secure WordPress sites](https://m0n.co/securewp). That's a good place to learn more about the best techniques and WP plugins for protecting your site against threats.
 
 
 **Do I need to do anything else for BBQ to work?**
 
 Nope, just install and relax knowing that BBQ is protecting your site from bad URL requests.
+
+
+**I just installed this plugin and I don’t see NO MENU or any Settings whatsoever? Where is the settings?**
+
+No settings page needed for BBQ! Everything is done automatically behind the scenes. Zero configuration required. The free version of BBQ is strictly plug-n-play, set-it-and-forget-it, with no settings to configure whatsoever. Just install, activate, and enjoy better security and robust protection against malicious requests. The Pro version of BBQ is just as fast and simple to use, but is much more powerful and includes robust settings to customize and fine-tune your firewall.
+
+
+**Is BBQ free version compatible with Wordfence? Does it makes sense to use both?**
+
+Yes BBQ free and BBQ Pro are both compatible with any plugin written according to the WP API. And yes, there is benefit to using BBQ with any other security plugin, including Wordfence. They protect against different threats, so using both means you are extra secure.
 
 
 **Does BBQ make changes to my .htaccess file?**
@@ -129,7 +144,7 @@ Send any questions or feedback via my [contact form](https://perishablepress.com
 
 == Support development of this plugin ==
 
-I develop and maintain this free plugin with love for the WordPress community. To show support, you can [make a cash donation](http://m0n.co/donate), [bitcoin donation](http://m0n.co/bitcoin), or purchase one of my books:
+I develop and maintain this free plugin with love for the WordPress community. To show support, you can [make a cash donation](https://m0n.co/donate), [bitcoin donation](https://m0n.co/bitcoin), or purchase one of my books:
 
 * [The Tao of WordPress](https://wp-tao.com/)
 * [Digging into WordPress](https://digwp.com/)
@@ -139,6 +154,7 @@ I develop and maintain this free plugin with love for the WordPress community. T
 And/or purchase one of my premium WordPress plugins:
 
 * [BBQ Pro](https://plugin-planet.com/bbq-pro/) - Pro version of Block Bad Queries
+* [Blackhole Pro](https://plugin-planet.com/blackhole-pro/) - Pro version of Blackhole for Bad Bots
 * [SES Pro](https://plugin-planet.com/ses-pro/) - Super-simple &amp; flexible email signup forms
 * [USP Pro](https://plugin-planet.com/usp-pro/) - Pro version of User Submitted Posts
 
@@ -147,6 +163,13 @@ Links, tweets and likes also appreciated. Thank you! :)
 
 
 == Changelog ==
+
+**2017/03/22**
+
+* Adds plugin settings page
+* Adds French translation (thanks to Bouzin)
+* Generates new default translation template
+* Tests on WordPress version 4.8
 
 **2016/11/14**
 

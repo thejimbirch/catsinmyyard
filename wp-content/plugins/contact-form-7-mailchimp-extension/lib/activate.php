@@ -48,22 +48,11 @@ function mce_act_redirect( $plugin ) {
 
   }
 
-  delete_option('mce_show_notice', 0);
-  update_site_option('mce_show_notice', 1);
+
 
 }
 add_action( 'activated_plugin', 'mce_act_redirect' );
 
-
-
-/**
-    Shows the update notice
-    delete_option('mce_show_notice', 0);
-    update_site_option('mce_show_notice', 1);
- */
-
-// delete_option('mce_show_notice', 0);
-// add_option('mce_show_notice','1');
 
 
 if (get_site_option('mce_show_notice') == 1){
@@ -126,6 +115,14 @@ if (get_site_option('mce_show_notice') == 1){
     $result = update_site_option('mce_show_notice', 0);
     return $result;
     wp_die();
+  }
+
+}
+
+function mce_help() {
+
+  if (get_site_option('mce_show_notice') == NULL){
+    update_site_option('mce_show_notice', true);
   }
 
 }

@@ -1,13 +1,13 @@
 === Smush Image Compression and Optimization ===
 Plugin Name: Smush Image Compression and Optimization
-Version: 2.7.1
+Version: 2.7.4
 Author: WPMU DEV
 Author URI: http://premium.wpmudev.org/
 Contributors: WPMUDEV, alexdunae
 Tags: image, resize, optimize, compress, performance, lossless, lossy, photo, pictures, optimize JPG, compress PNG, Smush WordPress Compression, Smush.it
 Requires at least: 3.5
-Tested up to: 4.7.3
-Stable tag: 2.7.1
+Tested up to: 4.8
+Stable tag: 2.7.4
 License: GPL v2 - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
 Compress and optimize image files, improve performance and boost your SEO rank using Smush WordPress image compression and optimization.
@@ -37,7 +37,7 @@ In addition to smushing your media uploads, you may want to compress the images 
 
 = Compatible with Your Favorite Media Library Plugins =
 
-No matter what plugins you use to better manage your WordPress media library, Smush has you covered. Check out just a few of the plugins Smush is working with to help make your site faster and more efficient:  
+No matter what plugins you use to better manage your WordPress media library, Smush has you covered. Check out just a few of the plugins Smush is working with to help make your site faster and more efficient:
 
 * <a href="https://wordpress.org/plugins/wp-all-import/">WP All Import</a>
 * <a href="https://wordpress.org/plugins/amazon-s3-and-cloudfront/">WP Offload S3</a>
@@ -148,9 +148,36 @@ Yahoo's Smush.it API is gone forever. So WPMU DEV built our own free API that is
 
 == Changelog ==
 
+= 2.7.4 =
+
+* Update: Minor UI changes
+* Fixed:
+    * Images not being resized when image is uploaded via Mobile App
+    * Notices and Warnings
+    * S3 offload Integration - Original Image not being deleted in some cases
+
+= 2.7.3.1 =
+
+* Fixed: Pro user unable to login to WPMU DEV Dashboard plugin when Smush is active, Error: "Your key is invalid."
+* Updated: S3 Integration, return URL for any error, 'as3cf_get_attached_file'
+
+= 2.7.3 =
+
+* Fixed:
+    * Manual Smush not working
+    * Bulk Smush broken for few sites
+
+= 2.7.2 =
+
+* Updated:
+    * Use JS for stats calculation while using Bulk Smush, to reduce the Ajax time
+* Fixed:
+    * Some Images would keep appearing in the re-smush list, if "Resize original images" is enabled
+    * Enable buttons in settings redirects to network smush settings page in a subsite if networkwide settings are enabled
+
 = 2.7.1 =
 
-    * Fixed: Progress bar not updating
+* Fixed: Progress bar not updating
 
 = 2.7 =
 

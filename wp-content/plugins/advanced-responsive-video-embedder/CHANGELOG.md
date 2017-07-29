@@ -4,6 +4,19 @@
 * [ARVE Pro addon changelog](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/changelog/)
 * [ARVE AMP addon changelog](https://nextgenthemes.com/plugins/arve-amp/)
 
+### 2017-07-12 - 8.7.1 ###
+
+* Fix: Throw no PHP notice on admin when WP_DEBUG is enabled.
+* Fix: Fix related to upcoming Pro Addon update and private vimeo videos.
+
+### 2017-07-10 - 8.7.0 ###
+
+* Fix: web.facebook.com/... video urls not getting detected
+
+### 2017-06-17 - 8.6.6 ###
+
+* Fix: Message dismissal not working.
+
 ### 2017-06-17 - 8.6.5 ###
 
 * Fix: Added `allow-presentation` to iframe sandbox to fix Chrome 59 not loading iframes. Thanks njs

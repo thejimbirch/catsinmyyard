@@ -5,15 +5,37 @@ machine:
  PATH: $HOME/.composer/vendor/bin:$PATH
 
 dependencies:
- pre:
- - sudo apt-get update; sudo apt-get install subversion
+  pre:
+    # No password is required for the MySQL user `ubuntu`
+    - mysql -u ubuntu -e "create database wordpress"
+
+    # Use cURL to fetch WP-CLI
+    - curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+
+    # Make sure WP-CLI is executable
+    - chmod +x wp-cli.phar
+
+    # Download WordPress into `wordpress` directory
+    - ./wp-cli.phar core download --allow-root --path=wordpress
+
+    # Generate `wp-config.php` file
+    - ./wp-cli.phar core config --allow-root --dbname=wordpress --dbuser=ubuntu --dbhost=localhost --path=wordpress
+
+    # Install WordPress
+    - ./wp-cli.phar core install --allow-root --admin_name=admin --admin_password=admin --admin_email=admin@example.com
+
+    # Clonse WP Pusher plugin from GitHub
+    # - git clone repo-url
+
+    # And use WP-CLI to activate it
+    # - ./wp-cli.phar plugin activate plugin-name
 
 test:
- pre:
- - bash bin/install-wp-tests.sh wordpress_test ubuntu '' 127.0.0.1 latest
- - |
- composer global require wp-coding-standards/wpcs
- phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
+  pre:
+    - bash bin/install-wp-tests.sh wordpress_test ubuntu '' 127.0.0.1 latest
+    - composer global require wp-coding-standards/wpcs
+    - phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
  override:
- - phpcs --standard=phpcs.ruleset.xml $(find . -name '*.php')
- - phpunit
+   - phpcs --standard=phpcs.ruleset.xml $(find . -name '*.php')
+   - phpunit
+

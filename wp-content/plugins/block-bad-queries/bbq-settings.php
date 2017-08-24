@@ -129,7 +129,7 @@ add_filter('plugin_row_meta', 'bbq_meta_links', 10, 2);
 
 function bbq_menu_page() {
 	
-	$title = esc_html__('Block Bad Queries', 'block-bad-queries');
+	$title = esc_html__('BBQ Firewall', 'block-bad-queries');
 	
 	// add_options_page( $page_title, $menu_title, $capability, $menu_slug, $function);
 	add_options_page($title, $title, 'manage_options', 'bbq_settings', 'bbq_display_settings');

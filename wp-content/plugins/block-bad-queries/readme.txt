@@ -3,7 +3,7 @@
 Plugin Name: Block Bad Queries (BBQ)
 Plugin URI: https://perishablepress.com/block-bad-queries/
 Description: BBQ is a super fast firewall that automatically protects WordPress against malicious URL requests.
-Tags: firewall, security, protect, lockdown, blacklist,  hack, eval, http, malicious, query, request, secure, spam, whitelist
+Tags: firewall, security, protect, malicious, hack,  blacklist, lockdown, eval, http, query, request, secure, spam, whitelist
 Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests. For advanced protection check out BBQ Pro.
 Author: Jeff Starr
 Author URI: https://plugin-planet.com/
@@ -11,8 +11,8 @@ Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsul
 Donate link: https://m0n.co/donate
 Requires at least: 4.1
 Tested up to: 4.8
-Stable tag: 20170322
-Version: 20170322
+Stable tag: 20170730
+Version: 20170730
 Text Domain: block-bad-queries
 Domain Path: /languages
 License: GPLv2 or later
@@ -23,7 +23,8 @@ The fastest firewall plugin for WordPress.
 
 == Description ==
 
-> Install, activate, and done! Powerful protection from WP's __fastest__ firewall plugin.
+> Install, activate, and done!<br/>
+> Powerful protection from WP's __fastest__ firewall plugin.
 
 [Block Bad Queries](https://perishablepress.com/block-bad-queries/) (BBQ) is a simple, super-fast plugin that protects your site against malicious URL requests. BBQ checks all incoming traffic and quietly blocks bad requests containing nasty stuff like `eval(`, `base64_`, and excessively long request-strings. This is a simple yet solid solution for sites that are unable to use a [strong .htaccess firewall](https://perishablepress.com/6g/). 
 
@@ -163,6 +164,11 @@ Links, tweets and likes also appreciated. Thank you! :)
 
 
 == Changelog ==
+
+**2017/07/30**
+
+* Changed menu item name to "BBQ Firewall"
+* Tests on WordPress 4.9 (alpha)
 
 **2017/03/22**
 

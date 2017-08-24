@@ -3,7 +3,7 @@
 	Plugin Name: Block Bad Queries (BBQ)
 	Plugin URI: https://perishablepress.com/block-bad-queries/
 	Description: BBQ is a super fast firewall that automatically protects WordPress against malicious URL requests.
-	Tags: firewall, security, protect, lockdown, blacklist,  hack, eval, http, malicious, query, request, secure, spam, whitelist
+	Tags: firewall, security, protect, malicious, hack,  blacklist, lockdown, eval, http, query, request, secure, spam, whitelist
 	Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad queries automically to protect your site against malicious URL requests. For advanced protection check out BBQ Pro.
 	Author: Jeff Starr
 	Author URI: https://plugin-planet.com/
@@ -11,8 +11,8 @@
 	Donate link: https://m0n.co/donate
 	Requires at least: 4.1
 	Tested up to: 4.8
-	Stable tag: 20170322
-	Version: 20170322
+	Stable tag: 20170730
+	Version: 20170730
 	Text Domain: block-bad-queries
 	Domain Path: /languages
 	License: GPLv2 or later
@@ -21,20 +21,23 @@
 /*
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
+	as published by the Free Software Foundation; either version 
+	2 of the License, or (at your option) any later version.
 	
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
 	
-	Get a copy of the GNU General Public License: http://www.gnu.org/licenses/
+	You should have received a copy of the GNU General Public License
+	with this program. If not, visit: https://www.gnu.org/licenses/
+	
+	Copyright 2017 Monzilla Media. All rights reserved.
 */
 
 if (!defined('ABSPATH')) die();
 
-if (!defined('BBQ_VERSION')) define('BBQ_VERSION', '20170322');
+if (!defined('BBQ_VERSION')) define('BBQ_VERSION', '20170730');
 if (!defined('BBQ_FILE'))    define('BBQ_FILE', plugin_basename(__FILE__));
 if (!defined('BBQ_DIR'))     define('BBQ_DIR',  plugin_dir_path(__FILE__));
 if (!defined('BBQ_URL'))     define('BBQ_URL',  plugin_dir_url(__FILE__));

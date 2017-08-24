@@ -1,9 +1,9 @@
 /*
  Theme Name:   Wordpress Bootstrap Child
- Theme URI:    http://www.catsinmmyyard.com/
+ Theme URI:    https://www.catsinmmyyard.com/
  Description:  Cats In My Yard Child Theme
  Author:       Jim Birch
- Author URI:   http://www.catsinmyyard.com
+ Author URI:   https://www.catsinmyyard.com
  Template:     wordpress-bootstrap-master
  Version:      1.0.0
  Tags:         bootstrap
@@ -72,7 +72,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     font-size: 1.5em;
 }
 
-#tinymce img, 
+#tinymce img,
 #tinymce iframe {
     margin-top: 1em;
     margin-bottom: 1em;

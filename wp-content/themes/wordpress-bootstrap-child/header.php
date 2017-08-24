@@ -17,13 +17,13 @@
             <?php $url = wp_get_attachment_url( get_post_thumbnail_id($post->ID) ); ?>
                 <meta property="og:image" content="<?php echo $url; ?>" />
             <?php } elseif ( has_post_thumbnail() && is_front_page() ) { ?>
-                <meta property="og:image" content="http://www.catsinmyyard.com/wp-content/uploads/2015/01/VColony2.jpg" />
-                <meta property="og:image" content="http://www.catsinmyyard.com/wp-content/themes/wordpress-bootstrap-child/library/img/Cats-In-My-Yard-Logo-1024.png" />
-                <meta property="og:image" content="http://catsinmyyard.com/wp-content/uploads/2010/06/Cats-In-My-Yard-1024x651.jpg" />
+                <meta property="og:image" content="/wp-content/uploads/2015/01/VColony2.jpg" />
+                <meta property="og:image" content="/wp-content/themes/wordpress-bootstrap-child/library/img/Cats-In-My-Yard-Logo-1024.png" />
+                <meta property="og:image" content="/wp-content/uploads/2010/06/Cats-In-My-Yard-1024x651.jpg" />
             <?php } else { ?>
-                <meta property="og:image" content="http://www.catsinmyyard.com/wp-content/uploads/2015/01/VColony2.jpg" />
-                <meta property="og:image" content="http://www.catsinmyyard.com/wp-content/themes/wordpress-bootstrap-child/library/img/Cats-In-My-Yard-Logo-1024.png" />
-                <meta property="og:image" content="http://catsinmyyard.com/wp-content/uploads/2010/06/Cats-In-My-Yard-1024x651.jpg" />
+                <meta property="og:image" content="/wp-content/uploads/2015/01/VColony2.jpg" />
+                <meta property="og:image" content="/wp-content/themes/wordpress-bootstrap-child/library/img/Cats-In-My-Yard-Logo-1024.png" />
+                <meta property="og:image" content="/wp-content/uploads/2010/06/Cats-In-My-Yard-1024x651.jpg" />
         <?php }?>
         <script src="//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
         <script>
@@ -85,4 +85,4 @@
                     </div><!-- end row -->
                 </div> <!-- end .container -->
             </div> <!-- end .navbar -->
-	   </header> <!-- end header -->
+	    </header> <!-- end header -->

@@ -25,8 +25,12 @@ class UpdraftPlus_UpdraftCentral_Main {
 			'users' => 'UpdraftCentral_Users_Commands',
 			'comments' => 'UpdraftCentral_Comments_Commands',
 			'updraftvault' => 'UpdraftCentral_UpdraftVault_Commands',
+			'analytics' => 'UpdraftCentral_Analytics_Commands'
 		));
 	
+		// If nothing was POSTed, then there is no incoming message, so no need to set up a listener. This avoids a DB SELECT query on the option below in the case where it didn't get autoloaded, which is the case when there are no keys.
+		if (empty($_POST)) return;
+		
 		// Remote control keys
 		// These are different from the remote send keys, which are set up in the Migrator add-on
 		$our_keys = UpdraftPlus_Options::get_updraft_option('updraft_central_localkeys');
@@ -74,6 +78,11 @@ class UpdraftPlus_UpdraftCentral_Main {
 		die;
 	}
 	
+	/**
+	 * Checks _wpnonce, and if successful, saves the public key found in $_GET
+	 *
+	 * @return Array - with keys responsetype (can be 'error' or 'ok') and code, indicating whether the parse was successful
+	 */
 	private function receive_public_key() {
 		
 		if (!is_user_logged_in()) {

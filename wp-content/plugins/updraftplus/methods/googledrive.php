@@ -938,7 +938,7 @@ class UpdraftPlus_BackupModule_googledrive extends UpdraftPlus_BackupModule {
 				// Error handling??
 				$pointer += strlen($chunk);
 				$status = $media->nextChunk($chunk);
-				$this->jobdata_set($transkey, array($media->updraftplus_getResumeUri(), $media->getProgress()), 'gd'.$transkey);
+				$this->jobdata_set($transkey, array($media->updraftplus_getResumeUri(), $media->getProgress()));
 				$updraftplus->record_uploaded_chunk(round(100*$pointer/$local_size, 1), $media->getProgress(), $file);
 			}
 			

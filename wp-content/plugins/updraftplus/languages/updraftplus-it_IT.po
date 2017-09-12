@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the UpdraftPlus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-01-31 17:20:57+0000\n"
+"PO-Revision-Date: 2017-09-05 14:31:53+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -144,15 +144,15 @@ msgstr ""
 #: src/methods/updraftvault.php:71,
 #: src/templates/wp-admin/settings/tab-addons.php:277
 msgid "UpdraftVault"
-msgstr ""
+msgstr "UpdraftVault"
 
 #: src/includes/class-wpadmin-commands.php:488
 msgid "archive"
-msgstr ""
+msgstr "archivio"
 
 #: src/includes/class-wpadmin-commands.php:479
 msgid "Extra database"
-msgstr ""
+msgstr "Extra database"
 
 #: src/admin.php:3436
 msgid "Press here to download or browse"
@@ -160,7 +160,7 @@ msgstr ""
 
 #: src/admin.php:1070, src/admin.php:1080
 msgid "Error: invalid path"
-msgstr ""
+msgstr "Errore: percorso non valido"
 
 #: src/admin.php:928
 msgid "An error occurred when fetching storage module options: "
@@ -176,7 +176,7 @@ msgstr ""
 
 #: src/admin.php:754
 msgid "Search"
-msgstr ""
+msgstr "Cerca"
 
 #: src/admin.php:753
 msgid "Select a file to view information about it"
@@ -192,7 +192,7 @@ msgstr ""
 
 #: src/admin.php:669
 msgid "Browse contents"
-msgstr ""
+msgstr "Sfoglia il contenuto"
 
 #: src/restorer.php:1692
 msgid "Skipped tables:"
@@ -220,7 +220,7 @@ msgstr ""
 
 #: src/admin.php:751
 msgid "The available memory on the server."
-msgstr ""
+msgstr "Memoria disponibile sul server."
 
 #: src/admin.php:751
 msgid "Any settings in your .htaccess or web.config file that affects the maximum upload or post size."
@@ -232,7 +232,7 @@ msgstr ""
 
 #: src/admin.php:750
 msgid "HTTP code:"
-msgstr ""
+msgstr "codice HTTP:"
 
 #: src/admin.php:646
 msgid "You have chosen to backup a database, but no tables have been selected"
@@ -270,11 +270,11 @@ msgstr ""
 #: src/templates/wp-admin/settings/tab-addons.php:37,
 #: src/templates/wp-admin/settings/tab-addons.php:272
 msgid "UpdraftPlus Gold"
-msgstr ""
+msgstr "UpdraftPlus Gold"
 
 #: src/templates/wp-admin/settings/tab-addons.php:266
 msgid "UpdraftPlus Free"
-msgstr ""
+msgstr "UpdraftPlus Free"
 
 #: src/templates/wp-admin/settings/tab-addons.php:263
 msgid "Other products bundled with UpdraftPlus Premium or Gold"
@@ -313,7 +313,7 @@ msgstr ""
 #: src/templates/wp-admin/settings/tab-addons.php:183,
 #: src/templates/wp-admin/settings/tab-addons.php:184
 msgid "More database options"
-msgstr ""
+msgstr "Ulteriori opzioni per il database"
 
 #: src/templates/wp-admin/settings/tab-addons.php:169
 msgid "Set exact times to create or delete backups."
@@ -382,7 +382,7 @@ msgstr ""
 #: src/templates/wp-admin/settings/tab-addons.php:320,
 #: src/templates/wp-admin/settings/tab-addons.php:323
 msgid "Upgrade now"
-msgstr ""
+msgstr "Fai l'upgrade"
 
 #: src/templates/wp-admin/settings/tab-addons.php:44,
 #: src/templates/wp-admin/settings/tab-addons.php:317
@@ -395,13 +395,13 @@ msgstr ""
 
 #: src/templates/wp-admin/settings/tab-addons.php:30
 msgid "Free"
-msgstr ""
+msgstr "Gratuito"
 
 #: src/templates/wp-admin/settings/tab-addons.php:30,
 #: src/templates/wp-admin/settings/tab-addons.php:34,
 #: src/templates/wp-admin/settings/tab-addons.php:38
 msgid "UpdraftPlus"
-msgstr ""
+msgstr "UpdraftPlus"
 
 #: src/templates/wp-admin/settings/form-contents.php:245
 msgid "Recommended: optimize your database with WP-Optimize."
@@ -510,29 +510,29 @@ msgstr ""
 #: src/templates/wp-admin/notices/report-plain.php:27,
 #: src/templates/wp-admin/notices/report.php:24
 msgid "Get Premium"
-msgstr ""
+msgstr "Ottieni Premium"
 
 #: src/templates/wp-admin/notices/bottom-notice.php:23,
 #: src/templates/wp-admin/notices/horizontal-notice.php:34,
 #: src/templates/wp-admin/notices/report-plain.php:25,
 #: src/templates/wp-admin/notices/report.php:22
 msgid "Review UpdraftPlus"
-msgstr ""
+msgstr "Recensisci UpdraftPlus"
 
 #: src/templates/wp-admin/notices/bottom-notice.php:21,
 #: src/templates/wp-admin/notices/horizontal-notice.php:32,
 #: src/templates/wp-admin/notices/report-plain.php:23,
 #: src/templates/wp-admin/notices/report.php:20
 msgid "Get UpdraftCentral"
-msgstr ""
+msgstr "Ottieni UpdraftCentral"
 
 #: src/templates/wp-admin/advanced/site-info.php:84
 msgid "Apache modules"
-msgstr ""
+msgstr "moduli Apache"
 
 #: src/includes/updraftplus-notices.php:255
 msgid "Summer sale - 20% off UpdraftPlus Premium until July 31st"
-msgstr ""
+msgstr "Offerta estiva: -20% di sconto su UpdraftPlus Premium fino al 31 luglio"
 
 #: src/includes/updraftplus-notices.php:242
 msgid "Spring sale - 20% off UpdraftPlus Premium until April 31st"
@@ -569,7 +569,7 @@ msgstr ""
 
 #: src/includes/updraftplus-notices.php:141
 msgid "UpdraftPlus Newsletter"
-msgstr ""
+msgstr "UpdraftPlus Newsletter"
 
 #: src/includes/updraftplus-notices.php:112
 msgid "Control all your WordPress installations from one place using UpdraftCentral remote site management!"
@@ -577,7 +577,7 @@ msgstr ""
 
 #: src/includes/updraftplus-notices.php:111
 msgid "Do you use UpdraftPlus on multiple sites?"
-msgstr ""
+msgstr "Usi UpdraftPlus con più siti?"
 
 #: src/includes/updraftplus-notices.php:92,
 #: src/templates/wp-admin/settings/tab-addons.php:300
@@ -610,7 +610,7 @@ msgstr ""
 
 #: src/includes/updraftplus-notices.php:61
 msgid "advanced options"
-msgstr ""
+msgstr "opzioni avanzate"
 
 #: src/includes/updraftplus-notices.php:52
 msgid "Enhanced storage options for Dropbox, Google Drive and S3. Plus many more options."
@@ -635,7 +635,7 @@ msgstr ""
 
 #: src/includes/updraftplus-notices.php:31
 msgid "support"
-msgstr ""
+msgstr "supporto"
 
 #: src/includes/updraftplus-notices.php:30,
 #: src/includes/updraftplus-notices.php:40,
@@ -644,7 +644,7 @@ msgstr ""
 #: src/includes/updraftplus-notices.php:70,
 #: src/includes/updraftplus-notices.php:80
 msgid "UpdraftPlus Premium:"
-msgstr ""
+msgstr "UpdraftPlus Premium:"
 
 #: src/templates/wp-admin/settings/tab-status.php:70
 msgid "Then, try out our \"Migrator\" add-on which can perform a direct site-to-site migration. After using it once, you'll have saved the purchase price compared to the time needed to copy a site by hand."
@@ -704,7 +704,7 @@ msgstr ""
 
 #: src/restorer.php:1658
 msgid "Backup of: %s"
-msgstr ""
+msgstr "Backup al: %s"
 
 #: src/methods/googledrive.php:243
 msgid "The client has been deleted from the Google Drive API console. Please create a new Google Drive project and reconnect with UpdraftPlus."
@@ -748,7 +748,7 @@ msgstr ""
 
 #: src/admin.php:749
 msgid "remote files deleted"
-msgstr ""
+msgstr "file remoti cancellati"
 
 #: src/admin.php:747
 msgid "Complete"
@@ -1167,7 +1167,7 @@ msgstr ""
 
 #: src/admin.php:714
 msgid "Please enter a valid URL"
-msgstr ""
+msgstr "Inserisci una URL valida"
 
 #: src/admin.php:697
 msgid "Saving..."
@@ -1749,11 +1749,11 @@ msgstr ""
 
 #: src/admin.php:701
 msgid "Disconnecting..."
-msgstr ""
+msgstr "Disconnessione..."
 
 #: src/admin.php:699
 msgid "Connecting..."
-msgstr ""
+msgstr "Connessione..."
 
 #: src/methods/updraftvault.php:406, src/methods/updraftvault.php:480
 msgid "Refresh current status"
@@ -1779,7 +1779,7 @@ msgstr ""
 
 #: src/admin.php:700, src/methods/updraftvault.php:388
 msgid "Disconnect"
-msgstr ""
+msgstr "Disconnesso"
 
 #: src/methods/updraftvault.php:380
 msgid "Quota:"
@@ -1870,7 +1870,7 @@ msgstr ""
 #: src/addons/azure.php:374, src/addons/googlecloud.php:760,
 #: src/methods/s3.php:1080
 msgid "Delete failed:"
-msgstr ""
+msgstr "Cancellazione fallita:"
 
 #: src/backup.php:3043
 msgid "The zip engine returned the message: %s."
@@ -2103,7 +2103,7 @@ msgstr ""
 
 #: src/addons/migrator.php:2182, src/admin.php:705
 msgid "Add site"
-msgstr ""
+msgstr "Aggiungi sito"
 
 #: src/admin.php:704
 msgid "Adding..."
@@ -2185,7 +2185,7 @@ msgstr ""
 
 #: src/methods/email.php:75
 msgid "configure it here"
-msgstr ""
+msgstr "configuralo qui"
 
 #: src/addons/onedrive.php:618, src/methods/updraftvault.php:618
 msgid "To remove the block, please go here."
@@ -2362,7 +2362,7 @@ msgstr ""
 
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:17
 msgid "Premium WooCommerce plugins"
-msgstr ""
+msgstr "Premium WooCommerce plugin"
 
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:17
 msgid "Free two-factor security plugin"
@@ -2378,7 +2378,7 @@ msgstr "Vai allo shop."
 
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:11
 msgid "Compare with the free version"
-msgstr "Compara con la versione gratuita"
+msgstr "Confronta con la versione gratuita"
 
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:11,
 #: src/templates/wp-admin/settings/tab-addons.php:33,
@@ -2409,7 +2409,7 @@ msgstr ""
 
 #: src/admin.php:3012
 msgid "No backup has been completed"
-msgstr ""
+msgstr "Nessun backup è stato completato"
 
 #: src/templates/wp-admin/settings/tab-addons.php:14
 msgid "The first step is to de-install the free version."
@@ -2421,7 +2421,7 @@ msgstr ""
 
 #: src/templates/wp-admin/settings/header.php:21
 msgid "Newsletter sign-up"
-msgstr ""
+msgstr "Iscrizione alla newsletter"
 
 #: src/includes/updraftplus-notices.php:142
 msgid "Follow this link to sign up for the UpdraftPlus newsletter."
@@ -2446,7 +2446,7 @@ msgstr ""
 
 #: src/templates/wp-admin/settings/tab-addons.php:16
 msgid "Get UpdraftPlus Premium"
-msgstr ""
+msgstr "Ottieni UpdraftPlus Premium"
 
 #: src/templates/wp-admin/settings/tab-addons.php:14
 msgid "You are currently using the free version of UpdraftPlus from wordpress.org."
@@ -2795,7 +2795,7 @@ msgstr "È necessario consultare il fornitore di web hosting per sapere come imp
 
 #: src/templates/wp-admin/advanced/advanced-tools.php:6
 msgid "Unless you have a problem, you can completely ignore everything here."
-msgstr "A meno che non si verifichi un problem, è possibile ignorare completamente questo."
+msgstr "A meno che non si verifichi un problema, è possibile ignorare completamente questi dati."
 
 #: src/admin.php:1935
 msgid "This file could not be uploaded"
@@ -3345,7 +3345,7 @@ msgstr "WordPress ha un numero di operazioni pianificate (%d) che sono in ritard
 
 #: src/admin.php:676, src/class-updraftplus.php:2900
 msgid "If this is a backup created by a different backup plugin, then UpdraftPlus Premium may be able to help you."
-msgstr "Se questo è un backup creato da un diverso plugin di backup, allora UpdraftPlus Premium potrebbe essere in grado di aiutarvi."
+msgstr "Se questo è un backup creato da un diverso plugin di backup, UpdraftPlus Premium potrebbe essere in grado di aiutarvi."
 
 #: src/admin.php:675
 msgid "However, UpdraftPlus archives are standard zip/SQL files - so if you are sure that your file has the right format, then you can rename it to match that pattern."
@@ -4204,7 +4204,7 @@ msgstr "Il web server ha restituito un codice di errore (riprova, o controlla i 
 
 #: src/admin.php:647
 msgid "The restore operation has begun. Do not press stop or close your browser until it reports itself as having finished."
-msgstr "L'operazione di ripristino è iniziata. Non premere stop e non chiudere il browser fino a quando non viene segnalato la fine."
+msgstr "L'operazione di ripristino è iniziata. Non premere stop e non chiudere il browser fino a quando non viene segnalata la fine."
 
 #: src/admin.php:644
 msgid "If you exclude both the database and the files, then you have excluded everything!"
@@ -4506,7 +4506,7 @@ msgstr "Se è ancora possibile leggere queste parole dopo che il  caricamento de
 
 #: src/admin.php:685
 msgid "The file was uploaded."
-msgstr "Il fil eè stato caricato."
+msgstr "Il file è stato caricato."
 
 #: src/admin.php:684
 msgid "Unknown server response status:"
@@ -4926,7 +4926,7 @@ msgstr "Risposta sconosciuta:"
 
 #: src/addons/reporting.php:451, src/admin.php:643
 msgid "To send to more than one address, separate each address with a comma."
-msgstr "Per inviare a più di un indirizzo, separate ognuno da una virgola."
+msgstr "Per inviare a più di un indirizzo, separateli con una virgola."
 
 #: src/admin.php:672
 msgid "PHP information"
@@ -5025,7 +5025,7 @@ msgstr "Errori riscontrati:"
 
 #: src/admin.php:641
 msgid "Rescanning (looking for backups that you have uploaded manually into the internal backup store)..."
-msgstr "Rescan in corsco (ricerca di backup uploadati manualmente nello spazio interno di archiviazione).."
+msgstr "Rescan in corso (ricerca di backup caricati manualmente nello spazio interno di archiviazione)..."
 
 #: src/admin.php:654
 msgid "Begun looking for this entity"
@@ -5211,7 +5211,7 @@ msgstr "Sovrascrittura wp-config.php"
 
 #: src/addons/morefiles.php:127, src/includes/class-wpadmin-commands.php:482
 msgid "WordPress Core"
-msgstr "Core WordPerss"
+msgstr "WordPress Core"
 
 #: src/methods/addon-base-v2.php:301, src/methods/stream-base.php:315
 msgid "Failed: We were not able to place a file in that directory - please check your credentials."
@@ -6367,7 +6367,7 @@ msgstr "UpdraftPlus non supporta ufficialmente le versioni di WordPress prima di
 
 #: src/admin.php:949
 msgid "You have less than %s of free disk space on the disk which UpdraftPlus is configured to use to create backups. UpdraftPlus could well run out of space. Contact your the operator of your server (e.g. your web hosting company) to resolve this issue."
-msgstr "Hai meno di %s di spazio libero su disco che UpdraftPlus può utilizzare per creare copie di backup. UpdraftPlus potrebbero ben esaurire lo spazio disponibile. Contattare il gestore del server (ad esempio, la vostra società di web hosting) per risolvere questo problema."
+msgstr "Hai meno di %s di spazio libero su disco che UpdraftPlus può utilizzare per creare copie di backup. UpdraftPlus potrebbe esaurire lo spazio disponibile. Contatta il gestore del server (ad esempio, la tua società di web hosting) per risolvere questo problema."
 
 #: src/admin.php:941, src/admin.php:945, src/admin.php:949, src/admin.php:953,
 #: src/admin.php:957, src/admin.php:966, src/admin.php:3169,

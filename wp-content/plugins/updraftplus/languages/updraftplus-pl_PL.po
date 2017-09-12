@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the UpdraftPlus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-06-25 18:56:09+0000\n"
+"PO-Revision-Date: 2017-09-05 14:36:49+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1212,7 +1212,7 @@ msgstr "Będzie zaimportowane jako nowa strona."
 #: src/admin.php:2395, src/templates/wp-admin/notices/horizontal-notice.php:16,
 #: src/templates/wp-admin/notices/horizontal-notice.php:18
 msgid "Dismiss"
-msgstr "Odwołaj"
+msgstr "Odwołąć"
 
 #: src/admin.php:734
 msgid "Please fill in the required information."
@@ -2898,7 +2898,7 @@ msgstr "Wyślij utworzony raport przez UpdraftPlus (edycja darmowa) wraz z najno
 
 #: src/methods/googledrive.php:1090
 msgid "N.B. If you install UpdraftPlus on several WordPress sites, then you cannot re-use your project; you must create a new one from your Google API console for each site."
-msgstr "A przy okazji, jeżeli instalujesz UpdraftPlus na kilku stronach WordPress, nie możesz używać tego samego projektu; powinieneś utworzyć nowy projekt ze swojej konsoli Google API dla każdej strony osobno."
+msgstr "A przy okazji, jeżeli instalujesz UpdraftPlus na kilku stronach WordPress, nie możesz używać tego samego projektu; powinieneś utworzyć nowy projekt ze swojej kosoli Google API dla każdej strony osobno."
 
 #: src/admin.php:3350
 msgid "You have not yet made any backups."
@@ -2929,7 +2929,7 @@ msgstr "Ten przycisk jest nieaktywny ponieważ brakuje praw do zapisu w Twoim fo
 #: src/templates/wp-admin/settings/downloading-and-restoring.php:22,
 #: src/templates/wp-admin/settings/tab-bar.php:6
 msgid "Existing Backups"
-msgstr "Istniejące kopie zapasowe"
+msgstr "Istniejące kopie zapasowwe"
 
 #: src/admin.php:514, src/templates/wp-admin/settings/tab-bar.php:5
 msgid "Current Status"
@@ -2937,7 +2937,7 @@ msgstr "Bieżący status"
 
 #: src/admin.php:937
 msgid "To change any of the default settings of what is backed up, to configure scheduled backups, to send your backups to remote storage (recommended), and more, go to the settings tab."
-msgstr "Aby zmienić ustawienia domyślne tego, co ma zostać skopiowane, aby skonfigurować zaplanowane kopie, aby wysłać kopie do lokalizacji zdalnych (rekomendowane) oraz więcej, przejdź do zakładki \"Ustawienia\""
+msgstr "Aby zmienić ustawienia domyślne tego, co ma zostac skopiowane, aby skonfigurować zaplanowane kopie, aby wysłać kopie do lokalizacji zdalnych (rekomendowane) oraz więcej, przejdź do zakładki \"Ustawienia\""
 
 #: src/admin.php:937
 msgid "To make a backup, just press the Backup Now button."
@@ -3079,7 +3079,7 @@ msgstr "Wystąpił błąd przy pierwszym poleceniu %s - trwa anulowanie"
 
 #: src/addons/moredatabase.php:105, src/backup.php:1390
 msgid "Connection failed: check your access details, that the database server is up, and that the network connection is not firewalled."
-msgstr "Połączenie nieudane: sprawdź ustawienia logowania; czy serwer działa; czy połączenie nie jest zablokowane przez firewall?"
+msgstr "Połączenie niedudane: sprawdź ustawienia logowania; czy serwer działa; czy połączenie nie jest zablokowane przez firewall?"
 
 #: src/backup.php:1390
 msgid "database connection attempt failed."
@@ -3153,7 +3153,7 @@ msgstr "Sukces:"
 
 #: src/addons/onedrive.php:991, src/methods/dropbox.php:538
 msgid "<strong>After</strong> you have saved your settings (by clicking 'Save Changes' below), then come back here once and click this link to complete authentication with %s."
-msgstr "<strong>Po</strong> zapisaniu ustawień (kliknij 'Zapisz zmiany' poniżej) wróć tutaj i kliknij poniższy link aby zakończyć autoryzację %s."
+msgstr "<strong>Po</strong> zapisaniu ustawień (klinkij 'Zapisz zmiany' poniżej) wróć tutaj i kliknij poniższy link aby zakończyć autoryzację %s."
 
 #: src/addons/onedrive.php:989, src/methods/dropbox.php:528
 msgid "(You appear to be already authenticated)."
@@ -3325,7 +3325,7 @@ msgstr "nieznane źródło"
 
 #: src/templates/wp-admin/settings/downloading-and-restoring.php:45
 msgid "Rescan remote storage"
-msgstr "Przeskanuj ponownie zdalną lokalizację."
+msgstr "Przeskanuj lokalizację zdalną ponownie."
 
 #: src/templates/wp-admin/settings/downloading-and-restoring.php:40
 msgid "Upload backup files"
@@ -4889,7 +4889,7 @@ msgstr "Proszę podać wymagane informacje, a następnie kontynuować."
 
 #: src/class-updraftplus.php:4690, src/restorer.php:1706
 msgid "Site information:"
-msgstr "Informacje o stronie:"
+msgstr "Informacje strony:"
 
 #: src/restorer.php:1573
 msgid "Your database user does not have permission to create tables. We will attempt to restore by simply emptying the tables; this should work as long as a) you are restoring from a WordPress version with the same database structure, and b) Your imported database does not contain any tables which are not already present on the importing site."
@@ -5938,7 +5938,7 @@ msgstr "Codziennie"
 
 #: src/admin.php:694, src/admin.php:3008
 msgid "Download log file"
-msgstr "Pobierz plik dziennika"
+msgstr "Pobieranie pliku dziennika"
 
 #: src/admin.php:2905
 msgid "The folder exists, but your webserver does not have permission to write to it."

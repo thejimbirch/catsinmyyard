@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the UpdraftPlus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-06-27 20:45:19+0000\n"
+"PO-Revision-Date: 2017-09-05 14:42:19+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -963,7 +963,7 @@ msgstr ""
 
 #: src/methods/ftp.php:380
 msgid "login"
-msgstr "belépés"
+msgstr "Belépés"
 
 #: src/methods/email.php:79
 msgid "Be aware that mail servers tend to have size limits; typically around %s MB; backups larger than any limits will likely not arrive."
@@ -1041,7 +1041,7 @@ msgstr "Adj meg leírást"
 
 #: src/central/bootstrap.php:469
 msgid "Description"
-msgstr "Leírás"
+msgstr "leírása"
 
 #: src/central/bootstrap.php:463
 msgid "Create new key"
@@ -1121,7 +1121,7 @@ msgstr ""
 
 #: src/admin.php:4202
 msgid "Your settings have been saved."
-msgstr "A beállítások el lettek mentve."
+msgstr "A beállításaid mentve"
 
 #: src/admin.php:3330
 msgid "Total backup size:"
@@ -1129,7 +1129,7 @@ msgstr "Teljes mentés mérete:"
 
 #: src/admin.php:2744
 msgid "stop"
-msgstr "megállítás"
+msgstr "megáll"
 
 #: src/admin.php:2582
 msgid "The backup has finished running"
@@ -1171,7 +1171,7 @@ msgstr ""
 
 #: src/admin.php:697
 msgid "Saving..."
-msgstr "Mentés..."
+msgstr "Mentés...."
 
 #: src/admin.php:660
 msgid "Error: the server sent us a response which we did not understand."
@@ -1212,7 +1212,7 @@ msgstr ""
 #: src/admin.php:2395, src/templates/wp-admin/notices/horizontal-notice.php:16,
 #: src/templates/wp-admin/notices/horizontal-notice.php:18
 msgid "Dismiss"
-msgstr "Elrejtés"
+msgstr "Figyelmen kívül hagy"
 
 #: src/admin.php:734
 msgid "Please fill in the required information."
@@ -1325,7 +1325,7 @@ msgstr ""
 
 #: src/admin.php:4077
 msgid "settings"
-msgstr ""
+msgstr "Beállítások"
 
 #: src/admin.php:4077
 msgid "Backup won't be sent to any remote storage - none has been saved in the %s"
@@ -1378,7 +1378,7 @@ msgstr ""
 
 #: src/admin.php:546
 msgid "Extensions"
-msgstr ""
+msgstr "Kiegészítők"
 
 #: src/admin.php:538, src/templates/wp-admin/settings/tab-bar.php:8
 msgid "Advanced Tools"
@@ -1657,11 +1657,11 @@ msgstr ""
 
 #: src/admin.php:729
 msgid "hour(s)"
-msgstr ""
+msgstr "óra"
 
 #: src/admin.php:728
 msgid "day(s)"
-msgstr ""
+msgstr "nap"
 
 #: src/admin.php:727
 msgid "in the month"
@@ -2937,7 +2937,7 @@ msgstr "Aktuális Állapot"
 
 #: src/admin.php:937
 msgid "To change any of the default settings of what is backed up, to configure scheduled backups, to send your backups to remote storage (recommended), and more, go to the settings tab."
-msgstr "A mentett adatok típusára vonatkozó, az ütemezési időpontok beállítására vonatkozó, a távoli tárhely beállítására vonatkozó és egyéb beállítások testreszabására a Beállítások fül alatt van lehetőség."
+msgstr "Hogy megváltoztasd az alapértelmezett beállításokat, hogy beállítsd az ütemezett mentéseket, hogy a biztonsági mentéseket egy külső tárhelyre küldd át (ajánlott), és egyebek, menj a Beállítások fülre."
 
 #: src/admin.php:937
 msgid "To make a backup, just press the Backup Now button."
@@ -3062,7 +3062,7 @@ msgstr "Nem akarod, hogy sikeresen kémkedjenek utánad? Az UpdraftPlus Premium 
 
 #: src/templates/wp-admin/settings/form-contents.php:94
 msgid "use UpdraftPlus Premium"
-msgstr "használd az UpdraftPlus Premium-ot"
+msgstr "használd az UpdraftPlus Premium-t"
 
 #: src/class-updraftplus.php:4546
 msgid "Decryption failed. The database file is encrypted."
@@ -3202,7 +3202,7 @@ msgstr "Fiók tulajdonos neve: %s."
 
 #: src/methods/googledrive.php:1135
 msgid "To be able to set a custom folder name, use UpdraftPlus Premium."
-msgstr "Ahhoz, hogy egy tetszőleges mappa nevet állíthass be, az UpdraftPlus Premium-ot kell használnod."
+msgstr "Ahhoz, hogy egy tetszőleges mappa nevet állíthass be, az UpdraftPlus Premium-t kell használnod."
 
 #: src/methods/googledrive.php:1126
 msgid "It is an ID number internal to Google Drive"
@@ -4473,7 +4473,7 @@ msgstr "További bővítmények"
 #: src/templates/wp-admin/settings/tab-addons.php:19,
 #: src/templates/wp-admin/settings/tab-addons.php:103
 msgid "Support"
-msgstr "Technikai támogatás"
+msgstr "Segítség"
 
 #: src/class-updraftplus.php:4769
 msgid "UpdraftPlus was unable to find the table prefix when scanning the database backup."
@@ -4898,7 +4898,7 @@ msgstr ""
 #: src/addons/migrator.php:333, src/admin.php:2229,
 #: src/class-updraftplus.php:4683, src/restorer.php:2033
 msgid "Warning:"
-msgstr ""
+msgstr "Figyelem:"
 
 #: src/class-updraftplus.php:4672, src/class-updraftplus.php:4675,
 #: src/restorer.php:154
@@ -4915,7 +4915,7 @@ msgstr ""
 
 #: src/admin.php:692
 msgid "Close"
-msgstr ""
+msgstr "Bezárás"
 
 #: src/addons/autobackup.php:330, src/addons/autobackup.php:422,
 #: src/admin.php:648, src/methods/remotesend.php:66,
@@ -5289,15 +5289,15 @@ msgstr "sikeresen hitelesítette %s fiókját"
 
 #: src/methods/dropbox.php:513, src/methods/dropbox.php:515
 msgid "there's an add-on for that."
-msgstr "van rá kiegészítő."
+msgstr "van rá kiterjesztés."
 
 #: src/methods/dropbox.php:513, src/methods/dropbox.php:515
 msgid "If you back up several sites into the same Dropbox and want to organise with sub-folders, then "
-msgstr "Ha több WordPress honlapot mentene ugyanabba a Dropbox-ba, és almappákba kívánja szervezni azokat, "
+msgstr "Ha több WordPress honlapot mentene ugyanabba a Dropbox-ba, és almappákba kívánja szervezni azokat,"
 
 #: src/methods/dropbox.php:513, src/methods/dropbox.php:515
 msgid "Backups are saved in"
-msgstr "A mentések ide kerülnek:"
+msgstr "A mentések ide kerültek:"
 
 #: src/methods/dropbox.php:513, src/methods/dropbox.php:515
 msgid "Need to use sub-folders?"
@@ -5881,7 +5881,7 @@ msgstr "Egyik sem"
 
 #: src/templates/wp-admin/settings/form-contents.php:110
 msgid "Choose your remote storage"
-msgstr "Válaszd ki a távoli tárhelyet"
+msgstr "Válasszon távoli tárhelyet"
 
 #: src/templates/wp-admin/settings/form-contents.php:207
 msgid "Manually decrypt a database backup file"
@@ -5999,7 +5999,7 @@ msgstr "Teljes (nem tömörített) adatméret:"
 #: src/templates/wp-admin/settings/tab-addons.php:305,
 #: src/templates/wp-admin/settings/tab-addons.php:308
 msgid "No"
-msgstr ""
+msgstr "Nem"
 
 #: src/templates/wp-admin/advanced/site-info.php:56,
 #: src/templates/wp-admin/advanced/site-info.php:59,
@@ -6034,7 +6034,7 @@ msgstr ""
 #: src/templates/wp-admin/settings/tab-addons.php:292,
 #: src/templates/wp-admin/settings/tab-addons.php:311
 msgid "Yes"
-msgstr ""
+msgstr "Igen"
 
 #: src/templates/wp-admin/advanced/site-info.php:43,
 #: src/templates/wp-admin/advanced/site-info.php:44,
@@ -6183,7 +6183,7 @@ msgstr "Opera böngésző"
 
 #: src/templates/wp-admin/settings/downloading-and-restoring.php:36
 msgid "More tasks:"
-msgstr "További feladatok:"
+msgstr "Több feladat:"
 
 #: src/admin.php:2505
 msgid "Download most recently modified log file"
@@ -6196,7 +6196,7 @@ msgstr "(Még semmit sem került naplózásra)"
 #: src/addons/autobackup.php:325, src/addons/autobackup.php:420,
 #: src/admin.php:2463, src/admin.php:2468
 msgid "Last log message"
-msgstr "Utolsó naplóbejegyzés"
+msgstr "Utolsó log sor"
 
 #: src/addons/migrator.php:224, src/admin.php:693, src/admin.php:3504,
 #: src/templates/wp-admin/settings/tab-status.php:30
@@ -6300,7 +6300,7 @@ msgstr "Vissza az UpdraftPlus beállításához"
 #: src/admin.php:2171, src/admin.php:2213, src/admin.php:2776,
 #: src/templates/wp-admin/settings/existing-backups-table.php:16
 msgid "Actions"
-msgstr "Műveletek"
+msgstr "Akciók"
 
 #: src/admin.php:2072
 msgid "Bad filename format - this does not look like an encrypted database file created by UpdraftPlus"

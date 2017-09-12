@@ -3,7 +3,7 @@ Contributors: Backup with UpdraftPlus, DavidAnderson, DNutbourne, aporter, snigh
 Tags: backup, restore, database backup, wordpress backup, cloud backup, s3, dropbox, google drive, onedrive, ftp, backups
 Requires at least: 3.2
 Tested up to: 4.8
-Stable tag: 1.13.6
+Stable tag: 1.13.7
 Author URI: https://updraftplus.com
 Donate link: https://david.dw-perspective.org.uk/donate
 License: GPLv3 or later
@@ -149,7 +149,17 @@ Unfortunately not; since this is free software, there’s no warranty and no gua
 
 The <a href="https://updraftplus.com/news/">UpdraftPlus backup blog</a> is the best place to learn in more detail about any important changes.
 
-N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.13.6 of the free version correspond to changes made in 2.13.6.x of the paid version.
+N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.13.7 of the free version correspond to changes made in 2.13.7.x of the paid version.
+
+= 1.13.7 - 06/Sep/2017 =
+
+* FIX: UpdraftCentral connectivity for various operations restored (regression in 1.13.6)
+* FIX: No error message was being shown when a backup to local storage was missing upon restore
+* COMPATIBILITY: Replace uses of the deprecated (PHP 7.2+) each() function
+* TRANSLATION: Portuguese (Portugal) and Romanian translations are now complete and supplied from wordpress.org, so can be removed from the free plugin zip
+* TWEAK: Fix some wrongly-called translation functions, and pull more known strings into the Premium version
+* TWEAK: Remove the legacy parameter for setting storage upload job status data (only useful for version downgrades of more than 1 release during in-progress backups)
+* TWEAK: Exclude some unnecessary build and unused files from the release zip (reduce disk space and download size)
 
 = 1.13.6 - 05/Sep/2017 =
 
@@ -542,5 +552,6 @@ Furthermore, reliance upon any non-English translation is at your own risk. Updr
 
 We recognise and thank the following for code and/or libraries used and/or modified under the terms of their open source licences; see: https://updraftplus.com/acknowledgements/
 
+
 == Upgrade Notice ==
-* 1.13.6: Easier Google Drive setup. Lots of small tweaks and improvements. Recommended update for all.
+* 1.13.7: Easier Google Drive setup. Lots of small tweaks and improvements. Fix UpdraftCentral regression in 1.13.6. Recommended update for all.

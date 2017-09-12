@@ -42,8 +42,8 @@ class UpdraftPlus_BackupModule_dropbox extends UpdraftPlus_BackupModule {
 		global $updraftplus;
 
 		// Update upload ID
-		$this->jobdata_set('upload_id_'.$this->current_file_hash, $uploadid, 'updraf_dbid_'.$this->current_file_hash);
-		$this->jobdata_set('upload_offset_'.$this->current_file_hash, $offset, 'updraf_dbof_'.$this->current_file_hash);
+		$this->jobdata_set('upload_id_'.$this->current_file_hash, $uploadid);
+		$this->jobdata_set('upload_offset_'.$this->current_file_hash, $offset);
 
 		$time_now = microtime(true);
 		

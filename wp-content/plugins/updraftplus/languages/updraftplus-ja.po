@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the UpdraftPlus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-04-04 10:51:15+0000\n"
+"PO-Revision-Date: 2017-09-05 14:36:35+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -51,23 +51,23 @@ msgstr ""
 
 #: src/templates/wp-admin/settings/tab-addons.php:151
 msgid "Network and multisite"
-msgstr ""
+msgstr "ネットワークとマルチサイト"
 
 #: src/templates/wp-admin/settings/tab-addons.php:87
 msgid "Migrator"
-msgstr ""
+msgstr "移行ツール"
 
 #: src/templates/wp-admin/settings/tab-addons.php:71
 msgid "Additional storage"
-msgstr ""
+msgstr "追加容量"
 
 #: src/templates/wp-admin/settings/tab-addons.php:55
 msgid "Remote storage"
-msgstr ""
+msgstr "リモートストレージ"
 
 #: src/templates/wp-admin/settings/form-contents.php:221
 msgid "Select Files"
-msgstr ""
+msgstr "ファイルを選択"
 
 #: src/methods/updraftvault.php:346
 msgid "__Password"
@@ -87,7 +87,7 @@ msgstr ""
 
 #: src/includes/updraftplus-notices.php:193
 msgid "Find out more about our revolutionary new WordPress plugin."
-msgstr ""
+msgstr "私達のさらに革命的なプラグインを見る。"
 
 #: src/includes/updraftplus-notices.php:193
 msgid "Instant and secure logon with a wave of your phone."
@@ -131,11 +131,11 @@ msgstr ""
 
 #: src/methods/cloudfiles.php:520
 msgid "Cloud Files"
-msgstr ""
+msgstr "Cloud Files"
 
 #: src/admin.php:4207
 msgid "Your settings failed to save. Please refresh the settings page and try again"
-msgstr ""
+msgstr "設定の保存に失敗しました。設定画面を更新し、もう一回挑戦してください"
 
 #: src/admin.php:4166
 msgid "UpdraftPlus seems to have been updated to version (%s), which is different to the version running when this settings page was loaded. Please reload the settings page before trying to save settings."
@@ -148,27 +148,27 @@ msgstr "UpdraftVault"
 
 #: src/includes/class-wpadmin-commands.php:488
 msgid "archive"
-msgstr ""
+msgstr "アーカイブ"
 
 #: src/includes/class-wpadmin-commands.php:479
 msgid "Extra database"
-msgstr ""
+msgstr "他のデータベース"
 
 #: src/admin.php:3436
 msgid "Press here to download or browse"
-msgstr ""
+msgstr "ダウンロードまたは閲覧するにはここをクリック"
 
 #: src/admin.php:1070, src/admin.php:1080
 msgid "Error: invalid path"
-msgstr ""
+msgstr "エラー: 無効なパス"
 
 #: src/admin.php:928
 msgid "An error occurred when fetching storage module options: "
-msgstr ""
+msgstr "ストレージモジュールのオプションを取得中にエラーが発生しました: "
 
 #: src/admin.php:756
 msgid "Loading log file"
-msgstr ""
+msgstr "ログファイルの読み込み中"
 
 #: src/admin.php:755
 msgid "Unable to download file. This could be caused by a timeout. It would be best to download the zip to your computer."
@@ -176,15 +176,15 @@ msgstr ""
 
 #: src/admin.php:754
 msgid "Search"
-msgstr ""
+msgstr "検索"
 
 #: src/admin.php:753
 msgid "Select a file to view information about it"
-msgstr ""
+msgstr "情報をご覧になるには、ファイルを選択してください。"
 
 #: src/admin.php:752
 msgid "Browsing zip file"
-msgstr ""
+msgstr "zip ファイルの参照"
 
 #: src/admin.php:721
 msgid "With UpdraftPlus Premium, you can directly download individual files from here."
@@ -192,7 +192,7 @@ msgstr ""
 
 #: src/admin.php:669
 msgid "Browse contents"
-msgstr ""
+msgstr "コンテンツを参照"
 
 #: src/restorer.php:1692
 msgid "Skipped tables:"
@@ -208,11 +208,11 @@ msgstr ""
 
 #: src/admin.php:2422
 msgid "All WordPress tables will be backed up."
-msgstr ""
+msgstr "すべての WordPress テーブルがバックアップされます。"
 
 #: src/admin.php:751
 msgid "Further information may be found in the browser JavaScript console, and the server PHP error logs."
-msgstr ""
+msgstr "更に詳しい情報は、ブラウザーの JavaScript コンソールや、サーバーにある、PHP のエラーログの中に見つかるかもしれません。"
 
 #: src/admin.php:751
 msgid "That you are attempting to upload a zip file previously created by UpdraftPlus."
@@ -220,7 +220,7 @@ msgstr ""
 
 #: src/admin.php:751
 msgid "The available memory on the server."
-msgstr ""
+msgstr "サーバー上の使用可能なメモリー。"
 
 #: src/admin.php:751
 msgid "Any settings in your .htaccess or web.config file that affects the maximum upload or post size."
@@ -228,7 +228,7 @@ msgstr ""
 
 #: src/admin.php:751
 msgid "The file failed to upload. Please check the following:"
-msgstr ""
+msgstr "ファイルのアップロードに失敗しました。次の項目を確認してください:"
 
 #: src/admin.php:750
 msgid "HTTP code:"
@@ -236,7 +236,7 @@ msgstr "HTTP コード:"
 
 #: src/admin.php:646
 msgid "You have chosen to backup a database, but no tables have been selected"
-msgstr ""
+msgstr "データベースをバックアップすることを選択しましたが、テーブルは選択されていません"
 
 #: src/addons/moredatabase.php:585
 msgid "tables"
@@ -286,7 +286,7 @@ msgstr ""
 
 #: src/templates/wp-admin/settings/tab-addons.php:233
 msgid "Some backup plugins can’t restore a backup, so Premium allows you to restore backups from other plugins."
-msgstr ""
+msgstr "一部のバックアッププラグインでは、バックアップを復元できないことがありますが、プレミアムプラグインは他のバックアッププラグインのバックアップから復元することができます。"
 
 #: src/templates/wp-admin/settings/tab-addons.php:231,
 #: src/templates/wp-admin/settings/tab-addons.php:232
@@ -317,7 +317,7 @@ msgstr "その他のデータベース設定"
 
 #: src/templates/wp-admin/settings/tab-addons.php:169
 msgid "Set exact times to create or delete backups."
-msgstr ""
+msgstr "バックアップを作成または削除する正確な時刻を設定します。"
 
 #: src/templates/wp-admin/settings/tab-addons.php:167,
 #: src/templates/wp-admin/settings/tab-addons.php:168
@@ -334,7 +334,7 @@ msgstr "ネットワーク / マルチサイト"
 
 #: src/templates/wp-admin/settings/tab-addons.php:137
 msgid "Backup WordPress core and non-WP files and databases."
-msgstr ""
+msgstr "WordPress のコアと、WordPress 以外のファイル、データベースをバックアップ"
 
 #: src/templates/wp-admin/settings/tab-addons.php:121
 msgid "Automatically backs up your website before any updates to plugins, themes and WordPress core."
@@ -351,7 +351,7 @@ msgstr ""
 
 #: src/templates/wp-admin/settings/tab-addons.php:104
 msgid "Fast, personal support"
-msgstr ""
+msgstr "迅速な、パーソナル・サポート"
 
 #: src/templates/wp-admin/settings/tab-addons.php:89
 msgid "UpdraftPlus Migrator clones your WordPress site and moves it to a new domain directly and simply."
@@ -395,7 +395,7 @@ msgstr "ゴールド"
 
 #: src/templates/wp-admin/settings/tab-addons.php:30
 msgid "Free"
-msgstr ""
+msgstr "無料"
 
 #: src/templates/wp-admin/settings/tab-addons.php:30,
 #: src/templates/wp-admin/settings/tab-addons.php:34,
@@ -405,11 +405,11 @@ msgstr "UpdraftPlus"
 
 #: src/templates/wp-admin/settings/form-contents.php:245
 msgid "Recommended: optimize your database with WP-Optimize."
-msgstr ""
+msgstr "推奨: WP-Optimize でデータベースを最適化してください。"
 
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:15
 msgid "When you've backed up your database, we recommend you install our WP-Optimize plugin to streamline it for better website performance."
-msgstr ""
+msgstr "データベースをバックアップしましたら、ウェブサイトのパフォーマンスを向上させるために WP-Optimize プラグインをインストールすることを推奨します。"
 
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:15
 msgid "WP-Optimize"
@@ -424,7 +424,7 @@ msgstr "もっと読み込む"
 
 #: src/includes/updraftplus-notices.php:182
 msgid "After you've backed up your database, we recommend you install our WP-Optimize plugin to streamline it for better website performance."
-msgstr ""
+msgstr "データベースをバックアップした後は、ウェブサイトのパフォーマンスを向上させるために WP-Optimize プラグインをインストールすることを推奨します。"
 
 #: src/addons/morefiles.php:309
 msgid "Please choose a file or directory"
@@ -524,7 +524,7 @@ msgstr "UpdraftPlus のレビュー"
 #: src/templates/wp-admin/notices/report-plain.php:23,
 #: src/templates/wp-admin/notices/report.php:20
 msgid "Get UpdraftCentral"
-msgstr ""
+msgstr "UpdraftCentral をゲット"
 
 #: src/templates/wp-admin/advanced/site-info.php:84
 msgid "Apache modules"
@@ -577,7 +577,7 @@ msgstr ""
 
 #: src/includes/updraftplus-notices.php:111
 msgid "Do you use UpdraftPlus on multiple sites?"
-msgstr ""
+msgstr "複数のサイトで UpdraftPlus を使用していますか ?"
 
 #: src/includes/updraftplus-notices.php:92,
 #: src/templates/wp-admin/settings/tab-addons.php:300
@@ -594,7 +594,7 @@ msgstr ""
 
 #: src/includes/updraftplus-notices.php:81
 msgid "easily migrate or clone your site in minutes"
-msgstr ""
+msgstr "数分で簡単にサイトを移行または複製します"
 
 #: src/includes/updraftplus-notices.php:72
 msgid "Add SFTP to send your data securely, lock settings and encrypt your database backups for extra security."
@@ -748,7 +748,7 @@ msgstr ""
 
 #: src/admin.php:749
 msgid "remote files deleted"
-msgstr ""
+msgstr "リモートファイルを削除しました"
 
 #: src/admin.php:747
 msgid "Complete"
@@ -756,7 +756,7 @@ msgstr "完了"
 
 #: src/admin.php:746
 msgid "Do you want to carry out the import?"
-msgstr ""
+msgstr "インポートを実行しますか ?"
 
 #: src/admin.php:745
 msgid "Which was exported on:"
@@ -813,7 +813,7 @@ msgstr "%s アドオンが見つかりません"
 
 #: src/templates/wp-admin/settings/delete-and-restore-modals.php:62
 msgid "or to restore manually"
-msgstr ""
+msgstr "または手動で復元します"
 
 #: src/templates/wp-admin/settings/delete-and-restore-modals.php:62
 msgid "This makes time-outs much more likely. You are recommended to turn safe_mode off, or to restore only one entity at a time"
@@ -1117,7 +1117,7 @@ msgstr "UpdraftCentral 接続"
 
 #: src/backup.php:867, src/class-updraftplus.php:3094
 msgid "The backup was aborted by the user"
-msgstr ""
+msgstr "バックアップはユーザーによって中止されました"
 
 #: src/admin.php:4202
 msgid "Your settings have been saved."
@@ -1681,7 +1681,7 @@ msgstr "付加的な保持ルールを追加しました"
 
 #: src/restorer.php:2191
 msgid "This database needs to be deployed on MySQL version %s or later."
-msgstr "このデータベースは、それ以降のMySQLのバージョン%sまたは以上のバージョンにする必要があります。"
+msgstr "このデータベースは、MySQLバージョン %s 以降にデプロイする必要があります。"
 
 #: src/restorer.php:2191
 msgid "This problem is caused by trying to restore a database on a very old MySQL version that is incompatible with the source database."
@@ -1783,7 +1783,7 @@ msgstr "接続解除"
 
 #: src/methods/updraftvault.php:380
 msgid "Quota:"
-msgstr "ディスク容量："
+msgstr "割り当て: "
 
 #: src/methods/updraftvault.php:378
 msgid "Vault owner"
@@ -2149,7 +2149,7 @@ msgstr ""
 
 #: src/admin.php:696, src/admin.php:722, src/admin.php:723
 msgid "You have made changes to your settings, and not saved."
-msgstr "設定を変更しましたが、保存されませんでした。"
+msgstr "設定を変更していますが、保存していません。"
 
 #: src/addons/onedrive.php:983
 msgid "N.B. %s is not case-sensitive."
@@ -2380,11 +2380,11 @@ msgstr "他の高品質なプラグイン"
 
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:11
 msgid "Go to the shop."
-msgstr "オンラインショップへ"
+msgstr "ショップに進む。"
 
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:11
 msgid "Compare with the free version"
-msgstr "無料版との比較"
+msgstr "無料版と比較する"
 
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:11,
 #: src/templates/wp-admin/settings/tab-addons.php:33,
@@ -2402,7 +2402,7 @@ msgstr "無料メールマガジン"
 
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:4
 msgid "Thank you for backing up with UpdraftPlus!"
-msgstr "バックアップに UpdraftPlus をご利用いただき、ありがとうございます！"
+msgstr "UpdraftPlus でバックアップしていただきありがとうございます。"
 
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:2,
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:21
@@ -2465,7 +2465,7 @@ msgstr "バックアップ（関連）のプラグイン、テーマ、更新前
 #: src/methods/s3.php:166, src/methods/s3.php:167, src/methods/s3.php:168,
 #: src/methods/s3.php:176, src/methods/s3.php:177, src/methods/s3.php:178
 msgid "%s Error: Failed to initialise"
-msgstr "%s エラー：初期化に失敗しました"
+msgstr "%s エラー: 初期化に失敗しました"
 
 #: src/templates/wp-admin/settings/form-contents.php:220
 msgctxt "Uploader: Drop db.gz.crypt files here to upload them for decryption - or - Select Files"
@@ -2474,7 +2474,7 @@ msgstr "または"
 
 #: src/admin.php:690
 msgid "You did not select any components to restore. Please select at least one, and then try again."
-msgstr "修復するコンポーネントが選択されていません。少なくとも1つ選択して、もう一度実行してください。"
+msgstr "復元するコンポーネントを選択していません。 少なくとも1つを選択してから、もう一度お試しください。"
 
 #: src/addons/sftp.php:442
 msgctxt "Do not translate BEGIN RSA PRIVATE KEY. PCKS1, XML, PEM and PuTTY are also technical acronyms which should not be translated."
@@ -2593,7 +2593,7 @@ msgstr "パスワードのメモをしたことを確認してください！"
 #: src/addons/lockadmin.php:141,
 #: src/templates/wp-admin/advanced/lock-admin.php:7
 msgid "Lock access to the UpdraftPlus settings page"
-msgstr "UpdraftPlus の設定ページへのアクセスをロックする"
+msgstr "UpdraftPlus 設定ページへのアクセスをロックします"
 
 #: src/addons/lockadmin.php:117
 msgid "The admin password has been changed."
@@ -2777,7 +2777,7 @@ msgstr "UpdraftPlus ソーシャルメディアをぜひチェックしてみて
 
 #: src/admin.php:3592
 msgid "Why am I seeing this?"
-msgstr "なぜ私はこれを見ていますか？"
+msgstr "なぜ私はこれを見ていますか ?"
 
 #: src/templates/wp-admin/settings/downloading-and-restoring.php:44
 msgid "The location of this directory is set in the expert settings, in the Settings tab."
@@ -3038,7 +3038,7 @@ msgstr "親フォルダへのアクセスに失敗しました"
 #: src/addons/googlecloud.php:615, src/addons/onedrive.php:762,
 #: src/addons/onedrive.php:773, src/methods/googledrive.php:403
 msgid "However, subsequent access attempts failed:"
-msgstr "しかし、その後のアクセスの試みは失敗しました："
+msgstr "しかし、その後のアクセス試行は失敗しました。"
 
 #: src/admin.php:3375
 msgid "External database"
@@ -3050,7 +3050,7 @@ msgstr "これはまた、すべてのプラグインからのデバッグ出力
 
 #: src/templates/wp-admin/settings/form-contents.php:263
 msgid "Back up more databases"
-msgstr "複数のデータベースをバックアップします"
+msgstr "より多くのデータベースをバックアップします。"
 
 #: src/templates/wp-admin/settings/form-contents.php:222
 msgid "First, enter the decryption key"
@@ -3165,7 +3165,7 @@ msgstr "あなたは（下の[変更を保存]をクリックして）、設定�
 
 #: src/addons/onedrive.php:989, src/methods/dropbox.php:528
 msgid "(You appear to be already authenticated)."
-msgstr "（すでに認証されて表示されます）。"
+msgstr "(あなたはすでに認証されているようです)。"
 
 #: src/methods/dropbox.php:523, src/methods/dropbox.php:532,
 #: src/methods/dropbox.php:538
@@ -3325,11 +3325,11 @@ msgstr "%s：によりバックアップが作成されました。"
 
 #: src/admin.php:3373
 msgid "Database (created by %s)"
-msgstr "データベース（%sで作成されました）"
+msgstr "データベース (作成: %s)"
 
 #: src/admin.php:3367, src/admin.php:3406
 msgid "unknown source"
-msgstr "未知のソース"
+msgstr "不明なソース"
 
 #: src/templates/wp-admin/settings/downloading-and-restoring.php:45
 msgid "Rescan remote storage"
@@ -3378,7 +3378,7 @@ msgstr "UpdraftPlusのこのバージョンは、このタイプの不明なバ�
 
 #: src/methods/dropbox.php:313
 msgid "%s returned an unexpected HTTP response: %s"
-msgstr "%sが予期しないHTTP応答が返されました：%s"
+msgstr "%s は予期しない HTTP 応答を返しました: %s"
 
 #: src/addons/sftp.php:963
 msgid "The UpdraftPlus module for this file access method (%s) does not support listing files"
@@ -3446,7 +3446,7 @@ msgstr "暗号化された FTP (暗黙的な暗号化)"
 
 #: src/methods/ftp.php:304
 msgid "regular non-encrypted FTP"
-msgstr "通常の非暗号化FTP"
+msgstr "通常の暗号化されていない FTP"
 
 #: src/restorer.php:1665
 msgid "Backup created by:"
@@ -3524,7 +3524,7 @@ msgstr "読み込みのためにデータベースファイルを開くことが
 
 #: src/backup.php:1438
 msgid "No database tables found"
-msgstr "データベースのテーブルが見つかりません。"
+msgstr "データベーステーブルが見つかりません"
 
 #: src/backup.php:1436
 msgid "please wait for the rescheduled attempt"
@@ -3727,7 +3727,7 @@ msgstr "rackspacecloud.comで作成したアカウントは、米国アカウン
 
 #: src/methods/cloudfiles-new.php:116
 msgid "US or UK-based Rackspace Account"
-msgstr "米国や英国のRackspaceのアカウント"
+msgstr "米国または英国拠点の Rackspace アカウント"
 
 #: src/addons/cloudfiles-enhanced.php:258, src/methods/cloudfiles-new.php:116
 msgid "Accounts created at rackspacecloud.com are US accounts; accounts created at rackspace.co.uk are UK accounts."
@@ -3770,7 +3770,7 @@ msgstr "移行後/復元後の前にあなたのWordPressのインストール�
 
 #: src/restorer.php:1732
 msgid "Split line to avoid exceeding maximum packet size"
-msgstr "分割ラインは、最大パケットサイズを超えないようにします"
+msgstr "最大パケットサイズを超えないように回線を分割する"
 
 #: src/restorer.php:1612
 msgid "Your database user does not have permission to drop tables. We will attempt to restore by simply emptying the tables; this should work as long as you are restoring from a WordPress version with the same database structure (%s)"
@@ -3786,7 +3786,7 @@ msgstr "所定の場所に新しいファイルを移動できませんでした
 
 #: src/restorer.php:149
 msgid "Could not move old files out of the way."
-msgstr "邪魔にならないように古いファイルを移動できませんでした。"
+msgstr "古いファイルを途中で移動できませんでした。"
 
 #: src/restorer.php:145
 msgid "Moving old data out of the way..."
@@ -4282,7 +4282,7 @@ msgstr "電子メールを介してバックアップを送信しようとした
 
 #: src/methods/email.php:47
 msgid "Backup is of: %s."
-msgstr "バックアップがあります。：%s"
+msgstr "バックアップ: %s"
 
 #: src/admin.php:737
 msgid "%s settings test result:"
@@ -4648,11 +4648,11 @@ msgstr "S3 (互換)"
 
 #: src/admin.php:3758
 msgid "File is not locally present - needs retrieving from remote storage"
-msgstr "ファイルがローカルに存在しない - リモートストレージから取得する必要"
+msgstr "ファイルがローカルに存在しません - リモートストレージから取得する必要があります"
 
 #: src/admin.php:3745
 msgid "Looking for %s archive: file name: %s"
-msgstr "%sのアーカイブを探して：ファイル名：%s"
+msgstr "%s アーカイブを探しています: ファイル名: %s"
 
 #: src/admin.php:3706
 msgid "Final checks"
@@ -4672,7 +4672,7 @@ msgstr "あなたの wp-content ディレクトリサーバーパス: %s"
 
 #: src/admin.php:674
 msgid "Raw backup history"
-msgstr "RAWバックアップ履歴"
+msgstr "未処理のバックアップ履歴"
 
 #: src/templates/wp-admin/advanced/site-info.php:97
 msgid "Show raw backup and file list"
@@ -4755,7 +4755,7 @@ msgstr "削除中に %s のアクセスエラーとなりました(詳細はロ�
 
 #: src/methods/dropbox.php:397
 msgid "You do not appear to be authenticated with %s (whilst deleting)"
-msgstr "（削除しながら）あなたは%sを認証されるように表示されません。"
+msgstr "%sで認証されていないようです (削除中)"
 
 #: src/methods/dropbox.php:127
 msgid "Dropbox error: %s (see log file for more)"
@@ -4895,7 +4895,7 @@ msgstr "%s で発生したエラー:"
 
 #: src/restorer.php:1403
 msgid "Please supply the requested information, and then continue."
-msgstr "要求された情報を提供し、その後継続してください。"
+msgstr "要求された情報を入力してから、続行してください。"
 
 #: src/class-updraftplus.php:4690, src/restorer.php:1706
 msgid "Site information:"
@@ -5221,7 +5221,7 @@ msgstr "wp-config.php を上書き"
 
 #: src/addons/morefiles.php:127, src/includes/class-wpadmin-commands.php:482
 msgid "WordPress Core"
-msgstr "WordPress Core"
+msgstr "WordPress コア"
 
 #: src/methods/addon-base-v2.php:301, src/methods/stream-base.php:315
 msgid "Failed: We were not able to place a file in that directory - please check your credentials."
@@ -5287,7 +5287,7 @@ msgstr "あなたは暗号化したい場合(例えば重要なビジネスデ�
 
 #: src/addons/onedrive.php:756, src/methods/dropbox.php:656
 msgid "Your %s account name: %s"
-msgstr "あなたの%sのアカウント名：%s"
+msgstr "あなたの %s アカウント名: %s"
 
 #: src/methods/dropbox.php:646, src/methods/dropbox.php:673
 msgid "though part of the returned information was not as expected - your mileage may vary"
@@ -5320,7 +5320,7 @@ msgstr "エラー: %s のファイルアップロードに失敗しました (�
 
 #: src/methods/dropbox.php:105, src/methods/dropbox.php:122
 msgid "You do not appear to be authenticated with Dropbox"
-msgstr "あなたはDropboxで認証されません。"
+msgstr "Dropbox で認証されていないようです"
 
 #: src/methods/s3.php:1068
 msgid "The communication with %s was not encrypted."
@@ -5427,7 +5427,7 @@ msgstr "WordPress バックアップ"
 
 #: src/methods/cloudfiles.php:582, src/methods/openstack-base.php:495
 msgid "We accessed the container, and were able to create files within it."
-msgstr "私たちは、コンテナにアクセスし、その中にファイルを作成することができました。"
+msgstr "コンテナにアクセスし、その中にファイルを作成することができました。"
 
 #: src/methods/cloudfiles.php:578
 msgid "Cloud Files error - we accessed the container, but failed to create a file within it"
@@ -5435,7 +5435,7 @@ msgstr "Cloud Files エラー - コンテナにアクセスしましたが、そ
 
 #: src/methods/cloudfiles.php:551, src/methods/openstack-base.php:437
 msgid "Failure: No container details were given."
-msgstr "失敗：コンテナの詳細は与えられませんでした。"
+msgstr "失敗: コンテナの詳細が指定されていません。"
 
 #: src/addons/moredatabase.php:245, src/addons/sftp.php:424,
 #: src/addons/webdav.php:103, src/methods/cloudfiles-new.php:178,
@@ -5601,7 +5601,7 @@ msgstr "まだGoogleからのアクセストークンを取得していない- �
 #: src/addons/googlecloud.php:635, src/addons/onedrive.php:794,
 #: src/methods/googledrive.php:423
 msgid "you have authenticated your %s account."
-msgstr "あなたは%sのアカウントを認証しました。"
+msgstr "%sアカウントを認証しました。"
 
 #: src/addons/googlecloud.php:635, src/addons/googlecloud.php:756,
 #: src/addons/onedrive.php:794, src/addons/sftp.php:550,
@@ -5669,7 +5669,7 @@ msgstr "復元されます："
 #: src/class-updraftplus.php:4661, src/restorer.php:1688,
 #: src/restorer.php:1777, src/restorer.php:1803
 msgid "Old table prefix:"
-msgstr "古いテーブル prefix:"
+msgstr "古いテーブルの接頭辞: "
 
 #: src/addons/reporting.php:70, src/addons/reporting.php:169,
 #: src/backup.php:960, src/class-updraftplus.php:4616
@@ -5698,7 +5698,7 @@ msgstr "バックアップからWP-config.phpを戻す：WP-CONFIG-backup.phpと
 
 #: src/restorer.php:384
 msgid "Failed to write out the decrypted database to the filesystem"
-msgstr "ファイルシステムへの復号化されたデータベースを書き込みに失敗しました"
+msgstr "解読されたデータベースをファイルシステムに書き出すことができませんでした"
 
 #: src/restorer.php:368
 msgid "Failed to create a temporary directory"
@@ -5734,7 +5734,7 @@ msgstr "バックアップ解凍中..."
 
 #: src/restorer.php:141
 msgid "Copying this entity failed."
-msgstr "このエンティティのコピーは、失敗した"
+msgstr "このエンティティをコピーできませんでした。"
 
 #: src/restorer.php:140
 msgid "Backup file not available."
@@ -5758,7 +5758,7 @@ msgstr "バックアップレコードには、このファイルの適切なサ
 
 #: src/admin.php:3773
 msgid "Archive is expected to be size:"
-msgstr "アーカイブのサイズであることが期待されます。"
+msgstr "アーカイブの予想サイズ: "
 
 #: src/admin.php:3657
 msgid "If making a request for support, please include this information:"
@@ -5766,11 +5766,11 @@ msgstr "サポートが必要な場合、この情報をお知らせください
 
 #: src/admin.php:3656
 msgid "ABORT: Could not find the information on which entities to restore."
-msgstr "失敗：復元するためにどのエンティティに関する情報を見つけることができませんでした。"
+msgstr "ABORT: 復元するエンティティに関する情報を見つけることができませんでした。"
 
 #: src/admin.php:3610
 msgid "UpdraftPlus Restoration: Progress"
-msgstr "UpdraftPlus復元：進捗状況"
+msgstr "UpdraftPlus の復元: 進行状況"
 
 #: src/admin.php:3562
 msgid "This backup does not exist in the backup history - restoration aborted. Timestamp:"
@@ -5794,7 +5794,7 @@ msgstr "WebサーバーのPHP/Curlのインストールは、HTTPSアクセス�
 
 #: src/admin.php:3176
 msgid "Your web server's PHP/Curl installation does not support https access. Communications with %s will be unencrypted. Ask your web host to install Curl/SSL in order to gain the ability for encryption (via an add-on)."
-msgstr ""
+msgstr "Web サーバーの PHP / Curl インストールは、HTTPS アクセスをサポートしていません。 %s の通信は暗号化されません。暗号化のための能力を得るためには、 Curl/SSL をインストールするよう、ホスティング業者に依頼してください。(アドオン経由で)"
 
 #: src/methods/cloudfiles-new.php:107, src/methods/cloudfiles.php:468,
 #: src/methods/openstack-base.php:541, src/methods/s3.php:825
@@ -5811,7 +5811,7 @@ msgstr "このオプションを選択すると、すべてで、可能な場合
 
 #: src/templates/wp-admin/settings/form-contents.php:377
 msgid "Disable SSL entirely where possible"
-msgstr "SSLを無効に完全に可能な場合"
+msgstr "可能な限り SSL を完全に無効にする"
 
 #: src/templates/wp-admin/settings/form-contents.php:373
 msgid "Note that not all cloud backup methods are necessarily using SSL authentication."
@@ -6175,7 +6175,7 @@ msgstr "UpdraftPlus が使用しているウェブサーバの容量"
 
 #: src/templates/wp-admin/settings/downloading-and-restoring.php:33
 msgid "This is a count of the contents of your Updraft directory"
-msgstr "これは、あなたのUpdraftディレクトリの内容のカウントです"
+msgstr "これは Updraft ディレクトリ内のコンテンツ数です"
 
 #: src/addons/google-enhanced.php:84, src/methods/googledrive.php:167,
 #: src/methods/googledrive.php:169, src/methods/googledrive.php:423,
@@ -6244,7 +6244,7 @@ msgstr "次のバックアップスケジュール"
 
 #: src/templates/wp-admin/settings/tab-status.php:46
 msgid "All the times shown in this section are using WordPress's configured time zone, which you can set in Settings -> General"
-msgstr "表示されている時間はWordPressで設定されたタイムゾーンを使用しています。あなたは「設定」よりタイムゾーンを変更することができます。"
+msgstr "表示されている時間は WordPress で設定されたタイムゾーンを使用しています。あなたは「設定」よりタイムゾーンを変更することができます。"
 
 #: src/admin.php:275
 msgid "At the same time as the files backup"
@@ -6417,7 +6417,7 @@ msgstr "UpdraftPlus に wordpress.orgで肯定的なレビューをして助け�
 
 #: src/includes/updraftplus-notices.php:101
 msgid "Like UpdraftPlus and can spare one minute?"
-msgstr "1分お時間をいただけますか？"
+msgstr "1分お時間をいただけますか ?"
 
 #: src/addons/azure.php:217, src/class-updraftplus.php:4340,
 #: src/methods/googledrive.php:1001, src/methods/s3.php:316

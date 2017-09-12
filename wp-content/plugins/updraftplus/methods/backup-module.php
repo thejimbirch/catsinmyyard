@@ -369,11 +369,10 @@ abstract class UpdraftPlus_BackupModule {
 	 *
 	 * @uses UpdraftPlus::jobdata_set()
 	 *
-	 * @param String	  $key   	  - the key for the job data
-	 * @param Mixed 	  $value	  - the data to be stored
-	 * @param String|Null $legacy_key - the previous name of the key, prior to instance-specific job data (so that upgrades across versions whilst a backup is in progress can still find its data)
+	 * @param String $key	- the key for the job data
+	 * @param Mixed  $value - the data to be stored
 	 */
-	public function jobdata_set($key, $value, $legacy_key = null) {
+	public function jobdata_set($key, $value) {
 	
 		$instance_key = $this->get_id().'-'.($this->_instance_id ? $this->_instance_id : 'no_instance');
 		
@@ -386,8 +385,6 @@ abstract class UpdraftPlus_BackupModule {
 		$instance_data[$key] = $value;
 		
 		$updraftplus->jobdata_set($instance_key, $instance_data);
-		
-		if (is_string($legacy_key)) $updraftplus->jobdata_set($legacy_key, $value);
 		
 	}
 

@@ -108,7 +108,7 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 			$config['error'] = array('message' => 'site_not_connected', 'values' => array());
 			
 			$this->vault_config = $config;
-			$this->jobdata_set('config', $config, 'updraftvault_config');
+			$this->jobdata_set('config', $config);
 			return $config;
 		}
 
@@ -229,7 +229,7 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 
 		$config['server_side_encryption'] = 'AES256';
 		$this->vault_config = $config;
-		$this->jobdata_set('config', $config, 'updraftvault_config');
+		$this->jobdata_set('config', $config);
 		// N.B. This isn't multi-server compatible
 		set_transient('udvault_last_config', $config, 86400*7);
 		return $config;
@@ -342,8 +342,8 @@ class UpdraftPlus_BackupModule_updraftvault extends UpdraftPlus_BackupModule_s3 
 				<div id="updraftvault_settings_connect" style="display:none;" class="updraft-hidden">
 					<p><?php _e('Enter your UpdraftPlus.Com email / password here to connect:', 'updraftplus');?></p>
 					<p>
-						<input id="updraftvault_email" class="udignorechange" type="text" placeholder="<?php esc_attr_e(__('E-mail', 'updraftplus'));?>">
-						<input id="updraftvault_pass" class="udignorechange" type="password" placeholder="<?php esc_attr_e(__('Password', 'updraftplus'));?>">
+						<input id="updraftvault_email" class="udignorechange" type="text" placeholder="<?php esc_attr_e('E-mail', 'updraftplus');?>">
+						<input id="updraftvault_pass" class="udignorechange" type="password" placeholder="<?php esc_attr_e('Password', 'updraftplus');?>">
 						<button id="updraftvault_connect_go" class="button-primary"><?php _e('Connect', 'updraftplus');?></button>
 					</p>
 					<p class="padding-top-14px">

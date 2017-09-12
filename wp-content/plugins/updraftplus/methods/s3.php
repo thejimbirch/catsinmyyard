@@ -384,7 +384,7 @@ class UpdraftPlus_BackupModule_s3 extends UpdraftPlus_BackupModule {
 							continue;
 						} else {
 							$updraftplus->log("$whoweare chunked upload: got multipart ID: $upload_id");
-							$this->jobdata_set($hash.'_uid', $upload_id, "upd_${whoweare_keys}_${hash}_uid");
+							$this->jobdata_set($hash.'_uid', $upload_id);
 						}
 					} else {
 						$updraftplus->log("$whoweare chunked upload: retrieved previously obtained multipart ID: $upload_id");
@@ -408,7 +408,7 @@ class UpdraftPlus_BackupModule_s3 extends UpdraftPlus_BackupModule {
 							if (false !== $etag && is_string($etag)) {
 								$updraftplus->record_uploaded_chunk(round(100*$i/$chunks, 1), "$i, $etag", $fullpath);
 								array_push($etags, $etag);
-								$this->jobdata_set($hash.'_etag_'.$i, $etag, "ud_${whoweare_keys}_${hash}_e$i");
+								$this->jobdata_set($hash.'_etag_'.$i, $etag);
 								$successes++;
 							} else {
 								$updraftplus->log("$whoweare chunk $i: upload failed");

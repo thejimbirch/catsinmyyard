@@ -1072,7 +1072,7 @@ function updraft_downloader(base, backup_timestamp, what, whicharea, set_content
 		if (!jQuery(stid_selector).length) {
 			var prdate = (prettydate) ? prettydate : backup_timestamp;
 			jQuery(whicharea).append('<div style="clear:left; border: 1px solid; padding: 8px; margin-top: 4px; max-width:840px;" class="'+stid+' updraftplus_downloader"><button onclick="jQuery(this).parent().fadeOut().remove();" type="button" style="float:right; margin-bottom: 8px;">X</button><strong>'+updraftlion.download+' '+what+itext+' ('+prdate+')</strong>:<div class="raw">'+updraftlion.begunlooking+'</div><div class="file '+stid+'_st"><div class="dlfileprogress" style="width: 0;"></div></div></div>');
-			jQuery(stid_selector).data('downloaderfor', { base: base, nonce: backup_timestamp, what: what, index: i });
+			jQuery(stid_selector).data('downloaderfor', { base: base, nonce: backup_timestamp, what: what, index: set_contents[i] });
 			setTimeout(function() {
 updraft_activejobs_update(true);}, 1500);
 		}

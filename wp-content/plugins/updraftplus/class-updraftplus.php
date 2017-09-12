@@ -943,7 +943,7 @@ class UpdraftPlus {
 			// Now run (v)sprintf on it, using any remaining arguments. vsprintf = sprintf but takes an array instead of individual arguments
 			$this->log(vsprintf($pre_line, $args));
 			// This is slightly hackish, in that we have no way to use a different level or destination. In that case, the caller should instead call log() twice with different parameters, instead of using this convenience function.
-			$this->log(vsprintf(__($pre_line, 'updraftplus'), $args), 'notice-restore');
+			$this->log(vsprintf($pre_line, $args), 'notice-restore');
 		}
 	}
 
@@ -3503,8 +3503,7 @@ class UpdraftPlus {
 		if (!empty($a_name) && '*' != $a_name) {
 			if (is_array($a_name)) {
 				$result = array();
-				reset($a_name);
-				while (list($key, $val) = each($a_name)) {
+				foreach ($a_name as $key => $val) {
 					$result[$key] = '`'.$val.'`';
 				}
 				return $result;

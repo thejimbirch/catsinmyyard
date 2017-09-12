@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the UpdraftPlus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-07-25 22:08:50+0000\n"
+"PO-Revision-Date: 2017-09-05 14:35:49+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -963,7 +963,7 @@ msgstr "Dette er undertiden forårsaget af en firewall - prøv at fravælge SSL 
 
 #: src/methods/ftp.php:380
 msgid "login"
-msgstr "login"
+msgstr "Log ind"
 
 #: src/methods/email.php:79
 msgid "Be aware that mail servers tend to have size limits; typically around %s MB; backups larger than any limits will likely not arrive."
@@ -1041,7 +1041,7 @@ msgstr "Angiv enhver beskrivelse"
 
 #: src/central/bootstrap.php:469
 msgid "Description"
-msgstr "Beskrivelse"
+msgstr "Forklaring"
 
 #: src/central/bootstrap.php:463
 msgid "Create new key"
@@ -1121,7 +1121,7 @@ msgstr "Backup'en blev afbrudt af brugeren"
 
 #: src/admin.php:4202
 msgid "Your settings have been saved."
-msgstr "Dine indstillinger er blevet gemt."
+msgstr "Dine indstillinger er gemt"
 
 #: src/admin.php:3330
 msgid "Total backup size:"
@@ -1129,7 +1129,7 @@ msgstr "Total backup-størrelse:"
 
 #: src/admin.php:2744
 msgid "stop"
-msgstr "stop"
+msgstr "stoppe"
 
 #: src/admin.php:2582
 msgid "The backup has finished running"
@@ -1143,7 +1143,7 @@ msgstr "Wipe-indstillinger"
 
 #: src/templates/wp-admin/advanced/site-info.php:95
 msgid "reset"
-msgstr "reset"
+msgstr "nulstil"
 
 #: src/templates/wp-admin/settings/delete-and-restore-modals.php:21
 msgid "these backup sets"
@@ -1155,7 +1155,7 @@ msgstr "dette backup sæt"
 
 #: src/templates/wp-admin/settings/downloading-and-restoring.php:33
 msgid "calculate"
-msgstr "beregn"
+msgstr "Beregn"
 
 #: src/admin.php:722
 msgid "You should save your changes to ensure that they are used for making your backup."
@@ -1212,7 +1212,7 @@ msgstr "Vil blive importeret som et nyt site."
 #: src/admin.php:2395, src/templates/wp-admin/notices/horizontal-notice.php:16,
 #: src/templates/wp-admin/notices/horizontal-notice.php:18
 msgid "Dismiss"
-msgstr "Afvis"
+msgstr "Luk"
 
 #: src/admin.php:734
 msgid "Please fill in the required information."
@@ -1325,7 +1325,7 @@ msgstr "Har du ikke et fjernlager?"
 
 #: src/admin.php:4077
 msgid "settings"
-msgstr "indstillinger"
+msgstr "Indstillinger"
 
 #: src/admin.php:4077
 msgid "Backup won't be sent to any remote storage - none has been saved in the %s"
@@ -1378,7 +1378,7 @@ msgstr "Du har valgt at tage backup, men har ikke valgt nogle filer"
 
 #: src/admin.php:546
 msgid "Extensions"
-msgstr "Udvidelser"
+msgstr "Udviddelser"
 
 #: src/admin.php:538, src/templates/wp-admin/settings/tab-bar.php:8
 msgid "Advanced Tools"

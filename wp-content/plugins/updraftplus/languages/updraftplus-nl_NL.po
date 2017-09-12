@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the UpdraftPlus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-04-04 10:53:14+0000\n"
+"PO-Revision-Date: 2017-09-05 14:38:15+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -131,7 +131,7 @@ msgstr ""
 
 #: src/methods/cloudfiles.php:520
 msgid "Cloud Files"
-msgstr ""
+msgstr "Cloud-bestanden"
 
 #: src/admin.php:4207
 msgid "Your settings failed to save. Please refresh the settings page and try again"
@@ -5780,7 +5780,7 @@ msgstr "De PHP/Curl-installatie van de webserver staat https-toegang niet toe. D
 
 #: src/admin.php:3176
 msgid "Your web server's PHP/Curl installation does not support https access. Communications with %s will be unencrypted. Ask your web host to install Curl/SSL in order to gain the ability for encryption (via an add-on)."
-msgstr ""
+msgstr "De PHP/Curl-installatie van de webserver ondersteunt https-toegang niet. Communicatie met %s zal niet versleuteld worden. Vraag de webhost Curl/SSL te installeren om versleutelde toegang te kunnen gebruiken (m.b.v. een add-on)."
 
 #: src/methods/cloudfiles-new.php:107, src/methods/cloudfiles.php:468,
 #: src/methods/openstack-base.php:541, src/methods/s3.php:825

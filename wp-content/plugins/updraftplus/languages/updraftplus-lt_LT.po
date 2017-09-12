@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the UpdraftPlus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2015-07-20 13:54:21+0000\n"
+"PO-Revision-Date: 2017-09-05 14:42:31+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -963,7 +963,7 @@ msgstr ""
 
 #: src/methods/ftp.php:380
 msgid "login"
-msgstr ""
+msgstr "Prisijungti"
 
 #: src/methods/email.php:79
 msgid "Be aware that mail servers tend to have size limits; typically around %s MB; backups larger than any limits will likely not arrive."
@@ -1041,7 +1041,7 @@ msgstr ""
 
 #: src/central/bootstrap.php:469
 msgid "Description"
-msgstr ""
+msgstr "Description"
 
 #: src/central/bootstrap.php:463
 msgid "Create new key"
@@ -1065,7 +1065,7 @@ msgstr ""
 
 #: src/central/bootstrap.php:442
 msgid "Details"
-msgstr ""
+msgstr "Paaiškinimai"
 
 #: src/central/bootstrap.php:441
 msgid "Key description"
@@ -1121,7 +1121,7 @@ msgstr ""
 
 #: src/admin.php:4202
 msgid "Your settings have been saved."
-msgstr ""
+msgstr "Ваши настройки были сохранены."
 
 #: src/admin.php:3330
 msgid "Total backup size:"
@@ -1129,7 +1129,7 @@ msgstr ""
 
 #: src/admin.php:2744
 msgid "stop"
-msgstr ""
+msgstr "sustabdyti"
 
 #: src/admin.php:2582
 msgid "The backup has finished running"
@@ -1171,7 +1171,7 @@ msgstr ""
 
 #: src/admin.php:697
 msgid "Saving..."
-msgstr ""
+msgstr "Išsaugoma..."
 
 #: src/admin.php:660
 msgid "Error: the server sent us a response which we did not understand."
@@ -1212,7 +1212,7 @@ msgstr ""
 #: src/admin.php:2395, src/templates/wp-admin/notices/horizontal-notice.php:16,
 #: src/templates/wp-admin/notices/horizontal-notice.php:18
 msgid "Dismiss"
-msgstr ""
+msgstr "Atmesti"
 
 #: src/admin.php:734
 msgid "Please fill in the required information."
@@ -1325,7 +1325,7 @@ msgstr ""
 
 #: src/admin.php:4077
 msgid "settings"
-msgstr ""
+msgstr "Nustatymai"
 
 #: src/admin.php:4077
 msgid "Backup won't be sent to any remote storage - none has been saved in the %s"
@@ -1378,7 +1378,7 @@ msgstr ""
 
 #: src/admin.php:546
 msgid "Extensions"
-msgstr ""
+msgstr "Įskiepiai"
 
 #: src/admin.php:538, src/templates/wp-admin/settings/tab-bar.php:8
 msgid "Advanced Tools"
@@ -4898,7 +4898,7 @@ msgstr ""
 #: src/addons/migrator.php:333, src/admin.php:2229,
 #: src/class-updraftplus.php:4683, src/restorer.php:2033
 msgid "Warning:"
-msgstr ""
+msgstr "Įspėjimas:"
 
 #: src/class-updraftplus.php:4672, src/class-updraftplus.php:4675,
 #: src/restorer.php:154
@@ -4915,7 +4915,7 @@ msgstr ""
 
 #: src/admin.php:692
 msgid "Close"
-msgstr ""
+msgstr "Uždaryti"
 
 #: src/addons/autobackup.php:330, src/addons/autobackup.php:422,
 #: src/admin.php:648, src/methods/remotesend.php:66,
@@ -5789,7 +5789,7 @@ msgstr ""
 
 #: src/templates/wp-admin/settings/form-contents.php:401
 msgid "Save Changes"
-msgstr ""
+msgstr "Įrašyti pakeitimus"
 
 #: src/templates/wp-admin/settings/form-contents.php:378
 msgid "Choosing this option lowers your security by stopping UpdraftPlus from using SSL for authentication and encrypted transport at all, where possible. Note that some cloud storage providers do not allow this (e.g. Dropbox), so with those providers this setting will have no effect."
@@ -5873,7 +5873,7 @@ msgstr ""
 
 #: src/addons/morefiles.php:297, src/admin.php:687
 msgid "Cancel"
-msgstr ""
+msgstr "Atšaukti"
 
 #: src/addons/reporting.php:233, src/admin.php:3325
 msgid "None"
@@ -5894,7 +5894,7 @@ msgstr ""
 #: src/templates/wp-admin/settings/form-contents.php:285,
 #: src/udaddons/options.php:130
 msgid "Email"
-msgstr ""
+msgstr "El.paštas"
 
 #: src/templates/wp-admin/settings/form-contents.php:176
 msgid "The above directories are everything, except for WordPress core itself which you can download afresh from WordPress.org."
@@ -6385,7 +6385,7 @@ msgstr ""
 #: src/admin.php:530, src/admin.php:882,
 #: src/templates/wp-admin/settings/tab-bar.php:7
 msgid "Settings"
-msgstr ""
+msgstr "Nustatymai"
 
 #: src/backup.php:232
 msgid "Could not create %s zip. Consult the log file for more information."

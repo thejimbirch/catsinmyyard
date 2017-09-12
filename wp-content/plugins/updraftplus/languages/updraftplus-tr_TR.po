@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the UpdraftPlus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2015-09-28 12:34:39+0000\n"
+"PO-Revision-Date: 2017-09-05 14:32:00+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -131,7 +131,7 @@ msgstr ""
 
 #: src/methods/cloudfiles.php:520
 msgid "Cloud Files"
-msgstr ""
+msgstr "Bulut dosyaları"
 
 #: src/admin.php:4207
 msgid "Your settings failed to save. Please refresh the settings page and try again"
@@ -503,7 +503,7 @@ msgstr ""
 #: src/templates/wp-admin/notices/report-plain.php:29,
 #: src/templates/wp-admin/notices/report.php:26
 msgid "Sign up"
-msgstr ""
+msgstr "Kayıt ol"
 
 #: src/templates/wp-admin/notices/bottom-notice.php:25,
 #: src/templates/wp-admin/notices/horizontal-notice.php:36,
@@ -656,18 +656,18 @@ msgstr ""
 
 #: src/templates/wp-admin/advanced/tools-menu.php:22
 msgid "Site size"
-msgstr ""
+msgstr "Site boyutu"
 
 #: src/templates/wp-admin/advanced/tools-menu.php:10,
 #: src/templates/wp-admin/settings/tab-addons.php:247,
 #: src/templates/wp-admin/settings/tab-addons.php:248
 msgid "Lock settings"
-msgstr ""
+msgstr "Kilit ayarları"
 
 #: src/templates/wp-admin/advanced/site-info.php:5,
 #: src/templates/wp-admin/advanced/tools-menu.php:6
 msgid "Site information"
-msgstr ""
+msgstr "Site bilgileri"
 
 #: src/templates/wp-admin/advanced/search-replace.php:9
 msgid "For the ability to migrate websites, upgrade to UpdraftPlus Premium."
@@ -675,7 +675,7 @@ msgstr ""
 
 #: src/templates/wp-admin/advanced/export-settings.php:15
 msgid "Import settings"
-msgstr ""
+msgstr "İçer aktarma ayarları"
 
 #: src/templates/wp-admin/advanced/export-settings.php:12
 msgid "You can also import previously-exported settings. This tool will replace all your saved settings."
@@ -683,7 +683,7 @@ msgstr ""
 
 #: src/templates/wp-admin/advanced/export-settings.php:9
 msgid "Export settings"
-msgstr ""
+msgstr "Dışa aktarma ayarları"
 
 #: src/templates/wp-admin/advanced/export-settings.php:7
 msgid "including any passwords"
@@ -696,7 +696,7 @@ msgstr ""
 #: src/templates/wp-admin/advanced/export-settings.php:5,
 #: src/templates/wp-admin/advanced/tools-menu.php:26
 msgid "Export / import settings"
-msgstr ""
+msgstr "Dışa/İçe aktarma ayarları"
 
 #: src/restorer.php:1869
 msgid "Processing table (%s)"
@@ -736,11 +736,11 @@ msgstr ""
 
 #: src/admin.php:1531
 msgid "Remote files deleted:"
-msgstr ""
+msgstr "Uzak sunucuda ki dosyalar silindi:"
 
 #: src/admin.php:1530
 msgid "Local files deleted:"
-msgstr ""
+msgstr "Yerel dosyalar silindi:"
 
 #: src/admin.php:973, src/admin.php:977, src/admin.php:985, src/admin.php:989
 msgid "Follow this link to authorize access to your %s account (you will not be able to back up to %s without it)."
@@ -752,7 +752,7 @@ msgstr ""
 
 #: src/admin.php:747
 msgid "Complete"
-msgstr ""
+msgstr "Tamamla"
 
 #: src/admin.php:746
 msgid "Do you want to carry out the import?"
@@ -768,11 +768,11 @@ msgstr ""
 
 #: src/admin.php:743
 msgid "Importing..."
-msgstr ""
+msgstr "İçe aktarılıyor..."
 
 #: src/admin.php:739
 msgid "You have not yet selected a file to import."
-msgstr ""
+msgstr "Henüz içe aktarmak için bir dosya seçmediniz."
 
 #: src/admin.php:723
 msgid "Your export file will be of your displayed settings, not your saved ones."
@@ -780,7 +780,7 @@ msgstr ""
 
 #: src/admin.php:82
 msgid "template not found"
-msgstr ""
+msgstr "şablon bulunamadı"
 
 #: src/addons/s3-enhanced.php:331
 msgid "US East (Ohio)"
@@ -821,7 +821,7 @@ msgstr ""
 
 #: src/admin.php:2247
 msgid "To fix this problem go here."
-msgstr ""
+msgstr "Bu sorunu gidermek için buraya gidin."
 
 #: src/admin.php:2247
 msgid "OptimizePress 2.0 encodes its contents, so search/replace does not work."
@@ -881,11 +881,11 @@ msgstr ""
 
 #: src/templates/wp-admin/settings/header.php:26
 msgid "FAQs"
-msgstr ""
+msgstr "SSS"
 
 #: src/central/bootstrap.php:496
 msgid "More information..."
-msgstr ""
+msgstr "Daha fazla bilgi..."
 
 #: src/central/bootstrap.php:494
 msgid "Use the alternative method for making a connection with the dashboard."
@@ -917,11 +917,11 @@ msgstr ""
 
 #: src/addons/migrator.php:2207, src/central/bootstrap.php:513
 msgid "slower, strongest"
-msgstr ""
+msgstr "daha yavaş, en güçlü"
 
 #: src/addons/migrator.php:2206, src/central/bootstrap.php:512
 msgid "recommended"
-msgstr ""
+msgstr "tavsiye edilen"
 
 #: src/addons/migrator.php:2206, src/central/bootstrap.php:512
 msgid "%s bytes"
@@ -933,7 +933,7 @@ msgstr ""
 
 #: src/addons/migrator.php:2204, src/central/bootstrap.php:510
 msgid "easy to break, fastest"
-msgstr ""
+msgstr "kırılması kolay, en hızlı"
 
 #: src/addons/migrator.php:2204, src/addons/migrator.php:2205,
 #: src/addons/migrator.php:2207, src/central/bootstrap.php:510,
@@ -943,7 +943,7 @@ msgstr ""
 
 #: src/addons/migrator.php:2202, src/central/bootstrap.php:508
 msgid "Encryption key size:"
-msgstr ""
+msgstr "Şifreleme anahtarı boyutu:"
 
 #: src/addons/migrator.php:2200
 msgid "Enter your chosen name"
@@ -963,7 +963,7 @@ msgstr ""
 
 #: src/methods/ftp.php:380
 msgid "login"
-msgstr ""
+msgstr "giriş"
 
 #: src/methods/email.php:79
 msgid "Be aware that mail servers tend to have size limits; typically around %s MB; backups larger than any limits will likely not arrive."
@@ -971,11 +971,11 @@ msgstr ""
 
 #: src/methods/email.php:30
 msgid "This backup archive is %s MB in size - the attempt to send this via email is likely to fail (few email servers allow attachments of this size). If so, you should switch to using a different remote storage method."
-msgstr ""
+msgstr "Bu yedek arşivi boyut olarak %s MB, bunu email ile göndermek yüksek olasılıkla başarısız olacaktır (çok az email sunucusu bu boyutta dosyalara izin veriyor). Eğer başarısız olursa farklı bir uzak depo alanına geçiş yapmalısınız."
 
 #: src/class-updraftplus.php:1693
 msgid "Size: %s MB"
-msgstr ""
+msgstr "Boyut: %s MB"
 
 #: src/central/bootstrap.php:486
 msgid "Other (please specify - i.e. the site where you have installed an UpdraftCentral dashboard)"
@@ -991,7 +991,7 @@ msgstr ""
 
 #: src/templates/wp-admin/settings/tab-status.php:47
 msgid "Now"
-msgstr ""
+msgstr "Şimdi"
 
 #: src/class-updraftplus.php:4628, src/restorer.php:1010
 msgid "You should enable %s to make any pretty permalinks (e.g. %s) work"
@@ -1009,7 +1009,7 @@ msgstr ""
 #: src/methods/updraftvault.php:316, src/methods/updraftvault.php:322,
 #: src/methods/updraftvault.php:328
 msgid "or (annual discount)"
-msgstr ""
+msgstr "ya da (yıllık indirim)"
 
 #: src/methods/updraftvault.php:252
 msgid "No Vault connection was found for this site (has it moved?); please disconnect and re-connect."
@@ -1025,11 +1025,11 @@ msgstr ""
 
 #: src/central/bootstrap.php:535
 msgid "fetch..."
-msgstr ""
+msgstr "getir..."
 
 #: src/central/bootstrap.php:534
 msgid "View recent UpdraftCentral log events"
-msgstr ""
+msgstr "Son UpdraftCentral kayıt günlüklerini görüntüle"
 
 #: src/central/bootstrap.php:489
 msgid "URL of mothership"
@@ -1037,19 +1037,19 @@ msgstr ""
 
 #: src/central/bootstrap.php:472
 msgid "Enter any description"
-msgstr ""
+msgstr "Bir açıklama girin"
 
 #: src/central/bootstrap.php:469
 msgid "Description"
-msgstr ""
+msgstr "Tanım"
 
 #: src/central/bootstrap.php:463
 msgid "Create new key"
-msgstr ""
+msgstr "Yeni anahtar oluştur"
 
 #: src/central/bootstrap.php:430
 msgid "Delete..."
-msgstr ""
+msgstr "Sil..."
 
 #: src/central/bootstrap.php:423
 msgid "Created:"
@@ -1065,11 +1065,11 @@ msgstr ""
 
 #: src/central/bootstrap.php:442
 msgid "Details"
-msgstr ""
+msgstr "Ayrıntılar"
 
 #: src/central/bootstrap.php:441
 msgid "Key description"
-msgstr ""
+msgstr "Anahtar açıklaması"
 
 #: src/central/bootstrap.php:316, src/central/bootstrap.php:327
 msgid "A key was created, but the attempt to register it with %s was unsuccessful - please try again later."
@@ -1085,7 +1085,7 @@ msgstr ""
 
 #: src/central/bootstrap.php:69
 msgid "This connection appears to already have been made."
-msgstr ""
+msgstr "Bu bağlantı zaten yapılmış gibi görünüyor."
 
 #: src/central/bootstrap.php:66
 msgid "You must visit this link in the same browser and login session as you created the key in."
@@ -1117,33 +1117,33 @@ msgstr ""
 
 #: src/backup.php:867, src/class-updraftplus.php:3094
 msgid "The backup was aborted by the user"
-msgstr ""
+msgstr "Yedekleme kullanıcı tarafından iptal edildi"
 
 #: src/admin.php:4202
 msgid "Your settings have been saved."
-msgstr ""
+msgstr "Ayarlarınız kaydedildi."
 
 #: src/admin.php:3330
 msgid "Total backup size:"
-msgstr ""
+msgstr "Toplam yedek boyutu:"
 
 #: src/admin.php:2744
 msgid "stop"
-msgstr ""
+msgstr "durdur"
 
 #: src/admin.php:2582
 msgid "The backup has finished running"
-msgstr ""
+msgstr "Yedekleme çalışmayı bitirdi"
 
 #: src/templates/wp-admin/advanced/tools-menu.php:30,
 #: src/templates/wp-admin/advanced/wipe-settings.php:5,
 #: src/templates/wp-admin/advanced/wipe-settings.php:9
 msgid "Wipe settings"
-msgstr ""
+msgstr "Ayarları sıfırla"
 
 #: src/templates/wp-admin/advanced/site-info.php:95
 msgid "reset"
-msgstr ""
+msgstr "varsayılana dön"
 
 #: src/templates/wp-admin/settings/delete-and-restore-modals.php:21
 msgid "these backup sets"
@@ -1155,7 +1155,7 @@ msgstr ""
 
 #: src/templates/wp-admin/settings/downloading-and-restoring.php:33
 msgid "calculate"
-msgstr ""
+msgstr "hesapla"
 
 #: src/admin.php:722
 msgid "You should save your changes to ensure that they are used for making your backup."
@@ -1167,19 +1167,19 @@ msgstr ""
 
 #: src/admin.php:714
 msgid "Please enter a valid URL"
-msgstr ""
+msgstr "Lütfen geçerli bir URL giriniz"
 
 #: src/admin.php:697
 msgid "Saving..."
-msgstr ""
+msgstr "Kaydediyor..."
 
 #: src/admin.php:660
 msgid "Error: the server sent us a response which we did not understand."
-msgstr ""
+msgstr "Hata: sunucu bize anlayamadığımız bir yanıt gönderdi."
 
 #: src/admin.php:652
 msgid "Fetching..."
-msgstr ""
+msgstr "Getiriliyor..."
 
 #: src/addons/s3-enhanced.php:339
 msgid "Asia Pacific (Seoul)"
@@ -1212,11 +1212,11 @@ msgstr ""
 #: src/admin.php:2395, src/templates/wp-admin/notices/horizontal-notice.php:16,
 #: src/templates/wp-admin/notices/horizontal-notice.php:18
 msgid "Dismiss"
-msgstr ""
+msgstr "İptal"
 
 #: src/admin.php:734
 msgid "Please fill in the required information."
-msgstr ""
+msgstr "Lütfen gerekli bilgileri doldurun."
 
 #: src/addons/multisite.php:576
 msgid "Read more..."
@@ -1289,19 +1289,19 @@ msgstr ""
 
 #: src/templates/wp-admin/settings/form-contents.php:100
 msgid "Sending Your Backup To Remote Storage"
-msgstr ""
+msgstr "Yedeğiniz uzak depolama alanına gönderiliyor"
 
 #: src/templates/wp-admin/settings/form-contents.php:65
 msgid "Database backup schedule"
-msgstr ""
+msgstr "Veritabanı yedekleme zamanlaması"
 
 #: src/templates/wp-admin/settings/form-contents.php:54
 msgid "Incremental file backup schedule"
-msgstr ""
+msgstr "Artan dosya yedekleme aralıkları"
 
 #: src/templates/wp-admin/settings/form-contents.php:22
 msgid "Files backup schedule"
-msgstr ""
+msgstr "Dosya yedekleme zamanlaması"
 
 #: src/templates/wp-admin/advanced/wipe-settings.php:6
 msgid "You will then need to enter all your settings again. You can also do this before deactivating/deinstalling UpdraftPlus if you wish."
@@ -1313,7 +1313,7 @@ msgstr ""
 
 #: src/admin.php:4079
 msgid "Send this backup to remote storage"
-msgstr ""
+msgstr "Bu yedeği uzak depolama alanına gönder"
 
 #: src/admin.php:4077
 msgid "Check out UpdraftPlus Vault."
@@ -1325,7 +1325,7 @@ msgstr ""
 
 #: src/admin.php:4077
 msgid "settings"
-msgstr ""
+msgstr "ayarlar"
 
 #: src/admin.php:4077
 msgid "Backup won't be sent to any remote storage - none has been saved in the %s"
@@ -1337,7 +1337,7 @@ msgstr ""
 
 #: src/admin.php:2414
 msgid "Include the database in the backup"
-msgstr ""
+msgstr "Yedeğin içine veritabanını dahil et"
 
 #: src/admin.php:2394
 msgid "Continue restoration"
@@ -1353,15 +1353,15 @@ msgstr ""
 
 #: src/admin.php:2386
 msgid "%s minutes, %s seconds"
-msgstr ""
+msgstr "%s dakika, %s saniye"
 
 #: src/admin.php:2333
 msgid "Backup Contents And Schedule"
-msgstr ""
+msgstr "Yedekleme içeriği ve zamanlama"
 
 #: src/templates/wp-admin/settings/tab-bar.php:9
 msgid "Premium / Extensions"
-msgstr ""
+msgstr "Premium / Eklentiler"
 
 #: src/admin.php:2113, src/admin.php:2122
 msgid "Sufficient information about the in-progress restoration operation could not be found."
@@ -1370,7 +1370,7 @@ msgstr ""
 #: src/addons/morefiles.php:55, src/admin.php:720
 msgctxt "(verb)"
 msgid "Download"
-msgstr ""
+msgstr "İndir"
 
 #: src/admin.php:645
 msgid "You have chosen to backup files, but no file entities have been selected"
@@ -1378,11 +1378,11 @@ msgstr ""
 
 #: src/admin.php:546
 msgid "Extensions"
-msgstr ""
+msgstr "Eklentiler"
 
 #: src/admin.php:538, src/templates/wp-admin/settings/tab-bar.php:8
 msgid "Advanced Tools"
-msgstr ""
+msgstr "Gelişmiş araçlar"
 
 #: src/addons/googlecloud.php:966
 msgid "Bucket location"
@@ -1516,7 +1516,7 @@ msgstr ""
 
 #: src/backup.php:1579
 msgid "the options table was not found"
-msgstr ""
+msgstr "seçenekler tablosu bulunamadı"
 
 #: src/backup.php:1577
 msgid "no options or sitemeta table was found"
@@ -1536,7 +1536,7 @@ msgstr ""
 
 #: src/templates/wp-admin/advanced/site-info.php:49
 msgid "Not installed"
-msgstr ""
+msgstr "Kurulmadı"
 
 #: src/addons/googlecloud.php:951, src/addons/s3-enhanced.php:54
 msgid "Storage class"
@@ -1629,7 +1629,7 @@ msgstr "Seçimi kaldır"
 
 #: src/templates/wp-admin/settings/delete-and-restore-modals.php:6
 msgid "Select all"
-msgstr "Tümünü seç"
+msgstr "Hepsini seç"
 
 #: src/templates/wp-admin/settings/delete-and-restore-modals.php:4
 msgid "Actions upon selected backups"
@@ -1653,19 +1653,19 @@ msgstr "Şu tarihten eski yedekler için"
 
 #: src/admin.php:730
 msgid "week(s)"
-msgstr "hafta"
+msgstr "hafta(lar)"
 
 #: src/admin.php:729
 msgid "hour(s)"
-msgstr "saat"
+msgstr "saat(ler)"
 
 #: src/admin.php:728
 msgid "day(s)"
-msgstr "gün"
+msgstr "gün(ler)"
 
 #: src/admin.php:727
 msgid "in the month"
-msgstr "ayın içerisinde"
+msgstr "ay içinde"
 
 #: src/admin.php:726
 msgid "day"
@@ -1689,7 +1689,7 @@ msgstr "Bu problem kaynak veritabanıyla uyumsuz çok eski bir MySQL versiyonuna
 
 #: src/methods/updraftvault.php:645
 msgid "You do not currently have any UpdraftPlus Vault quota"
-msgstr "Bir UpdraftPlus Vault kotanız bulunmamaktadır."
+msgstr "Şuan da bir UpdraftPlus Vault kotasına sahip değilsiniz"
 
 #: src/class-updraftplus.php:4714
 msgid "You must upgrade MySQL to be able to use this database."
@@ -2189,7 +2189,7 @@ msgstr "buradan ayarlayın"
 
 #: src/addons/onedrive.php:618, src/methods/updraftvault.php:618
 msgid "To remove the block, please go here."
-msgstr "Engellemeyi kaldırmak için lütfen buraya tıklayın."
+msgstr "Bloğu kaldırmak için lütfen buraya gidin."
 
 #: src/addons/s3-enhanced.php:450
 msgid "Do remember to save your settings."
@@ -2358,7 +2358,7 @@ msgstr "Wen sunucunuzun IP adresi (%s) engellenmiş gözüküyor."
 #: src/addons/onedrive.php:618, src/methods/updraftvault.php:618,
 #: src/udaddons/updraftplus-addons.php:816
 msgid "UpdraftPlus.com has responded with 'Access Denied'."
-msgstr "UpdraftPlus.com şu yanıtı dönerdi 'Erişim Başarısız'."
+msgstr "UpdraftPlus.com 'Erişim Reddedildi' cevabını verdi."
 
 #: src/templates/wp-admin/notices/thanks-for-using-main-dash.php:17
 msgid "Premium WooCommerce plugins"
@@ -2430,7 +2430,7 @@ msgstr "UpdraftPlus haber listesine katılmak için bu linke tıklayın."
 #: src/templates/wp-admin/settings/tab-addons.php:135,
 #: src/templates/wp-admin/settings/tab-addons.php:136
 msgid "Backup non-WordPress files and databases"
-msgstr ""
+msgstr "WordPress dosyalarını ve veritabanını yedekle"
 
 #: src/templates/wp-admin/settings/tab-addons.php:19
 msgid "Ask a pre-sales question"
@@ -2587,7 +2587,7 @@ msgstr "Lütfen şifreyi not aldığınızdan emin olun!"
 #: src/addons/lockadmin.php:141,
 #: src/templates/wp-admin/advanced/lock-admin.php:7
 msgid "Lock access to the UpdraftPlus settings page"
-msgstr "UpdraftPlus ayarlar sayfasına erişimi sınırla"
+msgstr "UpdraftPlus ayarlar sayfasına erişimi kilitle"
 
 #: src/addons/lockadmin.php:117
 msgid "The admin password has been changed."
@@ -3814,7 +3814,7 @@ msgstr "Bilgi ayıklanıyor"
 
 #: src/addons/reporting.php:211, src/admin.php:3313
 msgid "Uploaded to:"
-msgstr "Şu dizine yüklendi:"
+msgstr "Şuraya yüklendi:"
 
 #: src/addons/reporting.php:210
 msgid "Time taken:"
@@ -4048,7 +4048,7 @@ msgstr "İçerik URLsi:"
 
 #: src/restorer.php:149
 msgid "You should check the file ownerships and permissions in your WordPress installation"
-msgstr ""
+msgstr "WordPress yüklemenizdeki dosya izinlerini ve sahipliklerini kontrol etmelisiniz"
 
 #: src/templates/wp-admin/settings/form-contents.php:176
 msgid "See also the \"More Files\" add-on from our shop."
@@ -5780,7 +5780,7 @@ msgstr "Web sunucunuzun PHP/Curl yüklemesi https erişimini desteklemiyor. Bu d
 
 #: src/admin.php:3176
 msgid "Your web server's PHP/Curl installation does not support https access. Communications with %s will be unencrypted. Ask your web host to install Curl/SSL in order to gain the ability for encryption (via an add-on)."
-msgstr ""
+msgstr "Web sunucunuzun PHP/Curl yüklemesi https erişimini desteklemiyor. %s ile iletişimler kriptosuz olacak. Kriptolama (eklenti ile) için barındırma firmanızdan Curl/SSL yüklemesini isteyin."
 
 #: src/methods/cloudfiles-new.php:107, src/methods/cloudfiles.php:468,
 #: src/methods/openstack-base.php:541, src/methods/s3.php:825
@@ -6397,7 +6397,7 @@ msgstr "Sonsuz döngü: Daha fazla bilgi için lütfen logunuzu inceleyin"
 
 #: src/includes/updraftplus-notices.php:102
 msgid "Please help UpdraftPlus by giving a positive review at wordpress.org."
-msgstr ""
+msgstr "Lütfen wordpress.org sitesinde olumlu bir inceleme girerek UpdraftPlus'a yardımcı olun."
 
 #: src/includes/updraftplus-notices.php:101
 msgid "Like UpdraftPlus and can spare one minute?"

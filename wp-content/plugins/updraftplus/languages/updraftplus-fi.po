@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the UpdraftPlus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2015-09-28 10:58:33+0000\n"
+"PO-Revision-Date: 2017-09-05 14:42:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -921,7 +921,7 @@ msgstr ""
 
 #: src/addons/migrator.php:2206, src/central/bootstrap.php:512
 msgid "recommended"
-msgstr ""
+msgstr "suositus"
 
 #: src/addons/migrator.php:2206, src/central/bootstrap.php:512
 msgid "%s bytes"
@@ -963,7 +963,7 @@ msgstr ""
 
 #: src/methods/ftp.php:380
 msgid "login"
-msgstr ""
+msgstr "Kirjaudu sisään"
 
 #: src/methods/email.php:79
 msgid "Be aware that mail servers tend to have size limits; typically around %s MB; backups larger than any limits will likely not arrive."
@@ -991,7 +991,7 @@ msgstr ""
 
 #: src/templates/wp-admin/settings/tab-status.php:47
 msgid "Now"
-msgstr ""
+msgstr "Nyt"
 
 #: src/class-updraftplus.php:4628, src/restorer.php:1010
 msgid "You should enable %s to make any pretty permalinks (e.g. %s) work"
@@ -1041,7 +1041,7 @@ msgstr ""
 
 #: src/central/bootstrap.php:469
 msgid "Description"
-msgstr ""
+msgstr "Kuvaus/ tiivistelmä"
 
 #: src/central/bootstrap.php:463
 msgid "Create new key"
@@ -1065,7 +1065,7 @@ msgstr ""
 
 #: src/central/bootstrap.php:442
 msgid "Details"
-msgstr ""
+msgstr "Yksityiskohdat"
 
 #: src/central/bootstrap.php:441
 msgid "Key description"
@@ -1121,7 +1121,7 @@ msgstr ""
 
 #: src/admin.php:4202
 msgid "Your settings have been saved."
-msgstr ""
+msgstr "Asetukset on tallennettu."
 
 #: src/admin.php:3330
 msgid "Total backup size:"
@@ -1129,7 +1129,7 @@ msgstr ""
 
 #: src/admin.php:2744
 msgid "stop"
-msgstr ""
+msgstr "pysäkki"
 
 #: src/admin.php:2582
 msgid "The backup has finished running"
@@ -1171,7 +1171,7 @@ msgstr ""
 
 #: src/admin.php:697
 msgid "Saving..."
-msgstr ""
+msgstr "Tallentaa..."
 
 #: src/admin.php:660
 msgid "Error: the server sent us a response which we did not understand."
@@ -1212,7 +1212,7 @@ msgstr ""
 #: src/admin.php:2395, src/templates/wp-admin/notices/horizontal-notice.php:16,
 #: src/templates/wp-admin/notices/horizontal-notice.php:18
 msgid "Dismiss"
-msgstr ""
+msgstr "Piilota tämä huomautus."
 
 #: src/admin.php:734
 msgid "Please fill in the required information."
@@ -1325,7 +1325,7 @@ msgstr ""
 
 #: src/admin.php:4077
 msgid "settings"
-msgstr ""
+msgstr "Asetukset"
 
 #: src/admin.php:4077
 msgid "Backup won't be sent to any remote storage - none has been saved in the %s"
@@ -1378,7 +1378,7 @@ msgstr ""
 
 #: src/admin.php:546
 msgid "Extensions"
-msgstr ""
+msgstr "Laajennukset"
 
 #: src/admin.php:538, src/templates/wp-admin/settings/tab-bar.php:8
 msgid "Advanced Tools"
@@ -1536,7 +1536,7 @@ msgstr ""
 
 #: src/templates/wp-admin/advanced/site-info.php:49
 msgid "Not installed"
-msgstr ""
+msgstr "Ei asennettu"
 
 #: src/addons/googlecloud.php:951, src/addons/s3-enhanced.php:54
 msgid "Storage class"
@@ -1645,7 +1645,7 @@ msgstr ""
 
 #: src/admin.php:733
 msgid "Processing..."
-msgstr ""
+msgstr "Käsitellään..."
 
 #: src/admin.php:731
 msgid "For backups older than"
@@ -1657,11 +1657,11 @@ msgstr ""
 
 #: src/admin.php:729
 msgid "hour(s)"
-msgstr ""
+msgstr "tunti(a)"
 
 #: src/admin.php:728
 msgid "day(s)"
-msgstr ""
+msgstr "päivä(ä)"
 
 #: src/admin.php:727
 msgid "in the month"
@@ -3162,7 +3162,7 @@ msgstr "(Näyttää siltä, että olet jo tunnistautunut.)"
 #: src/methods/dropbox.php:523, src/methods/dropbox.php:532,
 #: src/methods/dropbox.php:538
 msgid "Dropbox"
-msgstr ""
+msgstr "Dropbox"
 
 #: src/addons/onedrive.php:988, src/methods/dropbox.php:523
 msgid "Authenticate with %s"
@@ -3738,7 +3738,7 @@ msgstr ""
 
 #: src/admin.php:689, src/central/bootstrap.php:520
 msgid "Create"
-msgstr ""
+msgstr "Luo"
 
 #: src/admin.php:651
 msgid "Trying..."
@@ -4898,7 +4898,7 @@ msgstr ""
 #: src/addons/migrator.php:333, src/admin.php:2229,
 #: src/class-updraftplus.php:4683, src/restorer.php:2033
 msgid "Warning:"
-msgstr ""
+msgstr "Varoitus:"
 
 #: src/class-updraftplus.php:4672, src/class-updraftplus.php:4675,
 #: src/restorer.php:154
@@ -4915,7 +4915,7 @@ msgstr ""
 
 #: src/admin.php:692
 msgid "Close"
-msgstr ""
+msgstr "Sulje"
 
 #: src/addons/autobackup.php:330, src/addons/autobackup.php:422,
 #: src/admin.php:648, src/methods/remotesend.php:66,
@@ -5154,7 +5154,7 @@ msgstr ""
 #: src/methods/openstack2.php:158, src/methods/updraftvault.php:346,
 #: src/udaddons/options.php:132
 msgid "Password"
-msgstr ""
+msgstr "Salasana"
 
 #: src/addons/sftp.php:417, src/addons/webdav.php:123
 msgid "Port"
@@ -5222,7 +5222,7 @@ msgstr ""
 #: src/admin.php:2840, src/admin.php:2849, src/methods/addon-base-v2.php:289,
 #: src/methods/stream-base.php:301
 msgid "Failed"
-msgstr ""
+msgstr "Epäonnistui"
 
 #: src/addons/webdav.php:71
 msgid "WebDAV URL"
@@ -5407,7 +5407,7 @@ msgstr ""
 
 #: src/methods/email.php:71
 msgid "Note:"
-msgstr ""
+msgstr "Huomaa:"
 
 #: src/methods/email.php:45
 msgid "WordPress Backup"
@@ -5429,7 +5429,7 @@ msgstr ""
 #: src/addons/webdav.php:103, src/methods/cloudfiles-new.php:178,
 #: src/methods/cloudfiles.php:531, src/methods/openstack2.php:152
 msgid "Username"
-msgstr ""
+msgstr "Käyttäjätunnus"
 
 #: src/methods/cloudfiles-new.php:173, src/methods/cloudfiles.php:526,
 #: src/methods/s3.php:999
@@ -5470,7 +5470,7 @@ msgstr ""
 #: src/addons/cloudfiles-enhanced.php:38, src/methods/cloudfiles-new.php:120,
 #: src/methods/cloudfiles.php:486
 msgid "UK"
-msgstr ""
+msgstr "UK"
 
 #: src/addons/cloudfiles-enhanced.php:37, src/methods/cloudfiles-new.php:119,
 #: src/methods/cloudfiles.php:485
@@ -5544,7 +5544,7 @@ msgstr ""
 #: src/addons/googlecloud.php:925, src/addons/onedrive.php:970,
 #: src/methods/googledrive.php:1106
 msgid "Client ID"
-msgstr ""
+msgstr "Asiakas tunnus"
 
 #: src/addons/googlecloud.php:914, src/methods/googledrive.php:1090
 msgid "You must add the following as the authorised redirect URI (under \"More Options\") when asked"

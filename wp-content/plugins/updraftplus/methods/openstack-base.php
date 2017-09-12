@@ -211,7 +211,7 @@ class UpdraftPlus_BackupModule_openstack_base extends UpdraftPlus_BackupModule {
 			$file_status = array('chunks' => array());
 		}
 		
-		$this->jobdata_set($file_key, $file_status, 'openstack_'.$file_key);
+		$this->jobdata_set($file_key, $file_status);
 		
 		if ($upload_start < $bytes_already_uploaded) {
 			if ($next_chunk_size != $upload_size) {
@@ -285,7 +285,7 @@ class UpdraftPlus_BackupModule_openstack_base extends UpdraftPlus_BackupModule {
 		
 		$file_status['chunks'][$chunk_index]['size'] = $upload_size;
 
-		$this->jobdata_set($file_key, $file_status, 'openstack_'.$file_key);
+		$this->jobdata_set($file_key, $file_status);
 		
 		if ($next_chunk_size != $upload_size) {
 			$response = new stdClass;
@@ -417,7 +417,7 @@ class UpdraftPlus_BackupModule_openstack_base extends UpdraftPlus_BackupModule {
 		} catch (Exception $e) {
 			global $updraftplus;
 			$updraftplus->log("$file: Failed to download (".$e->getMessage().")");
-			$updraftplus->log("$file: ".sprintf(__("%s Error", 'updraftplus'), $this->desc).": ".__('Error downloading remote file: Failed to download'.' ('.$e->getMessage().")", 'updraftplus'), 'error');
+			$updraftplus->log("$file: ".sprintf(__("%s Error", 'updraftplus'), $this->desc).": ".__('Error downloading remote file: Failed to download', 'updraftplus').' ('.$e->getMessage().")", 'error');
 			return false;
 		}
 		return $dl->getContent();

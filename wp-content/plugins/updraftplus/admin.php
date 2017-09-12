@@ -3539,8 +3539,6 @@ class UpdraftPlus_Admin {
 				</div>
 ENDHERE;
 			return $ret;
-		} else {
-// 			return str_replace(' ', '&nbsp;', '('.__('No backup log)', 'updraftplus').')');
 		}
 	}
 

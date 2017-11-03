@@ -955,6 +955,11 @@ class Updraft_Restorer extends WP_Upgrader {
 					if ($wp_filesystem->delete($working_dir)) $fixed_it_now = true;
 				}
 				
+				if (file_exists($working_dir . DIRECTORY_SEPARATOR . 'updraftplus-manifest.json')) {
+					$wp_filesystem->delete($working_dir . DIRECTORY_SEPARATOR . 'updraftplus-manifest.json');
+					if ($wp_filesystem->delete($working_dir)) $fixed_it_now = true;
+				}
+
 				if (!$fixed_it_now) {
 					$updraftplus->log_e('Error: %s', $this->strings['delete_failed'].' ('.$working_dir.')');
 					// List contents
@@ -1355,11 +1360,12 @@ ENDHERE;
 	}
 
 	/**
+	 * This will return the path with the actual content we want to restore, ignoring any other files that may be in the top level of the zip file
 	 * $dirnames: an array of preferred names
 	 *
 	 * @param  string $working_dir specify working directory
 	 * @param  string $dirnames    directory names
-	 * @return string
+	 * @return string the final path with the content we want to restore
 	 */
 	public function get_first_directory($working_dir, $dirnames) {
 		global $wp_filesystem, $updraftplus;
@@ -1514,6 +1520,10 @@ ENDHERE;
 
 		// Find the supported engines - in case the dump had something else (case seen: saved from MariaDB with engine Aria; imported into plain MySQL without)
 		$supported_engines = $wpdb->get_results("SHOW ENGINES", OBJECT_K);
+		$supported_charsets = $wpdb->get_results("SHOW CHARACTER SET", OBJECT_K);
+		$db_supported_collations_res = $wpdb->get_results('SHOW COLLATION', OBJECT_K);
+		$supported_collations = (null !== $db_supported_collations_res) ? $db_supported_collations_res : array();
+		$updraft_restorer_collate = isset($this->ud_restore_options['updraft_restorer_collate']) ? $this->ud_restore_options['updraft_restorer_collate'] : '';
 
 		$this->errors = 0;
 		$this->statements_run = 0;
@@ -1846,7 +1856,6 @@ ENDHERE;
 					if ($restoring_table != $this->new_table_name) $this->restored_table($restoring_table, $import_table_prefix, $this->old_table_prefix);
 
 				}
-
 				$engine = "(?)";
 				$engine_change_message = '';
 				if (preg_match('/ENGINE=([^\s;]+)/', $sql_line, $eng_match)) {
@@ -1865,7 +1874,50 @@ ENDHERE;
 						}
 					}
 				}
-
+				$charset_change_message = '';
+				if (preg_match('/ CHARSET=([^\s;]+)/i', $sql_line, $charset_match)) {
+					$charset = $charset_match[1];
+					if (!isset($supported_charsets[$charset])) {
+						$charset_change_message = sprintf(__('Requested table character set (%s) is not present - changing to %s.', 'updraftplus'), esc_html($charset), esc_html($this->ud_restore_options['updraft_restorer_charset']));
+						$sql_line = $updraftplus->str_lreplace("CHARSET=$charset", "CHARSET=".$this->ud_restore_options['updraft_restorer_charset'], $sql_line);
+						// Allow default COLLLATE to database
+						if (preg_match('/ COLLATE=([^\s;]+)/i', $sql_line, $collate_match)) {
+							$collate = $collate_match[1];
+							$sql_line = $updraftplus->str_lreplace(" COLLATE=$collate", "", $sql_line);
+						}
+					}
+				}
+				$collate_change_message = '';
+				$unsupported_collates_in_sql_line = array();
+				if (!empty($updraft_restorer_collate) && preg_match('/ COLLATE=([^\s]+)/i', $sql_line, $collate_match)) {
+					$collate = $collate_match[1];
+					if (!isset($supported_collations[$collate])) {
+						$unsupported_collates_in_sql_line[] = $collate;
+						$sql_line = $updraftplus->str_lreplace("COLLATE=$collate", "COLLATE=".$updraft_restorer_collate, $sql_line, false);
+					}
+				}
+				if (!empty($updraft_restorer_collate) && preg_match_all('/ COLLATE ([a-zA-Z0-9._-]+) /i', $sql_line, $collate_matches)) {
+					$collates = array_unique($collate_matches[1]);
+					foreach ($collates as $collate) {
+						if (!isset($supported_collations[$collate])) {
+							$unsupported_collates_in_sql_line[] = $collate;
+							$sql_line = str_ireplace("COLLATE $collate ", "COLLATE ".$updraft_restorer_collate." ", $sql_line);
+						}
+					}
+				}
+				if (!empty($updraft_restorer_collate) && preg_match_all('/ COLLATE ([a-zA-Z0-9._-]+),/i', $sql_line, $collate_matches)) {
+					$collates = array_unique($collate_matches[1]);
+					foreach ($collates as $collate) {
+						if (!isset($supported_collations[$collate])) {
+							$unsupported_collates_in_sql_line[] = $collate;
+							$sql_line = str_ireplace("COLLATE $collate,", "COLLATE ".$updraft_restorer_collate.",", $sql_line);
+						}
+					}
+				}
+				if (count($unsupported_collates_in_sql_line) > 0) {
+					$unsupported_unique_collates_in_sql_line = array_unique($unsupported_collates_in_sql_line);
+					$collate_change_message = sprintf(_n('Requested table collation (%1$s) is not present - changing to %2$s.', 'Requested table collations (%1$s) are not present - changing to %2$s.', count($unsupported_unique_collates_in_sql_line), 'updraftplus'), esc_html(implode(', ', $unsupported_unique_collates_in_sql_line)), esc_html($this->ud_restore_options['updraft_restorer_collate']));
+				}
 				$print_line = sprintf(__('Processing table (%s)', 'updraftplus'), $engine).":  ".$this->table_name;
 				$logline = "Processing table ($engine): ".$this->table_name;
 				if ('' != $this->old_table_prefix && $import_table_prefix != $this->old_table_prefix) {
@@ -1880,6 +1932,8 @@ ENDHERE;
 				$updraftplus->log($logline);
 				$updraftplus->log($print_line, 'notice-restore');
 				$restoring_table = $this->new_table_name;
+				if ($charset_change_message) $updraftplus->log($charset_change_message, 'notice-restore');
+				if ($collate_change_message) $updraftplus->log($collate_change_message, 'notice-restore');
 				if ($engine_change_message) $updraftplus->log($engine_change_message, 'notice-restore');
 
 			} elseif (preg_match('/^\s*(insert into \`?([^\`]*)\`?\s+(values|\())/i', $sql_line, $matches)) {

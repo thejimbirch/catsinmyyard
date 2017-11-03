@@ -152,6 +152,13 @@ class UpdraftPlus_BackupModule_openstack_base extends UpdraftPlus_BackupModule {
 		return $results;
 	}
 
+	/**
+	 * Called when all chunks have been uploaded, to allow any required finishing actions to be carried out
+	 *
+	 * @param String $file - the basename of the file being uploaded
+	 *
+	 * @return Boolean - success or failure state of any finishing actions
+	 */
 	public function chunked_upload_finish($file) {
 
 		$chunk_path = 'chunk-do-not-delete-'.$file;
@@ -176,14 +183,15 @@ class UpdraftPlus_BackupModule_openstack_base extends UpdraftPlus_BackupModule {
 	/**
 	 * N.B. Since we use varying-size chunks, we must be careful as to what we do with $chunk_index
 	 *
-	 * @param  string $file 		   Filename
-	 * @param  string $fp 			   Filepath to be used in chunked upload
-	 * @param  string $chunk_index 	   Index of chunked upload
-	 * @param  string $upload_size 	   Size of the upload, in bytes
-	 * @param  string $upload_start    Upload start file size
-	 * @param  string $upload_end 	   Upload end file size
-	 * @param  string $total_file_size Total file size
-	 * @return boolean
+	 * @param  String	$file 			 Full path for the file being uploaded
+	 * @param  Resource $fp 			 File handle to read upload data from
+	 * @param  Integer	$chunk_index 	 Index of chunked upload
+	 * @param  Integer	$upload_size 	 Size of the upload, in bytes
+	 * @param  Integer	$upload_start    How many bytes into the file the upload process has got
+	 * @param  Integer	$upload_end 	 How many bytes into the file we will be after this chunk is uploaded
+	 * @param  Integer	$total_file_size Total file size
+	 *
+	 * @return Boolean
 	 */
 	public function chunked_upload($file, $fp, $chunk_index, $upload_size, $upload_start, $upload_end, $total_file_size) {
 
@@ -549,5 +557,46 @@ class UpdraftPlus_BackupModule_openstack_base extends UpdraftPlus_BackupModule {
 		$this->config_print_middlesection();
 
 		echo $this->get_test_button_html($this->desc);
+	}
+	
+	/**
+	 * Get the configuration template
+	 *
+	 * @return String - the template, ready for substitutions to be carried out
+	 */
+	public function get_configuration_template() {
+		ob_start();
+		$classes = $this->get_css_classes();
+		?>
+		<tr class="<?php echo $classes; ?>">
+			<td></td>
+			<td>
+				<?php
+					if (!empty($this->img_url)) {
+					?>
+						<img alt="<?php echo $this->long_desc; ?>" src="<?php echo UPDRAFTPLUS_URL.$this->img_url; ?>">
+					<?php
+					}
+					?>
+				<p><em><?php printf(__('%s is a great choice, because UpdraftPlus supports chunked uploads - no matter how big your site is, UpdraftPlus can upload it a little at a time, and not get thwarted by timeouts.', 'updraftplus'), $this->long_desc);?></em></p></td>
+		</tr>
+		<tr class="<?php echo $classes; ?>">
+			<th></th>
+			<td>
+			<?php
+			// Check requirements.
+			global $updraftplus_admin;
+			if (!function_exists('mb_substr')) {
+				$updraftplus_admin->show_double_warning('<strong>'.__('Warning', 'updraftplus').':</strong> '.sprintf(__('Your web server\'s PHP installation does not included a required module (%s). Please contact your web hosting provider\'s support.', 'updraftplus'), 'mbstring').' '.sprintf(__("UpdraftPlus's %s module <strong>requires</strong> %s. Please do not file any support requests; there is no alternative.", 'updraftplus'), $this->desc, 'mbstring'), $this->method);
+			}
+			$updraftplus_admin->curl_check($this->long_desc, false, $this->method);
+			?>
+			</td>
+		</tr>
+		<?php
+		$template_str = ob_get_clean();
+		$template_str .= $this->get_configuration_middlesection_template();
+		$template_str .= $this->get_test_button_html($this->desc);
+		return $template_str;
 	}
 }

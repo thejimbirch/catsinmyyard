@@ -196,6 +196,15 @@ class UpdraftPlus_Notices extends Updraft_Notices {
 				'supported_positions' => $this->anywhere,
 				'validity_function' => 'keyy_installed',
 			),
+			'metaslider' => array(
+				'prefix' => '',
+				'title' => 'MetaSlider: The #1 WordPress slider plugin',
+				'text' => __("From the team behind UpdraftPlus.", "updraftplus") . ' ' . $this->url_start(true, 'metaslider.com') . __("Find out more.", 'updraftplus') . $this->url_end(true, 'metaslider.com'),
+				'image' => 'notices/metaslider_logo.png',
+				'dismiss_time' => 'dismiss_notice',
+				'supported_positions' => $this->anywhere,
+				'validity_function' => 'metaslider_installed',
+			),
 			
 			// The sale adverts content starts here
 			'blackfriday' => array(
@@ -313,6 +322,18 @@ class UpdraftPlus_Notices extends Updraft_Notices {
 		return true;
 	}
 
+	protected function metaslider_installed($plugin_base_dir = null, $product_name = null) {
+		if (!function_exists('get_plugins')) include_once(ABSPATH.'wp-admin/includes/plugin.php');
+		$plugins = get_plugins();
+
+		foreach ($plugins as $key => $value) {
+			if ('ml-slider' == $value['TextDomain']) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	protected function clef_2fa_installed($plugin_base_dir = null, $product_name = null) {
 
 		if (!function_exists('get_plugins')) include_once(ABSPATH.'wp-admin/includes/plugin.php');
@@ -354,7 +375,7 @@ class UpdraftPlus_Notices extends Updraft_Notices {
 		return false;
 	}
 	
-	protected function check_notice_dismissed($dismiss_time){
+	protected function check_notice_dismissed($dismiss_time) {
 
 		$time_now = defined('UPDRAFTPLUS_NOTICES_FORCE_TIME') ? UPDRAFTPLUS_NOTICES_FORCE_TIME : time();
 	

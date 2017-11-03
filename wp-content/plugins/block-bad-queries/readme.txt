@@ -10,9 +10,10 @@ Author URI: https://plugin-planet.com/
 Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsult
 Donate link: https://m0n.co/donate
 Requires at least: 4.1
-Tested up to: 4.8
-Stable tag: 20170730
-Version: 20170730
+Tested up to: 4.9
+Stable tag: 20171101
+Version: 20171101
+Requires PHP: 5.2
 Text Domain: block-bad-queries
 Domain Path: /languages
 License: GPLv2 or later
@@ -101,9 +102,9 @@ I recently recorded a video tutorial series for Lynda.com on [how to secure Word
 Nope, just install and relax knowing that BBQ is protecting your site from bad URL requests.
 
 
-**I just installed this plugin and I don’t see NO MENU or any Settings whatsoever? Where is the settings?**
+**I don't see any Settings whatsoever? Where is the settings?**
 
-No settings page needed for BBQ! Everything is done automatically behind the scenes. Zero configuration required. The free version of BBQ is strictly plug-n-play, set-it-and-forget-it, with no settings to configure whatsoever. Just install, activate, and enjoy better security and robust protection against malicious requests. The Pro version of BBQ is just as fast and simple to use, but is much more powerful and includes robust settings to customize and fine-tune your firewall.
+No settings needed for BBQ! Everything is done automatically behind the scenes. Zero configuration required. The free version of BBQ is strictly plug-n-play, set-it-and-forget-it, with no settings to configure whatsoever. Just install, activate, and enjoy better security and robust protection against malicious requests. The Pro version of BBQ is just as fast and simple to use, but is much more powerful and includes robust settings to customize and fine-tune your firewall.
 
 
 **Is BBQ free version compatible with Wordfence? Does it makes sense to use both?**
@@ -137,6 +138,11 @@ Nope! BBQ is available in the following flavors:
 So you can check out the Standalone PHP Script for sites that are not running WordPress.
 
 
+**Do you offer any other security plugins?**
+
+Yes, check out [Blackhole for Bad Bots](https://wordpress.org/plugins/blackhole-bad-bots/) to protect your site against bad bots. I also have a [video course on WordPress security](https://m0n.co/securewp), for more plugin recommendations and lots of tips and tricks.
+
+
 **Got a question?**
 
 Send any questions or feedback via my [contact form](https://perishablepress.com/contact/).
@@ -164,6 +170,20 @@ Links, tweets and likes also appreciated. Thank you! :)
 
 
 == Changelog ==
+
+**2017/11/01**
+
+* Updates readme.txt :)
+* Tests on WordPress 4.9
+
+**2017/10/19**
+
+* Changes `\/\.tar` to `\.tar` in Request patterns
+* Changes `\/\.bash` to `\.bash` in Request patterns
+* Adds new User Agent patterns: `shellshock`, `md5sum`, `\/bin\/bash`
+* Adds new Request patterns: `@@`, `@eval`, `\/file\:`, `\/php\:`, `\.cmd`, `\.bat`, `\.htacc`, `\.htpas`, `\.pass`, `usr\/bin\/perl`, `var\/lib\/php`, `wp-config\.php`
+* Adds new Query String patterns: `@@`, `\(0x`, `0x3c62723e`, `\(\)\}`, `\:\;\}\;`, `\;\!--\=`, `@eval`, `eval\(`, `base64_`, `UNION(.*)SELECT`, `\/config\.`, `\/wwwroot`, `\/makefile`, `\$_session`, `\$_request`, `\$_env`, `\$_server`, `\$_post`, `\$_get`, `phpinfo\(`, `shell_exec\(`, `file_get_contents`, `allow_url_include`, `disable_functions`, `auto_prepend_file`, `open_basedir`, `(benchmark|sleep)(\s|%20)*\(`
+* Tests on WordPress 4.9
 
 **2017/07/30**
 
@@ -300,5 +320,3 @@ Links, tweets and likes also appreciated. Thank you! :)
 * 2011/02/21 - Updated readme.txt file
 * 2009/12/30 - Added check for admin users
 * 2009/12/30 - Additional request strings added
-
-

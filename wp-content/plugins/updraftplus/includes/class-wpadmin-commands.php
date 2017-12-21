@@ -224,7 +224,14 @@ class UpdraftPlus_WPAdmin_Commands extends UpdraftPlus_Commands {
 			
 			do_action_ref_array('updraftplus_restore_all_downloaded_postscan', array($backups, $timestamp, $elements, &$info, &$mess, &$warn, &$err));
 
-			return array('m' => '<p>'.$mess_first.'</p>'.implode('<br>', $mess), 'w' => implode('<br>', $warn), 'e' => implode('<br>', $err), 'i' => json_encode($info));
+			$warn_result = '';
+			foreach ($warn as $warning) {
+				if (!$warn_result) $warn_result = '<ul id="updraft_restore_warnings">';
+				$warn_result .= '<li>'.$warning.'</li>';
+			}
+			if ($warn_result) $warn_result .= '</ul>';
+			
+			return array('m' => '<p>'.$mess_first.'</p>'.implode('<br>', $mess), 'w' => $warn_result, 'e' => implode('<br>', $err), 'i' => json_encode($info));
 		}
 	
 	}

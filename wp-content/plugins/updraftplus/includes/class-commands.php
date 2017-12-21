@@ -187,6 +187,7 @@ class UpdraftPlus_Commands {
 	}
 	
 	public function get_settings($options) {
+		global $updraftplus;
 		if (false === ($updraftplus_admin = $this->_load_ud_admin()) || false === ($updraftplus = $this->_load_ud())) return new WP_Error('no_updraftplus');
 		
 		if (!UpdraftPlus_Options::user_can_manage()) return new WP_Error('updraftplus_permission_denied');
@@ -196,8 +197,11 @@ class UpdraftPlus_Commands {
 		$output = ob_get_contents();
 		ob_end_clean();
 		
+		$remote_storage_options_and_templates = $updraftplus->get_remote_storage_options_and_templates();
 		return array(
 			'settings' => $output,
+			'remote_storage_options' => $remote_storage_options_and_templates['options'],
+			'remote_storage_templates' => $remote_storage_options_and_templates['templates'],
 			'meta' => apply_filters('updraftplus_get_settings_meta', array()),
 			'updraftplus_version' => $updraftplus->version,
 		);

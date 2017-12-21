@@ -23,7 +23,7 @@ class UpdraftPlus_BackupModule_openstack extends UpdraftPlus_BackupModule_openst
 	 * @param  string  $disablesslverify Check to disable SSL Verify
 	 * @return array
 	 */
-	public function get_service($opts, $useservercerts = false, $disablesslverify = null) {
+	public function get_openstack_service($opts, $useservercerts = false, $disablesslverify = null) {
 
 		// 'tenant', 'user', 'password', 'authurl', 'path', (optional) 'region'
 		extract($opts);

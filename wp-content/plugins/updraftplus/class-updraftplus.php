@@ -459,10 +459,16 @@ class UpdraftPlus {
 				$storage_objects_and_ids = $this->get_storage_objects_and_ids(array($method));
 
 				$instance_id = isset($_GET['updraftplus_instance']) ? $_GET['updraftplus_instance'] : '';
-				
+		
+				if ("POST" == $_SERVER['REQUEST_METHOD'] && isset($_POST['state'])) {
+					$state = urldecode($_POST['state']);
+				} elseif (isset($_GET['state'])) {
+					$state = $_GET['state'];
+				}
+
 				// If we don't have an instance_id but the state is set then we are coming back to finish the auth and should extract the instance_id from the state
-				if ('' == $instance_id && isset($_GET['state']) && false !== strpos($_GET['state'], ':')) {
-					$parts = explode(':', $_GET['state']);
+				if ('' == $instance_id && isset($state) && false !== strpos($state, ':')) {
+					$parts = explode(':', $state);
 					$instance_id = $parts[1];
 				}
 				
@@ -1181,7 +1187,7 @@ class UpdraftPlus {
 			if ($ret) {
 				$this->log("$logname upload: success");
 				// UpdraftPlus_RemoteStorage_Addons_Base calls this itself
-				if (!is_a($caller, 'UpdraftPlus_RemoteStorage_Addons_Base')) $this->uploaded_file($file);
+				if (!is_a($caller, 'UpdraftPlus_RemoteStorage_Addons_Base_v2')) $this->uploaded_file($file);
 			}
 
 			return $ret;
@@ -3016,7 +3022,8 @@ class UpdraftPlus {
 		$db_connected = $this->check_db_connection(false, true, true);
 
 		$service = empty($updraftplus_backup->current_service) ? '' : $updraftplus_backup->current_service;
-		$shash = $service.'-'.md5($file);
+		$instance_id = empty($updraftplus_backup->current_instance) ? '' : $updraftplus_backup->current_instance;
+		$shash = $service.(('' == $service) ? '' : '-').$instance_id.(('' == $instance_id) ? '' : '-').md5($file);
 
 		$this->jobdata_set("uploaded_".$shash, 'yes');
 	
@@ -3053,13 +3060,14 @@ class UpdraftPlus {
 	/**
 	 * Return whether a particular file has been uploaded to a particular remote service
 	 *
-	 * @param String $file	  - the filename (basename)
-	 * @param String $service - the service identifier; or none, to indicate all services
+	 * @param String $file	      - the filename (basename)
+	 * @param String $service     - the service identifier; or none, to indicate all services
+	 * @param String $instance_id - the instance identifier
 	 *
 	 * @return Boolean - the result
 	 */
-	public function is_uploaded($file, $service = '') {
-		$hash = $service.(('' == $service) ? '' : '-').md5($file);
+	public function is_uploaded($file, $service = '', $instance_id = '') {
+		$hash = $service.(('' == $service) ? '' : '-').$instance_id.(('' == $instance_id) ? '' : '-').md5($file);
 		return ($this->jobdata_get("uploaded_$hash") === "yes") ? true : false;
 	}
 
@@ -3421,13 +3429,17 @@ class UpdraftPlus {
 					}
 
 					if (empty($settings['settings'])) {
-						// See: https://wordpress.org/support/topic/cannot-setup-connectionauthenticate-with-dropbox/
-						error_log("UpdraftPlus: Warning: settings for $method are empty. A dummy field is usually needed so that something is saved.");
-						
+					
 						// Try to recover by getting a default set of options for display
 						if (is_callable(array($remote_storage, 'get_default_options'))) {
 							$uuid = 's-'.md5(rand().uniqid().microtime(true));
 							$settings['settings'] = array($uuid => $remote_storage->get_default_options());
+						}
+						
+						// See: https://wordpress.org/support/topic/cannot-setup-connectionauthenticate-with-dropbox/
+						if (empty($settings['settings'])) {
+							// This can get sent to the browser, and break the page, if the user has configured that. However, it should now (1.13.6+) be impossible for this condition to occur, now that we only log it after getting some default options.
+							error_log("UpdraftPlus: Warning: settings for $method are empty. A dummy field is usually needed so that something is saved.");
 						}
 						
 					}
@@ -3449,6 +3461,44 @@ class UpdraftPlus {
 
 		return $storage_objects_and_ids;
 		
+	}
+	
+	/**
+	 * This method will return an array of remote storage options and storage_templates.
+	 *
+	 * @return Array					- returns an array which consists of storage options and storage_templates multidimensional array
+	 */
+	public function get_remote_storage_options_and_templates() {
+		$storage_objects_and_ids = $this->get_storage_objects_and_ids(array_keys($this->backup_methods));
+		$options = array();
+		$templates = array();
+		foreach ($storage_objects_and_ids as $method => $method_info) {
+			if (!$method_info['object']->supports_feature('multi_options')) {
+				ob_start();
+				do_action('updraftplus_config_print_before_storage', $method, null);
+				$method_info['object']->config_print();
+				$templates[$method] = ob_get_clean();
+			} else {
+				$templates[$method] = $method_info['object']->get_template();
+			}
+			if (isset($method_info['instance_settings'])) {
+				foreach ($method_info['instance_settings'] as $instance_id => $instance_options) {
+					$opts_without_transform = $instance_options;
+					if ($method_info['object']->supports_feature('multi_options')) {
+						$opts_without_transform['instance_id'] = $instance_id;
+					}
+					$opts = $method_info['object']->transform_options_for_template($opts_without_transform);
+					foreach ($method_info['object']->filter_frontend_settings_keys() as $filter_frontend_settings_key) {
+						unset($opts[$filter_frontend_settings_key]);
+					}
+					$options[$method][$instance_id] = $opts;
+				}
+			}
+		}
+		return array(
+					'options' => $options,
+					'templates' => $templates,
+				);
 	}
 	
 	/**
@@ -3478,7 +3528,7 @@ class UpdraftPlus {
 	 * @param  string  $search         The value being searched for, otherwise known as the needle
 	 * @param  string  $replace        The replacement value that replaces found search values
 	 * @param  string  $subject        The string or array being searched and replaced on, otherwise known as the haystack
-	 * @param  boolean $case_sensitive whether replacement do in case seitively otr not
+	 * @param  boolean $case_sensitive Whether the replacement should be case sensitive or not
 	 *
 	 * @return string
 	 */
@@ -4395,6 +4445,7 @@ class UpdraftPlus {
 					if (untrailingslashit(site_url()) != $old_siteurl) {
 						if (!$migration_warning) {
 							$migration_warning = true;
+							$info['migration'] = true;
 							if ($this->normalise_url($old_siteurl) == $this->normalise_url(site_url()) && !class_exists('UpdraftPlus_Addons_Migrator')) {
 								$old_siteurl_parsed = parse_url($old_siteurl);
 								$actual_siteurl_parsed = parse_url(site_url());
@@ -4412,6 +4463,9 @@ class UpdraftPlus {
 								}
 							} else {
 								$warn[] = apply_filters('updraftplus_dbscan_urlchange', '<a href="https://updraftplus.com/shop/migrator/">'.__('This backup set is from a different site - this is not a restoration, but a migration. You need the Migrator add-on in order to make this work.', 'updraftplus').'</a>', $old_siteurl, $res);
+							}
+							if (!class_exists('UpdraftPlus_Addons_Migrator')) {
+								$warn[] .= '<strong><a href="'.apply_filters('updraftplus_com_link', "https://updraftplus.com/faqs/tell-me-more-about-the-search-and-replace-site-location-in-the-database-option/").'">'.__('You can search and replace your database (for migrating a website to a new location/URL) with the Migrator add-on - follow this link for more information', 'updraftplus').'</a></strong>';
 							}
 						}
 						// Explicitly set it, allowing the consumer to detect when the result was unknown

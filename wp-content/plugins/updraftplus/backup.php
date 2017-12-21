@@ -338,7 +338,7 @@ class UpdraftPlus_Backup {
 			if (class_exists($objname)) {
 				$remote_obj = new $objname;
 				$pass_to_prune = null;
-				$prune_services[$service] = array($remote_obj, null);
+				$prune_services[$service]['all'] = array($remote_obj, null);
 			} else {
 				$updraftplus->log("Could not prune from service $service: remote method not found");
 			}
@@ -363,13 +363,21 @@ class UpdraftPlus_Backup {
 		// We need to make sure that the loop below actually runs
 		if (empty($services)) $services = array('none');
 
+		$storage_objects_and_ids = $updraftplus->get_storage_objects_and_ids($services);
+
+		$total_instances_count = 0;
+
+		foreach ($storage_objects_and_ids as $service) {
+			if ($service['object']->supports_feature('multi_options')) $total_instances_count += count($service['instance_settings']);
+		}
+
 		$updraftplus->jobdata_set('jobstatus', 'clouduploading');
 
 		$updraftplus->register_wp_http_option_hooks();
 
 		$upload_status = $updraftplus->jobdata_get('uploading_substatus');
 		if (!is_array($upload_status) || !isset($upload_status['t'])) {
-			$upload_status = array('i' => 0, 'p' => 0, 't' => max(1, count($services))*count($backup_array));
+			$upload_status = array('i' => 0, 'p' => 0, 't' => max(1, $total_instances_count)*count($backup_array));
 			$updraftplus->jobdata_set('uploading_substatus', $upload_status);
 		}
 
@@ -387,17 +395,19 @@ class UpdraftPlus_Backup {
 		$errors_before_uploads = $updraftplus->error_count();
 
 		foreach ($services as $ind => $service) {
+
+			$instance_id_count = 0;
+			$total_instance_ids = ('none' !== $service && '' !== $service && $storage_objects_and_ids[$service]['object']->supports_feature('multi_options')) ? count($storage_objects_and_ids[$service]['instance_settings']) : 1;
+
 			// Used for logging by record_upload_chunk()
 			$this->current_service = $service;
+
 			// Used when deciding whether to delete the local file
-			$this->last_service = ($ind+1 >= count($services) && $errors_before_uploads == $updraftplus->error_count()) ? true : false;
+			$this->last_service = ($ind+1 >= count($services) && $instance_id_count+1 >= $total_instance_ids && $errors_before_uploads == $updraftplus->error_count()) ? true : false;
 
-			$log_extra = ($this->last_service) ? ' (last)' : '';
-			$updraftplus->log("Cloud backup selection (".($ind+1)."/".count($services)."): ".$service.$log_extra);
+			$log_extra = $this->last_service ? ' (last)' : '';
+			$updraftplus->log("Cloud backup selection (".($ind+1)."/".count($services)."): ".$service." with instance (".($instance_id_count+1)."/".$total_instance_ids.")".$log_extra);
 			@set_time_limit(UPDRAFTPLUS_SET_TIME_LIMIT);
-
-			$method_include = UPDRAFTPLUS_DIR.'/methods/'.$service.'.php';
-			if (file_exists($method_include)) include_once($method_include);
 
 			if ("none" == $service || '' == $service) {
 				$updraftplus->log("No remote despatch: user chose no remote backup service");
@@ -409,30 +419,28 @@ class UpdraftPlus_Backup {
 						$updraftplus->uploaded_file($file, true);
 					}
 				}
-				$this->prune_retained_backups(array("none" => array(null, null)));
+				$this->prune_retained_backups(array("none" => array("all" => array(null, null))));
+			} elseif ('remotesend' == $service) {
+				$remote_obj = $storage_objects_and_ids[$service]['object'];
+				
+				$do_prune = array_merge_recursive($do_prune, $this->upload_cloud($remote_obj, $service, $backup_array, ''));
 			} else {
-				$updraftplus->log("Beginning dispatch of backup to remote ($service)");
-				$sarray = array();
-				foreach ($backup_array as $bind => $file) {
-					if ($updraftplus->is_uploaded($file, $service)) {
-						$updraftplus->log("Already uploaded to $service: $file");
+				foreach ($storage_objects_and_ids[$service]['instance_settings'] as $instance_id => $options) {
+					// Used for logging by record_upload_chunk()
+					$this->current_instance = $instance_id;
+
+					if (!isset($options['instance_enabled'])) $options['instance_enabled'] = 1;
+
+					if (1 == $options['instance_enabled']) {
+						$remote_obj = $storage_objects_and_ids[$service]['object'];
+					
+						$remote_obj->set_options($options, true, $instance_id);
+						$do_prune = array_merge_recursive($do_prune, $this->upload_cloud($remote_obj, $service, $backup_array, $instance_id));
 					} else {
-						$sarray[$bind] = $file;
+						$updraftplus->log("This instance id ($instance_id) has been set to inactive.");
 					}
-				}
-				$objname = "UpdraftPlus_BackupModule_$service";
-				if (class_exists($objname)) {
-					$remote_obj = new $objname;
-					if (count($sarray)>0) {
-						$pass_to_prune = $remote_obj->backup($sarray);
-						$do_prune[$service] = array($remote_obj, $pass_to_prune);
-					} else {
-						// We still need to make sure that prune is run on this remote storage method, even if all entities were previously uploaded
-						$do_prune[$service] = array($remote_obj, null);
-					}
-				} else {
-					$updraftplus->log("Unexpected error: no class '$objname' was found ($method_include)");
-					$updraftplus->log(sprintf(__("Unexpected error: no class '%s' was found (your UpdraftPlus installation seems broken - try re-installing)", 'updraftplus'), $objname), 'error');
+
+					$instance_id_count++;
 				}
 			}
 		}
@@ -441,6 +449,55 @@ class UpdraftPlus_Backup {
 
 		$updraftplus->register_wp_http_option_hooks(false);
 
+	}
+
+	/**
+	 * This method will start the upload of the backups to the chosen remote storage method and return an array of files to be pruned and their location.
+	 *
+	 * @param  Object $remote_obj   - the remote storage object
+	 * @param  String $service      - the name of the service we are uploading to
+	 * @param  Array  $backup_array - an array that contains the backup files we want to upload
+	 * @param  String $instance_id  - the instance id we are using
+	 * @return Array                - an array with information about what files to prune and where they are located
+	 */
+	private function upload_cloud($remote_obj, $service, $backup_array, $instance_id) {
+
+		global $updraftplus;
+
+		$do_prune = array();
+
+		if ('' == $instance_id) {
+			$updraftplus->log("Beginning dispatch of backup to remote ($service)");
+		} else {
+			$updraftplus->log("Beginning dispatch of backup to remote ($service) (instance identifier $instance_id)");
+		}
+
+		$sarray = array();
+		foreach ($backup_array as $bind => $file) {
+			if ($updraftplus->is_uploaded($file, $service, $instance_id)) {
+				if ('' == $instance_id) {
+					$updraftplus->log("Already uploaded to $service: $file");
+				} else {
+					$updraftplus->log("Already uploaded to $service / $instance_id: $file");
+				}
+			} else {
+				$sarray[$bind] = $file;
+			}
+		}
+		
+		if (count($sarray) > 0) {
+			$pass_to_prune = $remote_obj->backup($sarray);
+			if ('remotesend' != $service) {
+				$do_prune[$service][$instance_id] = array($remote_obj, $pass_to_prune);
+			} else {
+				$do_prune[$service]['default'] = array($remote_obj, $pass_to_prune);
+			}
+		} else {
+			// We still need to make sure that prune is run on this remote storage method, even if all entities were previously uploaded
+			$do_prune[$service]['all'] = array($remote_obj, null);
+		}
+
+		return $do_prune;
 	}
 
 	private function group_backups($backup_history) {
@@ -472,7 +529,7 @@ class UpdraftPlus_Backup {
 	/**
 	 * Prunes historical backups, according to the user's settings
 	 *
-	 * @param Array $services - a list of services to prune on. This must be an array (i.e. it is not flexible like some other places)
+	 * @param Array $services - An associative array with list of services as key and remote object and boolean flag as values to prune on. This must be an array (i.e. it is not flexible like some other places)
 	 *
 	 * @return void
 	 */
@@ -495,7 +552,7 @@ class UpdraftPlus_Backup {
 		}
 
 		// If they turned off deletion on local backups, then there is nothing to do
-		if (0 == UpdraftPlus_Options::get_updraft_option('updraft_delete_local') && 1 == count($services) && in_array('none', $services)) {
+		if (0 == UpdraftPlus_Options::get_updraft_option('updraft_delete_local') && 1 == count($services) && array_key_exists('none', $services)) {
 			$updraftplus->log("Prune old backups from local store: nothing to do, since the user disabled local deletion and we are using local backups");
 			return;
 		}
@@ -635,8 +692,23 @@ class UpdraftPlus_Backup {
 						if (!empty($data)) {
 							$size_key = $key.'-size';
 							$size = isset($backup_to_examine[$size_key]) ? $backup_to_examine[$size_key] : null;
-							foreach ($services as $service => $sd) {
-								$this->prune_file($service, $data, $sd[0], $sd[1], array($size));
+							foreach ($services as $service => $instance_ids) {
+								foreach ($instance_ids as $instance_id => $sd) {
+									if ("none" != $service && '' != $service && 'all' != $instance_id) {
+										$storage_objects_and_ids = $updraftplus->get_storage_objects_and_ids(array($service));
+										$opts = $storage_objects_and_ids[$service]['instance_settings'][$instance_id];
+										$sd[0]->set_options($opts, false, $instance_id);
+										$this->prune_file($service, $data, $sd[0], $sd[1], array($size));
+									} elseif ("none" != $service && '' != $service && 'all' == $instance_id) {
+										$storage_objects_and_ids = $updraftplus->get_storage_objects_and_ids(array($service));
+										foreach ($storage_objects_and_ids[$service]['instance_settings'] as $instance_id => $options) {
+											$sd[0]->set_options($options, false, $instance_id);
+											$this->prune_file($service, $data, $sd[0], $sd[1], array($size));
+										}
+									} else {
+										$this->prune_file($service, $data, $sd[0], $sd[1], array($size));
+									}
+								}
 							}
 						}
 						unset($backup_to_examine[$key]);
@@ -764,9 +836,24 @@ class UpdraftPlus_Backup {
 				// Sending an empty array is not itself a problem - except that the remote storage method may not check that before setting up a connection, which can waste time: especially if this is done every time around the loop.
 				if (!empty($files_to_prune)) {
 					// Actually delete the files
-					foreach ($services as $service => $sd) {
-						$this->prune_file($service, $files_to_prune, $sd[0], $sd[1], $file_sizes);
-						$updraftplus->record_still_alive();
+					foreach ($services as $service => $instance_ids) {
+						foreach ($instance_ids as $instance_id => $sd) {
+							if ("none" != $service && '' != $service && 'all' != $instance_id) {
+								$storage_objects_and_ids = $updraftplus->get_storage_objects_and_ids(array($service));
+								$opts = $storage_objects_and_ids[$service]['instance_settings'][$instance_id];
+								$sd[0]->set_options($opts, false, $instance_id);
+								$this->prune_file($service, $files_to_prune, $sd[0], $sd[1], array($size));
+							} elseif ("none" != $service && '' != $service && 'all' == $instance_id) {
+								$storage_objects_and_ids = $updraftplus->get_storage_objects_and_ids(array($service));
+								foreach ($storage_objects_and_ids[$service]['instance_settings'] as $instance_id => $options) {
+									$sd[0]->set_options($options, false, $instance_id);
+									$this->prune_file($service, $files_to_prune, $sd[0], $sd[1], array($size));
+								}
+							} else {
+								$this->prune_file($service, $files_to_prune, $sd[0], $sd[1], array($size));
+							}
+							$updraftplus->record_still_alive();
+						}
 					}
 				}
 

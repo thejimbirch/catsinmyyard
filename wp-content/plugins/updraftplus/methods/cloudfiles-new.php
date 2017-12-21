@@ -20,7 +20,7 @@ class UpdraftPlus_BackupModule_cloudfiles_opencloudsdk extends UpdraftPlus_Backu
 		return $this->client;
 	}
 
-	public function get_service($opts, $useservercerts = false, $disablesslverify = null) {
+	public function get_openstack_service($opts, $useservercerts = false, $disablesslverify = null) {
 
 		$user = $opts['user'];
 		$apikey = $opts['apikey'];
@@ -107,21 +107,18 @@ class UpdraftPlus_BackupModule_cloudfiles_opencloudsdk extends UpdraftPlus_Backu
 			<th title="'.__('Accounts created at rackspacecloud.com are US accounts; accounts created at rackspace.co.uk are UK accounts.', 'updraftplus').'">'.__('US or UK-based Rackspace Account', 'updraftplus').':</th>
 			<td>
 				<select data-updraft_settings_test="authurl" '.$this->output_settings_field_name_and_id('authurl', true).' title="'.__('Accounts created at rackspacecloud.com are US-accounts; accounts created at rackspace.co.uk are UK-based', 'updraftplus').'">
-					<option {{#if is_us_authurl}}selected="selected"{{/if}} value="https://auth.api.rackspacecloud.com">'.__('US (default)', 'updraftplus').'</option>
-					<option {{#if is_uk_authurl}}selected="selected"{{/if}} value="https://lon.auth.api.rackspacecloud.com">'.__('UK', 'updraftplus').'</option>
+					<option {{#ifeq "https://auth.api.rackspacecloud.com" authurl}}selected="selected"{{/ifeq}} value="https://auth.api.rackspacecloud.com">'.__('US (default)', 'updraftplus').'</option>
+					<option {{#ifeq "https://lon.auth.api.rackspacecloud.com" authurl}}selected="selected"{{/ifeq}} value="https://lon.auth.api.rackspacecloud.com">'.__('UK', 'updraftplus').'</option>
 				</select>
 			</td>
 		</tr>
 		<tr class="'.$classes.'">
 			<th>'.__('Cloud Files Storage Region', 'updraftplus').':</th>
 			<td>
-				<select data-updraft_settings_test="region" '.$this->output_settings_field_name_and_id('region', true).'>
-					<option {{#if is_DFW_region}}selected="selected"{{/if}} value="DFW">'.__('Dallas (DFW) (default)', 'updraftplus').'</option>
-					<option {{#if is_SYD_region}}selected="selected"{{/if}} value="SYD">'.__('Sydney (SYD)', 'updraftplus').'</option>
-					<option {{#if is_ORD_region}}selected="selected"{{/if}} value="ORD">'.__('Chicago (ORD)', 'updraftplus').'</option>
-					<option {{#if is_IAD_region}}selected="selected"{{/if}} value="IAD">'.__('Northern Virginia (IAD)', 'updraftplus').'</option>
-					<option {{#if is_HKG_region}}selected="selected"{{/if}} value="HKG">'.__('Hong Kong (HKG)', 'updraftplus').'</option>
-					<option {{#if is_LON_region}}selected="selected"{{/if}} value="LON">'.__('London (LON)', 'updraftplus').'</option>
+				<select data-updraft_settings_test="region" '.$this->output_settings_field_name_and_id('region', true).'>						
+					{{#each regions as |desc reg|}}
+						<option {{#ifeq ../region reg}}selected="selected"{{/ifeq}} value="{{reg}}">{{desc}}</option>
+					{{/each}}
 				</select>
 			</td>
 		</tr>
@@ -151,15 +148,7 @@ class UpdraftPlus_BackupModule_cloudfiles_opencloudsdk extends UpdraftPlus_Backu
 	 * @param array $opts handerbar template options
 	 * @return array - Modified handerbar template options
 	 */
-	protected function transform_options_for_template($opts) {
-		if ('https://auth.api.rackspacecloud.com' == $opts['authurl']) {
-			$opts['is_us_authurl'] = true;
-		} elseif ('https://lon.auth.api.rackspacecloud.com' == $opts['authurl']) {
-			$opts['is_uk_authurl'] = true;
-		}
-		// Below code is for template transition part 2
-		
-		/*
+	public function transform_options_for_template($opts) {
 		$opts['regions'] = array(
 									'DFW' => __('Dallas (DFW) (default)', 'updraftplus'),
 									'SYD' => __('Sydney (SYD)', 'updraftplus'),
@@ -168,10 +157,11 @@ class UpdraftPlus_BackupModule_cloudfiles_opencloudsdk extends UpdraftPlus_Backu
 									'HKG' => __('Hong Kong (HKG)', 'updraftplus'),
 									'LON' => __('London (LON)', 'updraftplus')
 								);
-		*/
-		$selregion = (empty($opts['region'])) ? 'DFW' : $opts['region'];
-		$opts['is_'.$selregion.'_region'] = true;
-		$opts['apikey'] = trim($opts['apikey']);
+		$opts['region'] = (empty($opts['region'])) ? 'DFW' : $opts['region'];
+		if (isset($opts['apikey'])) {
+			$opts['apikey'] = trim($opts['apikey']);
+		}
+		$opts['authurl'] = !empty($opts['authurl']) ? $opts['authurl'] : '';
 		return $opts;
 	}
 

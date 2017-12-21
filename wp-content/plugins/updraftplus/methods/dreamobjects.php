@@ -76,8 +76,10 @@ class UpdraftPlus_BackupModule_dreamobjects extends UpdraftPlus_BackupModule_s3 
 		return '<tr class="'.$this->get_css_classes().'">
 					<th>'.sprintf(__('%s end-point', 'updraftplus'), 'DreamObjects').'</th>
 					<td>
-						<select data-updraft_settings_test="endpoint" '.$this->output_settings_field_name_and_id('endpoint', true).' style="width: 360px">
-							<option value="'.esc_attr('objects-us-west-1.dream.io').'" {{#if is_objects_us_west_1_dream_io_endpoint}}selected="selected"{{/if}}>'.esc_html('objects-us-west-1.dream.io').'</option>				
+						<select data-updraft_settings_test="endpoint" '.$this->output_settings_field_name_and_id('endpoint', true).' style="width: 360px">							
+							{{#each dreamobjects_endpoints}}
+								<option value="{{this}}" {{#ifeq ../endpoint this}}selected="selected"{{/ifeq}}>{{this}}</option>
+							{{/each}}				
 						</select>
 					</td>
 				</tr>';
@@ -89,10 +91,9 @@ class UpdraftPlus_BackupModule_dreamobjects extends UpdraftPlus_BackupModule_s3 
 	 * @param array $opts
 	 * @return array - Modified handerbar template options
 	 */
-	protected function transform_options_for_template($opts) {
-		if (isset($opts['endpoint']) && 'objects-us-west-1.dream.io' == $opts['endpoint']) {
-			$opts['is_objects_us_west_1_dream_io_endpoint'] = true;
-		}
+	public function transform_options_for_template($opts) {
+		$opts['endpoint'] = !empty($opts['endpoint']) ? $opts['endpoint'] : '';
+		$opts['dreamobjects_endpoints'] = $this->dreamobjects_endpoints;
 		return $opts;
 	}
 

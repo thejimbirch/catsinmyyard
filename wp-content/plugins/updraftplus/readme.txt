@@ -1,9 +1,9 @@
-=== UpdraftPlus WordPress Backup Plugin ===
+﻿=== UpdraftPlus WordPress Backup Plugin ===
 Contributors: Backup with UpdraftPlus, DavidAnderson, DNutbourne, aporter, snightingale, bcrodua
 Tags: backup, restore, database backup, wordpress backup, cloud backup, s3, dropbox, google drive, onedrive, ftp, backups
 Requires at least: 3.2
-Tested up to: 4.8
-Stable tag: 1.13.12
+Tested up to: 4.9
+Stable tag: 1.13.16
 Author URI: https://updraftplus.com
 Donate link: https://david.dw-perspective.org.uk/donate
 License: GPLv3 or later
@@ -149,10 +149,60 @@ Unfortunately not; since this is free software, there’s no warranty and no gua
 
 The <a href="https://updraftplus.com/news/">UpdraftPlus backup blog</a> is the best place to learn in more detail about any important changes.
 
-N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.13.12 of the free version correspond to changes made in 2.13.12.x of the paid version.
+N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which is 1 higher in the first digit, and has an extra component on the end, but the changelog below still applies. i.e. changes listed for 1.13.15 of the free version correspond to changes made in 2.13.15.x of the paid version.
+
+= 1.13.16 - 07/Dec/2017 =
+
+* TWEAK: Remove Ukranian translation files from wordpress.org zip (translation now complete, will download from wordpress.org separately)
+* TWEAK: Adding V4 Signature properties and methods to old S3 SDK
+* TWEAK: Migrator add-on: keep a log of tables as they are created
+* TWEAK: Tweak wording on the 'Premium/Extensions' tab
+* TWEAK: Change the order of classes in methods/cloudfiles.php to work around a PHP install bug seen in one instance
+* TWEAK: Be less aggressive about logging a usually unnecessary internal message about settings
+* TWEAK: Improve UI of migration notice in free version
+* TWEAK: Resolve PSR4 autoloading conflict with older version of Composer
+* TWEAK: Pruning will now prune backups from multiple storage destinations of the same type (not yet a user-visible feature)
+* TWEAK: Update the 'ifeq' handlebars helper to resolve a conflict with MainWP
+
+= 1.13.15 - 28/Nov/2017 =
+
+* FIX: Updated OneDrive SDK to allow for PHP 7.2 (due for release soon) compatibility
+* FIX: When multiple remote backup destinations existed, pruning of old backup sets was not removing from all destinations (recent regression)
+* FIX: When re-scanning a Rackspace Cloud Files remote location, only the first 100 files were processed
+* FIX: Backups being downloaded twice from Dropbox during a restore which could cause unexpected results upon a site migration
+* FIX: The 'SCP' and 'Server-side encryption' checkboxes in the settings was always ticked in the browser upon reload, regardless of the saved setting (regression in 1.13.14)
+* TWEAK: Improve export settings file name by appending site name to export download file
+* TWEAK: Perform escaping of table names in SQL calls without using esc_sql()
+* TWEAK: Site option is deleted before updating it in multisite
+* TWEAK: Improve WebDAV remote method upload speed
+* TWEAK: Improve WebDAV remote method download speed
+
+= 1.13.14 - 21/Nov/2017 =
+
+* FIX: Search/replace checkbox was not appearing when migrating a multisite setup
+* FIX: WordPress 4.8.3 introduced a breaking internal change in the WordPress database API, which broke the search/replace of strings including percent signs. Updated Migrator code to handle this.
+* FIX: WebDAV remote storage settings not being loaded onto the settings page properly
+* FIX: Rewrite of legacy (PHP 5.2) S3 SDK Class to fix pruning old backup sets when multiple storage back-ends that are all based on S3 are in use.
+* TWEAK: Improve formatting of restoration warnings
+* TWEAK: Add css classes to backup templates
+* TWEAK: Standardise the way storage classes are internally stored/retrieved
+* TWEAK: Remote storage modules configuration templates transition using handlebars.js
+* TWEAK: Adjust message mentioning mcrypt which is not needed if php-openssl is installed
+* TWEAK: Add UPDRAFTPLUS_USE_WPDB constant
+
+= 1.13.13 - 02/Nov/2017 =
+
+* FIX: Google Drive Custom App authorisation and de-authorisation was not working
+* FIX: Rackspace new user creation had stopped filling the new credential fields automatically after successful creation of a new user
+* TWEAK: When migrating, the detected search/replace terms now make sure that http and https variants are both included as search terms
+* TWEAK: Make the internal error code with OneDrive auth failures more accurate
+* TWEAK: Remote storage modules configuration templates transition using xamin/handlebars.php libraries
+* TWEAK: Changed the Dropbox authentication flow to not send a GET request on large URLs
+* TWEAK: Improve error message when invalid bucket name given by user for Backblaze remote storage method
 
 = 1.13.12 - 25/Oct/2017 =
 
+* TWEAK: Showing search/replace checkbox option only when needed.
 * FEATURE: Warn the user if their .htaccess seems to contain a redirect (or any other reference) to the old site after migration.
 * FEATURE: When importing a database, warn the user if the current MySQL server does not support a used collation, and offer to replace it
 * FIX: Saving of S3 settings had taken a dislike to buckets beginning with a capital 'B'
@@ -172,6 +222,7 @@ N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which i
 * TWEAK: Updater in paid versions can now receive and process update information in respond to entitlement claim - one less HTTP round-trip
 * TWEAK: Improve Google Cloud authentication success message for bucket name is not defined
 * TWEAK: UpdraftVault commands now pass an instance identifier
+* FEATURE: Backups can now be uploaded to multiple instances of the same remote storage but not yet possible to add multiple instances 
 
 = 1.13.11 - 27/Sep/2017 =
 
@@ -540,7 +591,7 @@ N.B. Paid versions of UpdraftPlus Backup / Restore have a version number which i
 * TWEAK: Detect a particular obscure PHP bug in some versions that is triggered by the Amazon S3 SDK, and automatically switch to the older SDK if it is hit (N.B. Not compatible with Frankfurt region).
 * TWEAK: Audit/update all use of wp_remote_ functions to reflect API changes in the upcoming WP 4.6
 * TWEAK: Tweak to the settings saving, to avoid a false-positive trigger of a particular rule found in some mod_security installs
-* TWEAK Update bundled UDRPC library to version 1.4.5
+* TWEAK: Update bundled UDRPC library to version 1.4.5
 
 = 1.12.9 - 11/May/2016 =
 
@@ -613,4 +664,4 @@ We recognise and thank the following for code and/or libraries used and/or modif
 
 
 == Upgrade Notice ==
-* 1.13.12: Handle unsupported collations, and unwanted .htaccess redirects; plus many tweaks and internal improvements
+* 1.13.16: Various small tweaks and fixes - a recommended update for everyone

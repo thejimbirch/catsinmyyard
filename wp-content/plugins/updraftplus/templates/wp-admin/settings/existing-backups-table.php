@@ -62,12 +62,14 @@ $image_folder_url = UPDRAFTPLUS_URL.'/images/icons/';
 							if (!isset($backup['service'])) $backup['service'] = array();
 							if (!is_array($backup['service'])) $backup['service'] = array($backup['service']);
 							foreach ($backup['service'] as $service) {
-								if ('none' === $service || '' === $service || (is_array($service) && (empty($service) || array('none') === $service))) {
+								if ('none' === $service || '' === $service || (is_array($service) && (empty($service) || array('none') === $service || array('') === $service))) {
 									// Do nothing
 								} else {
 									$image_url = file_exists($image_folder.$service.'.png') ? $image_folder_url.$service.'.png' : $image_folder_url.'folder.png';
+
+									$remote_storage = ('remotesend' === $service) ? __('remote site', 'updraftplus') : $updraftplus->backup_methods[$service];
 									?>
-									<img class="stored_icon" src="<?php echo esc_attr($image_url);?>" title="<?php echo esc_attr(sprintf(__('Stored at: %s', 'updraftplus'), $updraftplus->backup_methods[$service]));?>">
+									<img class="stored_icon" src="<?php echo esc_attr($image_url);?>" title="<?php echo esc_attr(sprintf(__('Stored at: %s', 'updraftplus'), $remote_storage));?>">
 									<?php
 								}
 							}

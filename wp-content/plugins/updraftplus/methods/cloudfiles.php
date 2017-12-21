@@ -7,14 +7,6 @@ if (!defined('UPDRAFTPLUS_DIR')) die('No direct access.');
  * Converted to array options: yes
  * Migration code for "new"-style options removed: Feb 2017 (created: Dec 2013)
  */
-if (version_compare(phpversion(), '5.3.3', '>=') && (!defined('UPDRAFTPLUS_CLOUDFILES_USEOLDSDK') || UPDRAFTPLUS_CLOUDFILES_USEOLDSDK != true)) {
-	include_once(UPDRAFTPLUS_DIR.'/methods/cloudfiles-new.php');
-	class UpdraftPlus_BackupModule_cloudfiles extends UpdraftPlus_BackupModule_cloudfiles_opencloudsdk {
-	}
-} else {
-	class UpdraftPlus_BackupModule_cloudfiles extends UpdraftPlus_BackupModule_cloudfiles_oldsdk {
-	}
-}
 
 if (!class_exists('UpdraftPlus_BackupModule')) require_once(UPDRAFTPLUS_DIR.'/methods/backup-module.php');
 
@@ -22,8 +14,6 @@ if (!class_exists('UpdraftPlus_BackupModule')) require_once(UPDRAFTPLUS_DIR.'/me
  * Old SDK
  */
 class UpdraftPlus_BackupModule_cloudfiles_oldsdk extends UpdraftPlus_BackupModule {
-
-	private $cloudfiles_object;
 
 	/**
 	 * This function does not catch any exceptions - that should be done by the caller
@@ -35,6 +25,9 @@ class UpdraftPlus_BackupModule_cloudfiles_oldsdk extends UpdraftPlus_BackupModul
 	 * @return array
 	 */
 	private function getCF($user, $apikey, $authurl, $useservercerts = false) {
+		
+		$storage = $this->get_storage();
+		if (!empty($storage)) return $storage;
 		
 		global $updraftplus;
 
@@ -48,11 +41,13 @@ class UpdraftPlus_BackupModule_cloudfiles_oldsdk extends UpdraftPlus_BackupModul
 
 		$auth->authenticate();
 
-		$conn = new UpdraftPlus_CF_Connection($auth);
+		$storage = new UpdraftPlus_CF_Connection($auth);
 
-		if (!$useservercerts) $conn->ssl_use_cabundle(UPDRAFTPLUS_DIR.'/includes/cacert.pem');
+		if (!$useservercerts) $storage->ssl_use_cabundle(UPDRAFTPLUS_DIR.'/includes/cacert.pem');
 
-		return $conn;
+		$this->set_storage($storage);
+		
+		return $storage;
 
 	}
 
@@ -90,18 +85,11 @@ class UpdraftPlus_BackupModule_cloudfiles_oldsdk extends UpdraftPlus_BackupModul
 
 		$updraft_dir = $updraftplus->backups_dir_location().'/';
 
-// if (preg_match("#^([^/]+)/(.*)$#", $path, $bmatches)) {
-// $container = $bmatches[1];
-// $path = $bmatches[2];
-// } else {
-// $container = $path;
-// $path = "";
-// }
 		$container = $opts['path'];
 
 		try {
-			$conn = $this->getCF($opts['user'], $opts['apikey'], $opts['authurl'], UpdraftPlus_Options::get_updraft_option('updraft_ssl_useservercerts'));
-			$container_object = $conn->create_container($container);
+			$storage = $this->getCF($opts['user'], $opts['apikey'], $opts['authurl'], UpdraftPlus_Options::get_updraft_option('updraft_ssl_useservercerts'));
+			$container_object = $storage->create_container($container);
 		} catch (AuthenticationException $e) {
 			$updraftplus->log('Cloud Files authentication failed ('.$e->getMessage().')');
 			$updraftplus->log(sprintf(__('%s authentication failed', 'updraftplus'), 'Cloud Files').' ('.$e->getMessage().')', 'error');
@@ -246,8 +234,8 @@ class UpdraftPlus_BackupModule_cloudfiles_oldsdk extends UpdraftPlus_BackupModul
 		if (empty($opts['user']) || empty($opts['apikey'])) new WP_Error('no_settings', __('No settings were found', 'updraftplus'));
 
 		try {
-			$conn = $this->getCF($opts['user'], $opts['apikey'], $opts['authurl'], UpdraftPlus_Options::get_updraft_option('updraft_ssl_useservercerts'));
-			$container_object = $conn->create_container($container);
+			$storage = $this->getCF($opts['user'], $opts['apikey'], $opts['authurl'], UpdraftPlus_Options::get_updraft_option('updraft_ssl_useservercerts'));
+			$container_object = $storage->create_container($container);
 		} catch (Exception $e) {
 			return new WP_Error('no_access', sprintf(__('%s authentication failed', 'updraftplus'), 'Cloud Files').' ('.$e->getMessage().')');
 		}
@@ -291,16 +279,14 @@ class UpdraftPlus_BackupModule_cloudfiles_oldsdk extends UpdraftPlus_BackupModul
 			try {
 				$opts = $this->get_options();
 				$container = $opts['path'];
-				$conn = $this->getCF($opts['user'], $opts['apikey'], $opts['authurl'], UpdraftPlus_Options::get_updraft_option('updraft_ssl_useservercerts'));
-				$container_object = $conn->create_container($container);
+				$storage = $this->getCF($opts['user'], $opts['apikey'], $opts['authurl'], UpdraftPlus_Options::get_updraft_option('updraft_ssl_useservercerts'));
+				$container_object = $storage->create_container($container);
 			} catch (Exception $e) {
 				$updraftplus->log('Cloud Files authentication failed ('.$e->getMessage().')');
 				$updraftplus->log(sprintf(__('%s authentication failed', 'updraftplus'), 'Cloud Files').' ('.$e->getMessage().')', 'error');
 				return false;
 			}
 		}
-
-// $fpath = ($path == '') ? $file : "$path/$file";
 
 		$ret = true;
 		foreach ($files as $file) {
@@ -343,7 +329,7 @@ class UpdraftPlus_BackupModule_cloudfiles_oldsdk extends UpdraftPlus_BackupModul
 		$opts = $this->get_options();
 
 		try {
-			$conn = $this->getCF($opts['user'], $opts['apikey'], $opts['authurl'], UpdraftPlus_Options::get_updraft_option('updraft_ssl_useservercerts'));
+			$storage = $this->getCF($opts['user'], $opts['apikey'], $opts['authurl'], UpdraftPlus_Options::get_updraft_option('updraft_ssl_useservercerts'));
 		} catch (AuthenticationException $e) {
 			$updraftplus->log('Cloud Files authentication failed ('.$e->getMessage().')');
 			$updraftplus->log(sprintf(__('%s authentication failed', 'updraftplus'), 'Cloud Files').' ('.$e->getMessage().')', 'error');
@@ -360,24 +346,16 @@ class UpdraftPlus_BackupModule_cloudfiles_oldsdk extends UpdraftPlus_BackupModul
 
 		$path = untrailingslashit($opts['path']);
 
-// if (preg_match("#^([^/]+)/(.*)$#", $path, $bmatches)) {
-// $container = $bmatches[1];
-// $path = $bmatches[2];
-// } else {
-// $container = $path;
-// $path = "";
-// }
 		$container = $path;
 
 		try {
-			$container_object = $conn->create_container($container);
+			$container_object = $storage->create_container($container);
 		} catch (Exception $e) {
 			$updraftplus->log('Cloud Files error - failed to create and access the container ('.$e->getMessage().')');
 			$updraftplus->log(__('Cloud Files error - failed to create and access the container', 'updraftplus').' ('.$e->getMessage().')', 'error');
 			return false;
 		}
 
-// $path = ($path == '') ? $file : "$path/$file";
 		$path = $file;
 
 		$updraftplus->log("Cloud Files download: cloudfiles://$container/$path");
@@ -474,8 +452,8 @@ class UpdraftPlus_BackupModule_cloudfiles_oldsdk extends UpdraftPlus_BackupModul
 			<th>'.__('US or UK Cloud', 'updraftplus').':</th>
 			<td>
 				<select data-updraft_settings_test="authurl" '.$this->output_settings_field_name_and_id('authurl', true).'>
-					<option {{#if is_us_authurl}}selected="selected"{{/if}} value="https://auth.api.rackspacecloud.com">'.__('US (default)', 'updraftplus').'</option>
-					<option {{#if is_uk_authurl}}selected="selected"{{/if}} value="https://lon.auth.api.rackspacecloud.com">'.__('UK', 'updraftplus').'</option>
+					<option {{#ifeq "https://auth.api.rackspacecloud.com" authurl}}selected="selected"{{/ifeq}} value="https://auth.api.rackspacecloud.com">'.__('US (default)', 'updraftplus').'</option>
+					<option {{#ifeq "https://lon.auth.api.rackspacecloud.com" authurl}}selected="selected"{{/ifeq}} value="https://lon.auth.api.rackspacecloud.com">'.__('UK', 'updraftplus').'</option>
 				</select>
 			</td>
 		</tr>
@@ -514,13 +492,9 @@ class UpdraftPlus_BackupModule_cloudfiles_oldsdk extends UpdraftPlus_BackupModul
  * @param array $opts handerbar template options
  * @return array - Modified handerbar template options
  */
-	protected function transform_options_for_template($opts) {
-		if ('https://auth.api.rackspacecloud.com' == $opts['authurl']) {
-			$opts['is_us_authurl'] = true;
-		} elseif ('https://lon.auth.api.rackspacecloud.com' == $opts['authurl']) {
-			$opts['is_uk_authurl'] = true;
-		}
+	public function transform_options_for_template($opts) {
 		$opts['apikey'] = trim($opts['apikey']);
+		$opts['authurl'] = isset($opts['authurl']) ? $opts['authurl'] : '';
 		return $opts;
 	}
 	
@@ -559,8 +533,8 @@ class UpdraftPlus_BackupModule_cloudfiles_oldsdk extends UpdraftPlus_BackupModul
 		define('UPDRAFTPLUS_SSL_DISABLEVERIFY', $disableverify);
 
 		try {
-			$conn = $this->getCF($user, $key, $authurl, $useservercerts);
-			$container_object = $conn->create_container($container);
+			$storage = $this->getCF($user, $key, $authurl, $useservercerts);
+			$container_object = $storage->create_container($container);
 		} catch (AuthenticationException $e) {
 			echo __('Cloud Files authentication failed', 'updraftplus').' ('.$e->getMessage().')';
 			return;
@@ -586,5 +560,15 @@ class UpdraftPlus_BackupModule_cloudfiles_oldsdk extends UpdraftPlus_BackupModul
 		echo __('Success', 'updraftplus').": ".__('We accessed the container, and were able to create files within it.', 'updraftplus');
 
 		@$container_object->delete_object($try_file);
+	}
+}
+
+// Moved to the bottom to fix a bug in some version or install of PHP which required UpdraftPlus_BackupModule_cloudfiles_oldsdk to be defined earlier in the file (despite the conditionality) - see HS#19911
+if (version_compare(PHP_VERSION, '5.3.3', '>=') && (!defined('UPDRAFTPLUS_CLOUDFILES_USEOLDSDK') || UPDRAFTPLUS_CLOUDFILES_USEOLDSDK != true)) {
+	include_once(UPDRAFTPLUS_DIR.'/methods/cloudfiles-new.php');
+	class UpdraftPlus_BackupModule_cloudfiles extends UpdraftPlus_BackupModule_cloudfiles_opencloudsdk {
+	}
+} else {
+	class UpdraftPlus_BackupModule_cloudfiles extends UpdraftPlus_BackupModule_cloudfiles_oldsdk {
 	}
 }

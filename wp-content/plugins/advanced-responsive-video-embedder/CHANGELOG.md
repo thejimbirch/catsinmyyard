@@ -4,6 +4,24 @@
 * [ARVE Pro addon changelog](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/changelog/)
 * [ARVE AMP addon changelog](https://nextgenthemes.com/plugins/arve-amp/)
 
+### 2017-12-20 - 8.7.6 ###
+
+* Fix license activation now working correctly.
+* Corrected link in readme.
+
+### 2017-12-19 - 8.7.5 ###
+
+* Maybe fix license activation in some rare cases.
+
+### 2017-12-17 - 8.7.4 ###
+
+* Fix: Removed URL validation because it fails with some weird URLs.
+
+### 2017-12-13 - 8.7.3 ###
+
+* Updated EDD Plugin Updater class.
+* Fixed some links in the readme.
+
 ### 2017-08-16 - 8.7.2 ###
 
 * Fix: Same Video with different start times in lightboxes.

@@ -2,8 +2,8 @@
 Contributors: scottsweb, codeforthepeople
 Tags: instagram, widget, photos, photography, hipster, sidebar, widgets, simple
 Requires at least: 4.4
-Tested up to: 4.8.2
-Stable tag: 2.0.0
+Tested up to: 4.9.1
+Stable tag: 2.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,9 +49,11 @@ The second allows you to filter video results from the widget:
 
 `add_filter('wpiw_images_only', '__return_true');`
 
-The rest allow you to add custom classes to each list item, link or image:
+The rest allow you to add custom classes to the [ul] list container, each list item, link or image:
 
-`add_filter( 'wpiw_item_class', 'my_instagram_class' );
+`add_filter( 'wpiw_list_class', 'my_instagram_class' );
+
+add_filter( 'wpiw_item_class', 'my_instagram_class' );
 add_filter( 'wpiw_a_class', 'my_instagram_class' );
 add_filter( 'wpiw_img_class', 'my_instagram_class' );
 add_filter( 'wpiw_linka_class', 'my_instagram_class' );
@@ -77,6 +79,12 @@ In version 1.9.6 you can now use a filter to change the location of your custom 
 2. Instagram widget in the theme customiser
 
 == Changelog ==
+
+= 2.0.2 =
+* Use image sizes from JSON due to errors loading images
+
+= 2.0.1 =
+* Fix hashtag support
 
 = 2.0.0 =
 * Ability to track tags / hashtags instead of just usernames (e.g. #cheese)
@@ -120,7 +128,7 @@ In version 1.9.6 you can now use a filter to change the location of your custom 
 * Apologies for all the recent updates, all good things though!
 * Update plugin text domain ready for translate.wordpress.org
 * Introduce an 'original' image size if you want to use non-square originals
-* Introduce new filter for <ul> class `wpiw_list_class`
+* Introduce new filter for `<ul>` class `wpiw_list_class`
 
 = 1.8 =
 * Bring back image captions

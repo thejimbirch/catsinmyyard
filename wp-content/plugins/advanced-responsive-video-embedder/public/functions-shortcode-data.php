@@ -10,7 +10,7 @@ function arve_get_default_aspect_ratio( $aspect_ratio, $provider ) {
 
 function arve_get_html5_attributes() {
 
-	return array( 'mp4', 'm4v', 'webm', 'ogv' );
+	return array( 'mp4', 'm4v', 'webm', 'ogv', 'ogg', 'ogm' );
 }
 
 function arve_url_query_array( $url ) {
@@ -157,6 +157,7 @@ function arve_add_autoplay_query_arg( $src, $a ) {
 			$on  = add_query_arg( 'player_autoplay', 'true',  $src );
 			$off = add_query_arg( 'player_autoplay', 'false', $src );
 			break;
+		/*
 		case 'iframe':
 			# We are spamming all kinds of autoplay parameters here in hope of a effect
 			$on = add_query_arg( array(
@@ -172,6 +173,7 @@ function arve_add_autoplay_query_arg( $src, $a ) {
 				'player_autoStart' => 'false',
 			), $src );
 			break;
+		*/
 		default:
 			# Do nothing for providers that to not support autoplay or fail with parameters
 			$on  = $src;

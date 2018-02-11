@@ -1,9 +1,9 @@
 === Flamingo ===
 Contributors: takayukister, megumithemes
 Tags: bird, contact, mail, crm
-Requires at least: 4.7
-Tested up to: 4.8.1
-Stable tag: 1.7
+Requires at least: 4.8
+Tested up to: 4.9.2
+Stable tag: 1.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,18 +28,13 @@ For more detailed information, please refer to the [Contact Form 7 documentation
 
 == Changelog ==
 
+= 1.8 =
+
+* Remove support for outdated Akismet APIs.
+* Take consent data through an inbound message.
+
 = 1.7 =
 
 * New filter: flamingo_add_inbound
 * New filter: flamingo_add_contact
 * New filter: flamingo_htmlize
-
-= 1.6 =
-
-* Tested up to WordPress 4.8.
-* Requires WordPress 4.7 or higher.
-* Added RTL stylesheet.
-* Strengthened capability checking.
-* Removed inappropriate content from h1 headings.
-* Changed the default format of the export CSV.
-* Introduced the flamingo_csv_value_separator and flamingo_csv_quotation filter hooks to enable customizing CSV output.

@@ -19,6 +19,7 @@ class Flamingo_Inbound_Message {
 	public $meta;
 	public $akismet;
 	public $spam;
+	public $consent;
 
 	public static function register_post_type() {
 		register_post_type( self::post_type, array(
@@ -122,6 +123,7 @@ class Flamingo_Inbound_Message {
 			'meta' => array(),
 			'akismet' => array(),
 			'spam' => false,
+			'consent' => array(),
 		);
 
 		$args = apply_filters( 'flamingo_add_inbound',
@@ -137,6 +139,7 @@ class Flamingo_Inbound_Message {
 		$obj->fields = $args['fields'];
 		$obj->meta = $args['meta'];
 		$obj->akismet = $args['akismet'];
+		$obj->consent = $args['consent'];
 
 		if ( $args['spam'] ) {
 			$obj->spam = true;
@@ -174,6 +177,7 @@ class Flamingo_Inbound_Message {
 
 			$this->meta = get_post_meta( $post->ID, '_meta', true );
 			$this->akismet = get_post_meta( $post->ID, '_akismet', true );
+			$this->consent = get_post_meta( $post->ID, '_consent', true );
 
 			$terms = wp_get_object_terms( $this->id, self::channel_taxonomy );
 
@@ -229,6 +233,7 @@ class Flamingo_Inbound_Message {
 			update_post_meta( $post_id, '_fields', $this->fields );
 			update_post_meta( $post_id, '_meta', $this->meta );
 			update_post_meta( $post_id, '_akismet', $this->akismet );
+			update_post_meta( $post_id, '_consent', $this->consent );
 
 			if ( term_exists( $this->channel, self::channel_taxonomy ) ) {
 				wp_set_object_terms( $this->id, $this->channel,

@@ -184,6 +184,29 @@ function flamingo_inbound_fields_meta_box( $post ) {
 <?php
 }
 
+function flamingo_inbound_consent_meta_box( $post ) {
+	$consent = $post->consent;
+
+	if ( empty( $consent ) ) {
+		return;
+	}
+
+?>
+<table class="widefat message-fields striped">
+<tbody>
+
+<?php foreach ( (array) $consent as $key => $value ) : ?>
+<tr>
+<td class="field-title"><?php echo esc_html( $key ); ?></td>
+<td class="field-value"><?php echo wp_kses( $value, wp_kses_allowed_html( 'data' ) ); ?></td>
+</tr>
+<?php endforeach; ?>
+
+</tbody>
+</table>
+<?php
+}
+
 function flamingo_inbound_meta_meta_box( $post ) {
 ?>
 <table class="widefat message-fields striped">

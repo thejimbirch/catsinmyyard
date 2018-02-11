@@ -656,6 +656,9 @@ function flamingo_load_inbound_admin() {
 		add_meta_box( 'inboundfieldsdiv', __( 'Fields', 'flamingo' ),
 			'flamingo_inbound_fields_meta_box', null, 'normal', 'core' );
 
+		add_meta_box( 'inboundconsentdiv', __( 'Consent', 'flamingo' ),
+			'flamingo_inbound_consent_meta_box', null, 'normal', 'core' );
+
 		add_meta_box( 'inboundmetadiv', __( 'Meta', 'flamingo' ),
 			'flamingo_inbound_meta_meta_box', null, 'normal', 'core' );
 

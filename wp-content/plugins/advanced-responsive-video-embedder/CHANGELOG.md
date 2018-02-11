@@ -4,6 +4,18 @@
 * [ARVE Pro addon changelog](https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/changelog/)
 * [ARVE AMP addon changelog](https://nextgenthemes.com/plugins/arve-amp/)
 
+### 2018-02-03 - 8.7.9 ###
+
+* No longer try to guess and spam autoplay parameters for general iframe embeds.
+* Fix: Google drive embeds not working.
+
+### 2018-01-09 - 8.7.7 ###
+
+* New: `duration` shortcode attribute and dialog entry.
+* Fixed: Corrected some dead links inside the plugin.
+* Improved: Added `muted`, `controls` and `loop` to shortcode UI dialog for HTML5 videos.
+* Improved: Removed video file extension check so any file can be used `[arve mp4="http://example.com/some-file" webm="http://example.com/some-other-file" /]`. Useful for example to embed files hosted on IPFS that do have a cryptic hash instead of a human readable filename.
+
 ### 2017-12-20 - 8.7.6 ###
 
 * Fix license activation now working correctly.

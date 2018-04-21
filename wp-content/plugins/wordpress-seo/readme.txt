@@ -5,8 +5,8 @@ License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: SEO, XML sitemap, Google Search Console, Content analysis, Readability
 Requires at least: 4.8
-Tested up to: 4.9.2
-Stable tag: 6.2
+Tested up to: 4.9.5
+Stable tag: 7.3
 Requires PHP: 5.2.4
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the Yoast SEO plugin.
@@ -98,57 +98,64 @@ You'll find answers to many of your questions on [kb.yoast.com](https://yoa.st/1
 == Screenshots ==
 
 1. The Yoast SEO plugin general meta box. You'll see this on edit post pages, for posts, pages and custom post types.
-2. The fully configurable XML sitemap for Yoast SEO.
-3. Easily import SEO data from other SEO plugins like All In One SEO pack, HeadSpace2 SEO and wpSEO.de.
-4. Example of the SEO analysis functionality.
-5. Example of the readability analysis functionality.
-6. The advanced section of the Yoast SEO meta box.
+2. Example of the SEO analysis functionality.
+3. Example of the readability analysis functionality.
+4. Overview of site-wide SEO problems and possible improvements.
+5. Control over which features you want to use.
+6. Easily import SEO data from other SEO plugins like All In One SEO pack, HeadSpace2 SEO and wpSEO.de.
 
 == Changelog ==
 
-= 6.2.0 =
-Release Date: January 23rd, 2018
+= 7.3.0 =
+Release Date: April 17th, 2018
 
 Enhancements:
-
-* Allows more strings to be translated.
-* Adds the passive voice assessment for French.
-* Adds the passive voice assessment for Spanish.
-* Simplifies the feedback message for the assessment that checks whether subheadings contain the keyword.
-
-Bugfixes:
-
-* Security hardening through stricter code checks.
-* Reduces the number of times the content analysis is refreshed on page load.
-* Fixes a bug where relative URLs were not counted as internal links in the internal link assessment.
-* Fixes a bug where Premium users would be shown ads when following a certain path through the SEO menu.
-* Fixes a bug where the method of setting the title and meta description templates for the WooCommerce shop page would not work anymore.
-
-= 6.1.1 =
-Release Date: January 10th, 2018
+* Removes the `intl` polyfill and shows a message on browsers that don't support this feature.
+* Adds Baidu Webmaster Tools verification support.
+* Adds import functionality for [Premium SEO Pack](https://wordpress.org/plugins/premium-seo-pack/).
+* Adds import functionality for [Smartcrawl SEO](https://wordpress.org/plugins/smartcrawl-seo/).
+* Adds import functionality for [Squirrly SEO](https://wordpress.org/plugins/squirrly-seo/).
+* Adds import functionality for [Platinum SEO Pack](https://wordpress.org/plugins/platinum-seo-pack/).
+* Adds import functionality for [SEO Framework](https://wordpress.org/plugins/autodescription/).
+* Adds import functionality for [Greg's High Performance SEO](https://wordpress.org/plugins/gregs-high-performance-seo/).
+* Adds import functionality for [WP Meta SEO](https://wordpress.org/plugins/wp-meta-seo/).
+* Improves the social data import for the wpSEO.de plugin.
+* Removes the debug data from the admin pages, which were only showing when WordPress is in DEBUG mode.
+* Applies Select2 to all select boxes on breadcrumbs page.
+* Attempts to reset `opcode` cache during the upgrade routine.
+* Changes the wording for the Ryte indexability check on the features tab.
 
 Bugfixes:
+* Prevents hard casting to array in the `WPSEO_Link_Columns::add_post_columns` method signature.
+* Fixes a bug where an error is thrown when MySQL has the `sql-mode` set to `ANSI_QUOTES`.
+* Fixes a bug where the pagination overlaps the cornerstone information message, on post overview pages in combination with low resolutions.
+* Fixed a bug where the keyword filter doesn't work on the post overview page.
+* Removes HTML entities from the HTML comment that appears for admins when there's no meta description on a post or page.
+* Changes JSON+LD organization output to always point to `#organization` on the homepage instead of the current page.
+* Fixes a bug where non-public taxonomies were shown in the breadcrumbs.
 
-* Fixes a bug where sitemaps could not be generated when there one or more galleries in the content.
+Other:
+* Minor internationalization improvements.
+* Security hardening.
 
-= 6.1.0 =
-Release Date: January 9th, 2018
+= 7.2.0 =
+Release Date: April 3rd, 2018
 
 Enhancements:
-
-* Allows more strings to be translated.
-* Replaces any Yoast domain URLs with shortlink alternatives.
+* Updates all Help Center videos with new recordings.
+* Adds functionality to import noindex, nofollow and OpenGraph tags from All in One SEO Pack.
+* Improves consistency of capitalization in settings and tabs.
+* Improves the traffic light icon accessibility.
+* Changes the words 'post type' into 'content type' throughout the plugin.
 
 Bugfixes:
-
-* Fixes a bug where the internal links aren't recognized when the `site_url` is not the same as the `home_url`.
-* Fixes a bug where the user locale is not used for the Help Center when it is different from the site locale.
-* Removes unsupported PHP 5.2 arguments in an `array_unique` call in the Term image sitemap.
-* Removes unsupported PHP 5.3 arguments in a `json_encode` call in the notification functionality.
-* Added support for locales without territory (examples: et, fi) - Props [Peeter Marvet](https://github.com/petskratt).
-* Added support support for 3-letter language codes (example: rhg) - Props [Peeter Marvet](https://github.com/petskratt).
-* Fixes a JavaScript compatibility issue by prefixing the webpack jsonP function with `yoast` - Props [Raitis Sevelis from Visual Composer](https://visualcomposer.io/).
+* Fixes a bug where the Facebook app-id could no longer be set in the Social settings.
+* Fixes a bug where existing Yoast SEO data could be overwritten when importing data from All in One SEO Pack.
+* Fixes a bug where the Ryte notification is not removed when disabling the Ryte feature.
+* Fixes a bug where setting a page to `noindex` through the `wpseo_robots` filter did not properly remove the `canonical` element.
+* Fixes a bug where attachments connected to password-protected parents are included in the sitemaps. Props [Scott Carter](https://gobarrelroll.com).
+* Fixes alignment of the `Go Premium` notice.
 
 = Earlier versions =
 
-For the changelog of earlier versions, please refer to the separate changelog.txt file.
+For the changelog of earlier versions, please refer to https://yoa.st/yoast-seo-changelog

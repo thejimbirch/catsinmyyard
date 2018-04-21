@@ -248,7 +248,8 @@ span.invalid {
 
 
 .mc-code {
-  font-size: 12px;
-  color: #888;
-  // font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+  font-size: 11px;
+  color: #999;
+  display: block;
+  /* font-family: Menlo,Monaco,Consolas,"Courier New",monospace; */
 }

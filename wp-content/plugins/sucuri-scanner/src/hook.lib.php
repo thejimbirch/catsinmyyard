@@ -28,8 +28,8 @@ if (!defined('SUCURISCAN_INIT') || SUCURISCAN_INIT !== true) {
  * The term hooking covers a range of techniques used to alter or augment the
  * behavior of an operating system, of applications, or of other software
  * components by intercepting method calls or messages or events passed
- * between software components. Code that handles such intercepted function
- * methods, events or messages is called a "hook".
+ * between software components. Code that handles such intercepted methods,
+ * events or messages is called a "hook".
  *
  * Hooking is used for many purposes, including debugging and extending
  * functionality. Examples might include intercepting keyboard or mouse event
@@ -68,6 +68,59 @@ class SucuriScanHook extends SucuriScanEvent
         $message = sprintf('Media file added; ID: %s; name: %s; type: %s', $id, $title, $mime_type);
         self::reportNoticeEvent($message);
         self::notifyEvent('post_publication', $message);
+    }
+    
+    /**
+     * Send and alert notifying that a user was added to a blog.
+     *
+     * @param int    $user_id User ID.
+     * @param string $role    User role.
+     * @param int    $blog_id Blog ID.
+     */
+    public static function hookAddUserToBlog($user_id, $role, $blog_id)
+    {
+        $title = 'unknown';
+        $email = 'user@domain.com';
+        $data = get_userdata($user_id);
+
+        if ($data) {
+            $title = $data->user_login;
+            $email = $data->user_email;
+        }
+
+        $message = sprintf('User added to website; user_id: %s; role: %s; blog_id: %s; name: %s; email: %s',
+            $user_id, 
+            $role, 
+            $blog_id,
+            $title,
+            $email
+        );
+        self::reportWarningEvent($message);
+    }
+
+    /**
+     * Send and alert notifying that a user was removed from a blog.
+     *
+     * @param int    $user_id User ID.
+     * @param int    $blog_id Blog ID.
+     */
+    public static function hookRemoveUserFromBlog($user_id, $blog_id) {
+        $title = 'unknown';
+        $email = 'user@domain.com';
+        $data = get_userdata($user_id);
+
+        if ($data) {
+            $title = $data->user_login;
+            $email = $data->user_email;
+        }
+        
+        $message = sprintf('User removed from website; user_id: %s; blog_id: %s; name: %s; email: %s',
+            $user_id, 
+            $blog_id,
+            $title,
+            $email
+        );
+        self::reportWarningEvent($message);
     }
 
     /**
@@ -176,13 +229,7 @@ class SucuriScanHook extends SucuriScanEvent
         $title = empty($title) ? 'Unknown' : sanitize_user($title, true);
         $message = 'User authentication failed: ' . $title;
 
-        /* send the submitted password along with the alert */
-        if (SucuriScanOption::isEnabled(':notify_failed_password')) {
-            $message .= '; password: ' . $password;
-            sucuriscan_log_failed_login($title, $password);
-        } else {
-            sucuriscan_log_failed_login($title, '[hidden]');
-        }
+        sucuriscan_log_failed_login($title);
 
         self::reportErrorEvent($message);
 
@@ -942,6 +989,46 @@ class SucuriScanHook extends SucuriScanEvent
     public static function hookUserDelete($id = 0)
     {
         self::reportWarningEvent('User account deleted; ID: ' . $id);
+    }
+
+    /**
+     * Send an alert notifying that a user was edited.
+     * @param int $id The identifier of the edited user account
+     * @param object $old_user_data Object containing user's data prior to update.
+     */
+    public static function hookProfileUpdate($id = 0, $old_user_data)
+    {
+        $title = 'unknown';
+        $email = 'user@domain.com';
+        $roles = 'none';
+        $data = get_userdata($id);
+
+        if ($data) {
+            $title = $data->user_login;
+            $email = $data->user_email;
+            $roles = @implode(', ', $data->roles);
+        }
+
+        $old_title = 'unknown';
+        $old_email = 'user@domain.com';
+        $old_roles = 'none';
+
+        if($old_user_data) {
+            $old_title = $old_user_data->user_login;
+            $old_email = $old_user_data->user_email;
+            $old_roles = @implode(', ', $old_user_data->roles);
+        }
+
+        $message = sprintf('User account edited; ID: %s; name: %s; old_name: %s; email: %s; old_email: %s; roles: %s; old_roles: %s',
+            $id,
+            $title,
+            $old_title,
+            $email,
+            $old_email,
+            $roles,
+            $old_roles
+        );
+        self::reportWarningEvent($message);
     }
 
     /**

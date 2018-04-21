@@ -586,6 +586,10 @@ class SucuriScanIntegrity
             }
         }
 
+        sort($output['added']);
+        sort($output['removed']);
+        sort($output['modified']);
+
         return $output;
     }
 
@@ -662,6 +666,8 @@ class SucuriScanIntegrity
             '^wp-content\/(themes|plugins)\/.+',
             '^google[0-9a-z]{16}\.html$',
             '^pinterest-[0-9a-z]{5}\.html$',
+            '^wp-content\/languages\/.+\.mo$',
+            '^wp-content\/languages\/.+\.po$',
             '\.ico$',
         );
 

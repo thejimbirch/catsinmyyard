@@ -68,7 +68,7 @@ function mce_referer() {
 	$mce_referer = '<p style="display: none !important"><span class="wpcf7-form-control-wrap referer-page">';
   $mce_referer .= '<input type="hidden" name="referer-page" ';
   $mce_referer .= 'value="'.$mce_referer_url.'" ';
-  $mce_referer .= 'size="40" class="wpcf7-form-control wpcf7-text referer-page" aria-invalid="false">';
+  $mce_referer .= 'class="wpcf7-form-control wpcf7-text referer-page" aria-invalid="false">';
   $mce_referer .= '</span></p>'. "\n";
 
   return $mce_referer;

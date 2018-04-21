@@ -1,6 +1,6 @@
 === Contact Form 7 MailChimp Extension ===
 Contributors: rnzo
-Donate link: https://www.paypal.me/renzojohnson
+Donate link: http://bit.ly/2HdTzmO
 Tags: mailchimp, chimpmail, mailchimp form, mailchimp list, newsletter
 Requires at least: 4.0
 Tested up to: 4.9
@@ -77,6 +77,10 @@ Do you have questions or issues with Contact Form 7 MailChimp Extension? Use the
 == Changelog ==
 
 For more information, see [Releases](http://renzojohnson.com/contributions/contact-form-7-mailchimp-extension).
+
+= 0.4.50 =
+
+* Updated API methods
 
 = 0.4.42 =
 

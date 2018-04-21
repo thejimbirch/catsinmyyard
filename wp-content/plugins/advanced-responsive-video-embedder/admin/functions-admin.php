@@ -2,6 +2,20 @@
 
 function arve_action_admin_init_setup_messages() {
 
+	if( defined( 'ARVE_PRO_VERSION' ) || defined( 'ARVE_AMP_VERSION' ) ) {
+
+		$msg = sprintf(
+			__( 'ARVE addons price change. Please read <a href="%s">Taking Business to a Serious Level - The Future NextGenThemes and ARVE.</a>.', ARVE_SLUG ),
+			'https://nextgenthemes.com/taking-business-to-a-serious-level-the-future-nextgenthemes-and-arve/'
+		);
+
+		new ARVE_Admin_Notice_Factory(
+			'price_change',
+			"<p>$msg</p>",
+			true
+		);
+	}
+
 	if( defined( 'ARVE_PRO_VERSION' ) && version_compare( ARVE_PRO_VERSION_REQUIRED, ARVE_PRO_VERSION, '>' ) ) {
 
 		$msg = sprintf(
@@ -9,7 +23,7 @@ function arve_action_admin_init_setup_messages() {
 			ARVE_PRO_VERSION_REQUIRED,
 			get_admin_url() . 'admin.php?page=nextgenthemes-licenses',
 			'https://nextgenthemes.com/support/',
-			'https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/documentation/installing-and-license-management/'
+			'https://nextgenthemes.com/plugins/arve/documentation/installing-and-license-management/'
 		);
 		new ARVE_Admin_Notice_Factory( 'arve-pro-outdated', "<p>$msg</p>", false );
 	}
@@ -136,7 +150,7 @@ function arve_add_action_links( $links ) {
 
 		$extra_links['buy_pro_addon'] = sprintf(
 			'<a href="%s"><strong style="display: inline;">%s</strong></a>',
-			'http://nextgenthemes.com/downloads/advanced-responsive-video-embedder',
+			'https://nextgenthemes.com/plugins/arve-pro/',
 			__( 'Buy Pro Addon', ARVE_SLUG )
 		);
 	}
@@ -165,7 +179,7 @@ function arve_add_media_button() {
 	printf(
 		"<div id='arve-thickbox' style='display:none;'><p>$p1</p><p>$p2</p><p>$p3</p></div>",
 		nextgenthemes_admin_install_search_url( 'Shortcode+UI' ),
-		esc_url( 'https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/documentation/' )
+		esc_url( 'https://nextgenthemes.com/plugins/arve/documentation/' )
 	);
 
 	printf(
@@ -341,8 +355,8 @@ function arve_register_settings() {
 			$value['label'],                       // title
 			$callback_function,                    // callback
 			ARVE_SLUG,                             // page
-			'main_section',                    // section
-			array(                             // args
+			'main_section',                        // section
+			array(                                 // args
 				'label_for'   => ( 'radio' === $value['type'] ) ? null : "arve_options_main[{$value['attr']}]",
 				'input_attr'  => $value['meta'] + array(
 					'type'        => $value['type'],
@@ -489,8 +503,6 @@ function arve_shortcodes_section_description() {
 
 function arve_params_section_description() {
 
-	$url  = 'https://nextgenthemes.com/advanced-responsive-video-embedder-pro/documentation';
-
 	$desc = sprintf(
 		__( 'This parameters will be added to the <code>iframe src</code> urls, you can control the video players behavior with them. Please read <a href="%s" target="_blank">the documentation</a> on.',
 		ARVE_SLUG ),
@@ -505,7 +517,7 @@ function arve_params_section_description() {
 		<a target="_blank" href="https://developers.google.com/youtube/player_parameters">Youtube Parameters</a>,
 		<a target="_blank" href="http://www.dailymotion.com/doc/api/player.html#parameters">Dailymotion Parameters</a>,
 		<a target="_blank" href="https://developer.vimeo.com/player/embedding">Vimeo Parameters</a>,
-		<a target="_blank" href="https://nextgenthemes.com/advanced-responsive-video-embedder-pro/documentation">Vimeo Parameters</a>,
+		<a target="_blank" href="https://nextgenthemes.com/arve-pro/documentation">Vimeo Parameters</a>,
 	</p>
 	<?php
 }
@@ -556,42 +568,43 @@ function arve_debug_section_description() {
  */
 function arve_validate_options_main( $input ) {
 
-	//* Storing the Options Section as a empty array will cause the plugin to use defaults
+	// Storing the Options Section as a empty array will cause the plugin to use defaults
 	if( isset( $input['reset'] ) ) {
 		return array();
 	}
 
-	$output = array();
+	$output['align']             = sanitize_text_field( $input['align'] );
+	$output['mode']              = sanitize_text_field( $input['mode'] );
+	$output['last_settings_tab'] = sanitize_text_field( $input['last_settings_tab'] );
+	$output['controlslist']      = sanitize_text_field( $input['controlslist'] );
+	$output['vimeo_api_token']   = sanitize_text_field( $input['vimeo_api_token'] );
 
-	$output['align']              = sanitize_text_field( $input['align'] );
-	$output['mode']               = sanitize_text_field( $input['mode'] );
-	$output['last_settings_tab']  = sanitize_text_field( $input['last_settings_tab'] );
-	$output['controlslist']       = sanitize_text_field( $input['controlslist'] );
-
-	$output['autoplay']          = ( 'yes' == $input['autoplay'] )          ? true : false;
-	$output['promote_link']      = ( 'yes' == $input['promote_link'] )      ? true : false;
-	$output['wp_video_override'] = ( 'yes' == $input['wp_video_override'] ) ? true : false;
+	$output['always_enqueue_assets'] = ( 'yes' == $input['always_enqueue_assets'] ) ? true : false;
+	$output['autoplay']              = ( 'yes' == $input['autoplay'] ) ? true : false;
+	$output['iframe_flash']          = ( 'yes' == $input['iframe_flash'] ) ? true : false;
+	$output['promote_link']          = ( 'yes' == $input['promote_link'] ) ? true : false;
+	$output['wp_video_override']     = ( 'yes' == $input['wp_video_override'] ) ? true : false;
 
 	$output['wp_image_cache_time'] = (int) $input['wp_image_cache_time'];
 
 	if( (int) $input['video_maxwidth'] > 100 ) {
-		$output['video_maxwidth'] = (int) $input['video_maxwidth'];
+		$output['video_maxwidth']  = (int) $input['video_maxwidth'];
 	} else {
-		$output['video_maxwidth'] = '';
+		$output['video_maxwidth']  = '';
 	}
 
 	if( (int) $input['align_maxwidth'] > 100 ) {
-		$output['align_maxwidth'] = (int) $input['align_maxwidth'];
+		$output['align_maxwidth']  = (int) $input['align_maxwidth'];
 	}
 
 	$options_defaults = arve_get_options_defaults( 'main' );
-	//* Store only the options in the database that are different from the defaults.
+	// Store only the options in the database that are different from the defaults.
 	return array_diff_assoc( $output, $options_defaults );
 }
 
 function arve_validate_options_params( $input ) {
 
-	//* Storing the Options Section as a empty array will cause the plugin to use defaults
+	// Storing the Options Section as a empty array will cause the plugin to use defaults
 	if( isset( $input['reset'] ) ) {
 		return array();
 	}

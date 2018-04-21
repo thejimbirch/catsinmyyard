@@ -6,7 +6,6 @@ function arve_shortcode_arve( $input_atts, $content = null, $arve_shortcode = tr
 	$options    = arve_get_options();
 	$properties = arve_get_host_properties();
 	$input_atts = (array) $input_atts;
-	$f_atts = $input_atts;
 
 	$pairs = array(
 		'align'         => $options['align'],
@@ -20,34 +19,33 @@ function arve_shortcode_arve( $input_atts, $content = null, $arve_shortcode = tr
 		'maxwidth'      => (string) $options['video_maxwidth'],
 		'mode'          => $options['mode'],
 		'parameters'    => null,
-		'src'           => null, # Just a alias for url to make it simple
+		'src'           => null, // Just a alias for url to make it simple
 		'thumbnail'     => null,
 		'title'         => null,
 		'upload_date'   => null,
-		# <video>
-		'm4v'          => null,
-		'mp4'          => null,
-		'ogv'          => null,
-		'webm'         => null,
-		'preload'      => 'metadata',
-		'playsinline'  => null,
-		'muted'        => null,
-		'controls'     => 'y',
-		'controlslist' => empty( $options['controlslist'] ) ? null : (string) $options['controlslist'],
-		'loop'         => 'n',
-		# TED only
-		'lang'     => null,
-		# Vimeo only
-		'start'    => null,
-		# Old Shortcodes / URL embeds
-		'id'       => null,
-		'provider' => null,
-		# deprecated, title should be used
-		'link_text' => null,
+		// <video>
+		'm4v'           => null,
+		'mp4'           => null,
+		'ogv'           => null,
+		'webm'          => null,
+		'preload'       => 'metadata',
+		'playsinline'   => null,
+		'muted'         => null,
+		'controls'      => 'y',
+		'controlslist'  => empty( $options['controlslist'] ) ? null : (string) $options['controlslist'],
+		'loop'          => 'n',
+		// TED only
+		'lang'          => null,
+		// Vimeo only
+		'start'         => null,
+		// Old Shortcodes / URL embeds
+		'id'            => null,
+		'provider'      => null,
+		// deprecated, title should be used
+		'link_text'     => null,
 	);
 
 	for ( $n = 1; $n <= ARVE_NUM_TRACKS; $n++ ) {
-
 		$pairs["track_{$n}"]       = null;
 		$pairs["track_{$n}_label"] = null;
 	}
@@ -140,7 +138,7 @@ function arve_shortcode_arve_supported() {
 	$out .= '</tr>';
 	$out .= '<tr>';
 	$out .= '<td></td>';
-	$out .= '<td colspan="6"><a href="https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/documentation/#general-iframe-embedding">All providers with responsive iframe embed codes</a></td>';
+	$out .= '<td colspan="6"><a href="https://nextgenthemes.com/plugins/arve/documentation/#general-iframe-embedding">All providers with responsive iframe embed codes</a></td>';
 	$out .= '</tr>';
 
 	$count = 1;
@@ -164,7 +162,7 @@ function arve_shortcode_arve_supported() {
 
 	$out .= '<tr>';
 	$out .= '<td></td>';
-	$out .= '<td colspan="6"><a href="https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/documentation/#general-iframe-embedding">All providers with responsive iframe embed codes</a></td>';
+	$out .= '<td colspan="6"><a href="https://nextgenthemes.com/plugins/arve/documentation/#general-iframe-embedding">All providers with responsive iframe embed codes</a></td>';
 	$out .= '</tr>';
 	$out .= '</table>';
 

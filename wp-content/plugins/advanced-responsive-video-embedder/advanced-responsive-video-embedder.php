@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name:       ARVE Advanced Responsive Video Embedder
- * Plugin URI:        https://nextgenthemes.com/plugins/advanced-responsive-video-embedder-pro/
+ * Plugin URI:        https://nextgenthemes.com/plugins/arve-pro/
  * Description:       Easy responsive video embeds via URL (like WordPress) or Shortcodes. Supports almost anything you can imagine.
- * Version:           8.7.9
+ * Version:           8.9.2
  * Author:            Nicolas Jonas
  * Author URI:        https://nextgenthemes.com
  * License:           GPL-3.0
@@ -19,7 +19,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 define( 'ARVE_SLUG',                 'advanced-responsive-video-embedder' );
-define( 'ARVE_VERSION',              '8.7.9' );
+define( 'ARVE_VERSION',              '8.9.2' );
 define( 'ARVE_PRO_VERSION_REQUIRED', '4.0.0' );
 
 define( 'ARVE_URL', plugin_dir_url( __FILE__ ) );
@@ -27,12 +27,7 @@ define( 'ARVE_PUBLIC_URL', ARVE_URL . 'public/' );
 define( 'ARVE_ADMIN_URL',  ARVE_URL . 'admin/' );
 
 define( 'ARVE_PATH', plugin_dir_path( __FILE__ ) );
-
 define( 'ARVE_NUM_TRACKS', 10 );
-
-if( ! class_exists( 'EDD_SL_Plugin_Updater' ) ) {
-	require_once __DIR__ . '/admin/class-edd-sl-plugin-updater.php';
-}
 
 #add_action( 'init', 'arve_init' );
 arve_init();
@@ -48,10 +43,8 @@ function arve_init() {
 		return;
 	}
 
-	if ( ! has_action( 'admin_menu', 'nextgenthemes_menus' ) ) {
-		require_once __DIR__ . '/admin/functions-licensing.php';
-	}
-
+	require_once __DIR__ . '/admin/class-nextgenthemes-plugin-updater.php';
+	require_once __DIR__ . '/admin/functions-licensing.php';
 	require_once __DIR__ . '/admin/functions-admin.php';
 	require_once __DIR__ . '/public/functions-enqueue.php';
 	require_once __DIR__ . '/public/functions-html-output.php';
@@ -72,6 +65,7 @@ function arve_init() {
 	add_action( 'plugins_loaded',      'arve_oembed_remove_providers', 998 );
 	add_action( 'wp_enqueue_scripts',  'arve_register_styles', 0 );
 	add_action( 'wp_enqueue_scripts',  'arve_register_scripts', 0 );
+	add_action( 'wp_enqueue_scripts',  'arve_maybe_enqueue_assets' );
 	add_action( 'wp_video_shortcode_override', 'arve_wp_video_shortcode_override', 10, 4 );
 	add_filter( 'widget_text',         'do_shortcode' );
 	add_filter( 'language_attributes', 'arve_html_id' );

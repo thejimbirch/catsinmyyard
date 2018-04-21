@@ -25,7 +25,7 @@ if ( in_array( $plugchimpmail , $plugins ) ) {
   add_filter( 'wpcf7_editor_panels', 'show_mch_metabox' );
   add_action( 'wpcf7_after_save', 'wpcf7_mch_save_mailchimp' );
   add_filter('wpcf7_form_response_output', 'spartan_mce_author_wpcf7', 40,4);
-  add_action( 'wpcf7_before_send_mail', 'wpcf7_mch_subscribe' );
+  add_action( 'wpcf7_before_send_mail', 'wpcf7_mch_subscribe_remote' );
   add_filter( 'wpcf7_form_class_attr', 'spartan_mce_class_attr' );
 }
 
@@ -116,8 +116,7 @@ function spartan_mce_author_wpcf7( $mce_supps, $class, $content, $args ) {
 
 function cf7_mch_tag_replace( $pattern, $subject, $posted_data, $html = false ) {
 
-  if( preg_match($pattern,$subject,$matches) > 0)
-  {
+  if( preg_match($pattern,$subject,$matches) > 0) {
 
     if ( isset( $posted_data[$matches[1]] ) ) {
       $submitted = $posted_data[$matches[1]];
@@ -148,13 +147,10 @@ function cf7_mch_tag_replace( $pattern, $subject, $posted_data, $html = false ) 
 
 
 
-function wpcf7_mch_subscribe($obj) {
+function wpcf7_mch_subscribe_remote($obj) {
   $cf7_mch = get_option( 'cf7_mch_'.$obj->id() );
 
   $submission = WPCF7_Submission::get_instance();
-
-  // $logfileEnabled = $cf7_mch['logfileEnabled'];
-  // $logfileEnabled = ( is_null( $logfileEnabled ) ) ? false : $logfileEnabled;
 
   $logfileEnabled = isset($cf7_mch['logfileEnabled']) && !is_null($cf7_mch['logfileEnabled']) ? $cf7_mch['logfileEnabled'] : false;
 
@@ -188,24 +184,25 @@ function wpcf7_mch_subscribe($obj) {
         }
 
 
-    if( isset($cf7_mch['accept']) && strlen($cf7_mch['accept']) != 0 )
-    {
+    if( isset($cf7_mch['accept']) && strlen($cf7_mch['accept']) != 0 ) {
+
       $accept = cf7_mch_tag_replace( $regex, $cf7_mch['accept'], $submission->get_posted_data() );
-      if($accept != $cf7_mch['accept'])
-      {
+
+      if($accept != $cf7_mch['accept']) {
         if(strlen($accept) > 0)
           $subscribe = true;
       }
-    }
-    else
-    {
+
+    } else {
+
       $subscribe = true;
+
     }
 
     for($i=1;$i<=20;$i++){
 
-      if( isset($cf7_mch['CustomKey'.$i]) && isset($cf7_mch['CustomValue'.$i]) && strlen(trim($cf7_mch['CustomValue'.$i])) != 0 )
-      {
+      if( isset($cf7_mch['CustomKey'.$i]) && isset($cf7_mch['CustomValue'.$i]) && strlen(trim($cf7_mch['CustomValue'.$i])) != 0 ) {
+
         $CustomFields[] = array('Key'=>trim($cf7_mch['CustomKey'.$i]), 'Value'=>cf7_mch_tag_replace( $regex, trim($cf7_mch['CustomValue'.$i]), $submission->get_posted_data() ) );
         $NameField=trim($cf7_mch['CustomKey'.$i]);
         $NameField=strtr($NameField, "[", "");
@@ -216,9 +213,13 @@ function wpcf7_mch_subscribe($obj) {
     }
 
     if( isset($cf7_mch['confsubs']) && strlen($cf7_mch['confsubs']) != 0 ) {
+
       $mce_csu = 'pending';
+
     } else {
+
       $mce_csu = 'subscribed';
+
     }
 
     if($subscribe && $email != $cf7_mch['email']) {
@@ -229,49 +230,87 @@ function wpcf7_mch_subscribe($obj) {
         $cuentarray = count($merge_vars);
 
         //Armando mergerfields
-        foreach($merge_vars as $clave=>$valor)
-
-        {
+        foreach($merge_vars as $clave=>$valor) {
             $cadvar= '"'.$clave.'":"' .$valor. '", ';
-            //var_dump($cadvar);
             $cad_mergefields = $cad_mergefields . $cadvar ;
-            //var_dump($cad_mergefields);
         }
-
 
         $cad_mergefields = substr($cad_mergefields,0,strlen($cad_mergefields) -2);
 
 
-        // Variables for auth and must fields
+        // rj tests
+        // ================================================================
         $api   = $cf7_mch['api'];
-        $dc    = explode("-",$api);
+        $dc    = explode( "-", $api );
+        $urlmcv3 = "https://anystring:$dc[0]@$dc[1].api.mailchimp.com/3.0";
         $list  = $lists;
+        $vc_date = date( 'Md.H:i' );
+        $vc_user_agent = '.' . SPARTAN_MCE_VERSION . '.' . strtolower( $vc_date );  // rj
+        $vc_headers = array( "Content-Type" => "application/json" ) ;
 
-        $datex = date('H.i.s');
-        $url   = "https://anystring:$dc[0]@$dc[1].api.mailchimp.com/3.0/lists/$list";
+
+        // 1
+        // ================================================================
+        $url_get_merge_fields = "$urlmcv3/lists/$list/merge-fields";  //// $urlmcv3
+        $opts = array(
+                  'headers' => $vc_headers,
+                  'user-agent' => 'mce-r' . $vc_user_agent
+                );
+
+        $mergerfield = wp_remote_get( $url_get_merge_fields, $opts );
+        $resultbody = wp_remote_retrieve_body( $mergerfield );
+        $arraymerger = json_decode( $resultbody, True );
+
+        $campreque = array_column($arraymerger['merge_fields'],'required','merge_id'); // arr de req campos
+
+          foreach($campreque as $clave=>$valor) {
+
+              if ($valor) {
+                  $cadreq = '{"required":false}';
+                  $url_edit   = "$urlmcv3/lists/$list/merge-fields/$clave"; //// $urlmcv3
+
+                  $opts = array(
+                            'method' => 'PATCH',
+                            'headers' => $vc_headers,
+                            'body' => $cadreq,
+                            'user-agent' => 'mce-h' . $vc_user_agent
+                          );
+
+                  $resptres = wp_remote_post( $url_edit, $opts );
+
+              }
+
+          }
+
+
+        // 2
+        // ================================================================
+        $url_put   = "$urlmcv3/lists/$list";  //// $urlmcv3
         $info  = '{"members": [
 
-                      { "email_address": "'.$email.'",
-                        "status": "'.$mce_csu.'",
-                        "merge_fields":{ '.$cad_mergefields.' }
-                      }
+                    { "email_address": "'.$email.'",
+                      "status": "'.$mce_csu.'",
+                      "merge_fields":{ '.$cad_mergefields.' }
+                    }
+
                   ],
                   "update_existing": true}';
 
-        $resp = vc_post( $url,$info );
-        //var_dump($resp);
+        $opts = array(
+                  'method' => 'POST',
+                  'headers' => $vc_headers,
+                  'body' => $info,
+                  'user-agent' => 'mce-p' . $vc_user_agent
+                );
 
-        // decode response from MC
-        // =========================================
+        $respenvio = wp_remote_post( $url_put, $opts );
+        $resp = wp_remote_retrieve_body( $respenvio );
+        // $respArr = json_decode( $resultbody,true);
 
-        // $objs  = json_decode($resp);
-        // return $objs;
-        // $array  = json_decode($resp,true);
-
-
+        mce_save_contador();
 
         $mch_debug_logger = new mch_Debug_Logger();
-        $mch_debug_logger->log_mch_debug( 'Contact Form 7 response: Mail sent OK | MailChimp.com response: ' .$resp ,1,$logfileEnabled );
+        $mch_debug_logger->log_mch_debug( 'Contact Form 7 response: Mail sent OK | MailChimp.com response: ' . $resp , 1 , $logfileEnabled );
 
 
       } // end try
@@ -279,12 +318,53 @@ function wpcf7_mch_subscribe($obj) {
       catch (Exception $e) {
 
         $mch_debug_logger = new mch_Debug_Logger();
-        $mch_debug_logger->log_mch_debug( 'Contact Form 7 response: ' .$e->getMessage(),4,$logfileEnabled );
+        $mch_debug_logger->log_mch_debug( 'Contact Form 7 response: ' . $e->getMessage(), 4, $logfileEnabled );
 
       }  // end catch
 
 
     } // end $subscribe
+
+  }
+
+}
+
+
+
+function mce_save_contador() {
+  $option_name = 'mce_sent' ;
+  $new_value = 1 ;
+  $valorvar = get_option( $option_name );
+
+  if ( $valorvar !== false ) {
+
+    update_option( $option_name, $valorvar + 1 );
+
+  } else {
+
+    $deprecated = null;
+    $autoload = 'no';
+    add_option( $option_name, $new_value, $deprecated, $autoload );
+
+  }
+
+}
+
+
+
+function mce_get_contador() {
+  $option_name = 'mce_sent' ;
+  $new_value = 1 ;
+
+  $valorvar = get_option( $option_name );
+
+  if ( $valorvar !== false ) {
+
+    echo 'Contador: '.$valorvar;
+
+  } else {
+
+    echo 'Contador: 0' ;
 
   }
 
@@ -302,7 +382,7 @@ function vc_post( $url, $info, $method = 'POST', $adminEmail = false ){// primar
 
     return cf7mce_use_curl( $url, $info, $method );
 
-  }else{// neither method is available, send mail
+  } else { // neither method is available, send mail
 
     if( !$adminEmail ){ $adminEmail = get_bloginfo( 'admin_email' ); }
     return cf7mce_use_wpmail($url,$info,$method,$adminEmail);
@@ -325,7 +405,6 @@ function cf7mce_use_fopen( $url, $info, $method ){
 
     )
   );
-
   return stream_get_contents(fopen($url,'rb',0,stream_context_create($data)));
 
 }
@@ -390,6 +469,7 @@ function cf7mce_use_curl($url,$info,$method){
 }
 
 
+
 function cf7mce_use_wpmail($url,$info,$method,$adminEmail){
   $msg = "Attempted to send ".$info." to ".$url." but server doesnt support allow_url_fopen OR cURL";
   $wp_mail_resp = wp_mail( $adminEmail,'CF7 Mailchimp Extension Problem',$msg);
@@ -402,11 +482,36 @@ function cf7mce_use_wpmail($url,$info,$method,$adminEmail){
 
 
 
-
-
 function spartan_mce_class_attr( $class ) {
 
   $class .= ' mailchimp-ext-' . SPARTAN_MCE_VERSION;
   return $class;
 
+}
+
+if (! function_exists('array_column')) {
+    function array_column(array $input, $columnKey, $indexKey = null) {
+        $array = array();
+        foreach ($input as $value) {
+            if ( !array_key_exists($columnKey, $value)) {
+                trigger_error("Key \"$columnKey\" does not exist in array");
+                return false;
+            }
+            if (is_null($indexKey)) {
+                $array[] = $value[$columnKey];
+            }
+            else {
+                if ( !array_key_exists($indexKey, $value)) {
+                    trigger_error("Key \"$indexKey\" does not exist in array");
+                    return false;
+                }
+                if ( ! is_scalar($value[$indexKey])) {
+                    trigger_error("Key \"$indexKey\" does not contain scalar value");
+                    return false;
+                }
+                $array[$value[$indexKey]] = $value[$columnKey];
+            }
+        }
+        return $array;
+    }
 }

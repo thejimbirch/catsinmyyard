@@ -39,19 +39,75 @@ function mce_error() {
 add_action('admin_notices', 'mce_error');
 
 
-
 function mce_act_redirect( $plugin ) {
 
   if( $plugin == SPARTAN_MCE_PLUGIN_BASENAME ) {
-
+    mce_save_date_activation();
     exit( wp_redirect( admin_url( 'admin.php?page=wpcf7&post='.mc_get_latest_item().'&active-tab=4' ) ) );
 
   }
 
-
-
 }
 add_action( 'activated_plugin', 'mce_act_redirect' );
+
+
+
+function mce_save_date_activation() {
+  $option_name = 'mce_loyalty' ;
+  $new_value = getdate() ;
+
+  $valorvar = get_option( $option_name );
+
+  if ( $valorvar !== false ) {
+
+    if (empty($valorvar)) {
+        update_option( $option_name, $new_value );
+    }
+
+  } else {
+
+      $deprecated = null;
+      $autoload = 'no';
+      add_option( $option_name, $new_value, $deprecated, $autoload );
+  }
+
+}
+
+
+
+function mce_difer_dateact_date() {
+  $option_name = 'mce_loyalty' ;
+  $today = getdate() ;
+  mce_save_date_activation();
+
+  $date_act = get_option( $option_name );
+
+  $datetime_ini = new DateTime("now");
+  $datetime_fin = new DateTime($date_act['year'].'-'.$date_act['mon'].'-'.$date_act['wday']);
+
+  $fechaF = date_diff($datetime_ini,$datetime_fin);
+
+
+  if ($fechaF->y > 0 ) {
+     if ($fechaF->m > 0 ) {
+        $differenceFormat = '%y Years %m Months %d Days ';
+     } else {
+       $differenceFormat = '%y Years %d Days ';
+     }
+  } else {
+    if ($fechaF->m > 0 ) {
+        $differenceFormat = '%m Months %d Days ';
+     } else {
+       $differenceFormat = '%d Days ';
+     }
+  }
+
+  $resultf = $fechaF->format($differenceFormat);
+
+
+  return $resultf;
+
+}
 
 
 
@@ -118,6 +174,8 @@ if (get_site_option('mce_show_notice') == 1){
   }
 
 }
+
+
 
 function mce_help() {
 

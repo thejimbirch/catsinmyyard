@@ -1,32 +1,53 @@
 <?php
 
-function arve_sc_filter_attr( $a ) {
+function arve_load_vimeo_api( $a ) {
 
+	if ( true ) {
+		require_once ARVE_PATH . '/vendor/autoload.php';
+	}
+
+	return $a;
+}
+
+function arve_get_wrapper_id( $a ) {
+
+	static $wrapper_ids = array();
 	$wrapper_id = null;
-	$align_class = empty( $a['align'] ) ? '' : ' align' . $a['align'];
 
 	foreach ( array( 'id', 'mp4', 'm4v', 'webm', 'ogv', 'url', 'webtorrent' ) as $att ) {
 
 		if ( ! empty( $a[ $att ] ) && is_string( $a[ $att ] ) ) {
-
-			$wrapper_id = preg_replace( '/[^-a-zA-Z0-9]+/', '', $a[ $att ] );
-			$wrapper_id = str_replace(
-				array( 'https', 'http', 'wp-contentuploads' ),
-				'',
-				$wrapper_id
-			);
-			$wrapper_id = 'video-' . $wrapper_id;
+			$wrapper_id = 'arve-' . $a[ $att ];
+			$wrapper_id = preg_replace( '/[^a-zA-Z0-9-]/', '', $wrapper_id );
 			break;
 		}
 	}
 
 	if ( empty( $wrapper_id ) ) {
-		$a['wrapper_id_error'] = new WP_Error( 'embed_id', __( 'Element ID could not be build, please report this bug.', ARVE_SLUG ) );
+		return null;
+	} else {
+		$wrapper_ids[] = $wrapper_id;
 	}
 
-	static $wrapper_id = 0;
+	if ( in_array( $wrapper_id, $wrapper_ids ) ) {
+		$id_counts = array_count_values( $wrapper_ids );
+		$id_count  = $id_counts[ $wrapper_id ];
 
-	$wrapper_id++;
+		if ( $id_count >= 2 ) {
+			$wrapper_id .= '-' . $id_count;
+		}
+	}
+
+	return $wrapper_id;
+}
+
+function arve_sc_filter_attr( $a ) {
+
+	$wrapper_id = arve_get_wrapper_id( $a );
+
+	if ( empty( $wrapper_id ) ) {
+		$a['wrapper_id_error'] = new WP_Error( 'wrapper_id', __( 'Wrapper ID could not be build, please report this bug.', ARVE_SLUG ) );
+	}
 
 	$align_class = empty( $a['align'] ) ? '' : ' align' . $a['align'];
 
@@ -34,7 +55,7 @@ function arve_sc_filter_attr( $a ) {
 		'class'         => "arve-wrapper$align_class",
 		'data-mode'     => $a['mode'],
 		'data-provider' => $a['provider'],
-		'id'            => "arve-video-$wrapper_id",
+		'id'            => $wrapper_id,
 		'style'         => empty( $a['maxwidth'] ) ? false : sprintf( 'max-width:%dpx;', $a['maxwidth'] ),
 		// Schema.org
 		'itemscope' => '',
@@ -64,7 +85,7 @@ function arve_sc_filter_attr( $a ) {
 	} else {
 
 		$properties = arve_get_host_properties();
-
+		$options    = arve_get_options();
 		$iframe_src = arve_build_iframe_src( $a );
 		$iframe_src = arve_add_query_args_to_iframe_src( $iframe_src, $a );
 		$iframe_src = arve_add_autoplay_query_arg( $iframe_src, $a );
@@ -73,27 +94,27 @@ function arve_sc_filter_attr( $a ) {
 			$iframe_src .= '#t=' . (int) $a['start'];
 		}
 
-		$iframe_sandbox = 'allow-scripts allow-same-origin allow-presentation allow-popups';
-
-		if ( 'vimeo' == $a['provider'] ) {
-			$iframe_sandbox .= ' allow-forms';
-		}
-
-		if ( null === $a['disable_flash'] && $properties[ $a['provider'] ]['requires_flash'] ) {
-			$iframe_sandbox = false;
-		}
-
 		$a['iframe_attr'] = array(
 			'allowfullscreen' => '',
-			'class'       => 'arve-iframe fitvidsignore',
-			'frameborder' => '0',
-			'name'        => $a['iframe_name'],
-			'scrolling'   => 'no',
-			'src'         => $iframe_src,
-			'sandbox'     => $iframe_sandbox,
-			'width'       => empty( $a['width'] )  ? false : $a['width'],
-			'height'      => empty( $a['height'] ) ? false : $a['height'],
+			'class'           => 'arve-iframe fitvidsignore',
+			'frameborder'     => '0',
+			'name'            => $a['iframe_name'],
+			'scrolling'       => 'no',
+			'src'             => $iframe_src,
+			'sandbox'         => 'allow-scripts allow-same-origin allow-presentation allow-popups',
+			'width'           => empty( $a['width'] )  ? false : $a['width'],
+			'height'          => empty( $a['height'] ) ? false : $a['height'],
 		);
+
+		if ( 'vimeo' == $a['provider'] ) {
+			$a['iframe_attr']['sandbox'] .= ' allow-forms';
+		}
+
+		$properties['iframe']['requires_flash'] = $options['iframe_flash'];
+
+		if ( null === $a['disable_flash'] && $properties[ $a['provider'] ]['requires_flash'] ) {
+			$a['iframe_attr']['sandbox'] = false;
+		}
 	}
 
 	return $a;
@@ -143,12 +164,10 @@ function arve_sc_filter_sanitise( $atts ) {
 
 	foreach ( $atts as $key => $value ) {
 
-		if ( null === $value ) {
-			continue;
-		}
+		$atts[ $key ] = (string) $value;
 
-		if( ! is_string( $value ) ) {
-			$atts[ $key ] = arve_error( sprintf( __( '<code>%s</code> is not a string. Only Strings should be passed to the shortcode function', ARVE_SLUG ), $key ) );
+		if ( '' === $value ) {
+			$atts[ $key ] = null;
 		}
 	}
 
@@ -402,21 +421,21 @@ function arve_sc_filter_build_tracks_html( $atts ) {
 			return $atts;
 		}
 
-		preg_match( '#-(captions|chapters|descriptions|metadata|subtitles)-([a-z]{2}).vtt$#i', $atts[ "track_{$n}" ], $matches );
+		preg_match( '#-(?<type>captions|chapters|descriptions|metadata|subtitles)-(?<lang>[a-z]{2}).vtt$#i', $atts[ "track_{$n}" ], $matches );
 
 		if ( empty( $matches[1] ) ) {
 			$atts[ "track_{$n}" ] = new WP_Error( 'track', __( 'Track kind or language code could not detected from filename', ARVE_SLUG ) );
 			return $atts;
 		}
 
-		$label = empty( $atts[ "track_{$n}_label" ] ) ? arve_get_language_name_from_code( $matches[2] ) : $atts[ "track_{$n}_label" ];
+		$label = empty( $atts[ "track_{$n}_label" ] ) ? arve_get_language_name_from_code( $matches['lang'] ) : $atts[ "track_{$n}_label" ];
 
 		$attr = array(
 			'default' => ( 1 === $n ) ? true : false,
-			'kind'    => $matches[1],
+			'kind'    => $matches['type'],
 			'label'   => $label,
 			'src'     => $atts[ "track_{$n}" ],
-			'srclang' => $matches[2],
+			'srclang' => $matches['lang'],
 		);
 
 		$atts['video_tracks_html'] .= sprintf( '<track%s>', arve_attr( $attr) );

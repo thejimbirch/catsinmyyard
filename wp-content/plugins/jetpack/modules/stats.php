@@ -702,6 +702,7 @@ function stats_convert_post_titles( $html ) {
 			'post_type' => 'any',
 			'post_status' => 'any',
 			'numberposts' => -1,
+			'suppress_filters' => false,
 		)
 	);
 	foreach ( $posts as $post ) {
@@ -1248,6 +1249,9 @@ jQuery( function($) {
 #stats-info #top-posts, #stats-info #top-search {
 	float: left;
 	width: 50%;
+}
+#stats-info #top-posts {
+	padding-right: 3%;
 }
 #top-posts .stats-section-inner p {
 	white-space: nowrap;

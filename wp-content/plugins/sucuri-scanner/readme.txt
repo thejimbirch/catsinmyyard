@@ -1,10 +1,10 @@
 === Sucuri Security - Auditing, Malware Scanner and Security Hardening ===
 Contributors: dd@sucuri.net
 Donate Link: https://sucuri.net/
-Tags: malware, security, firewall, scan, spam, virus, sucuri, protection, WordPress Security, Login Security, Security Auditing, File Integrity, htaccess, phishing, backdoors, SQL Injection, RFI, LFI, XSS, CSRF, website firewall, Website Security, Performance Optimization, Zero Day, Software Vulnerability, Exploits, Hacks, Attackers, Bad Actors, Reverse Proxy, Two Factor Security, Two Factor Authentication, Security Logs, HeatBleed Vulnerability, Website Protection, Bash Vulnerability, RevSlider Vulnerability, MailPoet Vulnerability, Malware Prevention, Website Security, Website Firewall, Website AntiVirus, Security Response, Security Detection, Security Prevention
+Tags: malware, security, firewall, scan, spam, virus, sucuri, protection, blacklist, detection, hardening, file integrity
 Requires at least: 3.6
 Tested up to: 4.9.4
-Stable tag: 1.8.14
+Stable tag: 1.8.15
 
 The Sucuri WordPress Security plugin is a security toolset for security integrity monitoring, malware detection and security hardening.
 
@@ -181,10 +181,16 @@ No, it is not required. The Website Firewall runs in the cloud without the need 
 
 == Upgrade Notice ==
 
-= 1.8.14 =
+= 1.8.15 =
 This version adds support for the latest version of WordPress. Introduces new features and fixes some bugs reported by the WordPress community as well as bugs found by our automated testing system.
 
 == Changelog ==
+
+= 1.8.15 =
+* Make default plugin options filterable
+* Fix missing button to manually activate the advanced features
+* Remove unnecessary tags from README per WordPress guidelines
+* Modify resolution of the images to respect retina display
 
 = 1.8.14 =
 * Add filter to allow automatic configuration of the settings

@@ -3,9 +3,11 @@ Contributors: hishaman, schemapress
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NGVUBT2QXN7YL
 Tags: schema, schema.org, json, json-ld, google, seo, structured data, markup, search engine, search, rich snippets, breadcrumbs, social, post, page, plugin, wordpress, content, article, news, search results, site name, knowledge graph, social, social profiles, keywords, meta-tags, metadata, tags, categories, optimize, ranking, search engine optimization, search engines, serp, sitelinks, google sitelinks, sitelinks search box, google sitelinks search box, semantic, structured, canonical, custom post types, post type, title, terms, media, images, thumb, featured, url, video, video markup, video object, VideoObject, video schema, audio object, AudioObject, audio schema, audio, sameAs, about, contact, amp, mobile, taxonomy
 Requires at least: 4.0
-Tested up to: 4.9
+Tested up to: 4.9.6
 Requires PHP: 5.4
-Stable tag: 1.6.9.8.1
+Stable tag: 1.7
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Get the next generation of Schema Structured Data to enhance your WordPress site presentation in Google search results.
 
@@ -51,7 +53,7 @@ Schema markup is code (semantic vocabulary) that you put on your website to help
 
 **Supported Schema Types**
  
-* Creative Works
+* Creative Work
  * [Article](https://schema.org/Article) enabled on Pages
   * [BlogPosting](https://schema.org/BlogPosting) enabled on Posts
   * [NewsArticle](https://schema.org/NewsArticle)
@@ -60,9 +62,12 @@ Schema markup is code (semantic vocabulary) that you put on your website to help
   * [TechArticle](https://schema.org/TechArticle)
 
 * [Blog](https://schema.org/Blog) to markup Blog posts list page.
+* [WPHeader](https://schema.org/WPHeader) to markup Web Page Header.
+* [WPFooter](https://schema.org/WPFooter) to markup Web Page Footer.
 * [BreadcrumbList](https://schema.org/BreadcrumbList) to markup Breadcrumbs.
 * [CollectionPage](https://schema.org/CollectionPage) to markup Categories Archives.
 * [CollectionPage](https://schema.org/CollectionPage) to markup Tags Archives.
+* [ItemList](https://schema.org/ItemList) to markup Post Type Archives.
 * [AboutPage](https://schema.org/AboutPage) to markup the About page.
 * [ContactPage](https://schema.org/ContactPage) to markup the Contact page.
 * [Person](https://schema.org/Person) enabled on Author pages
@@ -71,6 +76,8 @@ Schema markup is code (semantic vocabulary) that you put on your website to help
 
 **Supported Plugins**
 
+Schema plugin integrates, and play nicely with (not necessarily a full integration):
+
  * Yoast SEO
  * AMP plugin
  * WPRichSnippets
@@ -78,6 +85,7 @@ Schema markup is code (semantic vocabulary) that you put on your website to help
  * Visual Composer
  * ThirstyAffiliates
  * WooCommerce
+ * Easy Digital Downloads (EDD)
 
 **Supported Themes**
 
@@ -144,8 +152,35 @@ Yes, Schema plugin will detect AMP plugin and output a more complete and valid s
 2. Create new schema type screen.
 3. Create post meta fields with Post Meta Box generator feature.
 4. Google Structured Data Testing Tool.
+5. Configuration Wizard.
 
 == Changelog ==
+
+= 1.7 =
+* Fixed some typos and wording in the plugin settings.
+* Enhanced plugin settings usability by adding functionality for tooltips.
+* Enhanced plugin settings by show/hide settings based on selection. 
+* Enhanced plugin settings by showing Schema plugin version in settings page title.
+* Added check if Genesis Framework functions exists before unhook site Header and Footer.
+* Added new step by step settings configuration setup wizard.
+* Added new settings for Site type.
+* Moved Social Profiles to its own sub tab in plugin settings.
+* Moved Yoast SEO setting under Advanced settings tab.
+* Updated the Welcome page, added link to configuration wizard.
+* Updated readme.txt file.
+
+= 1.6.9.8.2 =
+* Fixed typos when return false in a couple of functions.
+* Fixed fatal errors caused due duplicate function names with other plugin in post meta.
+* Fixed ImageObject output in the About and Contact pages.
+* Fixed the About admin sub menu item url, it was not pointing correctly in some cases.
+* Fixed duplicate schema output in some cases when Sitelinks Search Box is enabled. 
+* Removed the Auto Featured Image feature, it was causing several issues.
+* Removed class-settings.php file, which was not used in the plugin.
+* Reverted all changes made in version 1.6.9.8 back, since issue has been solved!
+* Updated Chosen script and CSS to version 1.8.5 for post meta fields.
+* Updated the plugin welcome page.
+* Updated readme.txt file to include GPL license details.
 
 = 1.6.9.8.1 =
 * Reverted back all changes made in version 1.6.9.8, since it breaks!
@@ -586,8 +621,14 @@ Yes, Schema plugin will detect AMP plugin and output a more complete and valid s
 
 == Upgrade Notice ==
 
+= 1.7 =
+In this release, we have introduced new settings page and step-by-step settings Configuration Wizard. Please, update the plugin on your website now to get fixes and enhancements.
+
+= 1.6.9.8.2 =
+In this release, most of the reported bugs has been fixed. Please, update the plugin on your website now to get fixes and enhancements.
+
 = 1.6.9.8.1 =
-In this update, we have reverted back and removed all changes made in version 1.6.9.8, since it seems to be broken! Please, update the plugin on your website now to get fixes.
+In this release, we reverted back to 1.6.9.8, update the plugin on your website now to get fixes.
 
 = 1.6.9.8 =
 In this release, most of the reported bugs has been fixed, including a fix for Easy Digital Downloads plugin. Also, new features has been introduced, example WPHeader and WPFooter markups, and support for ItemList markup on post types archive pages. Please, update the plugin on your website now to get fixes and enhancements.

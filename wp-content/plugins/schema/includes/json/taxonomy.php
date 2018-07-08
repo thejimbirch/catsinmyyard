@@ -17,6 +17,11 @@ add_action('wp_head', 'schema_wp_output_taxonomy');
  */
 function schema_wp_output_taxonomy() {
 	
+	// filter this and return false to disable the function
+	$enabled = apply_filters('schema_wp_output_taxonomy_enabled', true);
+	if ( ! $enabled)
+		return;
+		
 	if ( is_admin() ) return;
 	
 	// Run only on taxonomy pages

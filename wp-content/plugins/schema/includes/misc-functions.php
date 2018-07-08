@@ -13,6 +13,28 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
+ * Check if post type is enabled
+ *
+ * @since 1.6.9.8
+ *
+ * @param int $post_type The post type.
+ * @return string post ID, or false
+ */
+function schema_wp_is_post_type_enabled( $post_type = null ) {
+	
+	if ( ! isset($post_type) ) $post_type = get_post_type();
+	if ( ! isset($post_type) ) 
+		return false;
+	
+	$enabled 			= false;
+	$enabled_post_types	= schema_wp_cpt_get_enabled_post_types();
+	
+	if ( in_array( $post_type, $enabled_post_types, false ) )  $enabled = true;
+	
+	return apply_filters( 'schema_wp_is_post_type_enabled', $enabled );
+}
+
+/**
  * Get schema ref for a post
  *
  * @since 1.6.9.5
@@ -28,7 +50,7 @@ function schema_wp_get_ref( $post_id = null ) {
 	
 	$schema_ref = get_post_meta( $post_id, '_schema_ref', true );
 	
-	If ( ! isset($schema_ref) ) $schema_ref = false;
+	If ( ! isset($schema_ref) ) $schema_ref = fasle;
 	
 	return apply_filters( 'schema_wp_ref', $schema_ref );
 }
@@ -78,7 +100,7 @@ function schema_wp_get_jsonld( $post_id = null ) {
 	
 	$schema_json = get_post_meta( $post_id, '_schema_json', true);
 	
-	If ( ! isset($schema_json )) $schema_json = false;
+	If ( ! isset($schema_json )) $schema_json = fasle;
 	
 	return apply_filters( 'schema_wp_json', $schema_json );
 }
@@ -105,7 +127,7 @@ function schema_wp_get_publisher_array() {
 	$publisher = array(
 		"@type"	=> "Organization",	// default required value
 		"@id" => get_bloginfo("url") . "/#organization",
-		"name"	=> $name,
+		"name"	=> wp_filter_nohtml_kses($name),
 		"logo"	=> array(
     		"@type" => "ImageObject",
     		"url" => $logo,
@@ -160,6 +182,8 @@ function schema_wp_cpt_get_enabled() {
 		
 	endforeach;
  	
+	wp_reset_postdata();
+	
 	// debug
 	//echo '<pre>'; print_r($cpt_enabled); echo '</pre>'; exit;
 	
@@ -460,6 +484,31 @@ function schema_save_categories( $post_id, $post, $update ) {
 	$post_categories = schema_wp_get_categories( $post_id );
 	
 	update_post_meta($post_id, '_schema_categories', $post_categories);
+}
+
+/**
+ * Get categories as a comma separated keywords
+ *
+ * @since 1.6.9.8
+ * @return string
+ */
+function schema_wp_get_categories_as_keywords() {
+	
+	$categories = get_categories( array(
+    	'orderby' => 'name',
+    	'order'   => 'ASC'
+	) );
+	
+	$cat = array();
+	
+	foreach ( $categories as $category ) {
+    	$cat[] = $category->name;
+	}
+	
+	// transform into a comma separated string
+	$cat = implode(", ", $cat);
+	
+	return apply_filters( 'schema_wp_get_categories', $cat );
 }
 
 /**
@@ -767,4 +816,50 @@ function schema_wp_get_archive_link( $post_type ) {
 		$archive_link = get_option( 'siteurl' ) . "/{$slug}/";
 	}
 	return apply_filters( 'schema_wp_archive_link', $archive_link, $post_type );
+}
+
+/**
+ * Get blog posts page URL.
+ *
+ * @source https://gist.github.com/kellenmace/9ef19dd86580cb7e63720b396c8c2721
+ * @since 1.6.9.8
+ * @return string The blog posts page URL.
+ */
+function schema_wp_get_blog_posts_page_url() {
+	// If front page is set to display a static page, get the URL of the posts page.
+	if ( 'page' === get_option( 'show_on_front' ) ) {
+		return get_permalink( get_option( 'page_for_posts' ) );
+	}
+	// The front page IS the posts page. Get its URL.
+	return get_home_url();
+}
+
+/**
+ * Get First Post Date Function
+ *
+ * @since 1.6.9.8
+ * @param  $format Type of date format to return, using PHP date standard, default Y-m-d
+ * @return Date of first post
+ */
+function schema_wp_first_post_date( $format = 'Y-m-d' ) {
+	// Setup get_posts arguments
+	$ax_args = array(
+		'numberposts' => -1,
+		'post_status' => 'publish',
+		'order' => 'ASC'
+	);
+
+	// Get all posts in order of first to last
+	$ax_get_all = get_posts($ax_args);
+
+	// Extract first post from array
+	$ax_first_post = $ax_get_all[0];
+
+	// Assign first post date to var
+	$ax_first_post_date = $ax_first_post->post_date;
+
+	// return date in required format
+	$output = date($format, strtotime($ax_first_post_date));
+
+	return $output;
 }

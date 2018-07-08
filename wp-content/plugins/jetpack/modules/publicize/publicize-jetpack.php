@@ -138,6 +138,27 @@ class Publicize extends Publicize_Base {
 		return false;
 	}
 
+	function get_all_connections_for_user() {
+		$connections = Jetpack_Options::get_option( 'publicize_connections' );
+
+		$connections_to_return = array();
+		if ( ! empty( $connections ) ) {
+			foreach ( (array) $connections as $service_name => $connections_for_service ) {
+				foreach ( $connections_for_service as $id => $connection ) {
+					$user_id = intval( $connection['connection_data']['user_id'] );
+					// phpcs:ignore WordPress.PHP.YodaConditions.NotYoda
+					if ( $user_id === 0 || $this->user_id() === $user_id ) {
+						$connections_to_return[ $service_name ][ $id ] = $connection;
+					}
+				}
+			}
+
+			return $connections_to_return;
+		}
+
+		return false;
+	}
+
 	function get_connection_id( $connection ) {
 		return $connection['connection_data']['id'];
 	}
@@ -395,6 +416,10 @@ class Publicize extends Publicize_Base {
 	}
 
 	function flag_post_for_publicize( $new_status, $old_status, $post ) {
+		if ( ! $this->post_type_is_publicizeable( $post->post_type ) ) {
+			return;
+		}
+
 		if ( 'publish' == $new_status && 'publish' != $old_status ) {
 			/**
 			 * Determines whether a post being published gets publicized.

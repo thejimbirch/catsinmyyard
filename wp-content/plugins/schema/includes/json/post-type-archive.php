@@ -19,11 +19,18 @@ function schema_wp_output_post_type_archive() {
 	
 	global $post;
 	
-	$post_type = get_post_type();
-	
 	// Run only on blog list page
 	if ( is_post_type_archive() ) { 
-		
+	
+		$post_type = get_post_type();
+	
+		$enabled = schema_wp_is_post_type_enabled( $post_type ) ;
+		if ( ! $enabled) return;
+	
+		//add_filter( 'edd_add_schema_microdata', '__return_false' );
+		// add action to hook to this function
+		do_action('schema_wp_action_post_type_archive');
+
 		$json = schema_wp_get_post_type_archive_json( $post_type );
 		
 		$output = '';
@@ -43,7 +50,6 @@ function schema_wp_output_post_type_archive() {
 	}
 }
 
-
 /**
  * The main function responsible for putting shema array all together
  *
@@ -60,8 +66,6 @@ function schema_wp_get_post_type_archive_json( $post_type ) {
 	//var_dump( $GLOBALS['wp_query'] );
 	
 	if ( empty($wp_query->query_vars) ) return;
-	
-	
 	
 	$blogPost 	= array();
 	$schema 	= array();
@@ -104,18 +108,21 @@ function schema_wp_get_post_type_archive_json( $post_type ) {
 		$post_type_archive_title = post_type_archive_title( __(''), false );
 		$obj = get_post_type_object( $post_type );
 		
-		// put all together
-		$schema = array
-        (
-			'@context' 			=> 'http://schema.org/',
-			'@type' 			=> array('ItemList', 'CreativeWork'),
-			'name' 				=> ($post_type_archive_title) ? $post_type_archive_title : get_bloginfo( 'name' ),
-			'description' 		=> isset($obj->description) ? $obj->description : '',
-			'url' 				=> $url,
-			'itemListOrder' 	=> 'http://schema.org/ItemListOrderAscending',
-			'numberOfItems' 	=> count($blogPost),
-			'itemListElement' 	=> $blogPost,
-        );
+		if ( ! empty($blogPost)) {
+			// put all together
+			$schema = array
+        	(
+				'@context' 			=> 'http://schema.org/',
+				//'@type' 			=> array('ItemList', 'CreativeWork', 'WebPage'),
+				'@type' 			=> array('ItemList', 'CreativeWork'),
+				'name' 				=> isset($post_type_archive_title) ? $post_type_archive_title : get_bloginfo( 'name' ),
+				'description' 		=> isset($obj->description) ? $obj->description : '',
+				'url' 				=> $url,
+				'itemListOrder' 	=> 'http://schema.org/ItemListOrderAscending',
+				'numberOfItems' 	=> count($blogPost),
+				'itemListElement' 	=> $blogPost,
+        	);
+		}
 				
 	endif;
 	

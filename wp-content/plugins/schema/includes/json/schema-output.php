@@ -235,7 +235,7 @@ function schema_wp_get_schema_json_prepare( $post_id = null ) {
 	$content_post		= get_post($post_id);
 	
 	// Get description
-	$description = schema_wp_get_description( $post_id );
+	$description 		= schema_wp_get_description( $post_id );
 	
 	// Stuff for any page, if it exists
 	$permalink			= get_permalink( $post_id) ;

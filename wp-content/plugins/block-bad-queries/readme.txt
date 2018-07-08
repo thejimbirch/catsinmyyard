@@ -11,8 +11,8 @@ Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsul
 Donate link: https://m0n.co/donate
 Requires at least: 4.1
 Tested up to: 4.9
-Stable tag: 20171101
-Version: 20171101
+Stable tag: 20180511
+Version: 20180511
 Requires PHP: 5.2
 Text Domain: block-bad-queries
 Domain Path: /languages
@@ -28,6 +28,9 @@ The fastest firewall plugin for WordPress.
 > Powerful protection from WP's __fastest__ firewall plugin.
 
 [Block Bad Queries](https://perishablepress.com/block-bad-queries/) (BBQ) is a simple, super-fast plugin that protects your site against malicious URL requests. BBQ checks all incoming traffic and quietly blocks bad requests containing nasty stuff like `eval(`, `base64_`, and excessively long request-strings. This is a simple yet solid solution for sites that are unable to use a [strong .htaccess firewall](https://perishablepress.com/6g/). 
+
+> GDPR-compliant: does not collect any user data
+> Gutenberg-compliant: works perfectly with or without Gutenberg
 
 **Awesome Features**
 
@@ -46,6 +49,7 @@ The fastest firewall plugin for WordPress.
 * Hassle-free security plugin that's easy to use
 * Thoroughly tested, error-free performance
 * Compatible with other security plugins
+* Regularly updated and "future proof"
 * Customize blocked strings via [Whitelist/Blacklist plugins](https://perishablepress.com/bbq-whitelist-blacklist/)
 
 **Pro Version**
@@ -160,16 +164,23 @@ I develop and maintain this free plugin with love for the WordPress community. T
 
 And/or purchase one of my premium WordPress plugins:
 
-* [BBQ Pro](https://plugin-planet.com/bbq-pro/) - Pro version of Block Bad Queries
-* [Blackhole Pro](https://plugin-planet.com/blackhole-pro/) - Pro version of Blackhole for Bad Bots
-* [SES Pro](https://plugin-planet.com/ses-pro/) - Super-simple &amp; flexible email signup forms
-* [USP Pro](https://plugin-planet.com/usp-pro/) - Pro version of User Submitted Posts
+* [BBQ Pro](https://plugin-planet.com/bbq-pro/) - Super fast WordPress firewall
+* [Blackhole Pro](https://plugin-planet.com/blackhole-pro/) - Automatically block bad bots
+* [Banhammer Pro](https://plugin-planet.com/banhammer-pro/) - Monitor traffic and ban the bad guys
+* [USP Pro](https://plugin-planet.com/usp-pro/) - Unlimited front-end forms
 
 Links, tweets and likes also appreciated. Thank you! :)
 
 
 
 == Changelog ==
+
+**2018/05/11**
+
+* Adds `xrumer` to blocked query strings and request URIs
+* Adds `indoxploi` to blocked query strings and request URIs
+* Generates new translation template
+* Tests on WordPress 5.0
 
 **2017/11/01**
 

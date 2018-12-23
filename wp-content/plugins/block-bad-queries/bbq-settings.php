@@ -47,7 +47,7 @@ function bbq_validate_options($input) {
 function bbq_settings_section_general() {
 	
 	echo '<p>'. esc_html__('Thanks for using the free version of ', 'block-bad-queries');
-	echo '<a target="_blank" href="https://wordpress.org/plugins/block-bad-queries/">'. esc_html__('Block Bad Queries (BBQ)', 'block-bad-queries') .'</a>.</p>';
+	echo '<a target="_blank" rel="noopener noreferrer" href="https://wordpress.org/plugins/block-bad-queries/">'. esc_html__('Block Bad Queries (BBQ)', 'block-bad-queries') .'</a>.</p>';
 	echo '<p>'. esc_html__('The free version is completely plug-&amp;-play, protecting your site automatically with no settings required.', 'block-bad-queries') .'</p>';
 	
 }
@@ -61,11 +61,11 @@ function bbq_settings_section_upgrade() {
 	
 	$upgrade  = '<p>';
 	$upgrade .= $text;
-	$upgrade .= '<a target="_blank" href="'. $url .'">'. esc_html__('Get BBQ Pro &raquo;', 'block-bad-queries') .'</a>';
+	$upgrade .= '<a target="_blank" rel="noopener noreferrer" href="'. $url .'">'. esc_html__('Get BBQ Pro &raquo;', 'block-bad-queries') .'</a>';
 	$upgrade .= '</p>';
 	
 	$upgrade .= '<p class="bbq-pro">';
-	$upgrade .= '<a target="_blank" href="'. $url .'" title="'. $text .'"><img src="'. $src .'" width="480" height="125" alt="'. $alt .'"></a>';
+	$upgrade .= '<a target="_blank" rel="noopener noreferrer" href="'. $url .'" title="'. $text .'"><img src="'. $src .'" width="480" height="125" alt="'. $alt .'"></a>';
 	$upgrade .= '</p>';
 	
 	echo $upgrade;
@@ -99,7 +99,7 @@ function bbq_action_links($links, $file) {
 		$pro_text  = esc_html__('Go&nbsp;Pro', 'block-bad-queries');
 		$pro_style = esc_attr('font-weight:bold;');
 		
-		$pro_link  = '<a target="_blank" href="'. $pro_url .'" title="'. $pro_title .'" style="'. $pro_style .'">'. $pro_text .'</a>';
+		$pro_link  = '<a target="_blank" rel="noopener noreferrer" href="'. $pro_url .'" title="'. $pro_title .'" style="'. $pro_style .'">'. $pro_text .'</a>';
 		
 		array_unshift($links, $pro_link, $settings_link);
 		
@@ -114,11 +114,17 @@ function bbq_meta_links($links, $file) {
 	
 	if ($file == BBQ_FILE) {
 		
+		$home_href  = 'https://perishablepress.com/block-bad-queries/';
+		$home_title = esc_attr__('Plugin Homepage', 'block-bad-queries');
+		$home_text  = esc_html__('Homepage', 'block-bad-queries');
+		
+		$links[] = '<a target="_blank" rel="noopener noreferrer" href="'. $home_href .'" title="'. $home_title .'">'. $home_text .'</a>';
+		
 		$rate_url   = esc_url('https://wordpress.org/support/plugin/block-bad-queries/reviews/?rate=5#new-post');
 		$rate_title = esc_attr__('Click here to rate and review this plugin at WordPress.org', 'block-bad-queries');
 		$rate_text  = esc_html__('Rate this plugin&nbsp;&raquo;', 'block-bad-queries');
 		
-		$links[] = '<a target="_blank" href="'. $rate_url .'" title="'. $rate_title .'">'. $rate_text .'</a>';
+		$links[] = '<a target="_blank" rel="noopener noreferrer" href="'. $rate_url .'" title="'. $rate_title .'">'. $rate_text .'</a>';
 		
 	}
 	

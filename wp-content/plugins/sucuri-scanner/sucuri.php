@@ -6,7 +6,7 @@
  * Plugin URI: https://wordpress.sucuri.net/
  * Author URI: https://sucuri.net/
  * Author: Sucuri Inc.
- * Version: 1.8.18
+ * Version: 1.8.19
  *
  * PHP version 5
  *
@@ -83,7 +83,7 @@ define('SUCURISCAN', 'sucuriscan');
 /**
  * Current version of the plugin's code.
  */
-define('SUCURISCAN_VERSION', '1.8.18');
+define('SUCURISCAN_VERSION', '1.8.19');
 
 /**
  * Defines the human readable name of the plugin.
@@ -252,6 +252,7 @@ function sucuriscanResetAndDeactivate()
 {
     /* Delete scheduled task from the system */
     wp_clear_scheduled_hook('sucuriscan_scheduled_scan');
+    SucuriScanEvent::reportDebugEvent('Sucuri plugin has been deactivated');
 }
 
 /**
@@ -303,6 +304,8 @@ function sucuriscanUninstall()
     $fifo->run_recursively = false;
     $directory = SucuriScan::dataStorePath();
     $fifo->removeDirectoryTree($directory);
+
+    SucuriScanEvent::reportDebugEvent('Sucuri plugin has been uninstalled');
 }
 
 register_deactivation_hook(__FILE__, 'sucuriscanResetAndDeactivate');

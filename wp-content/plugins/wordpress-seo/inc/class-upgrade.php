@@ -9,6 +9,7 @@
  * This code handles the option upgrades
  */
 class WPSEO_Upgrade {
+
 	/**
 	 * Class constructor
 	 */
@@ -117,6 +118,10 @@ class WPSEO_Upgrade {
 
 		if ( version_compare( $version, '7.7.2-RC0', '<' ) ) {
 			$this->upgrade_772();
+		}
+
+		if ( version_compare( $version, '9.0-RC0', '<' ) ) {
+			$this->upgrade90();
 		}
 
 		// Since 3.7.
@@ -275,12 +280,8 @@ class WPSEO_Upgrade {
 	 * Removes the about notice when its still in the database.
 	 */
 	private function upgrade_40() {
-		$center       = Yoast_Notification_Center::get();
-		$notification = $center->get_notification_by_id( 'wpseo-dismiss-about' );
-
-		if ( $notification ) {
-			$center->remove_notification( $notification );
-		}
+		$center = Yoast_Notification_Center::get();
+		$center->remove_notification_by_id( 'wpseo-dismiss-about' );
 	}
 
 	/**
@@ -306,7 +307,7 @@ class WPSEO_Upgrade {
 		$wpdb->query(
 			$wpdb->prepare(
 				'UPDATE ' . $wpdb->postmeta . ' SET meta_key = %s WHERE meta_key = "yst_is_cornerstone"',
-				WPSEO_Cornerstone::META_NAME
+				WPSEO_Cornerstone_Filter::META_NAME
 			)
 		);
 	}
@@ -597,7 +598,7 @@ class WPSEO_Upgrade {
 	 */
 	private function upgrade_77() {
 		// Remove all OpenGraph content image cache.
-		delete_post_meta_by_key( '_yoast_wpseo_post_image_cache' );
+		$this->delete_post_meta( '_yoast_wpseo_post_image_cache' );
 	}
 
 	/**
@@ -608,6 +609,40 @@ class WPSEO_Upgrade {
 	private function upgrade_772() {
 		if ( WPSEO_Utils::is_woocommerce_active() ) {
 			$this->migrate_woocommerce_archive_setting_to_shop_page();
+		}
+	}
+
+	/**
+	 * Performs the 9.0 upgrade.
+	 *
+	 * @return void
+	 */
+	private function upgrade90() {
+		global $wpdb;
+
+		// Invalidate all sitemap cache transients.
+		WPSEO_Sitemaps_Cache_Validator::cleanup_database();
+
+		// Removes all scheduled tasks for hitting the sitemap index.
+		wp_clear_scheduled_hook( 'wpseo_hit_sitemap_index' );
+
+		$wpdb->query( 'DELETE FROM ' . $wpdb->options . ' WHERE option_name LIKE "wpseo_sitemap_%"' );
+	}
+
+	/**
+	 * Removes the post meta fields for a given meta key.
+	 *
+	 * @param string $meta_key The meta key.
+	 *
+	 * @return void
+	 */
+	private function delete_post_meta( $meta_key ) {
+		global $wpdb;
+
+		$deleted = $wpdb->delete( $wpdb->postmeta, array( 'meta_key' => $meta_key ), array( '%s' ) );
+
+		if ( $deleted ) {
+			wp_cache_set( 'last_changed', microtime(), 'posts' );
 		}
 	}
 

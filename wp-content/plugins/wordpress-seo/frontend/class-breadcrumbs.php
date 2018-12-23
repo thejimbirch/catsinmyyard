@@ -11,7 +11,7 @@
 class WPSEO_Breadcrumbs {
 
 	/**
-	 * @var    object    Instance of this class
+	 * @var object    Instance of this class
 	 */
 	public static $instance;
 
@@ -27,12 +27,12 @@ class WPSEO_Breadcrumbs {
 
 
 	/**
-	 * @var    string    Blog's show on front setting, 'page' or 'posts'
+	 * @var string    Blog's show on front setting, 'page' or 'posts'
 	 */
 	private $show_on_front;
 
 	/**
-	 * @var    mixed    Blog's page for posts setting, page id or false
+	 * @var mixed    Blog's page for posts setting, page id or false
 	 */
 	private $page_for_posts;
 
@@ -57,7 +57,7 @@ class WPSEO_Breadcrumbs {
 	private $wrapper = 'span';
 
 	/**
-	 * @var    array    Array of crumbs
+	 * @var array    Array of crumbs
 	 *
 	 * Each element of the crumbs array can either have one of these keys:
 	 *    "id"         for post types;
@@ -78,18 +78,23 @@ class WPSEO_Breadcrumbs {
 	private $links = array();
 
 	/**
-	 * @var    string    Breadcrumb html string
+	 * @var string    Breadcrumb html string
 	 */
 	private $output;
 
+	/**
+	 * @var WPSEO_WooCommerce_Shop_Page
+	 */
+	private $woocommerce_shop_page;
 
 	/**
 	 * Create the breadcrumb.
 	 */
 	protected function __construct() {
-		$this->post           = ( isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null );
-		$this->show_on_front  = get_option( 'show_on_front' );
-		$this->page_for_posts = get_option( 'page_for_posts' );
+		$this->post                  = ( isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null );
+		$this->show_on_front         = get_option( 'show_on_front' );
+		$this->page_for_posts        = get_option( 'page_for_posts' );
+		$this->woocommerce_shop_page = new WPSEO_WooCommerce_Shop_Page();
 
 		$this->filter_element();
 		$this->filter_separator();
@@ -116,7 +121,7 @@ class WPSEO_Breadcrumbs {
 		self::$after  = $after;
 
 		$instance = self::get_instance();
-		$output = $before . $instance->output . $after;
+		$output   = $before . $instance->output . $after;
 
 		if ( $display === true ) {
 			echo $output;
@@ -184,7 +189,6 @@ class WPSEO_Breadcrumbs {
 		return $url;
 	}
 
-
 	/**
 	 * Filter: 'wpseo_breadcrumb_single_link_wrapper' - Allows developer to change or wrap each breadcrumb element.
 	 *
@@ -216,7 +220,6 @@ class WPSEO_Breadcrumbs {
 			$this->wrapper = $wrapper;
 		}
 	}
-
 
 	/**
 	 * Get a term's parents.
@@ -354,6 +357,7 @@ class WPSEO_Breadcrumbs {
 			if ( isset( $this->post->post_parent ) && 0 === $this->post->post_parent ) {
 				$this->maybe_add_taxonomy_crumbs_for_post();
 			}
+
 			if ( isset( $this->post->post_parent ) && $this->post->post_parent !== 0 ) {
 				$this->add_post_ancestor_crumbs();
 			}
@@ -363,13 +367,14 @@ class WPSEO_Breadcrumbs {
 			}
 		}
 		elseif ( is_post_type_archive() ) {
-			$post_type = $wp_query->get( 'post_type' );
-
-			if ( WPSEO_Utils::is_woocommerce_active() && is_shop() ) {
-				$id = wc_get_page_id( 'shop' );
-				$this->add_single_post_crumb( $id );
+			if ( $this->woocommerce_shop_page->is_shop_page() &&
+				$this->woocommerce_shop_page->get_shop_page_id() !== -1
+			) {
+				$this->add_single_post_crumb( $this->woocommerce_shop_page->get_shop_page_id() );
 			}
 			else {
+				$post_type = $wp_query->get( 'post_type' );
+
 				if ( $post_type && is_string( $post_type ) ) {
 					$this->add_ptarchive_crumb( $post_type );
 				}
@@ -413,6 +418,8 @@ class WPSEO_Breadcrumbs {
 				true
 			);
 		}
+
+		$this->maybe_add_page_crumb();
 
 		/**
 		 * Filter: 'wpseo_breadcrumb_links' - Allow the developer to filter the Yoast SEO breadcrumb links, add to them, change order, etc.
@@ -528,6 +535,7 @@ class WPSEO_Breadcrumbs {
 		if ( $this->post->post_type === 'post' ) {
 			return;
 		}
+
 		if ( isset( $this->post->post_type ) && get_post_type_archive_link( $this->post->post_type ) ) {
 			$this->add_ptarchive_crumb( $this->post->post_type );
 		}
@@ -589,6 +597,32 @@ class WPSEO_Breadcrumbs {
 		$this->maybe_add_term_parent_crumbs( $term );
 
 		$this->add_term_crumb( $term );
+	}
+
+	/**
+	 * Adds a page crumb to the visible breadcrumbs.
+	 *
+	 * @return void
+	 */
+	private function maybe_add_page_crumb() {
+		if ( ! is_paged() ) {
+			return;
+		}
+
+		$current_page = get_query_var( 'paged', 1 );
+		if ( $current_page <= 1 ) {
+			return;
+		}
+
+		$this->crumbs[] = array(
+			'text'           => sprintf(
+				/* translators: %s expands to the current page number */
+				__( 'Page %s', 'wordpress-seo' ),
+				$current_page
+			),
+			'url'            => '',
+			'hide_in_schema' => true,
+		);
 	}
 
 	/**
@@ -673,7 +707,6 @@ class WPSEO_Breadcrumbs {
 			true
 		);
 	}
-
 
 	/**
 	 * Take the crumbs array and convert each crumb to a single breadcrumb string.
@@ -771,26 +804,7 @@ class WPSEO_Breadcrumbs {
 	 */
 	private function get_link_info_for_ptarchive( $pt ) {
 		$link          = array();
-		$archive_title = '';
-
-		if ( WPSEO_Options::get( 'bctitle-ptarchive-' . $pt, '' ) !== '' ) {
-
-			$archive_title = WPSEO_Options::get( 'bctitle-ptarchive-' . $pt );
-		}
-		else {
-			$post_type_obj = get_post_type_object( $pt );
-			if ( is_object( $post_type_obj ) ) {
-				if ( isset( $post_type_obj->label ) && $post_type_obj->label !== '' ) {
-					$archive_title = $post_type_obj->label;
-				}
-				elseif ( isset( $post_type_obj->labels->menu_name ) && $post_type_obj->labels->menu_name !== '' ) {
-					$archive_title = $post_type_obj->labels->menu_name;
-				}
-				else {
-					$archive_title = $post_type_obj->name;
-				}
-			}
-		}
+		$archive_title = $this->get_archive_title( $pt );
 
 		$link['url']  = get_post_type_archive_link( $pt );
 		$link['text'] = $archive_title;
@@ -798,6 +812,74 @@ class WPSEO_Breadcrumbs {
 		return $link;
 	}
 
+	/**
+	 * Gets the custom set breadcrumb title for the passed post type.
+	 *
+	 * @param string $post_type The post type to check.
+	 *
+	 * @return string the breadcrumb title.
+	 */
+	private function get_post_type_archive_breadcrumb( $post_type ) {
+		return WPSEO_Options::get( 'bctitle-ptarchive-' . $post_type, '' );
+	}
+
+	/**
+	 * Gets the breadcrumb for the passed post type if it's a WooCommerce product and has a breadcrumb title set.
+	 *
+	 * @param string $post_type The post type to check.
+	 *
+	 * @return string The breadcrumb title.
+	 */
+	private function get_woocommerce_breadcrumb( $post_type ) {
+		if ( $post_type !== 'product' || ! WPSEO_Utils::is_woocommerce_active() ) {
+			return '';
+		}
+
+		$shop_page_id = $this->woocommerce_shop_page->get_shop_page_id();
+
+		if ( $shop_page_id === -1 ) {
+			return '';
+		}
+
+		return WPSEO_Meta::get_value( 'bctitle', $shop_page_id );
+	}
+
+	/**
+	 * Determines the archive title based on the passed post type.
+	 *
+	 * @param string $post_type The post type to determine the title for.
+	 *
+	 * @return string The archive title.
+	 */
+	private function get_archive_title( $post_type ) {
+		$woocommerce_breadcrumb = $this->get_woocommerce_breadcrumb( $post_type );
+
+		if ( $woocommerce_breadcrumb !== '' ) {
+			return $woocommerce_breadcrumb;
+		}
+
+		$post_type_archive_breadcrumb = $this->get_post_type_archive_breadcrumb( $post_type );
+
+		if ( $post_type_archive_breadcrumb !== '' ) {
+			return $post_type_archive_breadcrumb;
+		}
+
+		$post_type_obj = get_post_type_object( $post_type );
+
+		if ( ! is_object( $post_type_obj ) ) {
+			return '';
+		}
+
+		if ( isset( $post_type_obj->label ) && $post_type_obj->label !== '' ) {
+			return $post_type_obj->label;
+		}
+
+		if ( isset( $post_type_obj->labels->menu_name ) && $post_type_obj->labels->menu_name !== '' ) {
+			return $post_type_obj->labels->menu_name;
+		}
+
+		return $post_type_obj->name;
+	}
 
 	/**
 	 * Create a breadcrumb element string.
@@ -898,7 +980,6 @@ class WPSEO_Breadcrumbs {
 			$this->output = $output;
 		}
 	}
-
 
 	/**
 	 * Filter: 'wpseo_breadcrumb_output_id' - Allow changing the HTML ID on the Yoast SEO breadcrumbs wrapper element.

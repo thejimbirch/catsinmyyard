@@ -8,11 +8,11 @@ Usage: No configuration necessary. Upload, activate and done. BBQ blocks bad que
 Author: Jeff Starr
 Author URI: https://plugin-planet.com/
 Contributors: specialk, aldolat, WpBlogHost, jameswilkes, juliobox, lernerconsult
-Donate link: https://m0n.co/donate
+Donate link: https://monzillamedia.com/donate.html
 Requires at least: 4.1
-Tested up to: 4.9
-Stable tag: 20180511
-Version: 20180511
+Tested up to: 5.0
+Stable tag: 20181117
+Version: 20181117
 Requires PHP: 5.2
 Text Domain: block-bad-queries
 Domain Path: /languages
@@ -24,13 +24,10 @@ The fastest firewall plugin for WordPress.
 
 == Description ==
 
-> Install, activate, and done!<br/>
+> Install, activate, and done!
 > Powerful protection from WP's __fastest__ firewall plugin.
 
-[Block Bad Queries](https://perishablepress.com/block-bad-queries/) (BBQ) is a simple, super-fast plugin that protects your site against malicious URL requests. BBQ checks all incoming traffic and quietly blocks bad requests containing nasty stuff like `eval(`, `base64_`, and excessively long request-strings. This is a simple yet solid solution for sites that are unable to use a [strong .htaccess firewall](https://perishablepress.com/6g/). 
-
-> GDPR-compliant: does not collect any user data
-> Gutenberg-compliant: works perfectly with or without Gutenberg
+[Block Bad Queries](https://perishablepress.com/block-bad-queries/) (BBQ) is a simple, super-fast plugin that protects your site against malicious URL requests. BBQ checks all incoming traffic and quietly blocks bad requests containing nasty stuff like `eval(`, `base64_`, and excessively long request-strings. This is a simple yet solid solution for sites that are unable to use a [strong .htaccess firewall](https://perishablepress.com/6g/).
 
 **Awesome Features**
 
@@ -51,6 +48,12 @@ The fastest firewall plugin for WordPress.
 * Compatible with other security plugins
 * Regularly updated and "future proof"
 * Customize blocked strings via [Whitelist/Blacklist plugins](https://perishablepress.com/bbq-whitelist-blacklist/)
+
+**GDPR**
+
+This plugin does not collect any user data. So it does _not_ do anything to make your site _less_ compliant with GDPR. I have done my best to ensure that this plugin is 100% GDPR compliant, but I'm not a lawyer so can't guarantee anything. To determine if your site is GDPR compliant, please consult an attorney.
+
+> Works perfectly with or without Gutenberg Block Editor
 
 **Pro Version**
 
@@ -75,6 +78,11 @@ Once active, BBQ automically blocks bad queries to protect your site against mal
 * To block patterns otherwise allowed by BBQ, check out the [BBQ Blacklist plugin](https://perishablepress.com/bbq-whitelist-blacklist/)
 
 Note that the [Pro version of BBQ](https://plugin-planet.com/bbq-pro/) makes it possible to customize patterns (add, edit, remove) directly via the plugin settings, with a click. 
+
+
+**Like the plugin?**
+
+If you like BBQ, please take a moment to [give a 5-star rating](https://wordpress.org/support/plugin/block-bad-queries/reviews/?rate=5#new-post). It helps to keep development and support going strong. Thank you!
 
 
 
@@ -131,6 +139,11 @@ No, the free version of BBQ operates as each page is loaded; it does not make an
 Yes, BBQ scans any arrays that are included in the URI request. If any matching patterns are found, the request is blocked.
 
 
+**My PHP scanner/checker plugin says there is an error?**
+
+For example, if your PHP/plugin scanner reports something like, "found `0x3c62723e` which is bad." Normally you would not want to find such bad strings of code, but there is an exception for security plugins. Think about it: in order to block some nasty string, BBQ must _know_ about it. So each bad string that is blocked by BBQ is included in the plugin "blacklist". That means, when some PHP scanner looks at BBQ and finds some known bad strings, it just means that the scanner has discovered BBQ's list of blocked terms. In other words, BBQ contains static strings of non-functional text, in order to match and block malicious requests to your site. I hope this makes sense, feel free to [contact me](https://perishablepress.com/contact/) if I may provide any further infos.
+
+
 **Do I need WordPress to run BBQ?**
 
 Nope! BBQ is available in the following flavors:
@@ -155,7 +168,7 @@ Send any questions or feedback via my [contact form](https://perishablepress.com
 
 == Support development of this plugin ==
 
-I develop and maintain this free plugin with love for the WordPress community. To show support, you can [make a cash donation](https://m0n.co/donate), [bitcoin donation](https://m0n.co/bitcoin), or purchase one of my books:
+I develop and maintain this free plugin with love for the WordPress community. To show support, you can [make a donation](https://monzillamedia.com/donate.html) or purchase one of my books:
 
 * [The Tao of WordPress](https://wp-tao.com/)
 * [Digging into WordPress](https://digwp.com/)
@@ -174,6 +187,20 @@ Links, tweets and likes also appreciated. Thank you! :)
 
 
 == Changelog ==
+
+**2018/11/17**
+
+* Adds homepage link to Plugins screen
+* Updates default translation template
+* Tests on WordPress 5.0 (beta)
+
+**2018/08/21**
+
+* Removes `.tar` from Request URI patterns
+* Adds `rel="noopener noreferrer"` to all [blank-target links](https://perishablepress.com/wordpress-blank-target-vulnerability/)
+* Updates GDPR blurb and donate link
+* Regenerates default translation template
+* Further tests on WP 4.9 and 5.0 (alpha)
 
 **2018/05/11**
 

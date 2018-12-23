@@ -50,6 +50,7 @@ class WPSEO_Frontend {
 	private $title = null;
 	/** @var WPSEO_Frontend_Page_Type */
 	protected $frontend_page_type;
+
 	/** @var WPSEO_WooCommerce_Shop_Page */
 	protected $woocommerce_shop_page;
 
@@ -91,6 +92,9 @@ class WPSEO_Frontend {
 		add_filter( 'loginout', array( $this, 'nofollow_link' ) );
 		add_filter( 'register', array( $this, 'nofollow_link' ) );
 
+		// Add support for shortcodes to category descriptions.
+		add_filter( 'category_description', array( $this, 'custom_category_descriptions_add_shortcode_support' ) );
+
 		// Fix the WooThemes woo_title() output.
 		add_filter( 'woo_title', array( $this, 'fix_woo_title' ), 99 );
 
@@ -122,6 +126,7 @@ class WPSEO_Frontend {
 			new WPSEO_Frontend_Primary_Category(),
 			new WPSEO_JSON_LD(),
 			new WPSEO_Remove_Reply_To_Com(),
+			new WPSEO_OpenGraph_OEmbed(),
 			$this->woocommerce_shop_page,
 		);
 
@@ -188,33 +193,6 @@ class WPSEO_Frontend {
 	 */
 	public function fix_woo_title( $title ) {
 		return $this->title( $title );
-	}
-
-	/**
-	 * Determine whether this is the homepage and shows posts.
-	 *
-	 * @return bool
-	 */
-	public function is_home_posts_page() {
-		return ( is_home() && 'posts' === get_option( 'show_on_front' ) );
-	}
-
-	/**
-	 * Determine whether the this is the static frontpage.
-	 *
-	 * @return bool
-	 */
-	public function is_home_static_page() {
-		return ( is_front_page() && 'page' === get_option( 'show_on_front' ) && is_page( get_option( 'page_on_front' ) ) );
-	}
-
-	/**
-	 * Determine whether this is the posts page, when it's not the frontpage.
-	 *
-	 * @return bool
-	 */
-	public function is_posts_page() {
-		return ( is_home() && 'page' === get_option( 'show_on_front' ) );
 	}
 
 	/**
@@ -445,15 +423,14 @@ class WPSEO_Frontend {
 		// that is used to generate default titles.
 		$title_part = '';
 
-		if ( $this->is_home_static_page() ) {
+		if ( $this->frontend_page_type->is_home_static_page() ) {
 			$title = $this->get_content_title();
 		}
-		elseif ( $this->is_home_posts_page() ) {
+		elseif ( $this->frontend_page_type->is_home_posts_page() ) {
 			$title = $this->get_title_from_options( 'title-home-wpseo' );
 		}
 		elseif ( $this->woocommerce_shop_page->is_shop_page() ) {
-			$post  = get_post( $this->woocommerce_shop_page->get_shop_page_id() );
-			$title = $this->get_seo_title( $post );
+			$title = $this->get_woocommerce_title();
 
 			if ( ! is_string( $title ) || $title === '' ) {
 				$title = $this->get_post_type_archive_title( $separator, $separator_location );
@@ -702,7 +679,7 @@ class WPSEO_Frontend {
 		$robots['follow'] = 'follow';
 		$robots['other']  = array();
 
-		if ( ( is_object( $post ) && is_singular() ) || ( WPSEO_Utils::is_woocommerce_active() && is_shop() ) ) {
+		if ( ( is_object( $post ) && is_singular() ) || $this->woocommerce_shop_page->is_shop_page() ) {
 			$private = 'private' === $post->post_status;
 			$noindex = ! WPSEO_Post_Type::is_post_type_indexable( $post->post_type );
 
@@ -911,7 +888,7 @@ class WPSEO_Frontend {
 			elseif ( is_front_page() ) {
 				$canonical = WPSEO_Utils::home_url();
 			}
-			elseif ( $this->is_posts_page() ) {
+			elseif ( $this->frontend_page_type->is_posts_page() ) {
 
 				$posts_page_id = get_option( 'page_for_posts' );
 				$canonical     = $this->get_seo_meta_value( 'canonical', $posts_page_id );
@@ -1155,7 +1132,7 @@ class WPSEO_Frontend {
 	private function get_pagination_base() {
 		// If the current page is the frontpage, pagination should use /base/.
 		$base = '';
-		if ( ! is_singular() || $this->is_home_static_page() ) {
+		if ( ! is_singular() || $this->frontend_page_type->is_home_static_page() ) {
 			$base = trailingslashit( $GLOBALS['wp_rewrite']->pagination_base );
 		}
 		return $base;
@@ -1252,7 +1229,7 @@ class WPSEO_Frontend {
 			if ( is_search() ) {
 				$metadesc = '';
 			}
-			elseif ( $this->is_home_posts_page() ) {
+			elseif ( $this->frontend_page_type->is_home_posts_page() ) {
 				$template = WPSEO_Options::get( 'metadesc-home-wpseo' );
 				$term     = array();
 
@@ -1260,7 +1237,7 @@ class WPSEO_Frontend {
 					$template = get_bloginfo( 'description' );
 				}
 			}
-			elseif ( $this->is_home_static_page() ) {
+			elseif ( $this->frontend_page_type->is_home_static_page() ) {
 				$metadesc = $this->get_seo_meta_value( 'metadesc' );
 				if ( ( $metadesc === '' && $post_type !== '' ) && WPSEO_Options::get( 'metadesc-' . $post_type, '' ) !== '' ) {
 					$template = WPSEO_Options::get( 'metadesc-' . $post_type );
@@ -1751,6 +1728,39 @@ class WPSEO_Frontend {
 	}
 
 	/**
+	 * Retrieves the WooCommerce title.
+	 *
+	 * @return string The WooCommerce title.
+	 */
+	protected function get_woocommerce_title() {
+		$shop_page_id = $this->woocommerce_shop_page->get_shop_page_id();
+		$post         = get_post( $shop_page_id );
+		$title        = $this->get_seo_title( $post );
+
+		if ( is_string( $title ) && $title !== '' ) {
+			return $title;
+		}
+
+		if ( $shop_page_id !== -1 && is_archive() ) {
+			$title = $this->get_template( 'title-' . $post->post_type );
+			$title = $this->replace_vars( $title, $post );
+		}
+
+		return $title;
+	}
+
+	/**
+	 * Retrieves a template from the options.
+	 *
+	 * @param string $template The template to retrieve.
+	 *
+	 * @return string The set template.
+	 */
+	protected function get_template( $template ) {
+		return WPSEO_Options::get( $template );
+	}
+
+	/**
 	 * Retrieves the queried post type.
 	 *
 	 * @return string The queried post type.
@@ -1792,12 +1802,28 @@ class WPSEO_Frontend {
 		return $replacer->replace( $string, $args, $omit );
 	}
 
-	/** Deprecated functions */
-	// @codeCoverageIgnoreStart
+	/**
+	 * Adds shortcode support to category descriptions.
+	 *
+	 * @param string $desc String to add shortcodes in.
+	 *
+	 * @return string Content with shortcodes filtered out.
+	 */
+	public function custom_category_descriptions_add_shortcode_support( $desc ) {
+		// Wrap in output buffering to prevent shortcodes that echo stuff instead of return from breaking things.
+		ob_start();
+		$desc = do_shortcode( $desc );
+		ob_end_clean();
+		return $desc;
+	}
+
+	/* ********************* DEPRECATED METHODS ********************* */
+
 	/**
 	 * Outputs or returns the debug marker, which is also used for title replacement when force rewrite is active.
 	 *
 	 * @deprecated 4.4
+	 * @codeCoverageIgnore
 	 *
 	 * @param bool $echo Whether or not to echo the debug marker.
 	 *
@@ -1815,6 +1841,7 @@ class WPSEO_Frontend {
 	 * Outputs the meta keywords element.
 	 *
 	 * @deprecated 6.3
+	 * @codeCoverageIgnore
 	 *
 	 * @return void
 	 */
@@ -1828,6 +1855,7 @@ class WPSEO_Frontend {
 	 * Removes unneeded query variables from the URL.
 	 *
 	 * @deprecated 7.0
+	 * @codeCoverageIgnore
 	 *
 	 * @return void
 	 */
@@ -1842,6 +1870,7 @@ class WPSEO_Frontend {
 	 * Trailing slashes for everything except is_single().
 	 *
 	 * @deprecated 7.0
+	 * @codeCoverageIgnore
 	 */
 	public function add_trailingslash() {
 		// As this is a frontend method, we want to make sure it is not displayed for non-logged in users.
@@ -1854,6 +1883,7 @@ class WPSEO_Frontend {
 	 * Removes the ?replytocom variable from the link, replacing it with a #comment-<number> anchor.
 	 *
 	 * @deprecated 7.0
+	 * @codeCoverageIgnore
 	 *
 	 * @param string $link The comment link as a string.
 	 *
@@ -1870,6 +1900,7 @@ class WPSEO_Frontend {
 	 * Redirects out the ?replytocom variables.
 	 *
 	 * @deprecated 7.0
+	 * @codeCoverageIgnore
 	 *
 	 * @return boolean True when redirect has been done.
 	 */
@@ -1879,5 +1910,46 @@ class WPSEO_Frontend {
 		$remove_replytocom = new WPSEO_Remove_Reply_To_Com();
 		return $remove_replytocom->replytocom_redirect();
 	}
-	// @codeCoverageIgnoreEnd
+
+	/**
+	 * Determine whether this is the homepage and shows posts.
+	 *
+	 * @deprecated 7.7
+	 * @codeCoverageIgnore
+	 *
+	 * @return bool Whether or not the current page is the homepage that displays posts.
+	 */
+	public function is_home_posts_page() {
+		_deprecated_function( __FUNCTION__, '7.7', 'WPSEO_Frontend_Page_Type::is_home_posts_page' );
+
+		return $this->frontend_page_type->is_home_posts_page();
+	}
+
+	/**
+	 * Determine whether the this is the static frontpage.
+	 *
+	 * @deprecated 7.7
+	 * @codeCoverageIgnore
+	 *
+	 * @return bool Whether or not the current page is a static frontpage.
+	 */
+	public function is_home_static_page() {
+		_deprecated_function( __FUNCTION__, '7.7', 'WPSEO_Frontend_Page_Type::is_home_static_page' );
+
+		return $this->frontend_page_type->is_home_static_page();
+	}
+
+	/**
+	 * Determine whether this is the posts page, when it's not the frontpage.
+	 *
+	 * @deprecated 7.7
+	 * @codeCoverageIgnore
+	 *
+	 * @return bool Whether or not it's a non-frontpage, posts page.
+	 */
+	public function is_posts_page() {
+		_deprecated_function( __FUNCTION__, '7.7', 'WPSEO_Frontend_Page_Type::is_posts_page' );
+
+		return $this->frontend_page_type->is_posts_page();
+	}
 }

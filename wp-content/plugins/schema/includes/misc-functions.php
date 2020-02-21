@@ -345,13 +345,19 @@ function schema_wp_get_media( $post_id = null) {
 			
 			if ( $post->post_content ) {
 				$Document = new DOMDocument();
+				// @since 1.7.5
+				libxml_use_internal_errors(true);
+				// load the html into the object
 				@$Document->loadHTML( $post->post_content );
+				// @since 1.7.5
+				libxml_clear_errors();
 				$DocumentImages = $Document->getElementsByTagName( 'img' );
 
 				if ( $DocumentImages->length ) {
 					$image_url 		= $DocumentImages->item( 0 )->getAttribute( 'src' );
 					$image_width 	= ( $DocumentImages->item( 0 )->getAttribute( 'width' ) > 696 ) ? $DocumentImages->item( 0 )->getAttribute( 'width' ) : 696;
 					$image_height	= $DocumentImages->item( 0 )->getAttribute( 'height' );
+				
 				}
 			}
 		}
@@ -378,11 +384,69 @@ function schema_wp_get_media( $post_id = null) {
 }
 
 /**
+ *  Retrieves the attachment ID from the file URL
+ *
+ * @param string $image_url The attachment image url
+ * @return string - attachment ID 
+ * @since 1.7.7
+ */
+function schema_wp_get_attachment_id_from_url( $image_url ) {
+	
+	global $wpdb;
+	
+	$attachment = $wpdb->get_col($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE guid='%s';", $image_url )); 
+	
+	return $attachment[0]; 
+}
+
+/**
+ *  Get ImageObject by attachment ID 
+ *
+ * @param string $image_url The attachment image url
+ * @return array ImageObject
+ * @since 1.7.7
+ */
+function schema_wp_get_image_object_by_attachment_id( $attachment_id ) {
+	
+	if ( ! isset($attachment_id) ) 
+		return array();
+	
+	$ImageObject = array();
+	
+	// Featured image
+	$image_attributes = wp_get_attachment_image_src( $attachment_id, 'full' );
+	
+	if ( isset($image_attributes[0]) ) {
+		$url		= $image_attributes[0];
+		$width		= $image_attributes[1];
+		$height		= $image_attributes[2];
+		
+		$ImageObject = array (
+			'@type' 	=> 'ImageObject',
+			'url' 		=> $url,
+			'width'		=> $width,
+			'height' 	=> $height,
+		);
+		
+		// Add caption
+		$caption = wp_get_attachment_caption( $attachment_id );
+		If ($caption) { 
+			$ImageObject['caption'] = $caption;
+		}
+	}
+	
+	// debug
+	//echo'<pre>';print_r($image_attributes);echo'</pre>';exit;
+	
+	return $ImageObject;
+}
+
+/**
  * Get post single category,
  * the first category
  *
  * @param int $post_id The post ID.
- * @since 1.4.5
+ * @since 1.7.9
  */
 function schema_wp_get_post_category( $post_id ) {
 	
@@ -422,7 +486,6 @@ function schema_wp_get_post_tags( $post_id ) {
    
    return $tags;
 }
-
 
 /**
  * Get an array of schema enabed categories
@@ -890,11 +953,12 @@ function schema_wp_is_blog() {
  * @since 1.7.1
  * @return string
  */
-function schema_wp_get_truncate_to_word( $value, $limit = 110, $end = '...' ) {
+function schema_wp_get_truncate_to_word( $string, $limit = 110, $end = '...' ) {
 	
-	$limit 		= apply_filters( 'schema_wp_truncate_to_word_limit', $limit );
-	$limit 		= $limit - mb_strlen($end); // Take into account $end string into the limit
-    $valuelen 	= mb_strlen($value);
-    
-	return $limit < $valuelen ? mb_substr($value, 0, mb_strrpos($value, ' ', $limit - $valuelen)) . $end : $value;	
+	$limit 	= apply_filters( 'schema_wp_truncate_to_word_limit', $limit );
+	$limit 	= $limit - strlen($end); // Take into account $end string into the limit
+	$string = substr($string, 0, $limit);
+	$string = substr($string, 0, strrpos($string, ' ')) . $end;
+	
+	return $string;
 }

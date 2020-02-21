@@ -1,73 +1,79 @@
+/* global WP_Smush */
+/* global ajaxurl */
+
 /**
  * Directory scanner module that will Smush images in the Directory Smush modal.
  *
  * @since 2.8.1
  *
- * @param totalSteps
- * @param currentStep
- * @returns {{scan: scan, cancel: (function(): (*|$.promise|{})), getProgress: getProgress, onFinishStep: onFinishStep, onFinish: onFinish}}
- * @constructor
+ * @param {string|number} totalSteps
+ * @param {string|number} currentStep
+ * @return {Object}  Scan object.
+ * @class
  */
-
 const DirectoryScanner = ( totalSteps, currentStep ) => {
-	totalSteps  = parseInt( totalSteps );
+	totalSteps = parseInt( totalSteps );
 	currentStep = parseInt( currentStep );
 
-	let cancelling  = false,
+	let cancelling = false,
 		failedItems = 0;
 
-	let obj = {
-		scan: function() {
-			let remainingSteps = totalSteps - currentStep;
+	const obj = {
+		scan() {
+			const remainingSteps = totalSteps - currentStep;
 			if ( currentStep !== 0 ) {
 				// Scan started on a previous page load.
 				step( remainingSteps );
 			} else {
-				$.post( ajaxurl, { action: 'directory_smush_start' },
+				jQuery.post( ajaxurl, { action: 'directory_smush_start' },
 					() => step( remainingSteps ) );
 			}
 		},
 
-		cancel: function() {
+		cancel() {
 			cancelling = true;
-			return $.post( ajaxurl, { action: 'directory_smush_cancel' } );
+			return jQuery.post( ajaxurl, { action: 'directory_smush_cancel' } );
 		},
 
-		getProgress: function() {
+		getProgress() {
 			if ( cancelling ) {
 				return 0;
 			}
+			// O M G ... Logic at it's finest!
 			const remainingSteps = totalSteps - currentStep;
 			return Math.min( Math.round( ( parseInt( ( totalSteps - remainingSteps ) ) * 100 ) / totalSteps ), 99 );
 		},
 
-		onFinishStep: function( progress ) {
-			$( '.wp-smush-progress-dialog .sui-progress-state-text' ).html( ( currentStep - failedItems ) + '/' + totalSteps + ' ' + wp_smush_msgs.progress_smushed );
+		onFinishStep( progress ) {
+			jQuery( '.wp-smush-progress-dialog .sui-progress-state-text' ).html( ( currentStep - failedItems ) + '/' + totalSteps + ' ' + window.wp_smush_msgs.progress_smushed );
 			WP_Smush.directory.updateProgressBar( progress );
 		},
 
-		onFinish: function() {
+		onFinish() {
 			WP_Smush.directory.updateProgressBar( 100 );
-			window.location.href = wp_smush_msgs.directory_url + '&scan=done';
+			window.location.href = window.wp_smush_msgs.directory_url + '&scan=done';
 		},
 
-		limitReached: function() {
-			let dialog = $( '#wp-smush-progress-dialog' );
+		limitReached() {
+			const dialog = jQuery( '#wp-smush-progress-dialog' );
 
 			dialog.addClass( 'wp-smush-exceed-limit' );
-			dialog.find( '#cancel-directory-smush' ).attr( 'data-tooltip', wp_smush_msgs.bulk_resume );
+			dialog.find( '#cancel-directory-smush' ).attr( 'data-tooltip', window.wp_smush_msgs.bulk_resume );
 			dialog.find( '.sui-icon-close' ).removeClass( 'sui-icon-close' ).addClass( 'sui-icon-play' );
+			dialog.find( '#cancel-directory-smush' ).attr( 'id', 'cancel-directory-smush-disabled' );
 		},
 
-		resume: function() {
-			let dialog = $( '#wp-smush-progress-dialog' );
+		resume() {
+			const dialog = jQuery( '#wp-smush-progress-dialog' );
+			const resume = dialog.find( '#cancel-directory-smush-disabled' );
 
 			dialog.removeClass( 'wp-smush-exceed-limit' );
-			dialog.find( '#cancel-directory-smush' ).attr( 'data-tooltip', 'Cancel' );
 			dialog.find( '.sui-icon-play' ).removeClass( 'sui-icon-play' ).addClass( 'sui-icon-close' );
+			resume.attr( 'data-tooltip', 'Cancel' );
+			resume.attr( 'id', 'cancel-directory-smush' );
 
 			obj.scan();
-		}
+		},
 	};
 
 	/**
@@ -75,14 +81,14 @@ const DirectoryScanner = ( totalSteps, currentStep ) => {
 	 *
 	 * Private to avoid overriding
 	 *
-	 * @param remainingSteps
+	 * @param {number} remainingSteps
 	 */
 	const step = function( remainingSteps ) {
 		if ( remainingSteps >= 0 ) {
 			currentStep = totalSteps - remainingSteps;
-			$.post( ajaxurl, {
+			jQuery.post( ajaxurl, {
 				action: 'directory_smush_check_step',
-				step: currentStep
+				step: currentStep,
 			}, ( response ) => {
 				// We're good - continue on.
 				if ( 'undefined' !== typeof response.success && response.success ) {
@@ -103,7 +109,7 @@ const DirectoryScanner = ( totalSteps, currentStep ) => {
 				}
 			} );
 		} else {
-			$.post( ajaxurl, {
+			jQuery.post( ajaxurl, {
 				action: 'directory_smush_finish',
 				items: ( totalSteps - failedItems ),
 				failed: failedItems,

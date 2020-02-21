@@ -201,15 +201,25 @@
 		setTimeout( function () {
 			var flex = $( '.flex-viewport' );
 
-			if ( args.woocommerce_gallery === '1' && flex.length ) {
-				$( '.zoomImg' ).css( 'cursor', 'pointer' );
+			// if ( flex.length )
+				// flex.css( 'cursor', 'pointer' );
 
-				$( document ).on( 'click', '.flex-active-slide .zoomImg', function ( e ) {
-					e.preventDefault();
-					e.stopPropagation();
+			if ( args.woocommerce_gallery === '1' ) {
+				var gallery = $( '.woocommerce-product-gallery' );
 
-					flex.find( '.flex-active-slide a[data-rel]' ).trigger( 'click' );
-				} );
+				if ( gallery.find( '.woocommerce-product-gallery__trigger' ).length === 0 ) {
+					gallery.prepend( '<a href="#" class="woocommerce-product-gallery__trigger">🔍</a>' );
+
+					gallery.on( 'click', '.woocommerce-product-gallery__trigger', function( e ) {
+						e.preventDefault();
+						e.stopPropagation();
+
+						if ( flex.length )
+							flex.find( '.flex-active-slide a[data-rel]' ).trigger( 'click' );
+						else
+							gallery.find( 'a[data-rel]' ).first().trigger( 'click' );
+					} );
+				}
 			}
 		}, 10 );
 

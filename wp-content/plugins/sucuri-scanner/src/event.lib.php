@@ -86,15 +86,118 @@ class SucuriScanEvent extends SucuriScan
 
         foreach ($jobs as $unique => $info) {
             $schedules[$unique] = sprintf(
-                '%s (every %d seconds)',
+                __('%s (every %d seconds)', 'sucuri-scanner'),
                 $info['display'],
                 $info['interval']
             );
         }
 
-        $schedules['_oneoff'] = 'Never (no execution)';
+        $schedules['_oneoff'] = __('Never (no execution)', 'sucuri-scanner');
 
         return $schedules;
+    }
+
+    /**
+     * Returns a list of active cronjobs.
+     *
+     * This method will return not only the default WordPress cronjobs but also
+     * the custom ones defined by 3rd-party plugins or themes.
+     *
+     * @see https://developer.wordpress.org/reference/functions/_get_cron_array/
+     *
+     * @return array List of available cronjobs.
+     */
+    public static function activeSchedules()
+    {
+        $activeCrons = array();
+        foreach ((array) _get_cron_array() as $timestamp => $cronhooks) {
+            foreach ((array) $cronhooks as $hook => $events) {
+                foreach ((array) $events as $key => $event) {
+                    if (empty($event['args'])) {
+                        $event['args'] = array('[]');
+                    }
+                    $activeCrons[$hook] = array(
+                        'schedule' => $event['schedule'],
+                        'nextTime' => SucuriScan::datetime($timestamp),
+                        'nextTimeHuman' => SucuriScan::humanTime($timestamp),
+                        'arguments' => json_encode($event['args']),
+                    );
+                }
+            }
+        }
+        return $activeCrons;
+    }
+
+    /**
+     * Creates the cronjob weekly, monthly and quarterly frequencies.
+     *
+     * A few Sucuri services require additional cronjob frequencies that are not
+     * available on WordPress by default. This function will add these schedules
+     * frequency if they were not yet register by any a 3rd party extension.
+     *
+     * @return void
+     */
+    public static function additionalSchedulesFrequencies($schedules)
+    {
+        if (!isset($schedules['weekly'])) {
+            $schedules['weekly'] = array(
+                'display' => __('Weekly', 'sucuriscan'),
+                'interval' => WEEK_IN_SECONDS,
+            );
+        }
+        if (!isset($schedules['monthly'])) {
+            $schedules['monthly'] = array(
+                'display' => __('Monthly', 'sucuriscan'),
+                'interval' => MONTH_IN_SECONDS,
+            );
+        }
+        if (!isset($schedules['quarterly'])) {
+            $schedules['quarterly'] = array(
+                'display' => __('Quarterly', 'sucuriscan'),
+                'interval' => 3 * MONTH_IN_SECONDS,
+            );
+        }
+        return $schedules;
+    }
+
+    /**
+     * Creates a cronjob.
+     *
+     * @return bool True if the cronjob is correctly created.
+     */
+    public static function addScheduledTask($hookName, $frequency)
+    {
+        // Return false if schedule frequency does not exist.
+        if (!in_array($frequency, array_keys(self::availableSchedules()))) {
+            return false;
+        }
+
+        // Remove cron first if already exists.
+        if (wp_next_scheduled($hookName)) {
+            self::deleteScheduledTask($hookName);
+        }
+
+        // Add cron job hook.
+        wp_schedule_event(time() + 10, $frequency, $hookName);
+        return true;
+    }
+
+    /**
+     * Deletes a cronjob.
+     *
+     * @return bool True if the cronjob is correctly removed.
+     */
+    public static function deleteScheduledTask($hookName)
+    {
+        // Return false if task does not exist.
+        if (!wp_next_scheduled($hookName)) {
+            return false;
+        }
+
+        // Remove cron job hook.
+        wp_clear_scheduled_hook($hookName);
+
+        return true;
     }
 
     /**
@@ -105,7 +208,7 @@ class SucuriScanEvent extends SucuriScan
     public static function reportSiteVersion()
     {
         if (!SucuriScanAPI::getPluginKey()) {
-            return self::throwException('API key is not available');
+            return self::throwException(__('API key is not available', 'sucuri-scanner'));
         }
 
         $wp_version = self::siteVersion();
@@ -113,10 +216,10 @@ class SucuriScanEvent extends SucuriScan
 
         /* use simple comparison to leverage casting */
         if ($reported_version == $wp_version) {
-            return self::throwException('WordPress version was already reported');
+            return self::throwException(__('WordPress version was already reported', 'sucuri-scanner'));
         }
 
-        SucuriScanEvent::reportInfoEvent('WordPress version detected ' . $wp_version);
+        SucuriScanEvent::reportInfoEvent(sprintf(__('WordPress version detected %s', 'sucuri-scanner'), $wp_version));
 
         return SucuriScanOption::updateOption(':site_version', $wp_version);
     }
@@ -155,11 +258,11 @@ class SucuriScanEvent extends SucuriScan
     public static function filesystemScan($force_scan = false)
     {
         if (!SucuriScanAPI::getPluginKey()) {
-            return self::throwException('API key is not available');
+            return self::throwException(__('API key is not available', 'sucuri-scanner'));
         }
 
         if (!self::runFileScanner($force_scan)) {
-            return self::throwException('Scanner ran a couple of minutes ago');
+            return self::throwException(__('Scanner ran a couple of minutes ago', 'sucuri-scanner'));
         }
 
         $fifo = new SucuriScanFileInfo();
@@ -191,7 +294,7 @@ class SucuriScanEvent extends SucuriScan
     private static function sendLogToAPI($message = '', $timestamp = '', $timeout = 1)
     {
         if (empty($message)) {
-            return self::throwException('Event identifier cannot be empty');
+            return self::throwException(__('Event identifier cannot be empty', 'sucuri-scanner'));
         }
 
         $params = array();
@@ -355,7 +458,9 @@ class SucuriScanEvent extends SucuriScan
      */
     private static function reportEvent($severity = 0, $message = '')
     {
-        if (!function_exists('wp_get_current_user')) return;
+        if (!function_exists('wp_get_current_user')) {
+            return;
+        }
 
         $user = wp_get_current_user();
         $remote_ip = self::getRemoteAddr();
@@ -370,14 +475,14 @@ class SucuriScanEvent extends SucuriScan
         }
 
         $severity = intval($severity);
-        $severity_name = 'Info';
+        $severity_name = __('Info', 'sucuri-scanner');
         $severities = array(
-            /* 0 */ 'Debug',
-            /* 1 */ 'Notice',
-            /* 2 */ 'Info',
-            /* 3 */ 'Warning',
-            /* 4 */ 'Error',
-            /* 5 */ 'Critical',
+            /* 0 */ __('Debug', 'sucuri-scanner'),
+            /* 1 */ __('Notice', 'sucuri-scanner'),
+            /* 2 */ __('Info', 'sucuri-scanner'),
+            /* 3 */ __('Warning', 'sucuri-scanner'),
+            /* 4 */ __('Error', 'sucuri-scanner'),
+            /* 5 */ __('Critical', 'sucuri-scanner'),
         );
 
         if (isset($severities[$severity])) {
@@ -507,20 +612,7 @@ class SucuriScanEvent extends SucuriScan
             case 'failed_login':
                 $settings_url = SucuriScanTemplate::getUrl('settings');
                 $content .= "\n" . sprintf(
-                    "<br><br>\n\n<em>Explanation: Someone failed to login to y"
-                    . "our site. If you are getting too many of these messages"
-                    . ", it is likely your site is under a password guessing b"
-                    . "rute-force attack [1]. You can disable the failed login"
-                    . " alerts from here [2]. Alternatively, you can consider "
-                    . "to install a firewall between your website and your vis"
-                    . "itors to filter out these and other attacks, take a loo"
-                    . "k at Sucuri Firewall [3].</em><br><br>\n\n[1] <a href='"
-                    . "https://kb.sucuri.net/definitions/attacks/brute-force/p"
-                    . "assword-guessing'>https://kb.sucuri.net/definitions/att"
-                    . "acks/brute-force/password-guessing</a><br>\n[2] <a href"
-                    . "='%s'>%s</a> <br>\n[3] <a href='https://sucuri.net/webs"
-                    . "ite-firewall/?wpalert'>https://sucuri.net/website-firew"
-                    . "all/</a><br>\n",
+                    __("<br><br>\n\n<em>Explanation: Someone failed to login to your site. If you are getting too many of these messages, it is likely your site is under a password guessing brute-force attack [1]. You can disable the failed login alerts from here [2]. Alternatively, you can consider to install a firewall between your website and your visitors to filter out these and other attacks, take a look at Sucuri Firewall [3].</em><br><br>\n\n[1] <a href='https://kb.sucuri.net/definitions/attacks/brute-force/password-guessing'>https://kb.sucuri.net/definitions/attacks/brute-force/password-guessing</a><br>\n[2] <a href='%s'>%s</a> <br>\n[3] <a href='https://sucuri.net/website-firewall/?wpalert'>https://sucuri.net/website-firewall/</a><br>\n", 'sucuri-scanner'),
                     $settings_url,
                     $settings_url
                 );
@@ -652,7 +744,7 @@ class SucuriScanEvent extends SucuriScan
 
         $sent = SucuriScanMail::sendMail(
             $user->user_email,
-            'Password Change',
+            __('Password Change', 'sucuri-scanner'),
             $message,
             $data_set
         );
@@ -734,5 +826,50 @@ class SucuriScanEvent extends SucuriScan
         }
 
         return $resp;
+    }
+
+    /**
+     * Clear last logins or failed login logs.
+     *
+     * This can also be done via Sucuri Security -> Settings -> Data Storage,
+     * however to improve the user experience, a button on Last Logins  and on
+     * Failed logins sections was added and it triggers the removal of
+     * sucuri/sucuri-lastlogins.php and sucuri/sucuri-failedlogins.php.
+     *
+     * @param string $filename Name of the file to be deleted.
+     *
+     * @return HTML Message with the delete action outcome.
+     */
+    public static function clearLastLogs($filename)
+    {
+        // Get the complete path of the file.
+        $filepath = SucuriScan::dataStorePath($filename);
+
+        // Do not proceed if not possible.
+        if (!is_writable(dirname($filepath)) || is_dir($filepath)) {
+            return SucuriScanInterface::error(
+                sprintf(
+                    __('%s cannot be deleted.', 'sucuri-scanner'),
+                    $filename
+                )
+            );
+        }
+
+        // Delete $filepath.
+        @unlink($filepath);
+        
+        // Register on audit logs and return result.
+        SucuriScanEvent::reportInfoEvent(
+            sprintf(
+                __('%s was deleted.', 'sucuri-scanner'),
+                $filename
+            )
+        );
+        return SucuriScanInterface::info(
+            sprintf(
+                __('%s was deleted.', 'sucuri-scanner'),
+                $filename
+            )
+        );
     }
 }

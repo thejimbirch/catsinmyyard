@@ -1,8 +1,8 @@
 # WP Super Cache #
-* Contributors: donncha, automattic, kraftbj
+* Contributors: donncha, automattic
 * Tags: performance, caching, wp-cache, wp-super-cache, cache
-* Tested up to: 5.0.2
-* Stable tag: 1.6.4
+* Tested up to: 5.3.2
+* Stable tag: 1.7.1
 * Requires at least: 3.1
 * Requires PHP: 5.2.4
 * License: GPLv2 or later
@@ -89,7 +89,10 @@ There is one regular WordPress filter too. Use the "do_createsupercache" filter
 to customize the checks made before caching. The filter accepts one parameter.
 The output of WP-Cache's wp_cache_get_cookies_values() function.
 
-WP Super Cache has it's own plugin system. This code is loaded when WP Super Cache loads and can be used to change how caching is done. This is before most of WordPress loads so some functionality will not be available. Plugins can be located anywhere that PHP can load them. Add your own plugin by calling wpsc_add_plugin( $name ) where $name is the full filename and path to the plugin. You only need to call that function once to add it. Use wpsc_delete_plugin( $name ) to remove it from the list of loaded plugins.
+WP Super Cache has its own plugin system. This code is loaded when WP Super Cache loads and can be used to change how caching is done. This is before most of WordPress loads so some functionality will not be available. Plugins can be located anywhere that PHP can load them. Add your own plugin either:
+
+* by putting your plugin in the wp-content/plugins/wp-super-cache-plugins directory, or
+* by calling wpsc_add_plugin( $name ) where $name is the full filename and path to the plugin. You only need to call that function once to add it. Use wpsc_delete_plugin( $name ) to remove it from the list of loaded plugins.
 
 The cookies WP Super Cache uses to identify "known users" can be modified now by adding the names of those cookies to a list in the plugin configuration. Use wpsc_add_cookie( $name ) to add a new cookie, and wpsc_delete_cookie( $name ) to remove it. The cookie names also modify the mod_rewrite rules used by the plugin but I recommend using Simple mode caching to avoid complications with updating the .htaccess file.
 The cookie name and value are used to differenciate users so you can have one cookie, but different values for each type of user on your site for example. They'll be served different cache files.
@@ -266,12 +269,71 @@ Your theme is probably responsive which means it resizes the page to suit whatev
 
 ## Changelog ##
 
+### 1.7.1 ###
+* Minor fixes to docs. #709 #645
+* Fixed typo on cache contents page. #719
+* Fixed array index warning. #724
+* Updated yellow box links. #725
+
+### 1.7.0 ###
+* Added "wpsc_cdn_urls" filter to modify the URLs used to rewrite URLs. #697
+* Fixed CDN functionality for logged in users. #698
+* Disable settings that don't work in Expert mode. #699
+* Don't enable mobile support by default, but it can still be enabled manually. #700
+* Change "admin bar" to "Toolbar". Props @garrett-eclipse. #701
+* Show settings enabled by "easy" settings page. #703
+
+### 1.6.9 ###
+* Improve the variables and messaging used by advanced-cache.php code. #687
+* Add a warning message to the debug log viewer. #688
+* Disable raw viewing of the debug log. #691
+* Clean up the debug log. #692 #694
+* Added wpsc_update_check() in 9659af156344a77ae247dc582d52053d95c79b93.
+
+### 1.6.8 ###
+* Added new constants, WPSC_SERVE_DISABLED (disable serving of cached files) and WPSC_SUPERCACHE_ONLY (only serve supercache cache files). #682 and #672
+* Hide get_post() warning on some sites. #684
+* Check if WPCACHEHOME is set correctly before maybe updating it. #683
+* Remove object cache support as it never worked properly. #681
+* Add "logged in users" to the  "do not cache for users" setting and rename that setting to "Cache Restrictions" #657
+
+### 1.6.7 ###
+* wp_cache_setting() can now save boolean values since many of the settings are bools. #676
+* Check if $super_cache_enabled is true in a less strict way because it might be '1' rather than true. #677
+
+### 1.6.6 ###
+* Fix problems with saving settings. Returns false ONLY when there's an issue with the config file, not when the setting isn't changed. Change other code to cope with that, including updating WPCACHEHOME (#670)
+* When saving settings rename the temporary config file correctly, and delete wp-admin/.php if it exists. (#673)
+* Fix adding WPCACHEHOME to wp-config.php when advanced-cache.php is not found and wp-config.php is RO. (#674)
+
+### 1.6.5 ###
+* Check advanced-cache.php was created by the plugin before modifying/deleting it. (#666)
+* When saving settings, save blank lines. Fixes problems with WP_CACHE and WPCACHEHOME in wp-config.php. Related to #652. (#667)
+* Update outdated code and use is_multisite() (#600)
+* Fix the delete cache button in the Toolbar. (#603)
+* Code cleanup in #602
+* Use get_post_status instead of post_status (#623)
+* Fixes button - Update Direct Pages (#622)
+* Removes apache_response_headers and uses only headers_list (#618)
+* Function is_site_admin has been deprecated (#611)
+* Fixes action urls in wp_cache_manager (#610)
+* Remove the link to the HibbsLupusTrust tweet. (#635)
+* Don't load wp-cache-config.php if it's already loaded (#605)
+* PHPCS fixes and optimization for plugins/domain-mapping.php (#615)
+* Introduces PHP_VERSION_ID for faster checking (#604)
+* Fixes regex and optimizes ossdl-cdn.php (#596)
+* Only update new settings and use a temporary file to avoid corruption. (#652)
+* Serve cached files to rejected user agents, don't cache them. (#658)
+* Combine multiple headers with the same name (#641)
+* Open ‘Delete Cache’ link in same window (#656)
+* Promote the Jetpack Site Accelerator on the CDN page. (#636)
+
 ### 1.6.4 ###
 * Changes between [1.6.3 and 1.6.4](https://github.com/Automattic/wp-super-cache/compare/1.6.3...1.6.4)
 * Fixes for WP-CLI (#587) (#592)
 * Bumped the minimum WordPress version to 3.1 to use functions introduced then. (#591)
 * Fixes to wpsc_post_transition to avoid a fatal error using get_sample_permalink. (#595)
-* Fixed the admin bar "Delete Cache" link. (#589)
+* Fixed the Toolbar "Delete Cache" link. (#589)
 * Fixed the headings used in the settings page. (#597)
 
 ### 1.6.3 ###
@@ -284,7 +346,7 @@ Your theme is probably responsive which means it resizes the page to suit whatev
 * Don't clean expired cache files after preload if garbage collection is disabled (#572)
 * On preload, if deleting a post don't delete the sub directories if it's the homepage. (#573)
 * Fix generation of semaphores when using WP CLI (#576)
-* Fix deleting from the admin bar (#578)
+* Fix deleting from the Toolbar (#578)
 * Avoid a strpos() warning. (#579)
 * Improve deleting of cache in edit/delete/publish actions (#577)
 * Fixes to headers code (#496)
@@ -358,7 +420,7 @@ Your theme is probably responsive which means it resizes the page to suit whatev
 * Minor changes to indentaion and spaces to tabs conversion (#371) (#395)
 * Don't set $wp_super_cache_comments here as it's not saved. (#379)
 * realpath() only works on directories. The cache_file wasn't set correctly. (#377)
-* Fix problem deleting cache from admin bar because of realpath() (#381)
+* Fix problem deleting cache from Toolbar because of realpath() (#381)
 * Use trigger_error() instead of echoing to the screen if a config file isn't writeable. (#394)
 * Added the "wpsc_enable_wp_config_edit" filter to disable editing the wp-config.php (#392)
 * Fix some PHP notices when comments are edited/published/maintained. (#386)
@@ -501,7 +563,7 @@ Your theme is probably responsive which means it resizes the page to suit whatev
 
 ### 1.2 ###
 * Garbage collection of old cache files is significantly improved. I added a scheduled job that keeps an eye on things and restarts the job if necessary. Also, if you enable caching from the Easy page garbage collection will be enabled too.
-* Editors can delete single cached files from the admin bar now.
+* Editors can delete single cached files from the Toolbar now.
 * Fixed the cached page counter on the settings page.
 * Some sites that updated to 1.0 experienced too much garbage collection. There are still stragglers out there who haven't upgraded but that's fixed now!
 * Supercached mobile files are now used as there was a tiny little typo that needed fixing.
@@ -543,7 +605,7 @@ Your theme is probably responsive which means it resizes the page to suit whatev
 * Removed AddDefaultCharset .htaccess rule
 * Fixed problem with blogs in a folder and don't have a trailing slash
 * New scheduling of garbage collection
-* Added a "Delete cache" link to admin bar to delete cache of current page.
+* Added a "Delete cache" link to Toolbar to delete cache of current page.
 * Updated documentation
 * Sorry Digg, Stephen Fry power now!
 * Updated translations
@@ -691,4 +753,4 @@ Your theme is probably responsive which means it resizes the page to suit whatev
 
 
 ## Upgrade Notice ##
-Bug fixes
+Bugfix release.

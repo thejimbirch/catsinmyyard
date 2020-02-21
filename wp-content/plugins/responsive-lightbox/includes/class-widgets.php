@@ -12,6 +12,11 @@ new Responsive_Lightbox_Widgets();
  */
 class Responsive_Lightbox_Widgets {
 
+	/**
+	 * Constructor.
+	 *
+	 * @return void
+	 */
 	public function __construct() {
 		// actions
 		add_action( 'widgets_init', array( $this, 'register_widgets' ) );
@@ -19,6 +24,8 @@ class Responsive_Lightbox_Widgets {
 
 	/**
 	 * Register widgets.
+	 *
+	 * @return void
 	 */
 	public function register_widgets() {
 		register_widget( 'Responsive_Lightbox_Gallery_Widget' );
@@ -39,6 +46,11 @@ class Responsive_Lightbox_Gallery_Widget extends WP_Widget {
 	private $rlg_image_sizes = array();
 	private $rlg_gallery_types  = array();
 
+	/**
+	 * Constructor.
+	 *
+	 * @return void
+	 */
 	public function __construct() {
 		parent::__construct(
 			'Responsive_Lightbox_Gallery_Widget',

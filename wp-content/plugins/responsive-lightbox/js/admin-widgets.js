@@ -98,10 +98,10 @@
 				// create the media frame.
 				rl_gallery_frames[gallery_id] = wp.media( {
 					// Set the title of the modal.
-					title: rlArgs.textSelectImages,
+					title: rlArgsWidgets.textSelectImages,
 					multiple: true,
 					button: {
-						text: rlArgs.textUseImages
+						text: rlArgsWidgets.textUseImages
 					},
 					library: { type: 'image' },
 					multiple: true
@@ -149,7 +149,7 @@
 								rl_gallery_images[gallery_id].append( '\
 									<li class="rl-gallery-image" data-attachment_id="' + attachment.id + '">\
 										<div class="rl-gallery-inner"><img src="' + attachment.url + '" /></div>\
-										<div class="rl-gallery-actions"><a href="#" class="rl-gallery-image-remove dashicons dashicons-no" title="' + rlArgs.textRemoveImage + '"></a></div>\
+										<div class="rl-gallery-actions"><a href="#" class="rl-gallery-image-remove dashicons dashicons-no" title="' + rlArgsWidgets.textRemoveImage + '"></a></div>\
 									</li>'
 									);
 							}
@@ -197,9 +197,9 @@
 
 			// create a new media frame
 			rl_image_frame = wp.media( {
-				title: rlArgs.textSelectImage,
+				title: rlArgsWidgets.textSelectImage,
 				button: {
-					text: rlArgs.textUseImage
+					text: rlArgsWidgets.textUseImage
 				},
 				library: { type: 'image' },
 				multiple: false

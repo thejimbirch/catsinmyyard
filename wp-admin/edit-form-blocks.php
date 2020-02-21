@@ -1,6 +1,6 @@
 <?php
 /**
- * The Block Editor page.
+ * The block editor page.
  *
  * @since 5.0.0
  *
@@ -16,16 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * @global string       $post_type
  * @global WP_Post_Type $post_type_object
- * @global WP_Post      $post
+ * @global WP_Post      $post             Global post object.
  * @global string       $title
  * @global array        $editor_styles
  * @global array        $wp_meta_boxes
  */
 global $post_type, $post_type_object, $post, $title, $editor_styles, $wp_meta_boxes;
-
-if ( ! empty( $post_type_object ) ) {
-	$title = $post_type_object->labels->edit_item;
-}
 
 // Flag that we're loading the block editor.
 $current_screen = get_current_screen();
@@ -52,6 +48,8 @@ $preload_paths = array(
 	sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
 	sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
 	array( '/wp/v2/media', 'OPTIONS' ),
+	array( '/wp/v2/blocks', 'OPTIONS' ),
+	sprintf( '/wp/v2/%s/%d/autosaves?context=edit', $rest_base, $post->ID ),
 );
 
 /**
@@ -99,7 +97,7 @@ wp_add_inline_script(
  * but should be included in its save payload.
  */
 $initial_edits = null;
-$is_new_post = false;
+$is_new_post   = false;
 if ( 'auto-draft' === $post->post_status ) {
 	$is_new_post = true;
 	// Override "(Auto Draft)" new post default title with empty string, or filtered value.
@@ -120,10 +118,10 @@ wp_add_inline_script(
 $meta_box_url = admin_url( 'post.php' );
 $meta_box_url = add_query_arg(
 	array(
-		'post'            => $post->ID,
-		'action'          => 'edit',
-		'meta-box-loader' => true,
-		'_wpnonce'        => wp_create_nonce( 'meta-box-loader' ),
+		'post'                  => $post->ID,
+		'action'                => 'edit',
+		'meta-box-loader'       => true,
+		'meta-box-loader-nonce' => wp_create_nonce( 'meta-box-loader' ),
 	),
 	$meta_box_url
 );
@@ -178,7 +176,7 @@ $styles = array(
 	),
 );
 
-/* Translators: Use this to specify the CSS font family for the default font */
+/* translators: Use this to specify the CSS font family for the default font. */
 $locale_font_family = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font' );
 $styles[]           = array(
 	'css' => "body { font-family: '$locale_font_family' }",
@@ -195,7 +193,7 @@ if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {
 			}
 		} else {
 			$file = get_theme_file_path( $style );
-			if ( file_exists( $file ) ) {
+			if ( is_file( $file ) ) {
 				$styles[] = array(
 					'css'     => file_get_contents( $file ),
 					'baseURL' => get_theme_file_uri( $style ),
@@ -229,6 +227,8 @@ foreach ( $image_size_names as $image_size_slug => $image_size_name ) {
 // Lock settings.
 $user_id = wp_check_post_lock( $post->ID );
 if ( $user_id ) {
+	$locked = false;
+
 	/** This filter is documented in wp-admin/includes/post.php */
 	if ( apply_filters( 'show_post_locked_dialog', true, $post, $user_id ) ) {
 		$locked = true;
@@ -250,9 +250,13 @@ if ( $user_id ) {
 } else {
 	// Lock the post.
 	$active_post_lock = wp_set_post_lock( $post->ID );
-	$lock_details     = array(
+	if ( $active_post_lock ) {
+		$active_post_lock = esc_attr( implode( ':', $active_post_lock ) );
+	}
+
+	$lock_details = array(
 		'isLocked'       => false,
-		'activePostLock' => esc_attr( implode( ':', $active_post_lock ) ),
+		'activePostLock' => $active_post_lock,
 	);
 }
 
@@ -277,7 +281,7 @@ $editor_settings = array(
 	'titlePlaceholder'       => apply_filters( 'enter_title_here', __( 'Add title' ), $post ),
 	'bodyPlaceholder'        => $body_placeholder,
 	'isRTL'                  => is_rtl(),
-	'autosaveInterval'       => 10,
+	'autosaveInterval'       => AUTOSAVE_INTERVAL,
 	'maxUploadFileSize'      => $max_upload_size,
 	'allowedMimeTypes'       => get_allowed_mime_types(),
 	'styles'                 => $styles,
@@ -310,7 +314,7 @@ if ( false !== $color_palette ) {
 	$editor_settings['colors'] = $color_palette;
 }
 
-if ( ! empty( $font_sizes ) ) {
+if ( false !== $font_sizes ) {
 	$editor_settings['fontSizes'] = $font_sizes;
 }
 
@@ -399,9 +403,36 @@ require_once( ABSPATH . 'wp-admin/admin-header.php' );
 ?>
 
 <div class="block-editor">
-	<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
-	<div id="editor" class="block-editor__container"></div>
+	<h1 class="screen-reader-text hide-if-no-js"><?php echo esc_html( $title ); ?></h1>
+	<div id="editor" class="block-editor__container hide-if-no-js"></div>
 	<div id="metaboxes" class="hidden">
 		<?php the_block_editor_meta_boxes(); ?>
+	</div>
+
+	<?php // JavaScript is disabled. ?>
+	<div class="wrap hide-if-js block-editor-no-js">
+		<h1 class="wp-heading-inline"><?php echo esc_html( $title ); ?></h1>
+		<div class="notice notice-error notice-alt">
+			<p>
+				<?php
+					$message = sprintf(
+						/* translators: %s: A link to install the Classic Editor plugin. */
+						__( 'The block editor requires JavaScript. Please enable JavaScript in your browser settings, or try the <a href="%s">Classic Editor plugin</a>.' ),
+						esc_url( wp_nonce_url( self_admin_url( 'plugin-install.php?tab=favorites&user=wordpressdotorg&save=0' ), 'save_wporg_username_' . get_current_user_id() ) )
+					);
+
+					/**
+					 * Filters the message displayed in the block editor interface when JavaScript is
+					 * not enabled in the browser.
+					 *
+					 * @since 5.0.3
+					 *
+					 * @param string  $message The message being displayed.
+					 * @param WP_Post $post    The post being edited.
+					 */
+					echo apply_filters( 'block_editor_no_javascript_message', $message, $post );
+					?>
+			</p>
+		</div>
 	</div>
 </div>

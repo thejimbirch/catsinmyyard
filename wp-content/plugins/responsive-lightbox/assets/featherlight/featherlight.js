@@ -1,8 +1,8 @@
 /**
  * Featherlight - ultra slim jQuery lightbox
- * Version 1.7.12 - http://noelboss.github.io/featherlight/
+ * Version 1.7.13 - http://noelboss.github.io/featherlight/
  *
- * Copyright 2017, Noël Raoul Bossart (http://www.noelboss.com)
+ * Copyright 2018, Noël Raoul Bossart (http://www.noelboss.com)
  * MIT Licensed.
 **/
 (function($) {
@@ -71,8 +71,9 @@
 
 	// NOTE: List of available [iframe attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe).
 	var iFrameAttributeSet = {
-		allowfullscreen: 1, frameborder: 1, height: 1, longdesc: 1, marginheight: 1, marginwidth: 1,
-		name: 1, referrerpolicy: 1, scrolling: 1, sandbox: 1, src: 1, srcdoc: 1, width: 1
+		allow: 1, allowfullscreen: 1, frameborder: 1, height: 1, longdesc: 1, marginheight: 1, marginwidth: 1,
+		mozallowfullscreen: 1, name: 1, referrerpolicy: 1, sandbox: 1, scrolling: 1, src: 1, srcdoc: 1, style: 1,
+		webkitallowfullscreen: 1, width: 1
 	};
 
 	// Converts camelCased attributes to dasherized versions for given prefix:
@@ -479,7 +480,7 @@
 			/* make a copy */
 			config = $.extend({}, config);
 
-			/* Only for openTrigger and namespace... */
+			/* Only for openTrigger, filter & namespace... */
 			var namespace = config.namespace || Klass.defaults.namespace,
 				tempConfig = $.extend({}, Klass.defaults, Klass.readElementConfig($source[0], namespace), config),
 				sharedPersist;
@@ -505,7 +506,7 @@
 
 			$source.on(tempConfig.openTrigger+'.'+tempConfig.namespace, tempConfig.filter, handler);
 
-			return handler;
+			return {filter: tempConfig.filter, handler: handler};
 		},
 
 		current: function() {
@@ -530,8 +531,9 @@
 		_onReady: function() {
 			var Klass = this;
 			if(Klass.autoBind){
+				var $autobound = $(Klass.autoBind);
 				/* Bind existing elements */
-				$(Klass.autoBind).each(function(){
+				$autobound.each(function(){
 					Klass.attach($(this));
 				});
 				/* If a click propagates to the document level, then we have an item that was added later on */
@@ -539,10 +541,18 @@
 					if (evt.isDefaultPrevented()) {
 						return;
 					}
+					var $cur = $(evt.currentTarget);
+					var len = $autobound.length;
+					$autobound = $autobound.add($cur);
+					if(len === $autobound.length) {
+						return; /* already bound */
+					}
 					/* Bind featherlight */
-					var handler = Klass.attach($(evt.currentTarget));
+					var data = Klass.attach($cur);
 					/* Dispatch event directly */
-					handler(evt);
+					if (!data.filter || $(evt.target).parentsUntil($cur, data.filter).length > 0) {
+						data.handler(evt);
+					}
 				});
 			}
 		},

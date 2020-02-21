@@ -114,7 +114,7 @@ class UpdraftPlus_Storage_Methods_Interface {
 		
 			if (is_a($remote_storage, 'UpdraftPlus_BackupModule')) {
 			
-				if (!empty($method_objects[$method])) $storage_objects_and_ids[$method] = array();
+				if (empty($storage_objects_and_ids[$method])) $storage_objects_and_ids[$method] = array();
 				
 				$storage_objects_and_ids[$method]['object'] = $remote_storage;
 				
@@ -269,6 +269,8 @@ class UpdraftPlus_Storage_Methods_Interface {
 	public static function get_remote_file($services, $file, $timestamp, $restore = false) {
 		
 		global $updraftplus;
+
+		$backup_history = UpdraftPlus_Backup_History::get_history();
 		
 		$fullpath = $updraftplus->backups_dir_location().'/'.$file;
 
@@ -324,7 +326,7 @@ class UpdraftPlus_Storage_Methods_Interface {
 						$updraftplus->log(__('Error', 'updraftplus'), 'notice-restore');
 					} else {
 						clearstatcache();
-						if (0 === @filesize($fullpath)) @unlink($fullpath);
+						if (0 === @filesize($fullpath)) @unlink($fullpath);// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 						$updraftplus->log('Remote fetch failed');
 					}
 				}
@@ -336,25 +338,25 @@ class UpdraftPlus_Storage_Methods_Interface {
 	/**
 	 * Downloads a specified file into UD's directory
 	 *
-	 * @param String				   $file   The basename of the file
-	 * @param UpdraftPlus_BackupModule $object The object of the service to use to download with.
+	 * @param String				   $file		   The basename of the file
+	 * @param UpdraftPlus_BackupModule $service_object The object of the service to use to download with.
 	 *
 	 * @return Boolean - Whether the operation succeeded. Inherited from the storage module's download() method. N.B. At the time of writing it looks like not all modules necessarily return true upon success; but false can be relied upon for detecting failure.
 	 */
-	private static function download_file($file, $object) {
+	private static function download_file($file, $service_object) {
 
 		global $updraftplus;
 	
-		@set_time_limit(UPDRAFTPLUS_SET_TIME_LIMIT);
+		@set_time_limit(UPDRAFTPLUS_SET_TIME_LIMIT);// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 
-		$service = $object->get_id();
+		$service = $service_object->get_id();
 		
 		$updraftplus->log("Requested file from remote service: $service: $file");
 
-		if (method_exists($object, 'download')) {
+		if (method_exists($service_object, 'download')) {
 		
 			try {
-				return $object->download($file);
+				return $service_object->download($file);
 			} catch (Exception $e) {
 				$log_message = 'Exception ('.get_class($e).') occurred during download: '.$e->getMessage().' (Code: '.$e->getCode().', line '.$e->getLine().' in '.$e->getFile().')';
 				error_log($log_message);

@@ -13,6 +13,8 @@ class Jetpack_Simple_Payments {
 
 	static $css_classname_prefix = 'jetpack-simple-payments';
 
+	static $required_plan;
+
 	// Increase this number each time there's a change in CSS or JS to bust cache.
 	static $version = '0.25';
 
@@ -23,6 +25,7 @@ class Jetpack_Simple_Payments {
 		if ( ! self::$instance ) {
 			self::$instance = new self();
 			self::$instance->register_init_hooks();
+			self::$required_plan = ( defined( 'IS_WPCOM' ) && IS_WPCOM ) ? 'value_bundle' : 'jetpack_premium';
 		}
 		return self::$instance;
 	}
@@ -40,6 +43,7 @@ class Jetpack_Simple_Payments {
 
 	private function register_init_hooks() {
 		add_action( 'init', array( $this, 'init_hook_action' ) );
+		add_action( 'jetpack_register_gutenberg_extensions', array( $this, 'register_gutenberg_block' ) );
 		add_action( 'rest_api_init', array( $this, 'register_meta_fields_in_rest_api' ) );
 	}
 
@@ -57,11 +61,20 @@ class Jetpack_Simple_Payments {
 		$this->setup_cpts();
 
 		add_filter( 'the_content', array( $this, 'remove_auto_paragraph_from_product_description' ), 0 );
+	}
 
+	function register_gutenberg_block() {
 		if ( $this->is_enabled_jetpack_simple_payments() ) {
-			jetpack_register_block( 'simple-payments' );
+			jetpack_register_block( 'jetpack/simple-payments' );
 		} else {
-			jetpack_register_block( 'simple-payments', array(), array( 'available' => false, 'unavailable_reason' => 'missing_plan' ) );
+			Jetpack_Gutenberg::set_extension_unavailable(
+				'jetpack/simple-payments',
+				'missing_plan',
+				array(
+					'required_feature' => 'simple-payments',
+					'required_plan'    => self::$required_plan,
+				)
+			);
 		}
 	}
 
@@ -105,7 +118,7 @@ class Jetpack_Simple_Payments {
 		}
 
 		// For all Jetpack sites
-		return Jetpack::is_active() && Jetpack::active_plan_supports( 'simple-payments');
+		return Jetpack::is_active() && Jetpack_Plan::supports( 'simple-payments');
 	}
 
 	function parse_shortcode( $attrs, $content = false ) {
@@ -138,12 +151,15 @@ class Jetpack_Simple_Payments {
 
 		$data['id'] = $attrs['id'];
 
-		if( ! wp_style_is( 'jetpack-simple-payments', 'enqueue' ) ) {
+		if( ! wp_style_is( 'jetpack-simple-payments', 'enqueued' ) ) {
 			wp_enqueue_style( 'jetpack-simple-payments' );
 		}
 
 		if ( ! $this->is_enabled_jetpack_simple_payments() ) {
-			return $this->output_admin_warning( $data );
+			if ( ! is_feed() ) {
+				$this->output_admin_warning( $data );
+			}
+			return;
 		}
 
 		if ( ! wp_script_is( 'paypal-express-checkout', 'enqueued' ) ) {
@@ -165,38 +181,11 @@ class Jetpack_Simple_Payments {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-		$css_prefix = self::$css_classname_prefix;
 
-		$support_url = ( defined( 'IS_WPCOM' ) && IS_WPCOM )
-			? 'https://support.wordpress.com/simple-payments/'
-			: 'https://jetpack.com/support/simple-payment-button/';
-
-		return sprintf( '
-<div class="%1$s">
-	<div class="%2$s">
-		<div class="%3$s">
-			<div class="%4$s" id="%5$s">
-				<p>%6$s</p>
-				<p>%7$s</p>
-			</div>
-		</div>
-	</div>
-</div>
-',
-			esc_attr( "{$data['class']} ${css_prefix}-wrapper" ),
-			esc_attr( "${css_prefix}-product" ),
-			esc_attr( "${css_prefix}-details" ),
-			esc_attr( "${css_prefix}-purchase-message show error" ),
-			esc_attr( "{$data['dom_id']}-message-container" ),
-			sprintf(
-				wp_kses(
-					__( 'Your plan doesn\'t include Simple Payments. <a href="%s" rel="noopener noreferrer" target="_blank">Learn more and upgrade</a>.', 'jetpack' ),
-					array( 'a' => array( 'href' => array(), 'rel' => array(), 'target' => array() ) )
-				),
-				esc_url( $support_url )
-			),
-			esc_html__( '(Only administrators will see this message.)', 'jetpack' )
-		);
+		jetpack_require_lib( 'components' );
+		return Jetpack_Components::render_upgrade_nudge( array(
+			'plan' => self::$required_plan
+		) );
 	}
 
 	function output_shortcode( $data ) {
@@ -244,9 +233,9 @@ class Jetpack_Simple_Payments {
 			$image,
 			esc_attr( "${css_prefix}-details" ),
 			esc_attr( "${css_prefix}-title" ),
-			$data['title'],
+			esc_html( $data['title'] ),
 			esc_attr( "${css_prefix}-description" ),
-			$data['description'],
+			wp_kses( $data['description'], wp_kses_allowed_html( 'post' ) ),
 			esc_attr( "${css_prefix}-price" ),
 			esc_html( $data['price'] ),
 			esc_attr( "${css_prefix}-purchase-message" ),
@@ -285,7 +274,13 @@ class Jetpack_Simple_Payments {
 			);
 		}
 
-		return "$price $currency";
+		// Fall back to unspecified currency symbol like `¤1,234.05`.
+		// @link https://en.wikipedia.org/wiki/Currency_sign_(typography).
+		if ( ! $currency ) {
+			return '¤' . number_format_i18n( $price, 2 );
+		}
+
+		return number_format_i18n( $price, 2 ) . ' ' . $currency;
 	}
 
 	/**
@@ -382,11 +377,16 @@ class Jetpack_Simple_Payments {
 	/**
 	 * Sanitize three-character ISO-4217 Simple payments currency
 	 *
-	 * List has to be in sync with list at the client side:
-	 * @link https://github.com/Automattic/wp-calypso/blob/6d02ffe73cc073dea7270a22dc30881bff17d8fb/client/lib/simple-payments/constants.js
+	 * List has to be in sync with list at the block's client side and widget's backend side:
+	 * @link https://github.com/Automattic/jetpack/blob/31efa189ad223c0eb7ad085ac0650a23facf9ef5/extensions/blocks/simple-payments/constants.js#L9-L39
+	 * @link https://github.com/Automattic/jetpack/blob/31efa189ad223c0eb7ad085ac0650a23facf9ef5/modules/widgets/simple-payments.php#L19-L44
 	 *
 	 * Currencies should be supported by PayPal:
-	 * @link https://developer.paypal.com/docs/integration/direct/rest/currency-codes/
+	 * @link https://developer.paypal.com/docs/api/reference/currency-codes/
+	 *
+	 * Indian Rupee (INR) not supported because at the time of the creation of this file
+	 * because it's limited to in-country PayPal India accounts only.
+	 * Discussion: https://github.com/Automattic/wp-calypso/pull/28236
 	 */
 	public static function sanitize_currency( $currency ) {
 		$valid_currencies = array(

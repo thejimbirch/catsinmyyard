@@ -82,12 +82,56 @@ this["wp"] = this["wp"] || {}; this["wp"]["hooks"] =
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 311);
+/******/ 	return __webpack_require__(__webpack_require__.s = 351);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 311:
+/***/ 17:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/arrayWithoutHoles.js
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
+      arr2[i] = arr[i];
+    }
+
+    return arr2;
+  }
+}
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/iterableToArray.js
+var iterableToArray = __webpack_require__(30);
+
+// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/nonIterableSpread.js
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance");
+}
+// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/toConsumableArray.js
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return _toConsumableArray; });
+
+
+
+function _toConsumableArray(arr) {
+  return _arrayWithoutHoles(arr) || Object(iterableToArray["a" /* default */])(arr) || _nonIterableSpread();
+}
+
+/***/ }),
+
+/***/ 30:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return _iterableToArray; });
+function _iterableToArray(iter) {
+  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+}
+
+/***/ }),
+
+/***/ 351:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -155,6 +199,9 @@ function validateHookName(hookName) {
 /* harmony default export */ var build_module_validateHookName = (validateHookName);
 
 // CONCATENATED MODULE: ./node_modules/@wordpress/hooks/build-module/createAddHook.js
+/**
+ * Internal dependencies
+ */
 
 
 
@@ -208,21 +255,25 @@ function createAddHook(hooks) {
     if (hooks[hookName]) {
       // Find the correct insert index of the new hook.
       var handlers = hooks[hookName].handlers;
-      var i = 0;
+      var i;
 
-      while (i < handlers.length) {
-        if (handlers[i].priority > priority) {
+      for (i = handlers.length; i > 0; i--) {
+        if (priority >= handlers[i - 1].priority) {
           break;
         }
+      }
 
-        i++;
-      } // Insert (or append) the new hook.
-
-
-      handlers.splice(i, 0, handler); // We may also be currently executing this hook.  If the callback
+      if (i === handlers.length) {
+        // If append, operate via direct assignment.
+        handlers[i] = handler;
+      } else {
+        // Otherwise, insert before index via splice.
+        handlers.splice(i, 0, handler);
+      } // We may also be currently executing this hook.  If the callback
       // we're adding would come after the current callback, there's no
       // problem; otherwise we need to increase the execution index of
       // any other runs by 1 to account for the added element.
+
 
       (hooks.__current || []).forEach(function (hookInfo) {
         if (hookInfo.name === hookName && hookInfo.currentIndex >= i) {
@@ -246,6 +297,9 @@ function createAddHook(hooks) {
 /* harmony default export */ var build_module_createAddHook = (createAddHook);
 
 // CONCATENATED MODULE: ./node_modules/@wordpress/hooks/build-module/createRemoveHook.js
+/**
+ * Internal dependencies
+ */
 
 
 
@@ -335,24 +389,38 @@ function createRemoveHook(hooks, removeAll) {
  * @param  {Object}   hooks Stored hooks, keyed by hook name.
  *
  * @return {Function}       Function that returns whether any handlers are
- *                          attached to a particular hook.
+ *                          attached to a particular hook and optional namespace.
  */
 function createHasHook(hooks) {
   /**
-   * Returns how many handlers are attached for the given hook.
+   * Returns whether any handlers are attached for the given hookName and optional namespace.
    *
-   * @param  {string}  hookName The name of the hook to check for.
+   * @param {string}  hookName  The name of the hook to check for.
+   * @param {?string} namespace Optional. The unique namespace identifying the callback
+   *                                      in the form `vendor/plugin/function`.
    *
    * @return {boolean} Whether there are handlers that are attached to the given hook.
    */
-  return function hasHook(hookName) {
+  return function hasHook(hookName, namespace) {
+    // Use the namespace if provided.
+    if ('undefined' !== typeof namespace) {
+      return hookName in hooks && hooks[hookName].handlers.some(function (hook) {
+        return hook.namespace === namespace;
+      });
+    }
+
     return hookName in hooks;
   };
 }
 
 /* harmony default export */ var build_module_createHasHook = (createHasHook);
 
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/toConsumableArray.js + 2 modules
+var toConsumableArray = __webpack_require__(17);
+
 // CONCATENATED MODULE: ./node_modules/@wordpress/hooks/build-module/createRunHook.js
+
+
 /**
  * Returns a function which, when invoked, will execute all callbacks
  * registered to a hook of the specified type, optionally returning the final
@@ -382,7 +450,9 @@ function createRunHook(hooks, returnFirstArg) {
     }
 
     hooks[hookName].runs++;
-    var handlers = hooks[hookName].handlers;
+    var handlers = hooks[hookName].handlers; // The following code is stripped from production builds.
+
+    if (false) {}
 
     for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
       args[_key - 1] = arguments[_key];
@@ -482,6 +552,9 @@ function createDoingHook(hooks) {
 /* harmony default export */ var build_module_createDoingHook = (createDoingHook);
 
 // CONCATENATED MODULE: ./node_modules/@wordpress/hooks/build-module/createDidHook.js
+/**
+ * Internal dependencies
+ */
 
 /**
  * Returns a function which, when invoked, will return the number of times a
@@ -512,6 +585,9 @@ function createDidHook(hooks) {
 /* harmony default export */ var build_module_createDidHook = (createDidHook);
 
 // CONCATENATED MODULE: ./node_modules/@wordpress/hooks/build-module/createHooks.js
+/**
+ * Internal dependencies
+ */
 
 
 
@@ -574,6 +650,9 @@ function createHooks() {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "actions", function() { return build_module_actions; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filters", function() { return build_module_filters; });
 /* concated harmony reexport createHooks */__webpack_require__.d(__webpack_exports__, "createHooks", function() { return build_module_createHooks; });
+/**
+ * Internal dependencies
+ */
 
 
 var _createHooks = build_module_createHooks(),

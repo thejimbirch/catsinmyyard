@@ -12,18 +12,15 @@ new Responsive_Lightbox_Settings();
  */
 class Responsive_Lightbox_Settings {
 
-	public $settings 		= array();
-	public $tabs 			= array();
-	public $scripts 		= array();
-	private $choices 		= array();
-	private $loading_places	= array();
-	private $api_url		= 'http://dfactory.eu';
+	public $settings = array();
+	public $tabs = array();
+	public $scripts = array();
 
 	public function __construct() {
 		
 		// set instance
 		Responsive_Lightbox()->settings = $this;
-
+ 
 		// actions
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'admin_menu_options' ) );
@@ -59,6 +56,9 @@ class Responsive_Lightbox_Settings {
 	 * @return void
 	 */
 	public function load_defaults() {
+		// assign main instance
+		$rl = Responsive_Lightbox();
+
 		$this->scripts = apply_filters( 'rl_settings_scripts', array(
 			'swipebox'		 => array(
 				'name'		 => __( 'SwipeBox', 'responsive-lightbox' ),
@@ -153,26 +153,7 @@ class Responsive_Lightbox_Settings {
 			'alt'	 		=> __( 'Image Alt Text', 'responsive-lightbox' ),
 			'description'	=> __( 'Image Description', 'responsive-lightbox' )
 		);
-		
-		$this->image_icons = array(
-			'0' => __( 'none', 'responsive-lightbox' ),
-			'1' => '',
-			'2' => '',
-			'3' => '',
-			'4' => '',
-			'5' => '',
-			'6' => '',
-			'7' => '',
-			'8' => '',
-			'9' => '',
-			'10' => ''
-		);
 
-		$this->loading_places = array(
-			'header' => __( 'Header', 'responsive-lightbox' ),
-			'footer' => __( 'Footer', 'responsive-lightbox' )
-		);
-		
 		// get scripts
 		foreach ( $this->scripts as $key => $value ) {
 			$scripts[$key] = $value['name'];
@@ -187,7 +168,7 @@ class Responsive_Lightbox_Settings {
 		) );
 
 		// prepare galeries
-		$galleries = $builder_galleries = wp_parse_args( apply_filters( 'rl_gallery_types', array() ), Responsive_Lightbox()->gallery_types );
+		$galleries = $builder_galleries = wp_parse_args( apply_filters( 'rl_gallery_types', array() ), $rl->gallery_types );
 
 		unset( $builder_galleries['default'] );
 
@@ -207,21 +188,16 @@ class Responsive_Lightbox_Settings {
 						'section' => 'responsive_lightbox_settings',
 						'type' => 'button',
 						'label' => __( 'Start Tour', 'responsive-lightbox' ),
-						'description' => __( 'Take this tour to quickly learn about the use of this plugin.', 'responsive-lightbox' )
+						'description' => __( 'Take this tour to quickly learn about the use of this plugin.', 'responsive-lightbox' ),
+						'classname' => 'button-primary button-large',
 					),
 					'script' => array(
-						// 'name' => '',
 						'title' => __( 'Default lightbox', 'responsive-lightbox' ),
-						// 'callback' => '',
-						// 'page' => '',
 						'section' => 'responsive_lightbox_settings',
 						'type' => 'radio',
 						'label' => '',
 						'description' => sprintf(__( 'Select your preferred ligthbox effect script or get our <a href="%s">premium extensions</a>.', 'responsive-lightbox' ), wp_nonce_url( add_query_arg( array( 'action' => 'rl-hide-notice' ), admin_url( 'admin.php?page=responsive-lightbox-addons' ) ), 'rl_action', 'rl_nonce' ) ),
 						'options' => $scripts
-						// 'options_cb' => '',
-						// 'id' => '',
-						// 'class' => array(),
 					),
 					'selector' => array(
 						'title' => __( 'Selector', 'responsive-lightbox' ),
@@ -333,7 +309,7 @@ class Responsive_Lightbox_Settings {
 						'section' => 'responsive_lightbox_settings',
 						'type' => 'boolean',
 						'label' => __( 'Replace WooCommerce product gallery lightbox.', 'responsive-lightbox' ),
-						'disabled' => ! class_exists( 'WooCommerce' )
+						'disabled' => ! class_exists( 'WooCommerce' ) || Responsive_Lightbox()->options['settings']['default_woocommerce_gallery'] !== 'default'
 					),
 					'enable_custom_events' => array(
 						'title' => __( 'Custom events', 'responsive-lightbox' ),
@@ -355,7 +331,10 @@ class Responsive_Lightbox_Settings {
 						'section' => 'responsive_lightbox_settings',
 						'type' => 'radio',
 						'description' => __( 'Select where all the lightbox scripts should be placed.', 'responsive-lightbox' ),
-						'options' => $this->loading_places
+						'options' => array(
+							'header' => __( 'Header', 'responsive-lightbox' ),
+							'footer' => __( 'Footer', 'responsive-lightbox' )
+						)
 					),
 					'conditional_loading' => array(
 						'title' => __( 'Conditional loading', 'responsive-lightbox' ),
@@ -405,19 +384,19 @@ class Responsive_Lightbox_Settings {
 						'title' => __( 'Gallery Permalink', 'responsive-lightbox' ),
 						'section' => 'responsive_lightbox_builder',
 						'type' => 'text',
-						'description' => '<code>' . site_url() . '/<strong>' . untrailingslashit( esc_html( Responsive_Lightbox()->options['builder']['permalink'] ) ) . '</strong>/</code><br />' . __( 'Enter gallery page slug.', 'responsive-lightbox' )
+						'description' => '<code>' . site_url() . '/<strong>' . untrailingslashit( esc_html( $rl->options['builder']['permalink'] ) ) . '</strong>/</code><br />' . __( 'Enter gallery page slug.', 'responsive-lightbox' )
 					),
 					'permalink_categories' => array(
 						'title' => __( 'Categories Permalink', 'responsive-lightbox' ),
 						'section' => 'responsive_lightbox_builder',
 						'type' => 'text',
-						'description' => '<code>' . site_url() . '/<strong>' . untrailingslashit( esc_html( Responsive_Lightbox()->options['builder']['permalink_categories'] ) ) . '</strong>/</code><br />' . __( 'Enter gallery categories archive page slug.', 'responsive-lightbox' )
+						'description' => '<code>' . site_url() . '/<strong>' . untrailingslashit( esc_html( $rl->options['builder']['permalink_categories'] ) ) . '</strong>/</code><br />' . __( 'Enter gallery categories archive page slug.', 'responsive-lightbox' )
 					),
 					'permalink_tags' => array(
 						'title' => __( 'Tags Permalink', 'responsive-lightbox' ),
 						'section' => 'responsive_lightbox_builder',
 						'type' => 'text',
-						'description' => '<code>' . site_url() . '/<strong>' . untrailingslashit( esc_html( Responsive_Lightbox()->options['builder']['permalink_tags'] ) ) . '</strong>/</code><br />' . __( 'Enter gallery tags archive page slug.', 'responsive-lightbox' )
+						'description' => '<code>' . site_url() . '/<strong>' . untrailingslashit( esc_html( $rl->options['builder']['permalink_tags'] ) ) . '</strong>/</code><br />' . __( 'Enter gallery tags archive page slug.', 'responsive-lightbox' )
 					),
 					'archives' => array(
 						'title' => __( 'Archives', 'responsive-lightbox' ),
@@ -436,12 +415,114 @@ class Responsive_Lightbox_Settings {
 					)
 				)
 			),
+			'folders' => array(
+				'option_group'	=> 'responsive_lightbox_folders',
+				'option_name'	=> 'responsive_lightbox_folders',
+				'sections'		=> array(
+					'responsive_lightbox_folders' => array(
+						'title' 		=> __( 'Folders Settings', 'responsive-lightbox' )
+					)
+				),
+				'prefix'		=> 'rl',
+				'fields' => array(
+					'active' => array(
+						'title' => __( 'Folders', 'responsive-lightbox' ),
+						'section' => 'responsive_lightbox_folders',
+						'type' => 'boolean',
+						'label' => __( 'Enable media folders.', 'responsive-lightbox' )
+					),
+					'media_taxonomy' => array(
+						'title' => __( 'Media taxonomy', 'responsive-lightbox' ),
+						'section' => 'responsive_lightbox_folders',
+						'type' => 'select',
+						'description' => __( 'Select media taxonomy.', 'responsive-lightbox' ) . '<br />' . __( 'If you have ever used custom media taxonomies you may try to <a id="rl_folders_load_old_taxonomies" href="#">load and use them.</a>', 'responsive-lightbox' ),
+						'after_field' => '<span class="spinner rl-spinner"></span>',
+						'options' => array( $rl->options['folders']['media_taxonomy'] => $rl->options['folders']['media_taxonomy'] . ' (' . __( 'Folders', 'responsive-lightbox' ) . ')' )
+					),
+					'media_tags' => array(
+						'title' => __( 'Media tags', 'responsive-lightbox' ),
+						'section' => 'responsive_lightbox_folders',
+						'type' => 'boolean',
+						'label' => __( 'Enable media tags.', 'responsive-lightbox' ),
+						'description' => __( 'Enable if you want to use media tags.', 'responsive-lightbox' )
+					),
+					'show_in_menu' => array(
+						'title' => __( 'Show in menu', 'responsive-lightbox' ),
+						'section' => 'responsive_lightbox_folders',
+						'type' => 'boolean',
+						'label' => __( 'Enable to show the taxonomy in the admin menu.', 'responsive-lightbox' )
+					),
+					'folders_removal' => array(
+						'title' => __( 'Subfolder removal', 'responsive-lightbox' ),
+						'section' => 'responsive_lightbox_folders',
+						'type' => 'boolean',
+						'label' => __( 'Select to remove subfolders when parent folder is deleted.', 'responsive-lightbox' )
+					),
+					/*
+					'jstree_style' => array(
+						'title' => __( 'Tree style', 'responsive-lightbox' ),
+						'section' => 'responsive_lightbox_folders',
+						'type' => 'select',
+						'description' => __( 'Select the folder\'s tree style.', 'responsive-lightbox' ),
+						'options' => array(
+							'default'		=> __( 'Default', 'responsive-lightbox' ),
+							'default-dark'	=> __( 'Dark', 'responsive-lightbox' ),
+							'gray'			=> __( 'Gray', 'responsive-lightbox' ),
+							'modern'		=> __( 'Modern', 'responsive-lightbox' )
+						)
+					),*/
+					'jstree_wholerow' => array(
+						'title' => __( 'Whole row', 'responsive-lightbox' ),
+						'section' => 'responsive_lightbox_folders',
+						'type' => 'boolean',
+						'label' => __( 'Enable to highlight folder\'s row as a clickable area.', 'responsive-lightbox' )
+					)
+				)
+			),
+			'remote_library' => array(
+				'option_group'	=> 'responsive_lightbox_remote_library',
+				'option_name'	=> 'responsive_lightbox_remote_library',
+				'sections'		=> array(
+					'responsive_lightbox_remote_library' => array(
+						'title' => __( 'Remote Library Settings', 'responsive-lightbox' )
+					),
+					'responsive_lightbox_remote_library_providers' => array(
+						'title' => __( 'Media Providers', 'responsive-lightbox' ),
+						'page' => 'responsive_lightbox_remote_library',
+						'callback' => array( $this, 'remote_library_providers_description' )
+					)
+				),
+				'prefix'		=> 'rl',
+				'fields' => array(
+					'active' => array(
+						'title' => __( 'Remote Library', 'responsive-lightbox' ),
+						'section' => 'responsive_lightbox_remote_library',
+						'type' => 'boolean',
+						'label' => __( 'Enable remote libraries.', 'responsive-lightbox' ),
+						'description' => __( 'Check this to enable remote access to the following image libraries.', 'responsive-lightbox' )
+					),
+					'caching' => array(
+						'title' => __( 'Caching', 'responsive-lightbox' ),
+						'section' => 'responsive_lightbox_remote_library',
+						'type' => 'boolean',
+						'label' => __( 'Enable remote library requests caching.', 'responsive-lightbox' )
+					),
+					'cache_expiry' => array(
+						'title' => __( 'Cache expiry', 'responsive-lightbox' ),
+						'section' => 'responsive_lightbox_remote_library',
+						'type' => 'number',
+						'min' => 1,
+						'description' => __( 'Enter the cache expiry time.', 'responsive-lightbox' ),
+						'append' => __( 'hour(s)', 'responsive-lightbox' )
+					)
+				)
+			),
 			'configuration' => array(
 				'option_group'	=> 'responsive_lightbox_configuration',
 				'option_name'	=> 'responsive_lightbox_configuration',
 				'sections'		=> array(
 					'responsive_lightbox_configuration' => array(
-						'title' 		=> sprintf( __( '%s settings', 'responsive-lightbox' ), ( isset( $this->scripts[Responsive_Lightbox()->options['settings']['script']]['name'] ) ? $this->scripts[Responsive_Lightbox()->options['settings']['script']]['name'] : $this->scripts[Responsive_Lightbox()->defaults['settings']['script']]['name'] ) )
+						'title' 		=> sprintf( __( '%s settings', 'responsive-lightbox' ), ( isset( $this->scripts[$rl->options['settings']['script']]['name'] ) ? $this->scripts[$rl->options['settings']['script']]['name'] : $this->scripts[$rl->defaults['settings']['script']]['name'] ) )
 					),
 				),
 				'prefix'		=> 'rl',
@@ -807,7 +888,7 @@ class Responsive_Lightbox_Settings {
 				'name'	 => __( 'General', 'responsive-lightbox' ),
 				'key'	 => 'responsive_lightbox_settings',
 				'submit' => 'save_rl_settings',
-				'reset'	 => 'reset_rl_settings',
+				'reset'	 => 'reset_rl_settings'
 			),
 			'configuration'	=> array(
 				'name'	 => __( 'Lightboxes', 'responsive-lightbox' ),
@@ -815,25 +896,25 @@ class Responsive_Lightbox_Settings {
 				'submit' => 'save_' . $this->settings['configuration']['prefix'] . '_configuration',
 				'reset'	 => 'reset_' . $this->settings['configuration']['prefix'] . '_configuration',
 				'sections' => $scripts,
-				'default_section' => Responsive_Lightbox()->options['settings']['script']
+				'default_section' => $rl->options['settings']['script']
 			),
 			'basicgrid_gallery' => array(
 				'name'	 => __( 'Basic Grid', 'responsive-lightbox' ),
 				'key'	 => 'responsive_lightbox_basicgrid_gallery',
 				'submit' => 'save_rl_basicgrid_gallery',
-				'reset'	 => 'reset_rl_basicgrid_gallery',
+				'reset'	 => 'reset_rl_basicgrid_gallery'
 			),
 			'basicslider_gallery' => array(
 				'name'	 => __( 'Basic Slider', 'responsive-lightbox' ),
 				'key'	 => 'responsive_lightbox_basiclider_gallery',
 				'submit' => 'save_rl_basiclider_gallery',
-				'reset'	 => 'reset_rl_basiclider_gallery',
+				'reset'	 => 'reset_rl_basiclider_gallery'
 			),
 			'basicmasonry_gallery' => array(
 				'name'	 => __( 'Basic Masonry', 'responsive-lightbox' ),
 				'key'	 => 'responsive_lightbox_basicmasonry_gallery',
 				'submit' => 'save_rl_basicmasonry_gallery',
-				'reset'	 => 'reset_rl_basicmasonry_gallery',
+				'reset'	 => 'reset_rl_basicmasonry_gallery'
 			)
 		) );
 
@@ -853,7 +934,7 @@ class Responsive_Lightbox_Settings {
 		}
 
 		// get default gallery types
-		$gallery_types = Responsive_Lightbox()->gallery_types;
+		$gallery_types = $rl->gallery_types;
 
 		// remove default gallery
 		unset( $gallery_types['default'] );
@@ -886,7 +967,7 @@ class Responsive_Lightbox_Settings {
 			}
 
 			if ( $tab_key == 'gallery' )
-				$section_key = isset( $_REQUEST['section'] ) ? esc_attr( $_REQUEST['section'] ) : ( in_array( Responsive_Lightbox()->options['settings']['default_gallery'] . '_gallery', array_keys( $gallery_sections ) ) ? Responsive_Lightbox()->options['settings']['default_gallery'] . '_gallery' : key( $gallery_sections ) );
+				$section_key = isset( $_REQUEST['section'] ) ? esc_attr( $_REQUEST['section'] ) : ( in_array( $rl->options['settings']['default_gallery'] . '_gallery', array_keys( $gallery_sections ) ) ? $rl->options['settings']['default_gallery'] . '_gallery' : key( $gallery_sections ) );
 
 			$this->tabs['gallery'] = array(
 				'name'	 => __( 'Galleries', 'responsive-lightbox' ),
@@ -902,10 +983,33 @@ class Responsive_Lightbox_Settings {
 			'name'	 => __( 'Builder', 'responsive-lightbox' ),
 			'key'	 => 'responsive_lightbox_builder',
 			'submit' => 'save_rl_builder',
-			'reset'	 => 'reset_rl_builder',
+			'reset'	 => 'reset_rl_builder'
 		);
 
-		// push licenses just beofre the addons
+		$this->tabs['folders'] = array(
+			'name'	 => __( 'Folders', 'responsive-lightbox' ),
+			'key'	 => 'responsive_lightbox_folders',
+			'submit' => 'save_rl_folders',
+			'reset'	 => 'reset_rl_folders'
+		);
+
+		$this->tabs['remote_library'] = array(
+			'name'	 => __( 'Remote Library', 'responsive-lightbox' ),
+			'key'	 => 'responsive_lightbox_remote_library',
+			'submit' => 'save_rl_remote_library',
+			'reset'	 => 'reset_rl_remote_library'
+		);
+
+		// push licenses just before the addons
+		if ( isset( $this->tabs['seo_images'] ) ) {
+			$seo = $this->tabs['seo_images'];
+
+			unset( $this->tabs['seo_images'] );
+
+			$this->tabs['seo_images'] = $seo;
+		}
+
+		// push licenses just before the addons
 		if ( isset( $this->tabs['licenses'] ) ) {
 			unset( $this->tabs['licenses'] );
 		
@@ -913,7 +1017,7 @@ class Responsive_Lightbox_Settings {
 				'name'	 => __( 'Licenses', 'responsive-lightbox' ),
 				'key'	 => 'responsive_lightbox_licenses',
 				'submit' => 'save_rl_licenses',
-				'reset'	 => 'reset_rl_licenses',
+				'reset'	 => 'reset_rl_licenses'
 			);
 		}
 
@@ -927,7 +1031,7 @@ class Responsive_Lightbox_Settings {
 			$this->settings[$tab_key]['sections']['responsive_lightbox_' . $tab_key]['title'] = sprintf( __( '%s settings', 'responsive-lightbox' ), $this->tabs[$tab_key]['sections'][$section_key] );
 		}
 
-		switch ( ! empty( $section_key ) ? $section_key : Responsive_Lightbox()->options['settings']['script'] ) {
+		switch ( ! empty( $section_key ) ? $section_key : $rl->options['settings']['script'] ) {
 			case 'swipebox':
 				$this->settings['configuration']['prefix'] = 'rl_sb';
 				$this->settings['configuration']['fields'] = array(
@@ -1675,13 +1779,22 @@ class Responsive_Lightbox_Settings {
 				break;
 
 			default:
-				$this->settings['configuration'] = apply_filters( 'rl_settings_' . ( ! empty( $section_key ) ? $section_key : Responsive_Lightbox()->options['settings']['script'] ) . '_script_configuration', $this->settings['configuration'] );
+				$this->settings['configuration'] = apply_filters( 'rl_settings_' . ( ! empty( $section_key ) ? $section_key : $rl->options['settings']['script'] ) . '_script_configuration', $this->settings['configuration'] );
 		}
 
 		if ( isset( $this->tabs[$tab_key]['submit'], $this->tabs[$tab_key]['reset'] ) && ! empty( $this->settings[$tab_key]['prefix'] ) ) {
 			$this->tabs[$tab_key]['submit'] = 'save_' . $this->settings[$tab_key]['prefix'] . '_' . $tab_key;
 			$this->tabs[$tab_key]['reset'] = 'reset_' . $this->settings[$tab_key]['prefix'] . '_' . $tab_key;
 		}
+	}
+
+	/**
+	 * Remote Library Media Providers description
+	 * 
+	 * @return void
+	 */
+	public function remote_library_providers_description() {
+		echo '<p class="description">' . sprintf( __( 'Below you\'ll find a list of available remote media libraries. If you\'re looking for Pixabay, Pexels, Instagram and other integrations please check the <a href="%s" target="_blank">Remote Library Pro addon</a>.', 'responsive-lightbox' ), 'https://dfactory.eu/products/remote-library-pro/?utm_source=responsive-lightbox-settings&utm_medium=link&utm_campaign=addon' ) . '</p>';
 	}
 
 	/**
@@ -1768,7 +1881,7 @@ class Responsive_Lightbox_Settings {
 			call_user_func( $this->tabs[$tab_key]['callback'] );
 		else {
 			wp_nonce_field( 'update-options' );
-			
+
 			settings_fields( $this->tabs[$tab_key]['key'] );
 			do_settings_sections( $this->tabs[$tab_key]['key'] );
 
@@ -1803,6 +1916,9 @@ class Responsive_Lightbox_Settings {
 	 * @return void
 	 */
 	public function register_settings() {
+		// assign main instance
+		$rl = Responsive_Lightbox();
+
 		foreach ( $this->settings as $setting_id => $setting ) {
 			// set key
 			$setting_key = $setting_id;
@@ -1849,9 +1965,12 @@ class Responsive_Lightbox_Settings {
 						'max' => ! empty( $field['max'] ) ? (int) $field['max'] : '',
 						'options' => ! empty( $field['options'] ) ? $field['options'] : '',
 						'fields' => ! empty( $field['fields'] ) ? $field['fields'] : '',
-						'default' => $field['type'] === 'multiple' ? '' : ( $this->sanitize_field( ! empty( $field['parent'] ) ? Responsive_Lightbox()->defaults[$setting_key][$field['parent']][$field_key] : Responsive_Lightbox()->defaults[$setting_key][$field_key], $field['type'] ) ),
-						'value' => $field['type'] === 'multiple' ? '' : ( $this->sanitize_field( ! empty( $field['parent'] ) ? Responsive_Lightbox()->options[$setting_key][$field['parent']][$field_key] : ( isset( Responsive_Lightbox()->options[$setting_key][$field_key] ) ? Responsive_Lightbox()->options[$setting_key][$field_key] : Responsive_Lightbox()->defaults[$setting_key][$field_key] ), $field['type'] ) ),
+						'after_field' => ! empty( $field['after_field'] ) ? $field['after_field'] : '',
+						'default' => $field['type'] === 'multiple' ? '' : ( $this->sanitize_field( ! empty( $field['parent'] ) ? $rl->defaults[$setting_key][$field['parent']][$field_key] : $rl->defaults[$setting_key][$field_key], $field['type'] ) ),
+						'value' => $field['type'] === 'multiple' ? '' : ( $this->sanitize_field( ! empty( $field['parent'] ) ? $rl->options[$setting_key][$field['parent']][$field_key] : ( isset( $rl->options[$setting_key][$field_key] ) ? $rl->options[$setting_key][$field_key] : $rl->defaults[$setting_key][$field_key] ), $field['type'] ) ),
 						'label_for' => $field_id,
+						'classname' => ! empty( $field['classname'] ) ? $field['classname'] : '',
+						'callback' => ! empty( $field['callback'] ) ? $field['callback'] : '',
 						'return' => false
 					);
 
@@ -1861,8 +1980,8 @@ class Responsive_Lightbox_Settings {
 								'id' => $field_id . '-' . $subfield_id,
 								'class' => ! empty( $subfield['class'] ) ? $subfield['class'] : '',
 								'name' => $setting['option_name'] . ( ! empty( $subfield['parent'] ) ? '[' . $subfield['parent'] . ']' : '' ) . '[' . $subfield_id . ']',
-								'default' => $this->sanitize_field( ! empty( $subfield['parent'] ) ? Responsive_Lightbox()->defaults[$setting_key][$subfield['parent']][$subfield_id] : Responsive_Lightbox()->defaults[$setting_key][$subfield_id], $subfield['type'] ),
-								'value' => $this->sanitize_field( ! empty( $subfield['parent'] ) ? Responsive_Lightbox()->options[$setting_key][$subfield['parent']][$subfield_id] : Responsive_Lightbox()->options[$setting_key][$subfield_id], $subfield['type'] ),
+								'default' => $this->sanitize_field( ! empty( $subfield['parent'] ) ? $rl->defaults[$setting_key][$subfield['parent']][$subfield_id] : $rl->defaults[$setting_key][$subfield_id], $subfield['type'] ),
+								'value' => $this->sanitize_field( ! empty( $subfield['parent'] ) ? $rl->options[$setting_key][$subfield['parent']][$subfield_id] : $rl->options[$setting_key][$subfield_id], $subfield['type'] ),
 								'return' => true
 							) );
 						}
@@ -1925,7 +2044,6 @@ class Responsive_Lightbox_Settings {
 
 		switch ( $args['type'] ) {
 			case 'boolean':
-			
 				$html .= '<label class="cb-checkbox"><input id="' . $args['id'] . '" type="checkbox" name="' . $args['name'] . '" value="1" ' . checked( (bool) $args['value'], true, false ) . ( isset( $args['disabled'] ) && $args['disabled'] == true ? ' disabled="disabled"' : '' ) . ' />' . $args['label'] . '</label>';
 				break;
 				
@@ -1947,7 +2065,7 @@ class Responsive_Lightbox_Settings {
 				foreach ( $args['options'] as $key => $name ) {
 					$html .= '<option value="' . $key . '" ' . selected( $args['value'], $key, false ) . '>' . $name . '</option>';
 				}
-					
+
 				$html .= '</select>';
 				break;
 				
@@ -1984,9 +2102,12 @@ class Responsive_Lightbox_Settings {
 
 			case 'button':
 				$html .= ( ! empty( $args['prepend'] ) ? '<span>' . $args['prepend'] . '</span> ' : '' );
-				$html .= '<a href="' . esc_url( admin_url( 'admin.php?page=responsive-lightbox-tour' ) ) . '" id="' . $args['id'] . '" class="button button-secondary">' . esc_html( $args['label'] ) . '</a>';
-				// $html .= '<input id="' . $args['id'] . '" type="submit" value="' . esc_attr( $args['label'] ) . '" name="' . $args['name'] . '" class="button button-secondary" />';
+				$html .= '<a href="' . esc_url( admin_url( 'admin.php?page=responsive-lightbox-tour' ) ) . '" id="' . $args['id'] . '" class="button ' . ( ! empty( $args['classname'] ) ? esc_attr( $args['classname'] ) : 'button-secondary' ) . '">' . esc_html( $args['label'] ) . '</a>';
 				$html .= ( ! empty( $args['append'] ) ? ' <span>' . $args['append'] . '</spbuilderan>' : '' );
+				break;
+
+			case 'custom':
+				$html .= call_user_func( $args['callback'], $args );
 				break;
 
 			case 'text':
@@ -1995,16 +2116,17 @@ class Responsive_Lightbox_Settings {
 				$html .= '<input id="' . $args['id'] . '" class="' . $args['class'] . '" type="text" value="' . $args['value'] . '" name="' . $args['name'] . '" />';
 				$html .= ( ! empty( $args['append'] ) ? ' <span>' . $args['append'] . '</span>' : '' );
 		}
-		
-		if ( ! empty ( $args['description'] ) ) {
+
+		if ( ! empty ( $args['after_field'] ) )
+			$html .= $args['after_field'];
+
+		if ( ! empty ( $args['description'] ) )
 			$html .= '<p class="description">' . $args['description'] . '</p>';
-		}
-		
-		if ( ! empty( $args['return'] ) ) {
+
+		if ( ! empty( $args['return'] ) )
 			return $html;
-		} else {
+		else
 			echo $html;
-		}
 	}
 
 	/**
@@ -2053,6 +2175,10 @@ class Responsive_Lightbox_Settings {
 					$value = $args['max'];
 				break;
 
+			case 'custom':
+				// do nothing
+				break;
+
 			case 'text':
 			case 'select':
 			default:
@@ -2074,10 +2200,6 @@ class Responsive_Lightbox_Settings {
 		if ( ! current_user_can( apply_filters( 'rl_lightbox_settings_capability', 'manage_options' ) ) )
 			return $input;
 
-		if ( isset( $_POST['responsive_lightbox_settings']['tour'] ) ) {
-			
-		}
-
 		// check page
 		if ( ! isset( $_POST['option_page'] ) || ! ( $option_page = esc_attr( $_POST['option_page'] ) ) )
 			return $input;
@@ -2096,6 +2218,9 @@ class Responsive_Lightbox_Settings {
 		if ( ! $setting_id )
 			return $input;
 
+		// assign main instance
+		$rl = Responsive_Lightbox();
+
 		// save settings
 		if ( isset( $_POST['save' . '_' . $this->settings[$setting_id]['prefix']  . '_' . $setting_id] ) ) {
 			if ( $this->settings[$setting_id]['fields'] ) {
@@ -2107,9 +2232,9 @@ class Responsive_Lightbox_Settings {
 								if ( ! empty( $this->settings[$setting_id]['fields'][$field_id]['fields'][$subfield_id]['parent'] ) ) {
 									$field_parent = $this->settings[$setting_id]['fields'][$field_id]['fields'][$subfield_id]['parent'];
 
-									$input[$field_parent][$subfield_id] = isset( $input[$field_parent][$subfield_id] ) ? $this->sanitize_field( $input[$field_parent][$subfield_id], $subfield['type'] ) : ( $subfield['type'] === 'boolean' ? false : Responsive_Lightbox()->defaults[$setting_id][$field_parent][$subfield_id] );
+									$input[$field_parent][$subfield_id] = isset( $input[$field_parent][$subfield_id] ) ? $this->sanitize_field( $input[$field_parent][$subfield_id], $subfield['type'] ) : ( $subfield['type'] === 'boolean' ? false : $rl->defaults[$setting_id][$field_parent][$subfield_id] );
 								} else {
-									$input[$subfield_id] = isset( $input[$subfield_id] ) ? $this->sanitize_field( $input[$subfield_id], $subfield['type'] ) : ( $subfield['type'] === 'boolean' ? false : Responsive_Lightbox()->defaults[$setting_id][$field_id][$subfield_id] );
+									$input[$subfield_id] = isset( $input[$subfield_id] ) ? $this->sanitize_field( $input[$subfield_id], $subfield['type'] ) : ( $subfield['type'] === 'boolean' ? false : $rl->defaults[$setting_id][$field_id][$subfield_id] );
 								}
 							}
 						}
@@ -2118,9 +2243,9 @@ class Responsive_Lightbox_Settings {
 						if ( ! empty( $this->settings[$setting_id]['fields'][$field_id]['parent'] ) ) {
 							$field_parent = $this->settings[$setting_id]['fields'][$field_id]['parent'];
 
-							$input[$field_parent][$field_id] = isset( $input[$field_parent][$field_id] ) ? ( $field['type'] === 'checkbox' ? array_keys( $this->sanitize_field( $input[$field_parent][$field_id], $field['type'] ) ) : $this->sanitize_field( $input[$field_parent][$field_id], $field['type'] ) ) : ( in_array( $field['type'], array( 'boolean', 'checkbox' ) ) ? false : Responsive_Lightbox()->defaults[$setting_id][$field_parent][$field_id] );
+							$input[$field_parent][$field_id] = isset( $input[$field_parent][$field_id] ) ? ( $field['type'] === 'checkbox' ? array_keys( $this->sanitize_field( $input[$field_parent][$field_id], $field['type'] ) ) : $this->sanitize_field( $input[$field_parent][$field_id], $field['type'] ) ) : ( in_array( $field['type'], array( 'boolean', 'checkbox' ) ) ? false : $rl->defaults[$setting_id][$field_parent][$field_id] );
 						} else {
-							$input[$field_id] = isset( $input[$field_id] ) ? ( $field['type'] === 'checkbox' ? array_keys( $this->sanitize_field( $input[$field_id], $field['type'] ) ) : $this->sanitize_field( $input[$field_id], $field['type'] ) ) : ( in_array( $field['type'], array( 'boolean', 'checkbox' ) ) ? false : Responsive_Lightbox()->defaults[$setting_id][$field_id] );
+							$input[$field_id] = isset( $input[$field_id] ) ? ( $field['type'] === 'checkbox' ? array_keys( $this->sanitize_field( $input[$field_id], $field['type'] ) ) : $this->sanitize_field( $input[$field_id], $field['type'] ) ) : ( in_array( $field['type'], array( 'boolean', 'checkbox' ) ) ? false : $rl->defaults[$setting_id][$field_id] );
 						}
 					}
 				}
@@ -2128,26 +2253,33 @@ class Responsive_Lightbox_Settings {
 
 			if ( $setting_id === 'settings' ) {
 				// merge scripts settings
-				$input = array_merge( Responsive_Lightbox()->options['settings'], $input );
+				$input = array_merge( $rl->options['settings'], $input );
+
+				// woocommerce lightbox has to be enabled when using rl gallery
+				if ( $input['default_woocommerce_gallery'] !== 'default' )
+					$input['woocommerce_gallery_lightbox'] = true;
 			}
 
 			if ( $setting_id === 'configuration' ) {
 				// merge scripts settings
-				$input = array_merge( Responsive_Lightbox()->options['configuration'], $input );
+				$input = array_merge( $rl->options['configuration'], $input );
 			}
+
+			if ( $setting_id === 'remote_library' )
+				$input = apply_filters( 'rl_remote_library_settings', $input );
 		} elseif ( isset( $_POST['reset' . '_' . $this->settings[$setting_id]['prefix']  . '_' . $setting_id] ) ) {
 			if ( $setting_id === 'configuration' ) {
 				$script = key( $input );
 
 				// merge scripts settings
-				$input[$script] = Responsive_Lightbox()->defaults['configuration'][$script];
-				$input = array_merge( Responsive_Lightbox()->options['configuration'], $input );
+				$input[$script] = $rl->defaults['configuration'][$script];
+				$input = array_merge( $rl->options['configuration'], $input );
 			} elseif ( $setting_id === 'settings' ) {
-				$input = Responsive_Lightbox()->defaults[$setting_id];
-				$input['update_version'] = Responsive_Lightbox()->options['settings']['update_version'];
-				$input['update_notice'] = Responsive_Lightbox()->options['settings']['update_notice'];
+				$input = $rl->defaults[$setting_id];
+				$input['update_version'] = $rl->options['settings']['update_version'];
+				$input['update_notice'] = $rl->options['settings']['update_notice'];
 			} else
-				$input = Responsive_Lightbox()->defaults[$setting_id];
+				$input = $rl->defaults[$setting_id];
 
 			add_settings_error( 'reset_' . $this->settings[$setting_id]['prefix']  . '_' . $setting_id, 'settings_restored', __( 'Settings restored to defaults.', 'responsive-lightbox' ), 'updated' );
 		}
@@ -2349,7 +2481,7 @@ class Responsive_Lightbox_Settings {
 		);
 
 		// call the custom API.
-		$response = wp_remote_get( add_query_arg( $api_params, $this->api_url ) );
+		$response = wp_remote_get( add_query_arg( $api_params, 'http://dfactory.eu' ) );
 
 		return $response;
 	}

@@ -246,6 +246,10 @@
     text-align: left;
 }
 
+.rl-gallery-field-hidden {
+	display: none;
+}
+
 .rl-gallery-preview-inside .spinner {
 	margin: 4px 0 0 5px;
 	float: none;
@@ -276,7 +280,6 @@
 	display: inline-block;
 	width: 150px;
 	height: 150px;
-	cursor: move;
 	margin: 14px 14px 0 0;
 	position: relative;
 	box-sizing: border;
@@ -451,6 +454,15 @@ label[for="responsive-gallery-images-hide"], label[for="responsive-gallery-confi
 
 #rl-edit-attachment-modal .compat-item {
 	display: none;
+}
+
+.rl-gallery-preview-pagination {
+	margin: 10px 0;
+	text-align: center;
+}
+
+.rl-gallery-preview-pagination.tablenav .tablenav-pages {
+	float: none;
 }
 
 @media (max-width: 960px) {

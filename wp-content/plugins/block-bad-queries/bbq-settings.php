@@ -20,6 +20,29 @@ function bbq_options() {
 	return $bbq_options;
 }
 
+function bbq_check_plugin() {
+	
+	if (class_exists('BBQ_Pro')) {
+		
+		if (is_plugin_active('block-bad-queries/block-bad-queries.php')) {
+			
+			$msg  = '<strong>'. esc_html__('Warning:', 'block-bad-queries') .'</strong> ';
+			$msg .= esc_html__('Free and Pro versions of BBQ cannot be activated at the same time. ', 'block-bad-queries');
+			$msg .= esc_html__('Please return to the ', 'block-bad-queries');
+			$msg .= '<a href="'. admin_url('plugins.php') .'">'. esc_html__('WordPress Admin Area', 'block-bad-queries') .'</a> ';
+			$msg .= esc_html__('and try again.', 'block-bad-queries');
+			
+			deactivate_plugins(BBQ_FILE);
+			
+			wp_die($msg);
+			
+		}
+		
+	}
+	
+}
+add_action('admin_init', 'bbq_check_plugin');
+
 function bbq_register_settings() {
 	
 	// register_setting( $option_group, $option_name, $sanitize_callback );
@@ -86,13 +109,19 @@ function bbq_callback_version($args) {
 
 function bbq_action_links($links, $file) {
 	
-	if ($file == BBQ_FILE) {
+	if ($file == BBQ_FILE && current_user_can('manage_options')) {
 		
 		$settings_url   = admin_url('options-general.php?page=bbq_settings');
 		$settings_title = esc_attr__('Visit the BBQ plugin page', 'block-bad-queries');
 		$settings_text  = esc_html__('Settings', 'block-bad-queries');
 		
 		$settings_link  = '<a href="'. $settings_url .'" title="'. $settings_title .'">'. $settings_text .'</a>';
+		
+		array_unshift($links, $settings_link);
+		
+	}
+	
+	if ($file == BBQ_FILE) {
 		
 		$pro_url   = esc_url('https://plugin-planet.com/bbq-pro/');
 		$pro_title = esc_attr__('Get BBQ Pro for advanced protection', 'block-bad-queries');
@@ -101,7 +130,7 @@ function bbq_action_links($links, $file) {
 		
 		$pro_link  = '<a target="_blank" rel="noopener noreferrer" href="'. $pro_url .'" title="'. $pro_title .'" style="'. $pro_style .'">'. $pro_text .'</a>';
 		
-		array_unshift($links, $pro_link, $settings_link);
+		array_unshift($links, $pro_link);
 		
 	}
 	

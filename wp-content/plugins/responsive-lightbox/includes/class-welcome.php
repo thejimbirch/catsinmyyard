@@ -12,6 +12,11 @@ new Responsive_Lightbox_Welcome_Page();
  */
 class Responsive_Lightbox_Welcome_Page {
 
+	/**
+	 * Constructor.
+	 *
+	 * @return void
+	 */
 	public function __construct() {
 		// actions
 		add_action( 'admin_menu', array( $this, 'admin_menus' ) );
@@ -21,6 +26,8 @@ class Responsive_Lightbox_Welcome_Page {
 
 	/**
 	 * Add admin menus/screens.
+	 *
+	 * @return void
 	 */
 	public function admin_menus() {
 		$welcome_page_title = __( 'Welcome to Responsive Lightbox & Gallery', 'responsive-lightbox' );
@@ -30,6 +37,8 @@ class Responsive_Lightbox_Welcome_Page {
 
 	/**
 	 * Add styles just for this page, and remove dashboard page links.
+	 *
+	 * @return void
 	 */
 	public function admin_head() {
 		remove_submenu_page( 'index.php', 'responsive-lightbox-about' );
@@ -37,11 +46,10 @@ class Responsive_Lightbox_Welcome_Page {
 
 	/**
 	 * Intro text/links shown on all about pages.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	private function intro() {
-
 		// get plugin version
 		$plugin_version = substr( get_option( 'responsive_lightbox_version' ), 0, 3 );
 		?>
@@ -54,7 +62,7 @@ class Responsive_Lightbox_Welcome_Page {
 			?>
 		</div>
 		
-		<div class="rl-badge" style="position: absolute; top: 0; right: 0; box-shadow: 0 1px 3px rgba(0,0,0,.1);"><img src="<?php echo RESPONSIVE_LIGHTBOX_URL . '/images/logo-rl.png'; ?>" width="180" height="180" /></div>
+		<div class="rl-badge" style="position: absolute; top: 0; right: 0; box-shadow: 0 1px 3px rgba(0,0,0,.1); max-width: 180px;"><img src="<?php echo RESPONSIVE_LIGHTBOX_URL . '/images/logo-rl.png'; ?>" width="180" height="180" /></div>
 
 		<div class="changelog">
 			<a href="<?php echo esc_url( admin_url( 'admin.php?page=responsive-lightbox-tour' ) ); ?>" class="button button-primary button-large"><?php _e( 'Start Tour', 'responsive-lightbox' ); ?></a>
@@ -70,8 +78,8 @@ class Responsive_Lightbox_Welcome_Page {
 
 	/**
 	 * Ootput the about screen.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function about_screen() {
 		?>
@@ -112,6 +120,8 @@ class Responsive_Lightbox_Welcome_Page {
 
 	/**
 	 * Send user to the welcome page on first activation.
+	 *
+	 * @return void
 	 */
 	public function welcome() {
 
@@ -132,5 +142,4 @@ class Responsive_Lightbox_Welcome_Page {
 		wp_safe_redirect( admin_url( 'index.php?page=responsive-lightbox-about' ) );
 		exit;
 	}
-
 }

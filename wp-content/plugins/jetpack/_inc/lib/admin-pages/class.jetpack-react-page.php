@@ -1,4 +1,7 @@
 <?php
+use Automattic\Jetpack\Status;
+use Automattic\Jetpack\Partner;
+
 include_once( 'class.jetpack-admin-page.php' );
 
 // Builds the landing page and its menu
@@ -21,12 +24,12 @@ class Jetpack_React_Page extends Jetpack_Admin_Page {
 		add_filter( 'custom_menu_order',         '__return_true' );
 		add_filter( 'menu_order',                array( $this, 'jetpack_menu_order' ) );
 
-		if ( ! isset( $_GET['page'] ) || 'jetpack' !== $_GET['page'] || ! empty( $_GET['configure'] ) ) {
+		if ( ! isset( $_GET['page'] ) || 'jetpack' !== $_GET['page'] ) {
 			return; // No need to handle the fallback redirection if we are not on the Jetpack page
 		}
 
-		// Adding a redirect meta tag for older WordPress versions or if the REST API is disabled
-		if ( $this->is_wp_version_too_old() || ! $this->is_rest_api_enabled() ) {
+		// Adding a redirect meta tag if the REST API is disabled
+		if ( ! $this->is_rest_api_enabled() ) {
 			$this->is_redirecting = true;
 			add_action( 'admin_head', array( $this, 'add_fallback_head_meta' ) );
 		}
@@ -34,8 +37,13 @@ class Jetpack_React_Page extends Jetpack_Admin_Page {
 		// Adding a redirect meta tag wrapped in noscript tags for all browsers in case they have JavaScript disabled
 		add_action( 'admin_head', array( $this, 'add_noscript_head_meta' ) );
 
-		// Adding a redirect tag wrapped in browser conditional comments
-		add_action( 'admin_head', array( $this, 'add_legacy_browsers_head_script' ) );
+		// If this is the first time the user is viewing the admin, don't show JITMs.
+		// This filter is added just in time because this function is called on admin_menu
+		// and JITMs are initialized on admin_init
+		if ( Jetpack::is_active() && ! Jetpack_Options::get_option( 'first_admin_view', false ) ) {
+			Jetpack_Options::update_option( 'first_admin_view', true );
+			add_filter( 'jetpack_just_in_time_msgs', '__return_false' );
+		}
 	}
 
 	/**
@@ -46,7 +54,7 @@ class Jetpack_React_Page extends Jetpack_Admin_Page {
 	 * @since 4.3.0
 	 */
 	function jetpack_add_dashboard_sub_nav_item() {
-		if ( Jetpack::is_development_mode() || Jetpack::is_active() ) {
+		if ( ( new Status() )->is_development_mode() || Jetpack::is_active() ) {
 			global $submenu;
 			if ( current_user_can( 'jetpack_admin_page' ) ) {
 				$submenu['jetpack'][] = array( __( 'Dashboard', 'jetpack' ), 'jetpack_admin_page', 'admin.php?page=jetpack#/dashboard' );
@@ -60,7 +68,7 @@ class Jetpack_React_Page extends Jetpack_Admin_Page {
 	 * @since 4.3.0
 	 */
 	function jetpack_add_settings_sub_nav_item() {
-		if ( ( Jetpack::is_development_mode() || Jetpack::is_active() ) && current_user_can( 'jetpack_admin_page' ) && current_user_can( 'edit_posts' ) ) {
+		if ( ( ( new Status() )->is_development_mode() || Jetpack::is_active() ) && current_user_can( 'jetpack_admin_page' ) && current_user_can( 'edit_posts' ) ) {
 			global $submenu;
 			$submenu['jetpack'][] = array( __( 'Settings', 'jetpack' ), 'jetpack_admin_page', 'admin.php?page=jetpack#/settings' );
 		}
@@ -74,17 +82,6 @@ class Jetpack_React_Page extends Jetpack_Admin_Page {
 		echo '<noscript>';
 		$this->add_fallback_head_meta();
 		echo '</noscript>';
-	}
-
-	function add_legacy_browsers_head_script() {
-		echo
-			"<script type=\"text/javascript\">\n"
-			. "/*@cc_on\n"
-			. "if ( @_jscript_version <= 10) {\n"
-			. "window.location.href = '?page=jetpack_modules';\n"
-			. "}\n"
-			. "@*/\n"
-			. "</script>";
 	}
 
 	function jetpack_menu_order( $menu_order ) {
@@ -101,29 +98,7 @@ class Jetpack_React_Page extends Jetpack_Admin_Page {
 		return $jp_menu_order;
 	}
 
-	// Render the configuration page for the module if it exists and an error
-	// screen if the module is not configurable
-	// @todo remove when real settings are in place
-	function render_nojs_configurable( $module_name ) {
-		$module_name = preg_replace( '/[^\da-z\-]+/', '', $_GET['configure'] );
-
-		echo '<div class="wrap configure-module">';
-
-		if ( Jetpack::is_module( $module_name ) && current_user_can( 'jetpack_configure_modules' ) ) {
-			Jetpack::admin_screen_configure_module( $module_name );
-		} else {
-			echo '<h2>' . esc_html__( 'Error, bad module.', 'jetpack' ) . '</h2>';
-		}
-
-		echo '</div><!-- /wrap -->';
-	}
-
 	function page_render() {
-		// Handle redirects to configuration pages
-		if ( ! empty( $_GET['configure'] ) ) {
-			return $this->render_nojs_configurable( $_GET['configure'] );
-		}
-
 		/** This action is already documented in views/admin/admin-page.php */
 		do_action( 'jetpack_notices' );
 
@@ -168,19 +143,33 @@ class Jetpack_React_Page extends Jetpack_Admin_Page {
 	}
 
 	function page_admin_scripts() {
-		if ( $this->is_redirecting || isset( $_GET['configure'] ) ) {
+		if ( $this->is_redirecting ) {
 			return; // No need for scripts on a fallback page
 		}
 
-		// Enqueue jp.js and localize it
-		wp_enqueue_script( 'react-plugin', plugins_url( '_inc/build/admin.js', JETPACK__PLUGIN_FILE ), array(), JETPACK__VERSION, true );
 
-		if ( ! Jetpack::is_development_mode() && Jetpack::is_active() ) {
-			// Required for Analytics
+		$is_development_mode = ( new Status() )->is_development_mode();
+		$script_deps_path    = JETPACK__PLUGIN_DIR . '_inc/build/admin.asset.php';
+		$script_dependencies = array( 'wp-polyfill' );
+		if ( file_exists( $script_deps_path ) ) {
+			$asset_manifest      = include $script_deps_path;
+			$script_dependencies = $asset_manifest['dependencies'];
+		}
+
+		wp_enqueue_script(
+			'react-plugin',
+			plugins_url( '_inc/build/admin.js', JETPACK__PLUGIN_FILE ),
+			$script_dependencies,
+			JETPACK__VERSION,
+			true
+		);
+
+		if ( ! $is_development_mode && Jetpack::is_active() ) {
+			// Required for Analytics.
 			wp_enqueue_script( 'jp-tracks', '//stats.wp.com/w.js', array(), gmdate( 'YW' ), true );
 		}
 
-		// Add objects to be passed to the initial state of the app
+		// Add objects to be passed to the initial state of the app.
 		wp_localize_script( 'react-plugin', 'Initial_State', $this->get_initial_state() );
 	}
 
@@ -231,34 +220,39 @@ class Jetpack_React_Page extends Jetpack_Admin_Page {
 			? get_permalink( $last_post[0]->ID )
 			: get_home_url();
 
+		$current_user_data = jetpack_current_user_data();
+
+		$status = new Status();
+
 		return array(
-			'WP_API_root' => esc_url_raw( rest_url() ),
-			'WP_API_nonce' => wp_create_nonce( 'wp_rest' ),
-			'pluginBaseUrl' => plugins_url( '', JETPACK__PLUGIN_FILE ),
-			'connectionStatus' => array(
-				'isActive'  => Jetpack::is_active(),
-				'isStaging' => Jetpack::is_staging_site(),
-				'devMode'   => array(
-					'isActive' => Jetpack::is_development_mode(),
+			'WP_API_root'                 => esc_url_raw( rest_url() ),
+			'WP_API_nonce'                => wp_create_nonce( 'wp_rest' ),
+			'pluginBaseUrl'               => plugins_url( '', JETPACK__PLUGIN_FILE ),
+			'connectionStatus'            => array(
+				'isActive'           => Jetpack::is_active(),
+				'isStaging'          => $status->is_staging_site(),
+				'devMode'            => array(
+					'isActive' => $status->is_development_mode(),
 					'constant' => defined( 'JETPACK_DEV_DEBUG' ) && JETPACK_DEV_DEBUG,
 					'url'      => site_url() && false === strpos( site_url(), '.' ),
 					'filter'   => apply_filters( 'jetpack_development_mode', false ),
 				),
-				'isPublic'	=> '1' == get_option( 'blog_public' ),
+				'isPublic'           => '1' == get_option( 'blog_public' ), // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 				'isInIdentityCrisis' => Jetpack::validate_sync_error_idc_option(),
-				'sandboxDomain' => JETPACK__SANDBOX_DOMAIN,
+				'sandboxDomain'      => JETPACK__SANDBOX_DOMAIN,
 			),
-			'connectUrl' => Jetpack::init()->build_connect_url( true, false, false ),
-			'dismissedNotices' => $this->get_dismissed_jetpack_notices(),
-			'isDevVersion' => Jetpack::is_development_version(),
-			'currentVersion' => JETPACK__VERSION,
-			'is_gutenberg_available' => Jetpack_Gutenberg::is_gutenberg_available(),
-			'getModules' => $modules,
-			'showJumpstart' => jetpack_show_jumpstart(),
-			'rawUrl' => Jetpack::build_raw_urls( get_home_url() ),
-			'adminUrl' => esc_url( admin_url() ),
-			'stats' => array(
-				// data is populated asynchronously on page load
+			'connectUrl'                  => false == $current_user_data['isConnected'] // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+				? Jetpack::init()->build_connect_url( true, false, false )
+				: '',
+			'dismissedNotices'            => $this->get_dismissed_jetpack_notices(),
+			'isDevVersion'                => Jetpack::is_development_version(),
+			'currentVersion'              => JETPACK__VERSION,
+			'is_gutenberg_available'      => true,
+			'getModules'                  => $modules,
+			'rawUrl'                      => Jetpack::build_raw_urls( get_home_url() ),
+			'adminUrl'                    => esc_url( admin_url() ),
+			'stats'                       => array(
+				// data is populated asynchronously on page load.
 				'data'  => array(
 					'general' => false,
 					'day'     => false,
@@ -267,16 +261,17 @@ class Jetpack_React_Page extends Jetpack_Admin_Page {
 				),
 				'roles' => $stats_roles,
 			),
-			'settings' => $this->get_flattened_settings( $modules ),
-			'userData' => array(
-//				'othersLinked' => Jetpack::get_other_linked_admins(),
-				'currentUser'  => jetpack_current_user_data(),
+			'aff'                         => Partner::init()->get_partner_code( Partner::AFFILIATE_CODE ),
+			'partnerSubsidiaryId'         => Partner::init()->get_partner_code( Partner::SUBSIDIARY_CODE ),
+			'settings'                    => $this->get_flattened_settings( $modules ),
+			'userData'                    => array(
+				'currentUser' => $current_user_data,
 			),
-			'siteData' => array(
-				'icon' => has_site_icon()
+			'siteData'                    => array(
+				'icon'                       => has_site_icon()
 					? apply_filters( 'jetpack_photon_url', get_site_icon_url(), array( 'w' => 64 ) )
 					: '',
-				'siteVisibleToSearchEngines' => '1' == get_option( 'blog_public' ),
+				'siteVisibleToSearchEngines' => '1' == get_option( 'blog_public' ), // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 				/**
 				 * Whether promotions are visible or not.
 				 *
@@ -284,29 +279,31 @@ class Jetpack_React_Page extends Jetpack_Admin_Page {
 				 *
 				 * @param bool $are_promotions_active Status of promotions visibility. True by default.
 				 */
-				'showPromotions' => apply_filters( 'jetpack_show_promotions', true ),
-				'isAtomicSite' => jetpack_is_atomic_site(),
-				'plan' => Jetpack::get_active_plan(),
-				'showBackups' => Jetpack::show_backups_ui(),
+				'showPromotions'             => apply_filters( 'jetpack_show_promotions', true ),
+				'isAtomicSite'               => jetpack_is_atomic_site(),
+				'plan'                       => Jetpack_Plan::get(),
+				'showBackups'                => Jetpack::show_backups_ui(),
+				'isMultisite'                => is_multisite(),
 			),
-			'themeData' => array(
+			'themeData'                   => array(
 				'name'      => $current_theme->get( 'Name' ),
 				'hasUpdate' => (bool) get_theme_update_available( $current_theme ),
 				'support'   => array(
-					'infinite-scroll' => current_theme_supports( 'infinite-scroll' ) || in_array( $current_theme->get_stylesheet(), $inf_scr_support_themes ),
+					'infinite-scroll' => current_theme_supports( 'infinite-scroll' ) || in_array( $current_theme->get_stylesheet(), $inf_scr_support_themes, true ),
 				),
 			),
-			'locale' => Jetpack::get_i18n_data_json(),
-			'localeSlug' => join( '-', explode( '_', get_user_locale() ) ),
-			'jetpackStateNotices' => array(
-				'messageCode' => Jetpack::state( 'message' ),
-				'errorCode' => Jetpack::state( 'error' ),
+			'locale'                      => Jetpack::get_i18n_data_json(),
+			'localeSlug'                  => join( '-', explode( '_', get_user_locale() ) ),
+			'jetpackStateNotices'         => array(
+				'messageCode'      => Jetpack::state( 'message' ),
+				'errorCode'        => Jetpack::state( 'error' ),
 				'errorDescription' => Jetpack::state( 'error_description' ),
 			),
-			'tracksUserData' => Jetpack_Tracks_Client::get_connected_user_tracks_identity(),
-			'currentIp' => function_exists( 'jetpack_protect_get_ip' ) ? jetpack_protect_get_ip() : false,
-			'lastPostUrl' => esc_url( $last_post ),
-			'externalServicesConnectUrls' => $this->get_external_services_connect_urls()
+			'tracksUserData'              => Jetpack_Tracks_Client::get_connected_user_tracks_identity(),
+			'currentIp'                   => function_exists( 'jetpack_protect_get_ip' ) ? jetpack_protect_get_ip() : false,
+			'lastPostUrl'                 => esc_url( $last_post ),
+			'externalServicesConnectUrls' => $this->get_external_services_connect_urls(),
+			'calypsoEnv'                  => Jetpack::get_calypso_env(),
 		);
 	}
 
@@ -333,39 +330,6 @@ class Jetpack_React_Page extends Jetpack_Admin_Page {
 	}
 }
 
-/*
- * Only show Jump Start on first activation.
- * Any option 'jumpstart' other than 'new connection' will hide it.
- *
- * The option can be of 4 things, and will be stored as such:
- * new_connection      : Brand new connection - Show
- * jumpstart_activated : Jump Start has been activated - dismiss
- * jetpack_action_taken: Manual activation of a module already happened - dismiss
- * jumpstart_dismissed : Manual dismissal of Jump Start - dismiss
- *
- * @todo move to functions.global.php when available
- * @since 3.6
- * @return bool | show or hide
- */
-function jetpack_show_jumpstart() {
-	if ( ! Jetpack::is_active() ) {
-		return false;
-	}
-	$jumpstart_option = Jetpack_Options::get_option( 'jumpstart' );
-
-	$hide_options = array(
-		'jumpstart_activated',
-		'jetpack_action_taken',
-		'jumpstart_dismissed'
-	);
-
-	if ( ! $jumpstart_option || in_array( $jumpstart_option, $hide_options ) ) {
-		return false;
-	}
-
-	return true;
-}
-
 /**
  * Gather data about the current user.
  *
@@ -374,11 +338,20 @@ function jetpack_show_jumpstart() {
  * @return array
  */
 function jetpack_current_user_data() {
-	$current_user = wp_get_current_user();
+	$current_user   = wp_get_current_user();
 	$is_master_user = $current_user->ID == Jetpack_Options::get_option( 'master_user' );
 	$dotcom_data    = Jetpack::get_connected_user_data();
+
 	// Add connected user gravatar to the returned dotcom_data.
-	$dotcom_data['avatar'] = get_avatar_url( $dotcom_data['email'], array( 'size' => 64, 'default' => 'mysteryman' ) );
+	$dotcom_data['avatar'] = ( ! empty( $dotcom_data['email'] ) ?
+		get_avatar_url(
+			$dotcom_data['email'],
+			array(
+				'size'    => 64,
+				'default' => 'mysteryman',
+			)
+		)
+		: false );
 
 	$current_user_data = array(
 		'isConnected' => Jetpack::is_user_connected( $current_user->ID ),

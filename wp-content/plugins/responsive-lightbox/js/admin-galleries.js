@@ -1,11 +1,11 @@
 ( function ( $ ) {
 
 	$( document ).on( 'ready', function () {
-		
 		var gallery_frame = null,
 			attachment_frame = null,
 			gallery_container = $( '.rl-gallery-images' ),
-			gallery_ids = $( '.rl-gallery-ids' );
+			gallery_ids = $( '.rl-gallery-ids' ),
+			wikimedia = { '1': '' };
 
 		media_gallery_sortable( gallery_container, gallery_ids, $( 'input[name="rl_gallery[images][menu_item]"]:checked' ).val() );
 
@@ -39,10 +39,10 @@
 			// post ajax request
 			$.post( ajaxurl, {
 				action: 'rl-get-menu-content',
-				post_id: rlArgs.post_id,
+				post_id: rlArgsGalleries.post_id,
 				tab: tab,
 				menu_item: menu_item,
-				nonce: rlArgs.nonce
+				nonce: rlArgsGalleries.nonce
 			} ).done( function ( response ) {
 				try {
 					if ( response.success ) {
@@ -63,6 +63,61 @@
 
 						// color picker
 						container.find( '.color-picker' ).wpColorPicker();
+
+						/*
+						var click = $( this ),
+							type = click.hasClass( 'rl-gallery-update-preview' ) ? 'update' : 'page',
+							menu_item = $( '.rl-gallery-tab-menu-images input:checked' ).val(),
+							container = $( '.rl-gallery-tab-inside-images-' + menu_item ),
+							spinner = click.closest( 'td' ).find( '.rl-gallery-preview-inside .spinner' ),
+							query_args = {},
+							inside = $( this ).closest( '.inside' ).find( '.rl-gallery-tab-content' );
+
+						// disable nav on ajax
+						inside.addClass( 'rl-loading-content' );
+						*/
+
+						container.find( 'tr[data-field_type]' ).each( function() {
+							var el = $( this ),
+								field_name = el.data( 'field_name' ),
+								change = false;
+
+							switch ( el.data( 'field_type' ) ) {
+								case 'text':
+									el.find( 'input' ).on( 'change', function() {
+										console.log( 'text' );
+									} );
+									break;
+
+								case 'number':
+									el.find( 'input' ).on( 'change', function() {
+										console.log( 'number' );
+									} );
+									break;
+
+								case 'taxonomy':
+									// value = {
+										// 'id': parseInt( el.find( 'select option:selected' ).val() ),
+										// 'children': el.find( 'input[type="checkbox"]' ).prop( 'checked' )
+									// };
+									break;
+
+								case 'select':
+									el.find( 'select' ).on( 'change', function() {
+										console.log( 'select' );
+									} );
+										value = '';
+									break;
+
+								case 'radio':
+									// value = el.find( 'input:checked' ).val();
+									break;
+
+								case 'multiselect':
+									// value = el.find( 'select' ).val();
+									break;
+							}
+						} );
 					} else {
 						// @todo
 					}
@@ -152,12 +207,12 @@
 				frame: 'select',
 				uploader: false,
 				multiple: false,
-				title: rlArgs.editTitle,
+				title: rlArgsGalleries.editTitle,
 				library: {
 					post__in: attachment_id
 				},
 				button: {
-					text: rlArgs.buttonEditFile
+					text: rlArgsGalleries.buttonEditFile
 				}
 			} ).on( 'open', function () {
 				var attachment = wp.media.attachment( attachment_id ),
@@ -224,14 +279,14 @@
 
 			// create the media frame
 			gallery_frame = wp.media( {
-				title: rlArgs.textSelectImages,
+				title: rlArgsGalleries.textSelectImages,
 				multiple: 'add',
 				autoSelect: true,
 				library: {
 					type: 'image'
 				},
 				button: {
-					text: rlArgs.textUseImages
+					text: rlArgsGalleries.textUseImages
 				}
 			} ).on( 'open', function () {
 				var selection = gallery_frame.state().get( 'selection' ),
@@ -273,7 +328,7 @@
 							}
 
 							// append new image
-							gallery_container.append( rlArgs.mediaItemTemplate.replace( /__IMAGE_ID__/g, attachment.id ).replace( /__IMAGE__/g, '<img width="150" height="150" src="' + attachment.url + '" class="attachment-thumbnail size-thumbnail" alt="" sizes="(max-width: 150px) 100vw, 150px" />' ).replace( /__IMAGE_STATUS__/g, 'rl-status-active' ) );
+							gallery_container.append( rlArgsGalleries.mediaItemTemplate.replace( /__IMAGE_ID__/g, attachment.id ).replace( /__IMAGE__/g, '<img width="150" height="150" src="' + attachment.url + '" class="attachment-thumbnail size-thumbnail" alt="" sizes="(max-width: 150px) 100vw, 150px" />' ).replace( /__IMAGE_STATUS__/g, 'rl-status-active' ) );
 						}
 					} );
 				}
@@ -297,15 +352,32 @@
 			gallery_frame.open();
 		} );
 
-		// preview
-		$( document ).on( 'click', '.rl-gallery-update-preview', function ( e ) {
+		// preview pagination
+		$( document ).on( 'click', '.rl-gallery-update-preview, .rl-gallery-preview-pagination a', function ( e ) {
 			e.preventDefault();
 
-			var container = $( '.rl-gallery-tab-inside-images-featured' ),
-				parent = $( this ).parent(),
-				spinner = parent.find( '.spinner' ),
-				rules = $( '.rl-rules-groups > .rl-rules-group' ),
-				query_args = {};
+			var click = $( this ),
+				type = click.hasClass( 'rl-gallery-update-preview' ) ? 'update' : 'page',
+				menu_item = $( '.rl-gallery-tab-menu-images input:checked' ).val(),
+				container = $( '.rl-gallery-tab-inside-images-' + menu_item ),
+				spinner = click.closest( 'td' ).find( '.rl-gallery-preview-inside .spinner' ),
+				query_args = {},
+				inside = $( this ).closest( '.inside' ).find( '.rl-gallery-tab-content' );
+
+			// disable nav on ajax
+			inside.addClass( 'rl-loading-content' );
+
+			// pagination?
+			if ( type === 'page' ) {
+				var content = click.attr( 'href' ).match( 'preview_page/\\d+' ),
+					page = 1;
+
+				// get valid page number
+				if ( content !== null )
+					page = content[0].split( '/' )[1];
+
+				query_args['preview_page'] = page;
+			}
 
 			container.find( 'tr[data-field_type]' ).each( function() {
 				var el = $( this ),
@@ -313,45 +385,96 @@
 					value = null;
 
 				switch ( el.data( 'field_type' ) ) {
+					case 'text':
+						value = el.find( 'input' ).val();
+
+						if ( ! value )
+							value = '';
+						break;
+
 					case 'number':
 						value = parseInt( el.find( 'input' ).val() );
 
-						if ( ! value ) {
+						if ( ! value )
 							value = 0;
-						}
-						console.log
+						break;
+
+					case 'taxonomy':
+						value = {
+							'id': parseInt( el.find( 'select option:selected' ).val() ),
+							'children': el.find( 'input[type="checkbox"]' ).prop( 'checked' )
+						};
+
+						if ( ! value )
+							value = {
+								'id': 0,
+								'children': false
+							};
 						break;
 
 					case 'select':
 						value = el.find( 'select option:selected' ).val();
 
-						if ( ! value ) {
+						if ( ! value )
 							value = '';
-						}
 						break;
 
 					case 'radio':
 						value = el.find( 'input:checked' ).val();
 
-						if ( ! value ) {
+						if ( ! value )
 							value = '';
-						}
 						break;
 
 					case 'multiselect':
 						value = el.find( 'select' ).val();
 
-						if ( ! value ) {
+						if ( ! value )
 							value = [];
-						}
+						break;
+
+					case 'hidden':
+						var subel = el.find( 'input[type="hidden"]' ),
+							nofa = parseInt( subel.data( 'subarg' ) ),
+							val = el.find( 'input[type="hidden"]' ).val();
+
+						if ( nofa > 0 ) {
+							var atts = subel.attr( 'name' ).slice( 0, -1 ).split( '][' ),
+								new_value = {},
+								last;
+
+							for ( var i = atts.length; i > atts.length - nofa; i-- ) {
+								var number = i - 1;
+
+								// first element?
+								if ( i === atts.length )
+									new_value[atts[number]] = val;
+								else
+									new_value[atts[number]] = last;
+
+								// remember last array
+								last = new_value;
+
+								// do not reset for last element
+								if ( number > atts.length - nofa )
+									new_value = {};
+							}
+
+							// get new array
+							value = new_value;
+
+							// save wikimedia aicontinue for pages
+							if ( ! ( query_args['preview_page'] in wikimedia ) )
+								wikimedia[query_args['preview_page']] = value.wikimedia.continue;
+
+							value.wikimedia.continue = wikimedia[query_args['preview_page']];
+						} else
+							value = val;
 						break;
 				}
 
 				query_args[field_name] = value;
 			} );
-
-			// disable ui
-			// container.addClass( 'rl-loading-content' );
 
 			// display spinner
 			spinner.fadeIn( 'fast' ).css( 'visibility', 'visible' );
@@ -359,28 +482,86 @@
 			// post ajax request
 			$.post( ajaxurl, {
 				action: 'rl-get-preview-content',
-				post_id: rlArgs.post_id,
-				menu_item: $( '.rl-gallery-tab-menu-images input:checked' ).val(),
+				post_id: rlArgsGalleries.post_id,
+				menu_item: menu_item,
 				query: query_args,
-				excluded: container.find( '.rl-gallery-exclude-ids' ).val(),
-				nonce: rlArgs.nonce
+				preview_type: type,
+				excluded: $( '.rl-gallery-exclude' ).map( function( i, elem ) { return $( elem ).val(); } ).get(),
+				nonce: rlArgsGalleries.nonce
 			} ).done( function ( response ) {
 				try {
 					if ( response.success ) {
-						$( '.rl-gallery-images' ).empty().append( response.data );
+						container.find( 'tr[data-field_type]' ).each( function() {
+							var el = $( this ),
+								field_name = el.data( 'field_name' ),
+								value = null;
+
+							switch ( el.data( 'field_type' ) ) {
+								case 'hidden':
+									$( '#rl_images_remote_library_response_data_wikimedia_continue' ).val( response.data.data.wikimedia.continue );
+
+									var next_page = parseInt( query_args['preview_page'] ) + 1;
+
+									// save wikimedia aicontinue for pages
+									if ( ! ( next_page in wikimedia ) )
+										wikimedia[next_page] = response.data.data.wikimedia.continue;
+/*
+									var subel = el.find( 'input[type="hidden"]' ),
+										nofa = parseInt( subel.data( 'subarg' ) ),
+										val = el.find( 'input[type="hidden"]' ).val();
+
+									if ( nofa > 0 ) {
+										var atts = subel.attr( 'name' ).slice( 0, -1 ).split( '][' ),
+											new_value = {},
+											last;
+
+										for ( var i = atts.length - nofa; i <= atts.length; i++ ) {
+											var number = i - 1;
+
+											// first element?
+											if ( i === atts.length ) {
+												// new_value2 .= '[' + atts[number] + ']';
+												new_value = response.data.data[atts[number]];
+											} else {
+												last = new_value[atts[number]];
+											}
+
+											// remember last array
+											new_value = last;
+
+											// do not reset for last element
+											// if ( number > atts.length - nofa )
+												// new_value = {};
+										}
+
+										// get new array
+										value = new_value;
+									} else
+										subel.val( response.data.data );
+									break;
+*/
+							}
+						} );
+
+						$( '.rl-gallery-images' ).empty().append( response.data.images );
+
+						if ( type === 'page' )
+							$( '.rl-gallery-preview-pagination' ).replaceWith( response.data.pagination );
 					} else {
 						// @todo
 					}
 				} catch ( e ) {
 					// @todo
 				}
+			} ).always( function () {
+				// hide spinner
+				spinner.fadeOut( 'fast' );
 
-				// hide spinner
-				spinner.fadeOut( 'fast' );
-			} ).fail( function () {
-				// hide spinner
-				spinner.fadeOut( 'fast' );
+				// enable content
+				inside.removeClass( 'rl-loading-content' );
 			} );
+
+			return false;
 		} );
 
 		// load values for specified rule
@@ -396,7 +577,7 @@
 			$.post( ajaxurl, {
 				action: 'rl-get-group-rules-values',
 				type: _this.val(),
-				nonce: rlArgs.nonce
+				nonce: rlArgsGalleries.nonce
 			} ).done( function ( data ) {
 				spinner.hide();
 
@@ -412,7 +593,6 @@
 				//
 			} );
 		} );
-
 	} );
 
 	// listen for insert/remove media library thumbnail
@@ -466,6 +646,13 @@
 		} );
 	} );
 
+	function createSubValue( value, new_value, arg ) {
+		value = new_value;
+		// value = value[arg];
+
+		return value
+	}
+
 	// get attachment ids
 	function get_current_attachments( gallery_ids ) {
 		var attachments = gallery_ids.val();
@@ -473,7 +660,7 @@
 		// return integer image ids or empty array
 		return attachments !== '' ? attachments.split( ',' ).map( function ( i ) {
 			return parseInt( i )
-		} ) : [ ];
+		} ) : [];
 	}
 
 	// 

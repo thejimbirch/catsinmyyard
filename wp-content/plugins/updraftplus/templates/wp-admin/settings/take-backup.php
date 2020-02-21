@@ -50,8 +50,10 @@
 		<div class="updraft_backup_btn_wrapper">
 			<button id="updraft-backupnow-button" type="button" <?php echo $backup_disabled; ?> class="button button-primary button-large button-hero" <?php if ($backup_disabled) echo 'title="'.esc_attr(__('This button is disabled because your backup directory is not writable (see the settings).', 'updraftplus')).'" ';?> onclick="updraft_backup_dialog_open(); return false;"><?php echo str_ireplace('Back Up', 'Backup', __('Backup Now', 'updraftplus'));?></button>
 			<?php
-				$link = '<p><a href="#" id="updraftplus_incremental_backup_link" onclick="updraft_backup_dialog_open(\'incremental\'); return false;" data-incremental="0">'.__('Add changed files (incremental backup) ...', ' updraftplus ') . '</a></p>';
-				echo apply_filters('updraftplus_incremental_backup_link', $link);
+				if (!$backup_disabled) {
+					$link = '<p><a href="#" id="updraftplus_incremental_backup_link" onclick="updraft_backup_dialog_open(\'incremental\'); return false;" data-incremental="0">'.__('Add changed files (incremental backup) ...', ' updraftplus ') . '</a></p>';
+					echo apply_filters('updraftplus_incremental_backup_link', $link);
+				}
 			?>
 		</div>
 		<div id="updraft_activejobs_table">
@@ -93,7 +95,7 @@
 		<table>
 			<tr>
 				<td>
-					<p class="multisite-advert-width"><?php echo __('Do you need WordPress Multisite support?', 'updraftplus').' <a href="'.apply_filters('updraftplus_com_link', "https://updraftplus.com/shop/updraftplus-premium/").'">'. __('Please check out UpdraftPlus Premium, or the stand-alone Multisite add-on.', 'updraftplus');?></a>.</p>
+					<p class="multisite-advert-width"><?php echo __('Do you need WordPress Multisite support?', 'updraftplus').' <a href="'.apply_filters('updraftplus_com_link', "https://updraftplus.com/shop/updraftplus-premium/").'" target="_blank">'. __('Please check out UpdraftPlus Premium, or the stand-alone Multisite add-on.', 'updraftplus');?></a>.</p>
 				</td>
 			</tr>
 		</table>

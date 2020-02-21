@@ -13,13 +13,11 @@ class Publicize extends Publicize_Base {
 		add_action( 'wp_ajax_publicize_facebook_options_page', array( $this, 'options_page_facebook' ) );
 		add_action( 'wp_ajax_publicize_twitter_options_page', array( $this, 'options_page_twitter' ) );
 		add_action( 'wp_ajax_publicize_linkedin_options_page', array( $this, 'options_page_linkedin' ) );
-		add_action( 'wp_ajax_publicize_google_plus_options_page', array( $this, 'options_page_google_plus' ) );
 
 		add_action( 'wp_ajax_publicize_tumblr_options_save', array( $this, 'options_save_tumblr' ) );
 		add_action( 'wp_ajax_publicize_facebook_options_save', array( $this, 'options_save_facebook' ) );
 		add_action( 'wp_ajax_publicize_twitter_options_save', array( $this, 'options_save_twitter' ) );
 		add_action( 'wp_ajax_publicize_linkedin_options_save', array( $this, 'options_save_linkedin' ) );
-		add_action( 'wp_ajax_publicize_google_plus_options_save', array( $this, 'options_save_google_plus' ) );
 
 		add_action( 'load-settings_page_sharing', array( $this, 'force_user_connection' ) );
 
@@ -117,7 +115,11 @@ class Publicize extends Publicize_Base {
 	}
 
 	function get_all_connections() {
-		return Jetpack_Options::get_option( 'publicize_connections' );
+		$connections = Jetpack_Options::get_option( 'publicize_connections' );
+		if ( isset( $connections['google_plus'] ) ) {
+			unset( $connections['google_plus'] );
+		}
+		return $connections;
 	}
 
 	function get_connections( $service_name, $_blog_id = false, $_user_id = false ) {
@@ -239,17 +241,15 @@ class Publicize extends Publicize_Base {
 	function globalization() {
 		if ( 'on' == $_REQUEST['global'] ) {
 			$globalize_connection = $_REQUEST['connection'];
-
 			if ( ! current_user_can( $this->GLOBAL_CAP ) ) {
 				return;
 			}
 
-			$this->globalize_connection( $connection_id );
+			$this->globalize_connection( $globalize_connection );
 		}
 	}
 
 	function globalize_connection( $connection_id ) {
-		Jetpack::load_xml_rpc_client();
 		$xml = new Jetpack_IXR_Client();
 		$xml->query( 'jetpack.globalizePublicizeConnection', $connection_id, 'globalize' );
 
@@ -260,7 +260,6 @@ class Publicize extends Publicize_Base {
 	}
 
 	function unglobalize_connection( $connection_id ) {
-		Jetpack::load_xml_rpc_client();
 		$xml = new Jetpack_IXR_Client();
 		$xml->query( 'jetpack.globalizePublicizeConnection', $connection_id, 'unglobalize' );
 
@@ -298,7 +297,6 @@ class Publicize extends Publicize_Base {
 			'twitter'     => array(),
 			'linkedin'    => array(),
 			'tumblr'      => array(),
-			'google_plus' => array(),
 		);
 
 		if ( 'all' == $filter ) {
@@ -349,7 +347,6 @@ class Publicize extends Publicize_Base {
 
 		$id = $this->get_connection_id( $connection );
 
-		Jetpack::load_xml_rpc_client();
 		$xml = new Jetpack_IXR_Client();
 		$xml->query( 'jetpack.testPublicizeConnection', $id );
 
@@ -642,7 +639,7 @@ class Publicize extends Publicize_Base {
 	}
 
 	function get_basehostname( $url ) {
-		return parse_url( $url, PHP_URL_HOST );
+		return wp_parse_url( $url, PHP_URL_HOST );
 	}
 
 	function options_save_tumblr() {
@@ -655,7 +652,6 @@ class Publicize extends Publicize_Base {
 	}
 
 	function set_remote_publicize_options( $id, $options ) {
-		Jetpack::load_xml_rpc_client();
 		$xml = new Jetpack_IXR_Client();
 		$xml->query( 'jetpack.setPublicizeOptions', $id, $options );
 
@@ -674,20 +670,12 @@ class Publicize extends Publicize_Base {
 		Publicize_UI::options_page_other( 'linkedin' );
 	}
 
-	function options_page_google_plus() {
-		Publicize_UI::options_page_other( 'google_plus' );
-	}
-
 	function options_save_twitter() {
 		$this->options_save_other( 'twitter' );
 	}
 
 	function options_save_linkedin() {
 		$this->options_save_other( 'linkedin' );
-	}
-
-	function options_save_google_plus() {
-		$this->options_save_other( 'google_plus' );
 	}
 
 	function options_save_other( $service_name ) {

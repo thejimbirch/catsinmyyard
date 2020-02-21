@@ -3,8 +3,8 @@ Contributors: dd@sucuri.net
 Donate Link: https://sucuri.net/
 Tags: malware, security, firewall, scan, spam, virus, sucuri, protection, blacklist, detection, hardening, file integrity
 Requires at least: 3.6
-Tested up to: 4.9.8
-Stable tag: 1.8.19
+Tested up to: 5.3.2
+Stable tag: 1.8.24
 
 The Sucuri WordPress Security plugin is a security toolset for security integrity monitoring, malware detection and security hardening.
 
@@ -189,6 +189,48 @@ We take your privacy seriously. For free plugin users without an API key, no inf
 This version adds an option to refresh the malware scan results on demand, as well as several small bug fixes and improvements.
 
 == Changelog ==
+
+= 1.8.24 =
+* Fix warning caused by humanTime function
+* Fix fatal error caused by cron jobs with nested arguments
+
+= 1.8.23 =
+* Add Automatic Secret Keys Updater
+* Improve button's and link's messaging on Last Logins sections
+* Improve messaging on Hardening page
+* Improve messaging on IP Access page
+
+= 1.8.22 =
+* Add "SSL existence check" to WordPress Security Recommendations
+* Add "Salt & Security Keys existence check" to WordPress Security Recommendations
+* Add "Salt & Security Keys age check" to WordPress Security Recommendations
+* Add "Admin account check" to WordPress Security Recommendations
+* Add "Single super-admin check" to WordPress Security Recommendations
+* Add "Too many plugins check" to WordPress Security Recommendations
+* Add "File editing check" to WordPress Security Recommendations
+* Add "WordPress debug check" to WordPress Security Recommendations
+* Add "Basic hardening check" to WordPress Security Recommendations
+* Add a delete button on Last Logins sections
+* Add register of logs removal on Audit Logs
+* Fix display of Access File Integrity on NGINX/IIS servers
+* Remove PHP version check from hardening page
+
+= 1.8.21 =
+* Add WordPress Security Recommendations section in the dashboard
+* Add PHP version check
+* Fix goo.gl links
+* Fix post_type pattern match to allow numbers and max of 20 chars
+* Fix Audit Logs queue timezone issue
+* Fix regex in template string replacement
+* Update translation file to include WordPress Security Recommendations section fields
+* Make the menu icon use the menu color styling
+* Remove block button from failed logins page
+
+= 1.8.20 =
+* Add dynamic core directories in the hardening whitelist options
+* Modify scheduled tasks panel to load the table via Ajax
+* Allow hosting details display to be filterable
+* Preparation for translations
 
 = 1.8.19 =
 * Add option to refresh the SiteCheck malware scan results

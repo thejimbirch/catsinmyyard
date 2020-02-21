@@ -1,5 +1,4 @@
 <?php
-
 /**
  *  Author extention
  *
@@ -105,6 +104,11 @@ function schema_wp_get_author_array( $post_id = null ) {
 	$soundcloud = esc_attr( stripslashes( get_the_author_meta( 'soundcloud', $post_author->ID ) ) );
 	$tumblr 	= esc_attr( stripslashes( get_the_author_meta( 'tumblr', $post_author->ID ) ) );
 	$github 	= esc_attr( stripslashes( get_the_author_meta( 'github', $post_author->ID ) ) );
+	
+	// Add full URL	to Twitter
+	// @since 1.7.3
+	// @since 1.7.4
+	if ( isset($twitter) && $twitter != '' ) $twitter = 'https://twitter.com/' . $twitter;
 	
 	$sameAs_links = array( $website, $googleplus, $facebook, $twitter, $instagram, $youtube, $linkedin, $myspace, $pinterest, $soundcloud, $tumblr, $github);
 	

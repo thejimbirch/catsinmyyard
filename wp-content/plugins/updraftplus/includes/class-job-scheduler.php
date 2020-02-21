@@ -69,11 +69,33 @@ class UpdraftPlus_Job_Scheduler {
 
 		$updraftplus->something_useful_happened = true;
 
+		$clone_job = $updraftplus->jobdata_get('clone_job');
+
+		if (!empty($clone_job)) {
+			static $last_call = false;
+
+			// Check we haven't yet made a call or that 15 minutes has passed before we make another call
+			if (!$last_call || time() - $last_call > 900) {
+				$last_call = time();
+				$clone_id = $updraftplus->jobdata_get('clone_id');
+				$secret_token = $updraftplus->jobdata_get('secret_token');
+				$log_data = $updraftplus->get_last_log_chunk($updraftplus->file_nonce);
+				$log_contents = isset($log_data['log_contents']) ? $log_data['log_contents'] : '';
+				$first_byte = isset($log_data['first_byte']) ? $log_data['first_byte'] : 0;
+				$response = $updraftplus->get_updraftplus_clone()->clone_checkin(array('clone_id' => $clone_id, 'secret_token' => $secret_token, 'first_byte' => $first_byte, 'log_contents' => $log_contents));
+				if (!isset($response['status']) || 'success' != $response['status']) {
+					$updraftplus->log("UpdraftClone backup check-in failed.");
+				} else {
+					$updraftplus->log("UpdraftClone backup check-in made successfully.");
+				}
+			}
+		}
+
 		$updraft_dir = $updraftplus->backups_dir_location();
 		if (file_exists($updraft_dir.'/deleteflag-'.$updraftplus->nonce.'.txt')) {
 			$updraftplus->log("User request for abort: backup job will be immediately halted");
-			@unlink($updraft_dir.'/deleteflag-'.$updraftplus->nonce.'.txt');
-			$updraftplus->backup_finish($updraftplus->current_resumption + 1, true, true, $updraftplus->current_resumption, true);
+			@unlink($updraft_dir.'/deleteflag-'.$updraftplus->nonce.'.txt');// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+			$updraftplus->backup_finish(true, true, true);
 			die;
 		}
 		

@@ -250,7 +250,7 @@ class UpdraftPlus_Backup_History {
 	 * @param  String $v - ignored
 	 * @return Mixed - the database option
 	 */
-	public static function filter_updraft_backup_history($v) {
+	public static function filter_updraft_backup_history($v) {// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Filter use
 		global $wpdb;
 		$row = $wpdb->get_row($wpdb->prepare("SELECT option_value FROM $wpdb->options WHERE option_name = %s LIMIT 1", 'updraft_backup_history'));
 		if (is_object($row)) return maybe_unserialize($row->option_value);
@@ -503,7 +503,7 @@ class UpdraftPlus_Backup_History {
 					'code' => 'possibleforeign_'.md5($entry),
 					'desc' => $entry,
 					'method' => '',
-					'message' => __('This file does not appear to be an UpdraftPlus backup archive (such files are .zip or .gz files which have a name like: backup_(time)_(site name)_(code)_(type).(zip|gz)).', 'updraftplus').' <a href="https://updraftplus.com/shop/updraftplus-premium/">'.__('If this is a backup created by a different backup plugin, then UpdraftPlus Premium may be able to help you.', 'updraftplus').'</a>'
+					'message' => __('This file does not appear to be an UpdraftPlus backup archive (such files are .zip or .gz files which have a name like: backup_(time)_(site name)_(code)_(type).(zip|gz)).', 'updraftplus').' <a href="https://updraftplus.com/shop/updraftplus-premium/" target="_blank">'.__('If this is a backup created by a different backup plugin, then UpdraftPlus Premium may be able to help you.', 'updraftplus').'</a>'
 				);
 				$messages[$potmessage['code']] = $potmessage;
 				continue;
@@ -547,7 +547,7 @@ class UpdraftPlus_Backup_History {
 				$backup_times_by_nonce[$nonce] = $btime;
 			}
 			if ($btime <= 100) continue;
-			$file_size = @filesize($updraft_dir.'/'.$entry);
+			$file_size = @filesize($updraft_dir.'/'.$entry);// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 
 			if (!isset($backup_nonces_by_filename[$entry])) {
 				$changes = true;
@@ -556,7 +556,7 @@ class UpdraftPlus_Backup_History {
 					if (isset($only_add_this_file['label'])) $backup_history[$btime]['label'] = $only_add_this_file['label'];
 					$backup_history[$btime]['native'] = false;
 				} elseif ('db' == $type && !$accepted_foreign) {
-					list ($mess, $warn, $err, $info) = $updraftplus->analyse_db_file(false, array(), $updraft_dir.'/'.$entry, true);
+					list ($mess, $warn, $err, $info) = $updraftplus->analyse_db_file(false, array(), $updraft_dir.'/'.$entry, true);// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 					if (!empty($info['label'])) {
 						$backup_history[$btime]['label'] = $info['label'];
 					}
@@ -642,11 +642,12 @@ class UpdraftPlus_Backup_History {
 			if ($btime <= 100) continue;
 
 			// Remember that at this point, we already know that the file is not stored locally (else it would have been pruned earlier from $remote_files)
-			if (isset($backup_history[$btime])) {
+			// The check for a new set needs to take into account that $backup_history[$btime]['service_instance_ids'] may have been created further up this method
+			if (isset($backup_history[$btime]) && array('service_instance_ids') !== array_keys($backup_history[$btime])) {
 				if (!isset($backup_history[$btime]['service']) || (is_array($backup_history[$btime]['service']) && $backup_history[$btime]['service'] !== $services) || (is_string($backup_history[$btime]['service']) && (1 != count($services) || $services[0] !== $backup_history[$btime]['service']))) {
 					$changes = true;
 					if (isset($backup_history[$btime]['service'])) {
-						$existing_services = is_array($backup_history[$btime]['service']) ? $backup_history[$btime]['service'] : array($existing_services);
+						$existing_services = is_array($backup_history[$btime]['service']) ? $backup_history[$btime]['service'] : array($backup_history[$btime]['service']);
 						$backup_history[$btime]['service'] = array_unique(array_merge($services, $existing_services));
 						foreach ($backup_history[$btime]['service'] as $k => $v) {
 							if ('none' === $v || '' == $v) unset($backup_history[$btime]['service'][$k]);
@@ -691,7 +692,7 @@ class UpdraftPlus_Backup_History {
 				}
 			}
 		}
-		
+
 		$more_backup_history = apply_filters('updraftplus_more_rebuild', $backup_history);
 		
 		if ($more_backup_history) {
@@ -740,11 +741,6 @@ class UpdraftPlus_Backup_History {
 		return '';
 	}
 
-	/**
-	 * This function will look through the backup history and return the nonce of the latest backup that can be used for an incremental backup (this will exclude full backups sent to another site, e.g. for a migration or clone)
-	 *
-	 * @return String - the backup nonce of a full backup or an empty string if none are found
-	 */
 	/**
 	 * This function will look through the backup history and return the nonce of the latest backup that can be used for an incremental backup (this will exclude full backups sent to another site, e.g. for a migration or clone)
 	 *
@@ -809,7 +805,6 @@ class UpdraftPlus_Backup_History {
 	 * @param Array	  $backup_array - the backup
 	 */
 	public static function save_backup($backup_time, $backup_array) {
-		global $updraftplus;
 		$backup_history = self::get_history();
 
 		$backup_history[$backup_time] = isset($backup_history[$backup_time]) ? apply_filters('updraftplus_merge_backup_history', $backup_array, $backup_history[$backup_time]) : $backup_array;

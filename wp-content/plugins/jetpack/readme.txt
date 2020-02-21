@@ -1,45 +1,45 @@
 === Jetpack by WordPress.com ===
-Contributors: automattic, adamkheckler, aduth, akirk, allendav, alternatekev, andy, annezazu, apeatling, azaozz, batmoo, barry, beaulebens, blobaugh, cainm, cena, cfinke, chaselivingston, chellycat, clickysteve, csonnek, danielbachhuber, davoraltman, daniloercoli, designsimply, dllh, drawmyface, dsmart, dzver, ebinnion, eliorivero, enej, eoigal, erania-pinnera, ethitter, gcorne, georgestephanis, gibrown, goldsounds, hew, hugobaeta, hypertextranch, iammattthomas, iandunn, jblz, jasmussen, jeffgolenski, jeherve, jenhooks, jenia, jessefriedman, jgs, jkudish, jmdodd, joanrho, johnjamesjacoby, jshreve, keoshi, koke, kraftbj, lancewillett, lschuyler, macmanx, martinremy, matt, matveb, mattwiebe, maverick3x6, mcsf, mdawaffe, MichaelArestad, migueluy, mikeyarce, mkaz, nancythanki, nickmomrik, obenland, oskosk, pento, professor44, rachelsquirrel, rdcoll, ryancowles, richardmuscat, richardmtl, roccotripaldi, samhotchkiss, scarstocea, sdquirk, stephdau, tmoorewp, tyxla, Viper007Bond, westi, yoavf, zinigor
+Contributors: automattic, adamkheckler, aduth, akirk, allendav, alternatekev, andy, annezazu, apeatling, azaozz, batmoo, barry, beaulebens, blobaugh, brbrr, cainm, cena, cfinke, chaselivingston, chellycat, clickysteve, csonnek, danielbachhuber, davoraltman, daniloercoli, delawski, designsimply, dllh, drawmyface, dsmart, dzver, ebinnion, egregor, eliorivero, enej, eoigal, erania-pinnera, ethitter, gcorne, georgestephanis, gibrown, goldsounds, hew, hugobaeta, hypertextranch, iammattthomas, iandunn, jblz, jasmussen, jeffgolenski, jeherve, jenhooks, jenia, jessefriedman, jgs, jkudish, jmdodd, joanrho, johnjamesjacoby, jshreve, kbrownkd, keoshi, koke, kraftbj, lancewillett, lschuyler, macmanx, martinremy, matt, matveb, mattwiebe, maverick3x6, mcsf, mdawaffe, MichaelArestad, migueluy, mikeyarce, mkaz, nancythanki, nickmomrik, obenland, oskosk, pento, professor44, rachelsquirrel, rdcoll, ryancowles, richardmuscat, richardmtl, roccotripaldi, samhotchkiss, scarstocea, scottsweb, sdquirk, simison, stephdau, tmoorewp, tyxla, Viper007Bond, westi, yoavf, zinigor
 Tags: Jetpack, WordPress.com, backup, security, related posts, CDN, speed, anti-spam, social sharing, SEO, video, stats
-Stable tag: 6.8.1
-Requires at least: 4.8
-Tested up to: 5.0
+Stable tag: 8.2.3
+Requires at least: 5.2
+Requires PHP: 5.6
+Tested up to: 5.3
 
 The ideal plugin for stats, related posts, search engine optimization, social sharing, protection, backups, security, and more.
 
 == Description ==
 
-Hassle-free design, marketing, and security — all in one place.
+Security, performance, and site management: the best way to WordPress is with Jetpack.
 
-= Design and Customization Services =
-Create and customize your WordPress site from start to finish. Jetpack helps you with:
+= 24/7 Site Security =
+Jetpack is your site's security detail, guarding you against brute-force attacks and unauthorized logins. Basic protection is always free, while premium plans add expanded backup and automated fixes. Jetpack's full suite of site security tools include:
 
-* Hundreds of professional themes for any kind of site
-* Intuitive and powerful customization tools
-* Unlimited and high-speed image and video content delivery network
-* Lazy image loading for a faster mobile experience
-* Integration with the official WordPress mobile apps
+* Brute-force attack protection, spam filtering, and downtime monitoring.
+* Backups of your entire site, either once daily or in real time.
+* Secure login, with optional two-factor authentication.
+* Malware scanning, code scanning, and automated threat resolution.
+* A record of every change on your site to simplify troubleshooting.
+* Fast, priority support from WordPress experts.
 
-= Marketing and Performance Services =
-Measure, promote, and earn money from your site. Jetpack helps you with:
+= Peak Performance =
+Activate site accelerator tools and watch your page load times decrease -- we'll optimize your images and serve them from our own powerful global network, and speed up your mobile site to reduce bandwidth usage (and save money!). Connect Jetpack to take advantage of:
 
-* Site stats and analytics
-* Automated social media posting and scheduling in advance
-* Elasticsearch-powered related content and site search
-* SEO tools for Google, Bing, Twitter, Facebook, and WordPress.com
-* Advertising program that includes the best of AdSense, Facebook Ads, AOL, Amazon, Google AdX, and Yahoo
-* Simple PayPal payment buttons
-* Optimize: Activate Jetpack’s site accelerator to load pages faster, optimize your images, and serve your images and static files (like CSS and JavaScript) from our global network of servers. You’ll also reduce bandwidth usage, which may lead to lower hosting costs.
+* Images and static files, like CSS and JavaScript, served from our servers, not yours.
+* Elasticsearch-powered related content and site search, for relevant results with no drain on your servers.
+* Lazy image loading for a faster mobile experience.
+* Unlimited and high-speed video via our content delivery network.
 
-= Security and Backups Services =
-Stop worrying about data loss, downtime, and hacking. Jetpack helps you with:
+= Effortless Site Management =
+Create and customize your WordPress site, optimize it for visitors and revenue, and enjoy watching your stats tick up. Built it, share it, and watch it grow with:
 
-* Brute force attack protection, spam filtering, and downtime monitoring
-* Daily or real-time backups of your entire site
-* Secure logins with optional two-factor authentication
-* Malware scanning, code scanning, and automated threat resolution
-* Activity: a record of every change and update on your site
-* Fast, priority support from WordPress experts
+* Advanced site stats and analytics for understanding your audience.
+* Hundreds of professional themes, for a pro site no matter what your niche.
+* Intuitive and powerful customization tools to match your website to your brand.
+* Simple PayPal payment buttons for selling products and services.
+* SEO tools for Google, Bing, Twitter, Facebook, and WordPress.com to maximize your reach.
+* An advertising program that includes the best of AdSense, Facebook Ads, AOL, Amazon, Google AdX, and Yahoo.
+* Integration with the official WordPress mobile apps, to manage your site from anywhere.
 
 = Expert Support =
 We have a global team of Happiness Engineers ready to help you. Ask your questions in the support forum, or [contact us directly](https://jetpack.com/contact-support).
@@ -89,55 +89,69 @@ There are opportunities for developers at all levels to contribute. [Learn more 
 
 == Screenshots ==
 
-1. Themes: Choose from hundreds of customizable, professional themes.
-2. Performance: Free high-speed content delivery network for your images.
-3. Apps: Update your site from any device with the free WordPress apps.
-4. Analytics: Simple and concise site stats and traffic insights.
-5. Sharing: Connect your site to social networks for automated social sharing.
-6. Revenue: Sell products & take payments with simple payment buttons.
-7. Downtime Monitoring: Get notified if and when your site goes down.
-8. Security: Protection against brute force attacks, spam, and malware. On-demand backups and restores.
+1. Keep hackers out with brute force attack protection, malware scanning, spam filtering, and downtime monitoring. Secure your site data with on-demand backups and restores.
+2. Load pages faster, and serve your images and static files from our massive global content delivery network.
+3. Customize your website with professionally-designed WordPress themes, blocks, and widgets.
+4. Promote your newest posts, pages, and products across your social media channels.
 
 == Changelog ==
 
-= 6.8.1 =
+= 8.2.2 & 8.2.3 =
 
-* Release date: December 6, 2018
-* Release post: https://wp.me/p1moTy-d3t
+* Release date: February 20, 2020
+
+* General: fix compatibility issues with other plugins relying on the REST API to communicate with Jetpack, or on the Jetpack registration process.
+* Multisite: resolve issue with Jetpack's loading sequence that would fatal subsites that did not have any individually activated plugins.
+
+= 8.2.1 =
+
+* Release date: February 17, 2020
 
 **Bug fixes**
 
-* Contact Form: security changes to improve the display of success messages after submitting a form.
-* Publicize: avoid Fatal errors when trying to create or edit posts from a Custom Post Type that supports Publicize.
-* Sync: improve synchronization of WooCommerce events.
-* WordPress.com REST API: handle WooCommerce Product reviews for a better display in apps that use the API.
+* Block Editor: avoid errors when uploading additional media to the Slideshow, Tiled Gallery, and Video blocks.
+* Synchronization: address issues that would cause delayed synchronization of your posts to WordPress.com.
 
-= 6.8 =
+= 8.2 =
 
-* Release date: November 26, 2018
-* Release post: https://wp.me/p1moTy-cee
+* Release date: February 11, 2020
+* Release post: https://wp.me/p1moTy-mVu
 
 **Major Enhancements**
 
-* This release introduces the first wave of Jetpack blocks built for the new block editor, available in WordPress 5.0.
+* Calendly Block: a useful tool for all coaches, consultants, therapists… Add the block to a post or page and anyone can then book appointments, meetings, and classes right from your website.
+* EventBrite Block: allow your visitors to register to events right from your site with this new block.
+* OpenTable Block: restaurant owners, you can now add a reservation form to your site to make it easy for anyone to book a table online, via your site.
 
 **Enhancements**
 
-* General: improve ability to create and troubleshoot Jetpack connections.
-* REST API: new endpoint for testing the Jetpack connection.
+* Contact Form: add IP and Feedback date to data that can be exported via the CSV tool.
+* Dashboard: display a notice when a site uses conflicting plans.
+* Map Block: improve the calculation and persistence of maps' center points.
+* Map Block: improve the generation of an access token on WordPress.com sites.
+* Map Block: update Mapbox GL library to opt into map load based billing.
+* Shortcodes: add new Vimeo shortcode format.
+* Subscriptions: display a clear error message when you try to subscribe to a site where you've already subscribed but did not validate your subscription.
+* Subscriptions: display a clear message when an email having many pending confirmations tries to subscribe to a site.
+* Synchronization: improve performance of data synchronization with WordPress.com.
 
 **Improved compatibility**
 
-* Akismet: improve caching of all queries for Akismet status.
-* Spellcheck / Grammar: we've made sure the Jetpack feature did not create any error when using the block editor.
-* Twenty Nineteen: ensure compatibility with Jetpack's widgets.
+* Connnection Flow: ongoing work to improve the reliability of the connection between your site and WordPress.com.
+* Connection Flow: improve detection of hosting environments for better communication with WordPress.com.
+* General: avoid any login issues when using other plugins that may interact with cookies on your site.
+* Gutenberg: avoid any layout issues that may appear in the block editor when using the latest version of the Gutenberg plugin.
+* Related Posts: ensure that any filters customizing the display of Related Posts also apply to posts displayed with the AMP plugin.
+* Sharing: do not output Jetpack's Open Graph Meta Tags if the Complete Open Graph plugin is present on your site.
 
 **Bug fixes**
 
-* Asset CDN: do not try to serve assets from non-public versions.
-* Carousel: handle galleries created via the Gallery block in the new block editor.
-* Photon: make sure our image CDN is fully compatible with the block editor.
-
+* Blocks / Dashboard: ensure that blocks as well as Jetpack's dashboard can be used even in older browsers such as Internet Explorer 11.
+* Contact Info Block: ensure that Google's Structured Data tool can recognize phone numbers added to the block.
+* Copy Post: ensure correct sharing and like settings are copied when posts are duplicated.
+* Subscriptions: maintain email subscription settings when deactivating and reactivating the feature.
+* WordPress.com REST API: avoid PHP notices when a media file is edited via the API.
+* WordPress.com REST API: ensure that image URLs are currently set when uploading an image multiple times.
 
 --------
 

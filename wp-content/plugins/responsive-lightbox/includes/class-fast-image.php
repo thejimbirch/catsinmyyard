@@ -153,7 +153,7 @@ class Responsive_Lightbox_Fast_Image {
 				case 'readsize':
 					$c = $this->get_chars( 7 );
 
-					return array( $this->read_int( substr( $c, 5, 2 ) ), $this->read_int( substr( $c, 3, 2 ) ) );
+					return [ $this->read_int( substr( $c, 5, 2 ) ), $this->read_int( substr( $c, 3, 2 ) ) ];
 			}
 		}
 	}

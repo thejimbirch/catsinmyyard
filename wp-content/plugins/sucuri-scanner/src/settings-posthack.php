@@ -60,7 +60,7 @@ class SucuriScanSettingsPosthack extends SucuriScanSettings
                 $wpconfig_process = SucuriScanEvent::setNewConfigKeys();
 
                 if (!$wpconfig_process) {
-                    SucuriScanInterface::error(__('WordPress configuration file was not found.', 'sucuri-scanner'));
+                    SucuriScanInterface::error(__('WordPress configuration file was not found or new keys could not be created.', 'sucuri-scanner'));
                 } elseif ($wpconfig_process['updated']) {
                     SucuriScanEvent::reportNoticeEvent(__('Generate new security keys (success)', 'sucuri-scanner'));
                     SucuriScanInterface::info(__('Secret keys updated successfully (summary of the operation bellow).', 'sucuri-scanner'));
@@ -136,7 +136,7 @@ class SucuriScanSettingsPosthack extends SucuriScanSettings
             $cronFrequency = SucuriScanRequest::post(':autoseckeyupdater_frequency');
 
             // Deny action if cron frequency is invalid
-            if (empty($cronFrequency) || !in_array($cronFrequency, array_keys($availableSchedules))) {
+            if (empty($cronFrequency) || !in_array($cronFrequency, $availableSchedules)) {
                 SucuriScanInterface::error(__('No frequency selected for the automatic secret key updater.', 'sucuri-scanner'));
             } elseif ($cronFrequency === "disabled") {
                 // Disable Automatic Secret Keys Updater

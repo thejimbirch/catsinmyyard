@@ -1,5 +1,5 @@
 <?php
-/*  Copyright 2013-2019 Renzo Johnson (email: renzojohnson at gmail.com)
+/*  Copyright 2010-2022 Renzo Johnson (email: renzo.johnson at gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,14 +18,16 @@
 
 
 
-
-
 function mce_updts ( $update, $item ) {
     $plugins = array (
         'blocks',
+        'chimpmatic',
+        'quick-maps',
         'contact-form-7-campaign-monitor-extension',
         'contact-form-7-mailchimp-extension',
         'integrate-contact-form-7-and-aweber',
+        'cf7-getresponse',
+        'cf7-icontact-extension',
     );
     if ( in_array( $item->slug, $plugins ) ) {
         return true;
@@ -33,13 +35,16 @@ function mce_updts ( $update, $item ) {
         return $update;
     }
 }
-add_filter( 'auto_update_plugin', 'mce_updts', 10, 2 );
+
+$autoupdate = get_option( 'chimpmatic-update', '1' ) ;
+
+if ( $autoupdate  )
+  add_filter( 'auto_update_plugin', 'mce_updts', 10, 2 );
 
 
 
+// Disable auto-update email notifications for plugins.
+add_filter( 'auto_plugin_update_send_email', '__return_false' );
 
-
-
-
-
-
+// Disable auto-update email notifications for themes.
+add_filter( 'auto_theme_update_send_email', '__return_false' );

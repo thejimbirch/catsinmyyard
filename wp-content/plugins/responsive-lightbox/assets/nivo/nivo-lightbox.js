@@ -180,20 +180,20 @@
 						'line-height': $('.nivo-lightbox-content').height() +'px',
 						'height': $('.nivo-lightbox-content').height() +'px' // For Firefox
 					});
-					$(window).resize(function() {
+					$(window).on( 'resize', function() {
 						wrap.css({
 							'line-height': $('.nivo-lightbox-content').height() +'px',
 							'height': $('.nivo-lightbox-content').height() +'px' // For Firefox
 						});
-					});
+					} );
 				}).each(function() {
 					if(this.complete) $(this).load();
 				});
 
-				img.error(function() {
+				img.on( 'error', function() {
 					var wrap = $('<div class="nivo-lightbox-error"><p>'+ $this.options.errorMessage +'</p></div>');
                     content.html(wrap).removeClass('nivo-lightbox-loading');
-				});
+				} );
             }
             // Video (Youtube/Vimeo)
             else if(video){
@@ -248,7 +248,7 @@
 								'margin-top': -(wrap.outerHeight()/2) +'px'
 							});
 						}
-						$(window).resize(function() {
+						$(window).on( 'resize', function() {
 							if(wrap.outerHeight() < content.height()){
 								wrap.css({
 									'position': 'relative',
@@ -256,7 +256,7 @@
 									'margin-top': -(wrap.outerHeight()/2) +'px'
 								});
 							}
-						});
+						} );
 					},
 					error: function(){
 						var wrap = $('<div class="nivo-lightbox-error"><p>'+ $this.options.errorMessage +'</p></div>');
@@ -279,7 +279,7 @@
 							'margin-top': -(wrap.outerHeight()/2) +'px'
 						});
 					}
-					$(window).resize(function() {
+					$(window).on( 'resize', function() {
 						if(wrap.outerHeight() < content.height()){
 							wrap.css({
 								'position': 'relative',
@@ -287,7 +287,7 @@
 								'margin-top': -(wrap.outerHeight()/2) +'px'
 							});
 						}
-					});
+					} );
 				} else {
 					var wrapError = $('<div class="nivo-lightbox-error"><p>'+ $this.options.errorMessage +'</p></div>');
                     content.html(wrapError).removeClass('nivo-lightbox-loading');

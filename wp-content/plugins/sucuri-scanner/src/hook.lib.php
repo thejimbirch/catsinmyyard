@@ -141,19 +141,15 @@ class SucuriScanHook extends SucuriScanEvent
     /**
      * Detects when the core files are updated.
      *
+     * @param string $wp_version The current WordPress version.
      * @return void
      */
-    public static function hookCoreUpdate()
+    public static function hookCoreUpdate($wp_version='')
     {
-        // WordPress update request.
-        if (current_user_can('update_core')
-            && SucuriScanRequest::get('action', '(do-core-upgrade|do-core-reinstall)')
-            && SucuriScanRequest::post('upgrade')
-        ) {
-            $message = sprintf(__('WordPress updated to version: %s', 'sucuri-scanner'), SucuriScanRequest::post('version'));
-            self::reportCriticalEvent($message);
-            self::notifyEvent('website_updated', $message);
-        }
+        // WordPress core has been successfully updated
+        $message = sprintf(__('WordPress updated to version: %s', 'sucuri-scanner'), $wp_version);
+        self::reportCriticalEvent($message);
+        self::notifyEvent('website_updated', $message);
     }
 
     /**
@@ -522,9 +518,10 @@ class SucuriScanHook extends SucuriScanEvent
     {
         // Plugin installation request.
         if (current_user_can('install_plugins')
-            && SucuriScanRequest::get('action', '(install|upload)-plugin')
+            && SucuriScanRequest::getOrPost('action', '(install|upload)-plugin')
+            && check_ajax_referer( 'updates', false, false )
         ) {
-            $plugin = SucuriScanRequest::get('plugin', '.+');
+            $plugin = SucuriScanRequest::getOrPost('plugin', '.+');
 
             if (isset($_FILES['pluginzip'])) {
                 $plugin = $_FILES['pluginzip']['name'];
@@ -554,6 +551,11 @@ class SucuriScanHook extends SucuriScanEvent
         if (SucuriScanRequest::getOrPost('action', $plugin_update_actions)
             || SucuriScanRequest::getOrPost('action2', $plugin_update_actions)
         ) {
+
+            if (!check_ajax_referer( 'updates', false, false )) {
+                return;
+            }
+
             $plugin_list = array();
             $items_affected = array();
 
@@ -865,6 +867,7 @@ class SucuriScanHook extends SucuriScanEvent
         if (current_user_can('delete_themes')
             && SucuriScanRequest::getOrPost('action', 'delete')
             && SucuriScanRequest::getOrPost('stylesheet', '.+')
+            && check_ajax_referer( 'updates', false, false )
         ) {
             $theme = SucuriScanRequest::getOrPost('stylesheet', '.+');
             $theme = $theme ? $theme : __('Unknown', 'sucuri-scanner');
@@ -888,6 +891,7 @@ class SucuriScanHook extends SucuriScanEvent
             && SucuriScanRequest::post('theme', '.+')
             && SucuriScanRequest::post('file', '.+')
             && strpos($_SERVER['SCRIPT_NAME'], 'theme-editor.php') !== false
+            && check_ajax_referer( 'updates', false, false )
         ) {
             $theme_name = SucuriScanRequest::post('theme');
             $filename = SucuriScanRequest::post('file');
@@ -907,6 +911,7 @@ class SucuriScanHook extends SucuriScanEvent
         // Theme installation request.
         if (current_user_can('install_themes')
             && SucuriScanRequest::get('action', 'install-theme')
+            && check_ajax_referer( 'updates', false, false )
         ) {
             $theme = SucuriScanRequest::get('theme', '.+');
             $theme = $theme ? $theme : __('Unknown', 'sucuri-scanner');
@@ -942,6 +947,7 @@ class SucuriScanHook extends SucuriScanEvent
         if (current_user_can('update_themes')
             && SucuriScanRequest::get('action', '(upgrade-theme|do-theme-upgrade)')
             && SucuriScanRequest::post('checked', '_array')
+            && check_ajax_referer( 'updates', false, false )
         ) {
             $themes = SucuriScanRequest::post('checked', '_array');
             $items_affected = array();
@@ -996,7 +1002,7 @@ class SucuriScanHook extends SucuriScanEvent
      * @param int $id The identifier of the edited user account
      * @param object $old_user_data Object containing user's data prior to update.
      */
-    public static function hookProfileUpdate($id = 0, $old_user_data)
+    public static function hookProfileUpdate($id = 0, $old_user_data = false)
     {
         $title = __('unknown', 'sucuri-scanner');
         $email = __('user@domain.com', 'sucuri-scanner');
@@ -1072,7 +1078,7 @@ class SucuriScanHook extends SucuriScanEvent
     }
 
     /**
-     * Detects when a widget is added.
+     * Detects when a widget is added or deleted
      *
      * @return void
      */
@@ -1083,6 +1089,7 @@ class SucuriScanHook extends SucuriScanEvent
             && SucuriScanRequest::post('action', 'save-widget')
             && SucuriScanRequest::post('id_base') !== false
             && SucuriScanRequest::post('sidebar') !== false
+            && check_ajax_referer( 'save-sidebar-widgets', 'savewidgets', false )
         ) {
             if (SucuriScanRequest::post('delete_widget', '1')) {
                 $action_d = 'deleted';
@@ -1107,6 +1114,7 @@ class SucuriScanHook extends SucuriScanEvent
             self::notifyEvent('widget_' . $action_d, $message);
         }
     }
+
 
     /**
      * Detects when a widget is deleted.

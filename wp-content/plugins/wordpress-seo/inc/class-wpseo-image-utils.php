@@ -24,8 +24,14 @@ class WPSEO_Image_Utils {
 		 */
 		$url = preg_replace( '/(.*)-\d+x\d+\.(jpg|png|gif)$/', '$1.$2', $url );
 
+		static $uploads;
+
+		if ( $uploads === null ) {
+			$uploads = wp_get_upload_dir();
+		}
+
 		// Don't try to do this for external URLs.
-		if ( strpos( $url, get_site_url() ) !== 0 ) {
+		if ( strpos( $url, $uploads['baseurl'] ) !== 0 ) {
 			return 0;
 		}
 
@@ -60,7 +66,7 @@ class WPSEO_Image_Utils {
 			return $id;
 		}
 
-		// phpcs:ignore WordPress.VIP.RestrictedFunctions -- We use the WP COM version if we can, see above.
+		// Note: We use the WP COM version if we can, see above.
 		$id = attachment_url_to_postid( $url );
 
 		if ( empty( $id ) ) {
@@ -79,14 +85,15 @@ class WPSEO_Image_Utils {
 	 * @param array $image         Image array with URL and metadata.
 	 * @param int   $attachment_id Attachment ID.
 	 *
-	 * @return false|array $image {
+	 * @return false|array {
 	 *     Array of image data
 	 *
 	 *     @type string $alt      Image's alt text.
-	 *     @type string $alt      Image's alt text.
+	 *     @type string $path     Path of image.
 	 *     @type int    $width    Width of image.
 	 *     @type int    $height   Height of image.
 	 *     @type string $type     Image's MIME type.
+	 *     @type string $size     Image's size.
 	 *     @type string $url      Image's URL.
 	 *     @type int    $filesize The file size in bytes, if already set.
 	 * }
@@ -108,6 +115,29 @@ class WPSEO_Image_Utils {
 		if ( ! isset( $image['type'] ) ) {
 			$image['type'] = get_post_mime_type( $attachment_id );
 		}
+
+		/**
+		 * Filter: 'wpseo_image_data' - Filter image data.
+		 *
+		 * Elements with keys not listed in the section will be discarded.
+		 *
+		 * @api array {
+		 *     Array of image data
+		 *
+		 *     @type int    id       Image's ID as an attachment.
+		 *     @type string alt      Image's alt text.
+		 *     @type string path     Image's path.
+		 *     @type int    width    Width of image.
+		 *     @type int    height   Height of image.
+		 *     @type int    pixels   Number of pixels in the image.
+		 *     @type string type     Image's MIME type.
+		 *     @type string size     Image's size.
+		 *     @type string url      Image's URL.
+		 *     @type int    filesize The file size in bytes, if already set.
+		 * }
+		 * @api int  Attachment ID.
+		 */
+		$image = apply_filters( 'wpseo_image_data', $image, $attachment_id );
 
 		// Keep only the keys we need, and nothing else.
 		return array_intersect_key( $image, array_flip( [ 'id', 'alt', 'path', 'width', 'height', 'pixels', 'type', 'size', 'url', 'filesize' ] ) );
@@ -156,13 +186,14 @@ class WPSEO_Image_Utils {
 		}
 
 		if ( ! $image ) {
-			$image         = image_get_intermediate_size( $attachment_id, $size );
-			$image['size'] = $size;
+			$image = image_get_intermediate_size( $attachment_id, $size );
 		}
 
 		if ( ! $image ) {
 			return false;
 		}
+
+		$image['size'] = $size;
 
 		return self::get_data( $image, $attachment_id );
 	}
@@ -241,10 +272,16 @@ class WPSEO_Image_Utils {
 			return $image['filesize'];
 		}
 
+		if ( ! isset( $image['path'] ) ) {
+			return 0;
+		}
+
 		// If the file size for the file is over our limit, we're going to go for a smaller version.
-		// @todo Save the filesize to the image metadata.
-		// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged -- If file size doesn't properly return, we'll not fail.
-		return @filesize( self::get_absolute_path( $image['path'] ) );
+		if ( function_exists( 'wp_filesize' ) ) {
+			return wp_filesize( self::get_absolute_path( $image['path'] ) );
+		}
+
+		return file_exists( $image['path'] ) ? (int) filesize( $image['path'] ) : 0;
 	}
 
 	/**
@@ -321,7 +358,7 @@ class WPSEO_Image_Utils {
 	/**
 	 * Retrieve the internal WP image file sizes.
 	 *
-	 * @return array $image_sizes An array of image sizes.
+	 * @return array An array of image sizes.
 	 */
 	public static function get_sizes() {
 		/**
@@ -368,7 +405,7 @@ class WPSEO_Image_Utils {
 	/**
 	 * Gets the post's first usable content image. Null if none is available.
 	 *
-	 * @param int $post_id The post id.
+	 * @param int|null $post_id The post id.
 	 *
 	 * @return string|null The image URL.
 	 */

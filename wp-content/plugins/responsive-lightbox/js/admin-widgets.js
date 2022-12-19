@@ -1,18 +1,33 @@
-( function ( window, $ ) {
-	
-	/* Gallery widget */
+( function( window, $ ) {
 
+	/* Gallery widget */
 	var rl_galleries = [ ],
 		rl_gallery_frames = [ ],
 		rl_gallery_ids = [ ],
 		rl_gallery_images = [ ];
 
-	$( document ).on( 'ready widget-updated widget-added', function () {
+	/* Single image widget */
+	var rl_image_frame,
+		rl_image_container,
+		rl_image_input;
 
+	// ready event
+	$( function() {
+		init_rl_gallery_widget();
+		init_rl_image_widget();
+	} );
+
+	// custom events trigger
+	$( document ).on( 'widget-updated widget-added', function() {
+		init_rl_gallery_widget();
+		init_rl_image_widget();
+	} );
+
+	function init_rl_gallery_widget() {
 		rl_galleries = $( '.rl-gallery-widget' );
 
 		if ( rl_galleries.length > 0 ) {
-			$.each( rl_galleries, function ( index, gallery ) {
+			$.each( rl_galleries, function( index, gallery ) {
 				var gallery_id_attr = $( gallery ).attr( 'id' ),
 					gallery_id_arr = gallery_id_attr.match( /\-\d*\-/ );
 
@@ -33,16 +48,16 @@
 						helper: 'clone',
 						opacity: 0.65,
 						placeholder: 'rl-gallery-sortable-placeholder',
-						start: function ( event, ui ) {
+						start: function( event, ui ) {
 							ui.item.css( 'border-color', '#f6f6f6' );
 						},
-						stop: function ( event, ui ) {
+						stop: function( event, ui ) {
 							ui.item.removeAttr( 'style' );
 						},
-						update: function ( event, ui ) {
+						update: function( event, ui ) {
 							var attachment_ids = [ ];
 
-							$( rl_gallery_images[gallery_id] ).find( 'li.rl-gallery-image' ).each( function () {
+							$( rl_gallery_images[gallery_id] ).find( 'li.rl-gallery-image' ).each( function() {
 								var attachment_id = jQuery( this ).attr( 'data-attachment_id' );
 								attachment_ids.push( attachment_id );
 							} );
@@ -52,9 +67,9 @@
 					} );
 
 					// removing images
-					$( rl_gallery_images[gallery_id] ).on( 'click', '.rl-gallery-image-remove', function () {
+					$( rl_gallery_images[gallery_id] ).on( 'click', '.rl-gallery-image-remove', function() {
 						var li = $( this ).closest( 'li.rl-gallery-image' ),
-							attachment_ids = rl_gallery_ids[gallery_id].val().split( ',' ).map( function ( el ) {
+							attachment_ids = rl_gallery_ids[gallery_id].val().split( ',' ).map( function( el ) {
 							return parseInt( el )
 						} );
 
@@ -72,10 +87,9 @@
 				}
 			} );
 		}
-		;
 
 		// open the modal on click
-		$( '.rl-gallery-widget-select' ).on( 'click', function ( event ) {
+		$( '.rl-gallery-widget-select' ).on( 'click', function( event ) {
 			event.preventDefault();
 
 			var gallery = $( this ).closest( '.rl-gallery-widget' ),
@@ -107,12 +121,14 @@
 					multiple: true
 				} );
 
-				rl_gallery_frames[gallery_id].on( 'open', function () {
+				rl_gallery_frames[gallery_id].on( 'open', function() {
 					var selection = rl_gallery_frames[gallery_id].state().get( 'selection' ),
 						attachment_ids = rl_gallery_ids[gallery_id].val().split( ',' );
 
-					$.each( attachment_ids, function () {
-						if ( $.isNumeric( this ) ) {
+					$.each( attachment_ids, function() {
+						let _this = this;
+
+						if ( ! isNaN( parseFloat( _this ) ) && isFinite( _this ) ) {
 							attachment = wp.media.attachment( this );
 							attachment.fetch();
 							selection.add( attachment ? [ attachment ] : [ ] );
@@ -121,15 +137,15 @@
 				} );
 
 				// when an image is selected, run a callback.
-				rl_gallery_frames[gallery_id].on( 'select', function () {
+				rl_gallery_frames[gallery_id].on( 'select', function() {
 					var selection = rl_gallery_frames[gallery_id].state().get( 'selection' ),
 						selected_ids = [ ],
-						attachment_ids = rl_gallery_ids[gallery_id].val().split( ',' ).map( function ( el ) {
+						attachment_ids = rl_gallery_ids[gallery_id].val().split( ',' ).map( function( el ) {
 						return parseInt( el )
 					} );
 
 					if ( selection ) {
-						selection.map( function ( attachment ) {
+						selection.map( function( attachment ) {
 							if ( attachment.id ) {
 								selected_ids.push( attachment.id );
 
@@ -168,30 +184,21 @@
 						}
 					}
 
-					rl_gallery_ids[gallery_id].val( $.unique( copy ).join( ',' ) );
+					rl_gallery_ids[gallery_id].val( _.uniq( copy ).join( ',' ) );
 				} );
 
 				// finally, open the modal.
 				rl_gallery_frames[gallery_id].open();
 			}
-			;
 		} );
+	}
 
-	} );
+	function init_rl_image_widget() {
+		$( '.rl-image-widget-select' ).on( 'click', function( event ) {
+			var _this = $( this );
 
-	/* Single image widget */
-	
-	var rl_image_frame,
-		rl_image_container,
-		rl_image_input;
-
-	$( document ).on( 'ready widget-updated widget-added', function () {
-
-		$( '.rl-image-widget-select' ).on( 'click', function ( event ) {
-
-			var $this = $( this );
-			rl_image_container = $this.parent().find( '.rl-image-widget-content' );
-			rl_image_input = $this.parent().find( '.rl-image-widget-image-id' );
+			rl_image_container = _this.parent().find( '.rl-image-widget-content' );
+			rl_image_input = _this.parent().find( '.rl-image-widget-image-id' );
 
 			event.preventDefault();
 
@@ -206,7 +213,7 @@
 			} );
 
 			// when an image is selected in the media frame...
-			rl_image_frame.on( 'select', function () {
+			rl_image_frame.on( 'select', function() {
 				// get media attachment details from the frame state
 				var attachment = rl_image_frame.state().get( 'selection' ).first().toJSON();
 
@@ -218,7 +225,7 @@
 			} );
 
 			// when an image is already selected in the media frame...
-			rl_image_frame.on( 'open', function () {
+			rl_image_frame.on( 'open', function() {
 				var selection = rl_image_frame.state().get( 'selection' );
 
 				// get current image
@@ -230,9 +237,8 @@
 			} );
 
 			rl_image_frame.open();
-
 		} );
-		
+
 		$( '.rl-image-link-to' ).on( 'change', function() {
 			if ( $( this ).val() == 'custom' ) {
 				$( this ).parent().next().slideDown( 'fast' );
@@ -240,7 +246,6 @@
 				$( this ).parent().next().slideUp( 'fast' );
 			}
 		} );
-
-	} );
+	}
 
 } )( this, jQuery );

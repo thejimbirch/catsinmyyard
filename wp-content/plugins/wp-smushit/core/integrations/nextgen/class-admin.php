@@ -14,9 +14,12 @@ namespace Smush\Core\Integrations\NextGen;
 
 use C_Component_Registry;
 use C_Gallery_Storage;
+use nggdb;
+use Smush\App\Media_Library;
 use Smush\Core\Core;
 use Smush\Core\Integrations\NextGen;
-use Smush\WP_Smush;
+use stdClass;
+use WP_Smush;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -105,6 +108,9 @@ class Admin extends NextGen {
 
 		// Update the Super Smush count, after the smushing.
 		add_action( 'wp_smush_image_optimised_nextgen', array( $this, 'update_lists' ), '', 2 );
+
+		// Reset smush data after restoring the image.
+		add_action( 'ngg_recovered_image', array( $this, 'reset_smushdata' ) );
 	}
 
 	/**
@@ -130,11 +136,10 @@ class Admin extends NextGen {
 	 *
 	 * @param string     $column_name  Column name.
 	 * @param object|int $id           Image object or ID.
-	 * @param bool       $echo         Echo or return.
 	 *
 	 * @return array|bool|string|void
 	 */
-	public function wp_smush_column_options( $column_name, $id, $echo = false ) {
+	public function wp_smush_column_options( $column_name, $id ) {
 		// NExtGen Doesn't returns Column name, weird? yeah, right, it is proper because hook is called for the particular column.
 		if ( 'wp_smush_image' === $column_name || '' === $column_name ) {
 			// We're not using our in-house function Smush\Core\Integrations\Nextgen::get_nextgen_image_from_id()
@@ -173,11 +178,11 @@ class Admin extends NextGen {
 			// Check Image metadata, if smushed, print the stats or super smush button.
 			if ( ! empty( $image->meta_data['wp_smush'] ) ) {
 				// Echo the smush stats.
-				return $this->ng_stats->show_stats( $image->pid, $image->meta_data['wp_smush'], $image_type, false, $echo );
+				return $this->ng_stats->show_stats( $image->pid, $image->meta_data['wp_smush'], $image_type );
 			}
 
 			// Print the status of image, if Not smushed.
-			return $this->set_status( $image->pid, $echo, false );
+			return $this->set_status( $image->pid );
 		}
 	}
 
@@ -193,7 +198,7 @@ class Admin extends NextGen {
 				'utm_medium'   => 'plugin',
 				'utm_campaign' => 'smush_bulksmush_issues_filesizelimit_notice',
 			),
-			'https://premium.wpmudev.org/project/wp-smush-pro/'
+			'https://wpmudev.com/project/wp-smush-pro/'
 		);
 
 		if ( WP_Smush::is_pro() ) {
@@ -201,23 +206,20 @@ class Admin extends NextGen {
 		} else {
 			$error_in_bulk = sprintf(
 				/* translators: %1$s - opening link tag, %2$s - </a> */
-				esc_html__( '{{smushed}}/{{total}} images were successfully compressed, {{errors}} encountered issues. Are you hitting the 5MB "size limit exceeded" warning? %1$sUpgrade to Smush Pro for FREE%2$s to optimize image files up to 32MB.', 'wp-smushit' ),
+				esc_html__( '{{smushed}}/{{total}} images were successfully compressed, {{errors}} encountered issues. Are you hitting the 5MB "size limit exceeded" warning? %1$sUpgrade to Smush Pro for FREE%2$s to optimize unlimited image files.', 'wp-smushit' ),
 				'<a href="' . esc_url( $upgrade_url ) . '" target="_blank">',
 				'</a>'
 			);
 		}
 
 		$wp_smush_msgs = array(
-			'resmush'          => esc_html__( 'Super-Smush', 'wp-smushit' ),
-			'smush_now'        => esc_html__( 'Smush Now', 'wp-smushit' ),
-			'error_in_bulk'    => $error_in_bulk,
-			'all_resmushed'    => esc_html__( 'All images are fully optimized.', 'wp-smushit' ),
-			'restore'          => esc_html__( 'Restoring image..', 'wp-smushit' ),
-			'smushing'         => esc_html__( 'Smushing image..', 'wp-smushit' ),
-			'checking'         => esc_html__( 'Checking images..', 'wp-smushit' ),
-			// Button text.
-			'resmush_check'    => esc_html__( 'RE-CHECK IMAGES', 'wp-smushit' ),
-			'resmush_complete' => esc_html__( 'CHECK COMPLETE', 'wp-smushit' ),
+			'nonce'         => wp_create_nonce( 'wp-smush-ajax' ),
+			'resmush'       => esc_html__( 'Super-Smush', 'wp-smushit' ),
+			'smush_now'     => esc_html__( 'Smush Now', 'wp-smushit' ),
+			'error_in_bulk' => $error_in_bulk,
+			'all_resmushed' => esc_html__( 'All images are fully optimized.', 'wp-smushit' ),
+			'restore'       => esc_html__( 'Restoring image...', 'wp-smushit' ),
+			'smushing'      => esc_html__( 'Smushing image...', 'wp-smushit' ),
 		);
 
 		wp_localize_script( $handle, 'wp_smush_msgs', $wp_smush_msgs );
@@ -236,18 +238,13 @@ class Admin extends NextGen {
 
 		// Get the unsmushed ids, used for localized stats as well as normal localization.
 		$unsmushed = $this->ng_stats->get_ngg_images( 'unsmushed' );
-		$unsmushed = ( ! empty( $unsmushed ) && is_array( $unsmushed ) ) ? array_keys( $unsmushed ) : '';
+		$unsmushed = ( ! empty( $unsmushed ) && is_array( $unsmushed ) ) ? array_keys( $unsmushed ) : array();
 
 		$smushed = $this->ng_stats->get_ngg_images();
-		$smushed = ( ! empty( $smushed ) && is_array( $smushed ) ) ? array_keys( $smushed ) : '';
+		$smushed = ( ! empty( $smushed ) && is_array( $smushed ) ) ? array_keys( $smushed ) : array();
 
 		$this->smushed = $smushed;
-		if ( ! empty( $_REQUEST['ids'] ) ) {
-			// Sanitize the ids and assign it to a variable.
-			$this->ids = array_map( 'intval', explode( ',', $_REQUEST['ids'] ) );
-		} else {
-			$this->ids = $unsmushed;
-		}
+		$this->ids     = $unsmushed;
 
 		$this->super_smushed = get_option( 'wp-smush-super_smushed_nextgen', array() );
 		$this->super_smushed = ! empty( $this->super_smushed['ids'] ) ? $this->super_smushed['ids'] : array();
@@ -303,13 +300,11 @@ class Admin extends NextGen {
 	/**
 	 * Set send button status
 	 *
-	 * @param int  $pid        ID.
-	 * @param bool $echo       Echo or return.
-	 * @param bool $text_only  Text only.
+	 * @param int $pid  ID.
 	 *
 	 * @return string
 	 */
-	private function set_status( $pid, $echo = true, $text_only = false ) {
+	private function set_status( $pid ) {
 		// the status.
 		$status_txt = __( 'Not processed', 'wp-smushit' );
 
@@ -318,19 +313,13 @@ class Admin extends NextGen {
 
 		// the button text.
 		$button_txt = __( 'Smush', 'wp-smushit' );
-		if ( $text_only ) {
-			return $status_txt;
-		}
 
-		// If we are not showing smush button, append progree bar, else it is already there.
+		// If we are not showing smush button, append progress bar, else it is already there.
 		if ( ! $show_button ) {
-			$status_txt .= WP_Smush::get_instance()->core()->mod->smush->progress_bar();
+			$status_txt .= Media_Library::progress_bar();
 		}
 
-		$text = $this->column_html( $pid, $status_txt, $button_txt, $show_button, false, $echo );
-		if ( ! $echo ) {
-			return $text;
-		}
+		return $this->column_html( $pid, $status_txt, $button_txt, $show_button );
 	}
 
 	/**
@@ -341,38 +330,25 @@ class Admin extends NextGen {
 	 * @param string  $button_txt   Button label.
 	 * @param boolean $show_button  Whether to shoe the button.
 	 * @param bool    $smushed      Image compressed or not.
-	 * @param bool    $echo         Echo or return.
-	 * @param bool    $wrapper      Add a wrapper.
 	 *
 	 * @return string|void
 	 */
-	public function column_html( $pid, $status_txt = '', $button_txt = '', $show_button = true, $smushed = false, $echo = true ) {
+	public function column_html( $pid, $status_txt = '', $button_txt = '', $show_button = true, $smushed = false ) {
 		$class = $smushed ? '' : ' sui-hidden';
 		$html  = '<p class="smush-status' . $class . '">' . $status_txt . '</p>';
-		$html .= wp_nonce_field( 'wp_smush_nextgen', '_wp_smush_nonce', '', false );
+
 		// if we aren't showing the button.
 		if ( ! $show_button ) {
-			if ( $echo ) {
-				echo $html . WP_Smush::get_instance()->core()->mod->smush->progress_bar();
-
-				return;
-			} else {
-				return $html;
-			}
-		}
-		if ( ! $echo ) {
-			$html .= '
-			<button  class="button button-primary wp-smush-nextgen-send" data-id="' . $pid . '">
-				<span>' . $button_txt . '</span>
-			</button>';
-			$html .= WP_Smush::get_instance()->core()->mod->smush->progress_bar();
 			return $html;
-		} else {
-			$html .= '<button class="button button-primary wp-smush-nextgen-send" data-id="' . $pid . '">
+		}
+
+		$html .= '<div class="sui-smush-media smush-status-links">';
+		$html .= wp_nonce_field( 'wp_smush_nextgen', '_wp_smush_nonce', '', false );
+		$html .= '<button  class="button button-primary wp-smush-nextgen-send" data-id="' . $pid . '">
 				<span>' . $button_txt . '</span>
 			</button>';
-			echo $html . WP_Smush::get_instance()->core()->mod->smush->progress_bar();
-		}
+		$html .= '</div>';
+		return $html;
 	}
 
 	/**
@@ -458,8 +434,11 @@ class Admin extends NextGen {
 			$this->resmush_ids = get_option( 'wp-smush-nextgen-resmush-list', array() );
 		}
 
-		// I fwe have images to be resmushed, exclude it.
-		if ( ! empty( $this->resmush_ids ) ) {
+		// Includes the count of different sizes an image might have.
+		$this->image_count = $this->get_image_count( $smushed_images, false );
+
+		// If we have images to be resmushed, exclude it.
+		if ( ! empty( $this->resmush_ids ) && is_array( $smushed_images ) ) {
 			// Get the Smushed images, exlude resmush ids.
 			$smushed_images = array_diff_key( $smushed_images, array_flip( $this->resmush_ids ) );
 		}
@@ -467,11 +446,11 @@ class Admin extends NextGen {
 		// Set the counts.
 		$this->total_count = $this->ng_stats->total_count();
 
-		// Includes the count of different sizes an image might have.
-		$this->image_count = $this->get_image_count( $smushed_images );
-
 		// Count of images ( Attachments ), Does not includes additioanl sizes that might have been created.
 		$this->smushed_count = isset( $smushed_images ) && is_array( $smushed_images ) ? count( $smushed_images ) : $smushed_images;
+
+		$this->super_smushed = get_option( 'wp-smush-super_smushed_nextgen', array() );
+		$this->super_smushed = ! empty( $this->super_smushed['ids'] ) ? count( $this->super_smushed['ids'] ) : 0;
 
 		$this->remaining_count = $this->ng_stats->get_ngg_images( 'unsmushed', true );
 	}
@@ -578,6 +557,52 @@ class Admin extends NextGen {
 
 		return $super_smushed['ids'];
 
+	}
+
+	/**
+	 * Reset smush data after restoring the image.
+	 *
+	 * @since 3.10.0
+	 *
+	 * @param stdClass     $image                  Image object for NextGen gallery.
+	 * @param false|string $attachment_file_path   The full file path, if it's provided we will reset the dimension.
+	 */
+	public function reset_smushdata( $image, $attachment_file_path = false ) {
+		if ( empty( $image->meta_data['wp_smush'] ) && empty( $image->meta_data['wp_smush_resize_savings'] ) ) {
+			return;
+		}
+		// Remove the Meta, And send json success.
+		$image->meta_data['wp_smush'] = '';
+
+		// Remove resized data.
+		if ( ! empty( $image->meta_data['wp_smush_resize_savings'] ) ) {
+			$image->meta_data['wp_smush_resize_savings'] = '';
+
+			if ( $attachment_file_path && file_exists( $attachment_file_path ) ) {
+				// Update the dimension.
+				list( $width, $height ) = getimagesize( $attachment_file_path );
+				if ( $width ) {
+					$image->meta_data['width']         = $width;
+					$image->meta_data['full']['width'] = $width;
+				}
+				if ( $height ) {
+					$image->meta_data['height']         = $height;
+					$image->meta_data['full']['height'] = $height;
+				}
+			}
+		}
+
+		// Update metadata.
+		nggdb::update_image_meta( $image->pid, $image->meta_data );
+
+		/**
+		 * Called after the image has been successfully restored
+		 *
+		 * @since 3.7.0
+		 *
+		 * @param int $image_id ID of the restored image.
+		 */
+		do_action( 'wp_smush_image_nextgen_restored', $image->pid );
 	}
 
 }

@@ -5,32 +5,28 @@
  * @package WPSEO\Deprecated
  */
 
-/**
- * Adds help tabs.
- *
- * @deprecated 7.6.0
- * @codeCoverageIgnore
- *
- * @param array $tabs Current help center tabs.
- *
- * @return array List containing all the additional tabs.
- */
-function yoast_add_meta_options_help_center_tabs( $tabs ) {
-	_deprecated_function( __FUNCTION__, 'WPSEO 7.6.0', 'WPSEO_Help_Center_Template_Variables_Tab::add_meta_options_help_center_tabs' );
-
-	return $tabs;
+if ( ! function_exists( 'initialize_wpseo_front' ) ) {
+	/**
+	 * Wraps frontend class.
+	 *
+	 * @deprecated 14.0
+	 * @codeCoverageIgnore
+	 */
+	function initialize_wpseo_front() {
+		_deprecated_function( __FUNCTION__, 'WPSEO 14.0' );
+	}
 }
 
-/**
- * Adds template variables to the help center.
- *
- * @deprecated 7.6.0
- * @codeCoverageIgnore
- *
- * @return string The content for the template variables tab.
- */
-function wpseo_add_template_variables_helpcenter() {
-	_deprecated_function( __FUNCTION__, 'WPSEO 7.6.0' );
+if ( ! function_exists( 'wpseo_cli_init' ) ) {
 
-	return '';
+	// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
+	/**
+	 * Initialize the WP-CLI integration.
+	 *
+	 * @deprecated 19.6.1
+	 * @codeCoverageIgnore
+	 */
+	function wpseo_cli_init() {
+		_deprecated_function( __FUNCTION__, 'WPSEO 19.6.1' );
+	}
 }

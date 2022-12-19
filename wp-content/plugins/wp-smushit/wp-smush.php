@@ -3,29 +3,30 @@
  * WP Smush plugin
  *
  * Reduce image file sizes, improve performance and boost your SEO using the free
- * <a href="https://premium.wpmudev.org/">WPMU DEV</a> WordPress Smush API.
+ * <a href="https://wpmudev.com/">WPMU DEV</a> WordPress Smush API.
  *
- * @link              http://premium.wpmudev.org/projects/wp-smush-pro/
+ * @link              http://wpmudev.com/project/wp-smush-pro/
  * @since             1.0.0
  * @package           WP_Smush
  *
  * @wordpress-plugin
  * Plugin Name:       Smush
- * Plugin URI:        http://wordpress.org/extend/plugins/wp-smushit/
- * Description:       Reduce image file sizes, improve performance and boost your SEO using the free <a href="https://premium.wpmudev.org/">WPMU DEV</a> WordPress Smush API.
- * Version:           3.4.2
+ * Plugin URI:        http://wordpress.org/plugins/wp-smushit/
+ * Description:       Reduce image file sizes, improve performance and boost your SEO using the free <a href="https://wpmudev.com/">WPMU DEV</a> WordPress Smush API.
+ * Version:           3.12.4
  * Author:            WPMU DEV
- * Author URI:        https://premium.wpmudev.org/
+ * Author URI:        https://profiles.wordpress.org/wpmudev/
  * License:           GPLv2
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       wp-smushit
  * Domain Path:       /languages/
+ * Network:           true
  */
 
 /*
 This plugin was originally developed by Alex Dunae (http://dialect.ca/).
 
-Copyright 2007-2018 Incsub (http://incsub.com)
+Copyright 2007-2022 Incsub (http://incsub.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License (Version 2 - GPLv2) as published by
@@ -41,28 +42,23 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-namespace Smush;
-
-use WP_CLI;
-use WPMUDEV_Dashboard;
-
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
 if ( ! defined( 'WP_SMUSH_VERSION' ) ) {
-	define( 'WP_SMUSH_VERSION', '3.4.2' );
+	define( 'WP_SMUSH_VERSION', '3.12.4' );
 }
 // Used to define body class.
 if ( ! defined( 'WP_SHARED_UI_VERSION' ) ) {
-	define( 'WP_SHARED_UI_VERSION', 'sui-2-5-0' );
+	define( 'WP_SHARED_UI_VERSION', 'sui-2-12-10' );
 }
 if ( ! defined( 'WP_SMUSH_BASENAME' ) ) {
 	define( 'WP_SMUSH_BASENAME', plugin_basename( __FILE__ ) );
 }
 if ( ! defined( 'WP_SMUSH_API' ) ) {
-	define( 'WP_SMUSH_API', 'https://smushpro.wpmudev.org/1.0/' );
+	define( 'WP_SMUSH_API', 'https://smushpro.wpmudev.com/1.0/' );
 }
 if ( ! defined( 'WP_SMUSH_UA' ) ) {
 	define( 'WP_SMUSH_UA', 'WP Smush/' . WP_SMUSH_VERSION . '; ' . network_home_url() );
@@ -79,16 +75,20 @@ if ( ! defined( 'WP_SMUSH_MAX_BYTES' ) ) {
 if ( ! defined( 'WP_SMUSH_PREMIUM_MAX_BYTES' ) ) {
 	define( 'WP_SMUSH_PREMIUM_MAX_BYTES', 32000000 );
 }
-if ( ! defined( 'WP_SMUSH_PREFIX' ) ) {
-	define( 'WP_SMUSH_PREFIX', 'wp-smush-' );
-}
 if ( ! defined( 'WP_SMUSH_TIMEOUT' ) ) {
-	define( 'WP_SMUSH_TIMEOUT', apply_filters( 'WP_SMUSH_API_TIMEOUT', 150 ) );
+	define( 'WP_SMUSH_TIMEOUT', 150 );
 }
-
-// Compat with WPMU DEV staging.
-if ( ! defined( 'WP_SMUSH_ASYNC' ) && isset( $_SERVER['WPMUDEV_HOSTING_ENV'] ) && 'staging' === wp_unslash( $_SERVER['WPMUDEV_HOSTING_ENV'] ) ) {
-	define( 'WP_SMUSH_ASYNC', false );
+if ( ! defined( 'WP_SMUSH_RETRY_ATTEMPTS' ) ) {
+	define( 'WP_SMUSH_RETRY_ATTEMPTS', 3 );
+}
+if ( ! defined( 'WP_SMUSH_RETRY_WAIT' ) ) {
+	define( 'WP_SMUSH_RETRY_WAIT', 1 );
+}
+if ( ! defined( 'WP_SMUSH_PARALLEL' ) ) {
+	define( 'WP_SMUSH_PARALLEL', true );
+}
+if ( ! defined( 'WP_SMUSH_BACKGROUND' ) ) {
+	define( 'WP_SMUSH_BACKGROUND', true );
 }
 
 /**
@@ -97,10 +97,14 @@ if ( ! defined( 'WP_SMUSH_ASYNC' ) && isset( $_SERVER['WPMUDEV_HOSTING_ENV'] ) &
  * If Set to false, WP Smush switch backs to the Old Sync Optimisation.
  */
 $site_url = str_replace( array( 'http://', 'https://', 'www.' ), '', site_url() );
-if ( ! defined( 'WP_SMUSH_ASYNC' ) && ! empty( $_SERVER['SERVER_NAME'] ) && ( 0 !== strpos( $site_url, $_SERVER['SERVER_NAME'] ) ) ) { // Input var ok.
-	define( 'WP_SMUSH_ASYNC', false );
-} elseif ( ! defined( 'WP_SMUSH_ASYNC' ) ) {
-	define( 'WP_SMUSH_ASYNC', true );
+// Compat with WPMU DEV staging.
+$wpmu_host = isset( $_SERVER['WPMUDEV_HOSTING_ENV'] ) && 'staging' === sanitize_text_field( wp_unslash( $_SERVER['WPMUDEV_HOSTING_ENV'] ) );
+if ( ! defined( 'WP_SMUSH_ASYNC' ) ) {
+	if ( ( ! empty( $_SERVER['SERVER_NAME'] ) && 0 !== strpos( $site_url, sanitize_text_field( wp_unslash( $_SERVER['SERVER_NAME'] ) ) ) ) || $wpmu_host ) {
+		define( 'WP_SMUSH_ASYNC', false );
+	} else {
+		define( 'WP_SMUSH_ASYNC', true );
+	}
 }
 
 /**
@@ -116,7 +120,6 @@ if ( WP_SMUSH_BASENAME !== plugin_basename( __FILE__ ) ) {
 	}
 
 	if ( ! function_exists( 'is_plugin_active' ) ) {
-		/* @noinspection PhpIncludeInspection */
 		include_once ABSPATH . 'wp-admin/includes/plugin.php';
 	}
 
@@ -126,6 +129,10 @@ if ( WP_SMUSH_BASENAME !== plugin_basename( __FILE__ ) ) {
 		return; // Return to avoid errors with free-dashboard module.
 	} elseif ( $pro_installed && is_plugin_active( WP_SMUSH_BASENAME ) ) {
 		deactivate_plugins( WP_SMUSH_BASENAME );
+		// If WordPress is already in the process of activating - return.
+		if ( defined( 'WP_SANDBOX_SCRAPING' ) && WP_SANDBOX_SCRAPING ) {
+			return;
+		}
 		activate_plugin( plugin_basename( __FILE__ ) );
 	}
 }
@@ -136,13 +143,13 @@ register_activation_hook( __FILE__, array( 'Smush\\Core\\Installer', 'smush_acti
 register_deactivation_hook( __FILE__, array( 'Smush\\Core\\Installer', 'smush_deactivated' ) );
 
 // Init the plugin and load the plugin instance for the first time.
-add_action( 'plugins_loaded', array( 'Smush\\WP_Smush', 'get_instance' ) );
+add_action( 'plugins_loaded', array( 'WP_Smush', 'get_instance' ) );
 
-if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
+if ( ! class_exists( 'WP_Smush' ) ) {
 	/**
 	 * Class WP_Smush
 	 */
-	class WP_Smush {
+	final class WP_Smush {
 
 		/**
 		 * Plugin instance.
@@ -156,7 +163,7 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 		 * Plugin core.
 		 *
 		 * @since 2.9.0
-		 * @var Core\Core
+		 * @var Smush\Core\Core
 		 */
 		private $core;
 
@@ -164,7 +171,7 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 		 * Plugin admin.
 		 *
 		 * @since 2.9.0
-		 * @var App\Admin
+		 * @var Smush\App\Admin
 		 */
 		private $admin;
 
@@ -172,9 +179,17 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 		 * Plugin API.
 		 *
 		 * @since 3.0
-		 * @var Core\Api\API
+		 * @var Smush\Core\Api\Smush_API
 		 */
 		private $api = '';
+
+		/**
+		 * Media library UI.
+		 *
+		 * @since 3.4.0
+		 * @var Smush\App\Media_Library
+		 */
+		private $library;
 
 		/**
 		 * Stores the value of validate_install function.
@@ -182,14 +197,6 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 		 * @var bool $is_pro
 		 */
 		private static $is_pro;
-
-		/**
-		 * Smush project ID.
-		 *
-		 * @since  3.1.1
-		 * @var int $project_id
-		 */
-		private static $project_id = 912164;
 
 		/**
 		 * Return the plugin instance.
@@ -210,13 +217,20 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 		private function __construct() {
 			spl_autoload_register( array( $this, 'autoload' ) );
 
-			$this->register_actions();
+			/**
+			 * Include vendor dependencies
+			 */
+			require_once __DIR__ . '/vendor/autoload.php';
 
-			$this->maybe_upgrade_to_pro();
+			add_action( 'admin_init', array( '\\Smush\\Core\\Installer', 'upgrade_settings' ) );
+			add_action( 'current_screen', array( '\\Smush\\Core\\Installer', 'maybe_create_table' ) );
+			add_action( 'admin_init', array( $this, 'register_free_modules' ) );
+
+			// The dash-notification actions are hooked into "init" with a priority of 10.
+			add_action( 'init', array( $this, 'register_pro_modules' ), 5 );
 
 			$this->init();
 		}
-
 
 		/**
 		 * Autoload method.
@@ -231,6 +245,15 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 			// Does the class use the namespace prefix?
 			$len = strlen( $prefix );
 			if ( 0 !== strncmp( $prefix, $class, $len ) ) {
+				// Maybe require some external classes.
+				$external_libs = array( 'WDEV_Logger' );
+				if ( in_array( $class, $external_libs, true ) ) {
+					$lib  = str_replace( '_', '-', strtolower( $class ) );
+					$file = WP_SMUSH_DIR . "core/external/{$lib}/{$lib}.php";
+					if ( file_exists( $file ) ) {
+						require_once $file;
+					}
+				}
 				// No, move to the next registered autoloader.
 				return;
 			}
@@ -250,30 +273,27 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 		}
 
 		/**
-		 * Register actions and filters.
-		 *
-		 * @since 2.9.0
-		 */
-		private function register_actions() {
-			add_action( 'admin_init', array( $this, 'register_free_modules' ) );
-			add_action( 'init', array( $this, 'register_pro_modules' ), 5 );
-
-			// Add upgrade schedule.
-			add_action( 'smush_upgrade_to_pro', array( $this, 'upgrade_to_pro' ) );
-		}
-
-		/**
 		 * Init core module.
 		 *
 		 * @since 2.9.0
 		 */
 		private function init() {
-			$this->api = new Core\Api\API( self::get_api_key() );
+			try {
+				$this->api = new Smush\Core\Api\Smush_API( Smush\Core\Helper::get_wpmudev_apikey() );
+			} catch ( Exception $e ) {
+				$this->api = '';
+			}
 
-			self::$is_pro = $this->validate_install();
+			// Handle failed items, load it before validate the install.
+			new Smush\Core\Error_Handler();
 
-			$this->core  = new Core\Core();
-			$this->admin = new App\Admin();
+			$this->validate_install();
+
+			$this->core    = new Smush\Core\Core();
+			$this->library = new Smush\App\Media_Library( $this->core() );
+			if ( is_admin() ) {
+				$this->admin = new Smush\App\Admin( $this->library() );
+			}
 
 			if ( defined( 'WP_CLI' ) && WP_CLI ) {
 				WP_CLI::add_command( 'smush', '\\Smush\\Core\\CLI' );
@@ -285,7 +305,7 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 		 *
 		 * @since 2.9.0
 		 *
-		 * @return Core\Core
+		 * @return Smush\Core\Core
 		 */
 		public function core() {
 			return $this->core;
@@ -296,7 +316,7 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 		 *
 		 * @since 2.9.0
 		 *
-		 * @return App\Admin
+		 * @return Smush\App\Admin
 		 */
 		public function admin() {
 			return $this->admin;
@@ -307,10 +327,21 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 		 *
 		 * @since 3.0
 		 *
-		 * @return Core\Api\API
+		 * @return Smush\Core\Api\Smush_API
 		 */
 		public function api() {
 			return $this->api;
+		}
+
+		/**
+		 * Getter method for library.
+		 *
+		 * @since 3.4.0
+		 *
+		 * @return Smush\App\Media_Library
+		 */
+		public function library() {
+			return $this->library;
 		}
 
 		/**
@@ -325,47 +356,18 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 		}
 
 		/**
-		 * Filters the rating message, include stats if greater than 1Mb
-		 *
-		 * @param string $message  Message text.
-		 *
-		 * @return string
-		 */
-		public function wp_smush_rating_message( $message ) {
-			if ( empty( $this->core()->stats ) ) {
-				$this->core()->setup_global_stats();
-			}
-
-			$savings    = $this->core()->stats;
-			$show_stats = false;
-
-			// If there is any saving, greater than 1Mb, show stats.
-			if ( ! empty( $savings ) && ! empty( $savings['bytes'] ) && $savings['bytes'] > 1048576 ) {
-				$show_stats = true;
-			}
-
-			$message = "Hey %s, you've been using %s for a while now, and we hope you're happy with it.";
-
-			// Conditionally Show stats in rating message.
-			if ( $show_stats ) {
-				$message .= sprintf( " You've smushed <strong>%s</strong> from %d images already, improving the speed and SEO ranking of this site!", $savings['human'], $savings['total_images'] );
-			}
-			$message .= " We've spent countless hours developing this free plugin for you, and we would really appreciate it if you dropped us a quick rating!";
-
-			return $message;
-		}
-
-		/**
-		 * Register sub-modules.
+		 * Register submodules.
 		 * Only for wordpress.org members.
 		 */
 		public function register_free_modules() {
-			if ( false === strpos( WP_SMUSH_DIR, 'wp-smushit' ) ) {
+			if ( false === strpos( WP_SMUSH_DIR, 'wp-smushit' ) || class_exists( 'WPMUDEV_Dashboard' ) || file_exists( WP_PLUGIN_DIR . '/wpmudev-updates/update-notifications.php' ) ) {
 				return;
 			}
 
 			/* @noinspection PhpIncludeInspection */
 			require_once WP_SMUSH_DIR . 'core/external/free-dashboard/module.php';
+			/* @noinspection PhpIncludeInspection */
+			require_once WP_SMUSH_DIR . 'core/external/plugin-notice/notice.php';
 
 			// Add the Mailchimp group value.
 			add_action(
@@ -379,7 +381,7 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 
 			// Register the current plugin.
 			do_action(
-				'wdev-register-plugin',
+				'wdev_register_plugin',
 				/* 1             Plugin ID */ WP_SMUSH_BASENAME,
 				/* 2          Plugin Title */ 'Smush',
 				/* 3 https://wordpress.org */ '/plugins/wp-smushit/',
@@ -387,14 +389,21 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 				/* 5  Mailchimp List id for the plugin - e.g. 4b14b58816 is list id for Smush */ '4b14b58816'
 			);
 
-			// The rating message contains 2 variables: user-name, plugin-name.
-			add_filter( 'wdev-rating-message-' . WP_SMUSH_BASENAME, array( $this, 'wp_smush_rating_message' ) );
 			// The email message contains 1 variable: plugin-name.
 			add_filter(
-				'wdev-email-message-' . WP_SMUSH_BASENAME,
+				'wdev_email_message_' . WP_SMUSH_BASENAME,
 				function () {
 					return "You're awesome for installing %s! Make sure you get the most out of it, boost your Google PageSpeed score with these tips and tricks - just for users of Smush!";
 				}
+			);
+
+			// Recommended plugin notice.
+			do_action(
+				'wpmudev-recommended-plugins-register-notice',
+				WP_SMUSH_BASENAME,
+				__( 'Smush', 'wp-smushit' ),
+				\Smush\App\Admin::$plugin_pages,
+				array( 'before', '.sui-wrap .sui-floating-notices, .sui-wrap .sui-upgrade-page' )
 			);
 		}
 
@@ -425,19 +434,17 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 		 * Check if user is premium member, check for API key.
 		 *
 		 * @param bool $manual  Is it a manual check? Default: false.
-		 *
-		 * @return bool  True if a premium member, false if regular user.
 		 */
 		public function validate_install( $manual = false ) {
 			if ( isset( self::$is_pro ) && ! $manual ) {
-				return self::$is_pro;
+				return;
 			}
 
 			// No API key set, always false.
-			$api_key = self::get_api_key();
+			$api_key = Smush\Core\Helper::get_wpmudev_apikey();
 
 			if ( empty( $api_key ) ) {
-				return false;
+				return;
 			}
 
 			// Flag to check if we need to revalidate the key.
@@ -445,22 +452,23 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 
 			$api_auth = get_site_option( 'wp_smush_api_auth' );
 
-			// Check if need to revalidate.
-			if ( ! $api_auth || empty( $api_auth ) || empty( $api_auth[ $api_key ] ) ) {
+			// Check if we need to revalidate.
+			if ( empty( $api_auth[ $api_key ] ) ) {
+				$api_auth   = array();
 				$revalidate = true;
 			} else {
 				$last_checked = $api_auth[ $api_key ]['timestamp'];
 				$valid        = $api_auth[ $api_key ]['validity'];
 
 				// Difference in hours.
-				$diff = ( current_time( 'timestamp' ) - $last_checked ) / HOUR_IN_SECONDS;
+				$diff = ( time() - $last_checked ) / HOUR_IN_SECONDS;
 
 				if ( 24 < $diff ) {
 					$revalidate = true;
 				}
 			}
 
-			// If we are suppose to validate API, update the results in options table.
+			// If we are supposed to validate API, update the results in options table.
 			if ( $revalidate || $manual ) {
 				if ( empty( $api_auth[ $api_key ] ) ) {
 					// For api key resets.
@@ -473,20 +481,20 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 
 				// This is the first check.
 				if ( ! isset( $api_auth[ $api_key ]['timestamp'] ) ) {
-					$api_auth[ $api_key ]['timestamp'] = current_time( 'timestamp' );
+					$api_auth[ $api_key ]['timestamp'] = time();
 				}
 
 				$request = $this->api()->check( $manual );
 
 				if ( ! is_wp_error( $request ) && 200 === wp_remote_retrieve_response_code( $request ) ) {
 					// Update the timestamp only on successful attempts.
-					$api_auth[ $api_key ]['timestamp'] = current_time( 'timestamp' );
+					$api_auth[ $api_key ]['timestamp'] = time();
 					update_site_option( 'wp_smush_api_auth', $api_auth );
 
 					$result = json_decode( wp_remote_retrieve_body( $request ) );
 					if ( ! empty( $result->success ) && $result->success ) {
 						$valid = 'valid';
-						update_site_option( WP_SMUSH_PREFIX . 'cdn_status', $result->data );
+						update_site_option( 'wp-smush-cdn_status', $result->data );
 					} else {
 						$valid = 'invalid';
 					}
@@ -502,96 +510,6 @@ if ( ! class_exists( 'Smush\\WP_Smush' ) ) {
 			}
 
 			self::$is_pro = isset( $valid ) && 'valid' === $valid;
-
-			return self::$is_pro;
 		}
-
-		/**
-		 * Returns api key.
-		 *
-		 * @return mixed
-		 */
-		private static function get_api_key() {
-			$api_key = false;
-
-			// If API key defined manually, get that.
-			if ( defined( 'WPMUDEV_APIKEY' ) && WPMUDEV_APIKEY ) {
-				$api_key = WPMUDEV_APIKEY;
-			} elseif ( class_exists( 'WPMUDEV_Dashboard' ) ) {
-				// If dashboard plugin is active, get API key from db.
-				$api_key = get_site_option( 'wpmudev_apikey' );
-			}
-
-			return $api_key;
-		}
-
-		/**
-		 * Upgrade free version to pro.
-		 *
-		 * @since 3.1.1
-		 */
-		public function upgrade_to_pro() {
-			if ( WPMUDEV_Dashboard::$upgrader->install( self::$project_id ) ) {
-				delete_site_option( 'smush_cron_update_running' );
-				activate_plugin( 'wp-smush-pro/wp-smush.php' );
-
-				// Do we need to deactivate?
-				deactivate_plugins( 'wp-smushit/wp-smush.php', true );
-
-				define( 'WP_SMUSH_PRESERVE_STATS', true );
-				delete_plugins( array( 'wp-smushit/wp-smush.php' ) );
-			}
-		}
-
-		/**
-		 * Check if we can upgrade to Pro version.
-		 *
-		 * @since 3.1.1
-		 */
-		private function maybe_upgrade_to_pro() {
-			if ( 'wp-smush-pro/wp-smush.php' === WP_SMUSH_BASENAME ) {
-				return;
-			}
-
-			// Check that dashboard plugin is installed.
-			if ( ! class_exists( '\WPMUDEV_Dashboard' ) ) {
-				return;
-			}
-
-			if ( ! is_object( WPMUDEV_Dashboard::$api ) || is_null( WPMUDEV_Dashboard::$api ) ) {
-				return;
-			}
-
-			if ( ! method_exists( WPMUDEV_Dashboard::$api, 'has_key' ) ) {
-				return;
-			}
-
-			// If user can't install - exit.
-			if ( ! WPMUDEV_Dashboard::$upgrader->user_can_install( self::$project_id ) ) {
-				return;
-			}
-
-			// Check permissions and configuration.
-			if ( ! WPMUDEV_Dashboard::$upgrader->can_auto_install( self::$project_id ) ) {
-				return;
-			}
-
-			if ( ! method_exists( WPMUDEV_Dashboard::$api, 'get_project_data' ) ) {
-				return;
-			}
-
-			$plugin = WPMUDEV_Dashboard::$api->get_project_data( self::$project_id );
-			if ( version_compare( WP_SMUSH_VERSION, $plugin['version'], '>' ) ) {
-				return;
-			}
-
-			$running_cron_update = get_site_option( 'smush_cron_update_running' );
-			if ( empty( $running_cron_update ) ) {
-				// Schedule upgrade.
-				wp_schedule_single_event( time(), 'smush_upgrade_to_pro' );
-				update_site_option( 'smush_cron_update_running', true );
-			}
-		}
-
 	}
 }

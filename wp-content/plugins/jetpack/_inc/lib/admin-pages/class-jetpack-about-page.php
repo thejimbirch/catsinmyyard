@@ -2,7 +2,7 @@
 /**
  * Class for the Jetpack About Page within the wp-admin.
  *
- * @package Jetpack
+ * @package automattic/jetpack
  */
 
 /**
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once 'class.jetpack-admin-page.php';
+require_once __DIR__ . '/class.jetpack-admin-page.php';
 
 /**
  * Builds the landing page and its menu.
@@ -53,10 +53,12 @@ class Jetpack_About_Page extends Jetpack_Admin_Page {
 	/**
 	 * Add page action
 	 *
-	 * @param string $hook Hook of current page, unused.
+	 * @param string $hook Hook of current page.
 	 */
-	public function add_page_actions( $hook ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$this->a8c_data = $this->fetch_a8c_data();
+	public function add_page_actions( $hook ) {
+		if ( 'admin_page_jetpack_about' === $hook ) {
+			$this->a8c_data = $this->fetch_a8c_data();
+		}
 	}
 
 	/**
@@ -92,6 +94,7 @@ class Jetpack_About_Page extends Jetpack_Admin_Page {
 	public function page_render() {
 		?>
 		<div class="jp-lower">
+			<h1 class="screen-reader-text"><?php esc_html_e( 'About Jetpack', 'jetpack' ); ?></h1>
 			<div class="jetpack-about__link-back">
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=jetpack' ) ); ?>">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="0" fill="none" width="24" height="24"/><g><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></g></svg>
@@ -537,7 +540,7 @@ class Jetpack_About_Page extends Jetpack_Admin_Page {
 				true
 			);
 			if ( ! empty( $data ) && is_array( $data ) ) {
-				set_transient( 'jetpack_a8c_data', $data, DAY_IN_SECONDS );
+				set_transient( 'jetpack_a8c_data', $data, WEEK_IN_SECONDS );
 			} else {
 				// Fallback if everything fails.
 				$data = array(
@@ -570,9 +573,9 @@ class Jetpack_About_Page extends Jetpack_Admin_Page {
 			'https://1.gravatar.com/avatar/1c75d26ad0d38624f02b15accc1f20cd',
 			'https://1.gravatar.com/avatar/c510e69d83c7d10be4df64feeff4e46a',
 			'https://0.gravatar.com/avatar/88ec0dcadea38adf5f30a17e54e9b248',
-			'https://1.gravatar.com/avatar/bc45834430c5b0936d76e3f468f9ca57',
+			'https://1.gravatar.com/avatar/1ec3571e0201a990ceca5e365e780efa',
 			'https://0.gravatar.com/avatar/0619d4de8aef78c81b2194ff1d164d85',
-			'https://0.gravatar.com/avatar/72a638c2520ea177976e8eafb201a82f',
+			'https://0.gravatar.com/avatar/7fdcad31a04def0ab9583af475c9036c',
 			'https://0.gravatar.com/avatar/b3618d70c63bbc5cc7caee0beded5ff0',
 			'https://1.gravatar.com/avatar/4d346581a3340e32cf93703c9ce46bd4',
 			'https://2.gravatar.com/avatar/9c2f6b95a00dfccfadc6a912a2b859ba',

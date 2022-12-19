@@ -1,5 +1,5 @@
 <?php
-/*  Copyright 2013-2019 Renzo Johnson (email: renzojohnson at gmail.com)
+/*  Copyright 2010-2022 Renzo Johnson (email: renzo.johnson at gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,23 +15,41 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-	
-function chimp_html_log_view (){
-?>
-		<div id="sys-dev"> 
-			
-  <div id="eventlog-sys" class="highlight" style="margin-top: 1em; margin-bottom: 1em; display: none;">
-    <h3>Log Viewer</h3><input id="log_reset" type="button" value="Log Reset" class="button button-primary" style="width:15%;">
 
-			<pre><code id="log_panel" ><?php get_log_array ()  ?></code></pre>
 
-	 </div>
 
-</div> 
-<?php	
+function chimp_html_log_view () {
+  ?>
+    <div id="sys-dev">
+
+      <div id="eventlog-sys" class="highlight" style="margin-top: 1em; margin-bottom: 1em; display: none;">
+        <input id="log_reset" type="button" value="Clear This Log Now" class="button button-primary" style="width:auto%;">
+
+    			<pre><code id="log_panel" ><?php get_log_array ()  ?></code></pre>
+
+    	 </div>
+
+    </div>
+<?php
 }
-	
-	
+
+
+function chimp_html_php_log_view () {
+  ?>
+    <div id="sys-dev-php" class="new-php-logger">
+
+      <div id="eventlog-sys" class="highlight" style="margin-top: 1em; margin-bottom: 1em; display: none;">
+        <input id="log_reset" type="button" value="Clear This Log Now" class="button button-primary" style="width:auto%;">
+
+          <pre><code id="log_panel" ><?php get_php_log_array ()  ?></code></pre>
+
+       </div>
+
+    </div>
+<?php
+}
+
+
 function mce_html_log_datefilter( $object ) {
 
 		$default = array() ;
@@ -42,8 +60,4 @@ function mce_html_log_datefilter( $object ) {
 
 		var_dump ( $datesfilter );
 
-
 }
-
-
-

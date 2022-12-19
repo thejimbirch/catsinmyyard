@@ -15,34 +15,35 @@ class WPSEO_Rewrite {
 	 */
 	public function __construct() {
 		add_filter( 'query_vars', [ $this, 'query_vars' ] );
-		add_filter( 'category_link', [ $this, 'no_category_base' ] );
+		add_filter( 'term_link', [ $this, 'no_category_base' ], 10, 3 );
 		add_filter( 'request', [ $this, 'request' ] );
 		add_filter( 'category_rewrite_rules', [ $this, 'category_rewrite_rules' ] );
 
 		add_action( 'created_category', [ $this, 'schedule_flush' ] );
 		add_action( 'edited_category', [ $this, 'schedule_flush' ] );
 		add_action( 'delete_category', [ $this, 'schedule_flush' ] );
-
-		add_action( 'init', [ $this, 'flush' ], 999 );
 	}
 
 	/**
-	 * Save an option that triggers a flush on the next init.
+	 * Trigger a rewrite_rule flush on shutdown.
 	 *
 	 * @since 1.2.8
 	 */
 	public function schedule_flush() {
-		update_option( 'wpseo_flush_rewrite', 1 );
+		add_action( 'shutdown', 'flush_rewrite_rules' );
 	}
 
 	/**
 	 * If the flush option is set, flush the rewrite rules.
 	 *
 	 * @since 1.2.8
+	 * @deprecated 17.4
+	 * @codeCoverageIgnore
 	 *
 	 * @return bool
 	 */
 	public function flush() {
+		_deprecated_function( __METHOD__, 'WPSEO 17.4', __CLASS__ . '::schedule_flush' );
 		if ( get_option( 'wpseo_flush_rewrite' ) ) {
 
 			add_action( 'shutdown', 'flush_rewrite_rules' );
@@ -57,11 +58,17 @@ class WPSEO_Rewrite {
 	/**
 	 * Override the category link to remove the category base.
 	 *
-	 * @param string $link Unused, overridden by the function.
+	 * @param string  $link     Term link, overridden by the function for categories.
+	 * @param WP_Term $term     Unused, term object.
+	 * @param string  $taxonomy Taxonomy slug.
 	 *
 	 * @return string
 	 */
-	public function no_category_base( $link ) {
+	public function no_category_base( $link, $term, $taxonomy ) {
+		if ( $taxonomy !== 'category' ) {
+			return $link;
+		}
+
 		$category_base = get_option( 'category_base' );
 
 		if ( empty( $category_base ) ) {
@@ -232,7 +239,7 @@ class WPSEO_Rewrite {
 	protected function redirect( $category_redirect ) {
 		$catlink = trailingslashit( get_option( 'home' ) ) . user_trailingslashit( $category_redirect, 'category' );
 
-		wp_redirect( $catlink, 301, 'Yoast SEO' );
+		wp_safe_redirect( $catlink, 301, 'Yoast SEO' );
 		exit;
 	}
-} /* End of class */
+}

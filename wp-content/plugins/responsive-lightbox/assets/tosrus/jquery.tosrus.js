@@ -1,3 +1,15 @@
+/*
+ *	jQuery Touch Optimized Sliders "R"Us 2.5.0
+ *	
+ *	Copyright (c) Fred Heusschen
+ *	www.frebsite.nl
+ *
+ *	Plugin website:
+ *	tosrus.frebsite.nl
+ *
+ *	Licensed under the MIT license.
+ *	http://en.wikipedia.org/wiki/MIT_License
+ */
 ! function(t) {
     function i() {
         n = function(t) {
@@ -19,7 +31,7 @@
                 return "boolean" != typeof t && (t = i), t
             },
             complNumber: function(i, s) {
-                return t.isNumeric(i) || (i = s), i
+                return ( ! isNaN( parseFloat( i ) ) && isFinite( i ) ) || (i = s), i
             },
             complString: function(t, i) {
                 return "string" != typeof t && (t = i), t
@@ -92,7 +104,7 @@
                             t(s.target).is("img") || i.close()
                     }
                 }), this.nodes.$anchors = this._initAnchors(), this.nodes.$slides = this._initSlides(), this.slides.total = this.nodes.$slides.length, this.slides.visible = this.opts.slides.visible, this.slides.index = 0, this.vars.opened = !0;
-                for (var e = 0; e < t[s].addons.length; e++) t.isFunction(this["_addon_" + t[s].addons[e]]) && this["_addon_" + t[s].addons[e]]();
+                for (var e = 0; e < t[s].addons.length; e++) (typeof this["_addon_" + t[s].addons[e]] === "function" ) && this["_addon_" + t[s].addons[e]]();
                 for (var o = 0; o < t[s].ui.length; o++) this.nodes.$wrpr.find("." + n[t[s].ui[o]]).length && this.nodes.$wrpr.addClass(n("has-" + t[s].ui[o]));
                 "close" == this.opts.wrapper.onClick && (this.nodes.$uibg || t().add(this.nodes.$capt || t()).add(this.nodes.$pagr || t()).on(a.click, function(t) {
                     t.stopPropagation()
@@ -102,7 +114,7 @@
                 var e = this;
                 this.vars.opened || (this.vars.fixed && (d.scrollPosition = d.$wndw.scrollTop(), d.$body.addClass(n.opened), r.setViewportScale()), s ? this.nodes.$wrpr.addClass(n.opening).trigger(a.opening, [i, s]) : setTimeout(function() {
                     e.nodes.$wrpr.addClass(n.opening).trigger(a.opening, [i, s])
-                }, 5), this.nodes.$wrpr.addClass(n.hover).addClass(n.opened)), this.vars.opened = !0, this._loadContents(), t.isNumeric(i) && (s = s || !this.vars.opened, this.slideTo(i, s))
+                }, 5), this.nodes.$wrpr.addClass(n.hover).addClass(n.opened)), this.vars.opened = !0, this._loadContents(), ( ! isNaN( parseFloat( i ) ) && isFinite( i ) ) && (s = s || !this.vars.opened, this.slideTo(i, s))
             },
             close: function(i) {
                 this.vars.opened && (this.vars.fixed && d.$body.removeClass(n.opened), i ? this.nodes.$wrpr.removeClass(n.opened) : r.transitionend(this.nodes.$wrpr, function() {
@@ -110,14 +122,14 @@
                 }, this.conf.transitionDuration), this.nodes.$wrpr.removeClass(n.hover).removeClass(n.opening).trigger(a.closing, [this.slides.index, i])), this.vars.opened = !1
             },
             prev: function(i, s) {
-                t.isNumeric(i) || (i = this.opts.slides.slide), this.slideTo(this.slides.index - i, s)
+                ( ! isNaN( parseFloat( i ) ) && isFinite( i ) ) || (i = this.opts.slides.slide), this.slideTo(this.slides.index - i, s)
             },
             next: function(i, s) {
-                t.isNumeric(i) || (i = this.opts.slides.slide), this.slideTo(this.slides.index + i, s)
+                ( ! isNaN( parseFloat( i ) ) && isFinite( i ) ) || (i = this.opts.slides.slide), this.slideTo(this.slides.index + i, s)
             },
             slideTo: function(i, e) {
                 if (!this.vars.opened) return !1;
-                if (!t.isNumeric(i)) return !1;
+                if (!( ! isNaN( parseFloat( i ) ) && isFinite( i ) )) return !1;
                 var o = !0;
                 if (0 > i) {
                     var d = 0 == this.slides.index;
@@ -215,7 +227,7 @@
                 })
             },
             _complementOptions: function() {
-                if (void 0 === this.opts.wrapper.target && (this.opts.wrapper.target = this.$node.is("a") ? "window" : this.$node), "window" != this.opts.wrapper.target && "string" == typeof this.opts.wrapper.target && (this.opts.wrapper.target = t(this.opts.wrapper.target)), this.opts.show = r.complBoolean(this.opts.show, "window" != this.opts.wrapper.target), t.isNumeric(this.opts.slides.width)) this.slides.widthPercentage = !1, this.opts.slides.visible = r.complNumber(this.opts.slides.visible, 1);
+                if (void 0 === this.opts.wrapper.target && (this.opts.wrapper.target = this.$node.is("a") ? "window" : this.$node), "window" != this.opts.wrapper.target && "string" == typeof this.opts.wrapper.target && (this.opts.wrapper.target = t(this.opts.wrapper.target)), this.opts.show = r.complBoolean(this.opts.show, "window" != this.opts.wrapper.target), ( ! isNaN( parseFloat( this.opts.slides.width ) ) && isFinite( this.opts.slides.width ) )) this.slides.widthPercentage = !1, this.opts.slides.visible = r.complNumber(this.opts.slides.visible, 1);
                 else {
                     var i = !!r.isPercentage(this.opts.slides.width) && r.getPercentage(this.opts.slides.width);
                     this.slides.widthPercentage = !0, this.opts.slides.visible = r.complNumber(this.opts.slides.visible, i ? Math.floor(100 / i) : 1), this.opts.slides.width = i || Math.ceil(1e4 / this.opts.slides.visible) / 100

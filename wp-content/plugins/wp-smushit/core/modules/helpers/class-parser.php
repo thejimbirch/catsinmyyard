@@ -8,7 +8,7 @@
 
 namespace Smush\Core\Modules\Helpers;
 
-use Smush\WP_Smush;
+use WP_Smush;
 
 /**
  * Class Parser
@@ -38,11 +38,19 @@ class Parser {
 	private $background_images = false;
 
 	/**
-	 * Parser constructor.
+	 * Smush will __construct this class multiple times, but only once does it need to be initialized.
 	 *
-	 * @since 3.2.2
+	 * @since 3.5.0  Moved from __construct().
 	 */
-	public function __construct() {
+	public function init() {
+		if ( is_admin() || is_customize_preview() || wp_doing_ajax() || wp_doing_cron() ) {
+			return;
+		}
+
+		if ( $this->is_page_builder() ) {
+			return;
+		}
+
 		if ( $this->is_smartcrawl_analysis() ) {
 			return;
 		}
@@ -103,13 +111,7 @@ class Parser {
 			return $content;
 		}
 
-		// We probably don't want any processing during Ajax requests.
-		if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-			return $content;
-		}
-
-		// Add support for Oxygen Builder.
-		if ( defined( 'SHOW_CT_BUILDER' ) && SHOW_CT_BUILDER ) {
+		if ( is_customize_preview() ) {
 			return $content;
 		}
 
@@ -136,19 +138,19 @@ class Parser {
 	 * @return string
 	 */
 	private function process_images( $content ) {
-		$images = self::get_images_from_content( $content );
+		$images = $this->get_images_from_content( $content );
 
 		if ( empty( $images ) ) {
 			return $content;
 		}
 
 		foreach ( $images[0] as $key => $image ) {
-			$img_src   = $images['img_url'][ $key ];
+			$img_src   = $images['src'][ $key ];
 			$new_image = $image;
 
 			// Update the image with correct CDN links.
 			if ( $this->cdn ) {
-				$new_image = WP_Smush::get_instance()->core()->mod->cdn->parse_image( $img_src, $new_image );
+				$new_image = WP_Smush::get_instance()->core()->mod->cdn->parse_image( $img_src, $new_image, $images['srcset'][ $key ], $images['type'][ $key ] );
 			}
 
 			/**
@@ -163,7 +165,7 @@ class Parser {
 			 * @param bool $skip  Skip status.
 			 */
 			if ( $this->lazy_load && ! apply_filters( 'wp_smush_should_skip_parse', false ) ) {
-				$new_image = WP_Smush::get_instance()->core()->mod->lazy->parse_image( $img_src, $new_image );
+				$new_image = WP_Smush::get_instance()->core()->mod->lazy->parse_image( $img_src, $new_image, $images['type'][ $key ] );
 			}
 
 			$content = str_replace( $image, $new_image, $content );
@@ -188,6 +190,14 @@ class Parser {
 			return $content;
 		}
 
+		// Try to sort out the duplicate entries.
+		$elements = array_unique( $images[0] );
+		$urls     = array_unique( $images['img_url'] );
+		if ( count( $elements ) === count( $urls ) ) {
+			$images[0]         = $elements;
+			$images['img_url'] = $urls;
+		}
+
 		foreach ( $images[0] as $key => $image ) {
 			$img_src   = $images['img_url'][ $key ];
 			$new_image = $image;
@@ -196,6 +206,14 @@ class Parser {
 			$new_image = WP_Smush::get_instance()->core()->mod->cdn->parse_background_image( $img_src, $new_image );
 
 			$content = str_replace( $image, $new_image, $content );
+			/**
+			 * Filter the current page content after process background images.
+			 *
+			 * @param string $content Current Page content.
+			 * @param string $image   Backround Image tag without src.
+			 * @param string $img_src Image src.
+			 */
+			$content = apply_filters( 'smush_after_process_background_images', $content, $image, $img_src );
 		}
 
 		return $content;
@@ -208,12 +226,12 @@ class Parser {
 	 * @since 3.3.0
 	 */
 	private function is_smartcrawl_analysis() {
-		$wds_analysis = filter_input( INPUT_POST, 'action', FILTER_SANITIZE_STRING );
+		$wds_analysis = filter_input( INPUT_POST, 'action', FILTER_SANITIZE_SPECIAL_CHARS );
 		if ( ! is_null( $wds_analysis ) && 'wds-analysis-recheck' === $wds_analysis ) {
 			return true;
 		}
 
-		if ( isset( $_GET['wds-frontend-check'] ) ) {
+		if ( null !== filter_input( INPUT_GET, 'wds-frontend-check', FILTER_SANITIZE_SPECIAL_CHARS ) ) {
 			return true;
 		}
 
@@ -227,14 +245,30 @@ class Parser {
 	 * @since 3.2.0  Moved to WP_Smush_Content from \Smush\Core\Modules\CDN
 	 * @since 3.2.2  Moved to Parser from WP_Smush_Content
 	 *
+	 * Performance test: auto generated page with ~900 lines of HTML code, 84 images.
+	 * - Smush 2.4.0: 82 matches, 104359 steps (~80 ms) <- does not match <source> images in <picture>.
+	 * - Smush 2.5.0: 84 matches, 63791 steps (~51 ms).
+	 *
 	 * @param string $content  Page content.
 	 *
 	 * @return array
 	 */
-	public static function get_images_from_content( $content ) {
+	public function get_images_from_content( $content ) {
 		$images = array();
 
-		if ( preg_match_all( '/(?:<(img|source|iframe)[^>]*?\s+?(src|srcset)=["|\'](?P<img_url>[^\s]+?)["|\'].*?>)/is', $content, $images ) ) {
+		/**
+		 * Filter out only <body> content. As this was causing issues with escaped JS strings in <head>.
+		 *
+		 * @since 3.6.2
+		 */
+		if ( preg_match( '/(?=<body).*<\/body>/is', $content, $body ) ) {
+			$content = $body[0];
+		}
+
+		$pattern = '/<(?P<type>img|source|iframe)\b(?>\s+(?:src=[\'"](?P<src>[^\'"]*)[\'"]|srcset=[\'"](?P<srcset>[^\'"]*)[\'"])|[^\s>]+|\s+)*>/is';
+		$pattern = apply_filters( 'smush_images_from_content_regex', $pattern );
+
+		if ( preg_match_all( $pattern, $content, $images ) ) {
 			foreach ( $images as $key => $unused ) {
 				// Simplify the output as much as possible, mostly for confirming test results.
 				if ( is_numeric( $key ) && $key > 0 ) {
@@ -251,6 +285,10 @@ class Parser {
 	 *
 	 * @since 3.2.2
 	 *
+	 * Performance test: auto generated page with ~900 lines of HTML code, 84 images (only 1 with background image).
+	 * - Smush 2.4.0: 1 match, 522510 steps (~355 ms)
+	 * - Smush 2.5.0: 1 match, 12611 steps, (~12 ms)
+	 *
 	 * @param string $content  Page content.
 	 *
 	 * @return array
@@ -258,7 +296,10 @@ class Parser {
 	private static function get_background_images( $content ) {
 		$images = array();
 
-		if ( preg_match_all( '/<[^>]*?\s*?background-image:\s*?url\([\'"]*?(?P<img_url>[^\s\'"]+?)[\'")].*?>/is', $content, $images ) ) {
+		$pattern = '/(?:background-image:\s*?url\(\s*[\'"]?(?P<img_url>.*?[^)\'"]+)[\'"]?\s*\))/i';
+		$pattern = apply_filters( 'smush_background_images_regex', $pattern );
+
+		if ( preg_match_all( $pattern, $content, $images ) ) {
 			foreach ( $images as $key => $unused ) {
 				// Simplify the output as much as possible, mostly for confirming test results.
 				if ( is_numeric( $key ) && $key > 0 ) {
@@ -267,31 +308,77 @@ class Parser {
 			}
 		}
 
+		/**
+		 * Make sure that the image doesn't start and end with &quot;.
+		 *
+		 * @since 3.5.0
+		 */
+		$images['img_url'] = array_map(
+			function ( $image ) {
+				// Quote entities.
+				$quotes = apply_filters( 'wp_smush_background_image_quotes', array( '&quot;', '&#034;', '&#039;', '&apos;' ) );
+
+				$image = trim( $image );
+
+				// Remove the starting quotes.
+				if ( in_array( substr( $image, 0, 6 ), $quotes, true ) ) {
+					$image = substr( $image, 6 );
+				}
+
+				// Remove the ending quotes.
+				if ( in_array( substr( $image, -6 ), $quotes, true ) ) {
+					$image = substr( $image, 0, -6 );
+				}
+
+				return $image;
+			},
+			$images['img_url']
+		);
+
 		return $images;
 	}
 
 	/**
-	 * Get iframes from content.
+	 * Check if this is one of the known page builders.
 	 *
-	 * @since 3.4.0
+	 * @since 3.5.1
 	 *
-	 * @param string $content  Page content.
-	 *
-	 * @return array
+	 * @return bool
 	 */
-	private static function get_iframes( $content ) {
-		$iframes = array();
-
-		if ( preg_match_all( '/(?:<iframe[^>]*?\s+?src=["|\'](?P<frame_url>[^\s]+?)["|\'].*?>)/is', $content, $iframes ) ) {
-			foreach ( $iframes as $key => $unused ) {
-				// Simplify the output as much as possible, mostly for confirming test results.
-				if ( is_numeric( $key ) && $key > 0 ) {
-					unset( $iframes[ $key ] );
-				}
-			}
+	private function is_page_builder() {
+		// Oxygen builder.
+		if ( defined( 'SHOW_CT_BUILDER' ) && SHOW_CT_BUILDER ) {
+			return true;
 		}
 
-		return $iframes;
+		// Oxygen builder as well.
+		if ( null !== filter_input( INPUT_GET, 'ct_builder' ) ) {
+			return true;
+		}
+
+		// Beaver builder.
+		if ( null !== filter_input( INPUT_GET, 'fl_builder' ) ) {
+			return true;
+		}
+
+		// Thrive Architect Builder.
+		if ( null !== filter_input( INPUT_GET, 'tve' ) && null !== filter_input( INPUT_GET, 'tcbf' ) ) {
+			return true;
+		}
+
+		// Tatsu page builder.
+		if ( null !== filter_input( INPUT_GET, 'tatsu' ) ) {
+			return true;
+		}
+
+		// BuddyBoss' AJAX requests. They do something strange and end up defining
+		// DOING_AJAX on template_redirect after self::parse_page() runs. That makes
+		// our lazy load page parsing break some of their AJAX requests.
+		if ( function_exists( 'bbp_is_ajax' ) && bbp_is_ajax() ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -305,9 +392,15 @@ class Parser {
 	 * @param string $name     Img attribute name (srcset, size, etc).
 	 * @param string $value    Attribute value.
 	 */
-	public static function add_attribute( &$element, $name, $value ) {
+	public static function add_attribute( &$element, $name, $value = null ) {
 		$closing = false === strpos( $element, '/>' ) ? '>' : ' />';
-		$element = rtrim( $element, $closing ) . " {$name}=\"{$value}\"{$closing}";
+		$quotes  = false === strpos( $element, '"' ) ? '\'' : '"';
+
+		if ( ! is_null( $value ) ) {
+			$element = rtrim( $element, $closing ) . " {$name}={$quotes}{$value}{$quotes}{$closing}";
+		} else {
+			$element = rtrim( $element, $closing ) . " {$name}{$closing}";
+		}
 	}
 
 	/**
@@ -336,13 +429,17 @@ class Parser {
 	 * @param string $attribute  Img attribute name (srcset, size, etc).
 	 */
 	public static function remove_attribute( &$element, $attribute ) {
-		$element = preg_replace( '/' . $attribute . '=[\'|"](.*?)[\'|"]/', '', $element );
+		$element = preg_replace( '/' . $attribute . '=[\'"](.*?)[\'"]/i', '', $element );
 	}
 
 	/**
 	 * Get URLs from a string of content.
 	 *
 	 * This is mostly used to get the URLs from srcset and parse each single URL to use in CDN.
+	 *
+	 * Performance test: auto generated page with ~900 lines of HTML code, 84 images
+	 * - Smush 2.4.0: 11957 matches, 237227 steps (~169 ms) <- many false positive matches.
+	 * - Smush 2.5.0: 278 matches, 14509 steps, (~15 ms).
 	 *
 	 * @since 3.3.0
 	 *
@@ -352,16 +449,7 @@ class Parser {
 	 */
 	public static function get_links_from_content( $content ) {
 		$images = array();
-
-		if ( preg_match_all( '/([http:|https:][^\s]*)/is', $content, $images ) ) {
-			foreach ( $images as $key => $unused ) {
-				// Simplify the output as much as possible, mostly for confirming test results.
-				if ( is_numeric( $key ) && $key > 0 ) {
-					unset( $images[ $key ] );
-				}
-			}
-		}
-
+		preg_match_all( '/(?:https?[^\s\'"]*)/is', $content, $images );
 		return $images;
 	}
 

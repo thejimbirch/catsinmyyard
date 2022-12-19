@@ -5,7 +5,8 @@ Plugin Name: UpdraftPlus - Backup/Restore
 Plugin URI: https://updraftplus.com
 Description: Backup and restore: take backups locally, or backup to Amazon S3, Dropbox, Google Drive, Rackspace, (S)FTP, WebDAV & email, on automatic schedules.
 Author: UpdraftPlus.Com, DavidAnderson
-Version: 1.16.22
+Version: 1.22.24
+Update URI: https://wordpress.org/plugins/updraftplus/
 Donate link: https://david.dw-perspective.org.uk/donate
 License: GPLv3 or later
 Text Domain: updraftplus
@@ -15,7 +16,7 @@ Author URI: https://updraftplus.com
 // @codingStandardsIgnoreEnd
 
 /*
-Portions copyright 2011-19 David Anderson
+Portions copyright 2011-22 David Anderson
 Portions copyright 2010 Paul Kehrer
 Other portions copyright as indicated by authors in the relevant files
 
@@ -45,7 +46,7 @@ define('UPDRAFT_DEFAULT_UPLOADS_EXCLUDE', 'backup*,*backups,backwpup*,wp-clone,s
 
 // The following can go in your wp-config.php
 // Tables whose data can be skipped without significant loss, if (and only if) the attempt to back them up fails (e.g. bwps_log, from WordPress Better Security, is log data; but individual entries can be huge and cause out-of-memory fatal errors on low-resource environments). Comma-separate the table names (without the WordPress table prefix).
-if (!defined('UPDRAFTPLUS_DATA_OPTIONAL_TABLES')) define('UPDRAFTPLUS_DATA_OPTIONAL_TABLES', 'bwps_log,statpress,slim_stats,redirection_logs,Counterize,Counterize_Referers,Counterize_UserAgents,wbz404_logs,wbz404_redirects,tts_trafficstats,tts_referrer_stats,wponlinebackup_generations,svisitor_stat,simple_feed_stats,itsec_log,relevanssi_log,blc_instances,wysija_email_user_stat,woocommerce_sessions,et_bloom_stats,redirection_404,lbakut_activity_log,stream_meta');
+if (!defined('UPDRAFTPLUS_DATA_OPTIONAL_TABLES')) define('UPDRAFTPLUS_DATA_OPTIONAL_TABLES', 'bwps_log,statpress,slim_stats,redirection_logs,Counterize,Counterize_Referers,Counterize_UserAgents,wbz404_logs,wbz404_redirects,tts_trafficstats,tts_referrer_stats,wponlinebackup_generations,svisitor_stat,simple_feed_stats,itsec_log,relevanssi_log,blc_instances,wysija_email_user_stat,woocommerce_sessions,et_bloom_stats,redirection_404,lbakut_activity_log,stream_meta,wfFileMods,wffilemods,wfBlockedIPLog,wfblockediplog,page_visit_history,strack_st');
 if (!defined('UPDRAFTPLUS_ZIP_EXECUTABLE')) define('UPDRAFTPLUS_ZIP_EXECUTABLE', "/usr/bin/zip,/bin/zip,/usr/local/bin/zip,/usr/sfw/bin/zip,/usr/xdg4/bin/zip,/opt/bin/zip");
 if (!defined('UPDRAFTPLUS_MYSQLDUMP_EXECUTABLE')) define('UPDRAFTPLUS_MYSQLDUMP_EXECUTABLE', updraftplus_build_mysqldump_list());
 // If any individual file size is greater than this, then a warning is given
@@ -57,7 +58,7 @@ if (!defined('UPDRAFTPLUS_WARN_DB_ROWS')) define('UPDRAFTPLUS_WARN_DB_ROWS', 150
 if (!defined('UPDRAFTPLUS_SPLIT_MIN')) define('UPDRAFTPLUS_SPLIT_MIN', 25);
 
 // The maximum number of files to batch at one time when writing to the backup archive. You'd only be likely to want to raise (not lower) this.
-if (!defined('UPDRAFTPLUS_MAXBATCHFILES')) define('UPDRAFTPLUS_MAXBATCHFILES', 500);
+if (!defined('UPDRAFTPLUS_MAXBATCHFILES')) define('UPDRAFTPLUS_MAXBATCHFILES', 1000);
 
 // If any individual email attachment is greater than this, then a warning is given (and then removed if the email actually succeeds)
 if (!defined('UPDRAFTPLUS_WARN_EMAIL_SIZE')) define('UPDRAFTPLUS_WARN_EMAIL_SIZE', 20*1048576);
@@ -82,8 +83,34 @@ if (!defined('UPDRAFTPLUS_BINZIP_OPTS')) {
 	define('UPDRAFTPLUS_BINZIP_OPTS', $zip_binzip_opts);
 }
 
+/**
+ * A wrapper for (require|include)(_once)? that will first check for existence, and direct the user what to do (since the traditional PHP error messages aren't clear enough for all users)
+ *
+ * @param String $path the file path to check
+ * @param String $method the method to load the file
+ */
+function updraft_try_include_file($path, $method = 'include') {
+
+	$file_to_include = UPDRAFTPLUS_DIR.'/'.$path;
+
+	if (!file_exists($file_to_include)) {
+		trigger_error(sprintf(__('The expected file %s is missing from your UpdraftPlus installation.', 'updraftplus').' '.__('Most likely, WordPress did not correctly unpack the plugin when installing it. You should de-install and then re-install the plugin (your settings and data will be retained).'), $file_to_include), E_USER_WARNING);
+	}
+
+	if ('include' === $method) {
+		include($file_to_include);
+	} elseif ('include_once' === $method) {
+		include_once($file_to_include);
+	} elseif ('require' === $method) {
+		require($file_to_include);
+	} else {
+		require_once($file_to_include);
+	}
+	
+}
+
 // Load add-ons and files that may or may not be present, depending on where the plugin was distributed
-if (is_file(UPDRAFTPLUS_DIR.'/autoload.php')) require_once(UPDRAFTPLUS_DIR.'/autoload.php');
+if (is_file(UPDRAFTPLUS_DIR.'/autoload.php')) updraft_try_include_file('autoload.php', 'require_once');
 
 if (!function_exists('updraftplus_modify_cron_schedules')) :
 /**
@@ -107,7 +134,7 @@ endif;
 add_filter('cron_schedules', 'updraftplus_modify_cron_schedules', 30);
 
 // The checks here before loading are for performance only - unless one of those conditions is met, then none of the hooks will ever be used
-if (!is_admin() && (!defined('DOING_CRON') || !DOING_CRON) && (!defined('XMLRPC_REQUEST') || !XMLRPC_REQUEST) && empty($_SERVER['SHELL']) && empty($_SERVER['USER']) && empty($_POST['udrpc_message']) && empty($_GET['udcentral_action']) && (defined('UPDRAFTPLUS_THIS_IS_CLONE') && "1" != UPDRAFTPLUS_THIS_IS_CLONE) && empty($_GET['uc_auto_login']) && (empty($_SERVER['REQUEST_METHOD']) || 'OPTIONS' != $_SERVER['REQUEST_METHOD']) && (!defined('WP_CLI') || !WP_CLI)) {
+if (!is_admin() && (!defined('DOING_CRON') || !DOING_CRON) && (!defined('XMLRPC_REQUEST') || !XMLRPC_REQUEST) && empty($_SERVER['SHELL']) && empty($_POST['udrpc_message']) && empty($_GET['udcentral_action']) && (defined('UPDRAFTPLUS_THIS_IS_CLONE') && '1' != UPDRAFTPLUS_THIS_IS_CLONE) && empty($_GET['uc_auto_login']) && (empty($_SERVER['REQUEST_METHOD']) || 'OPTIONS' != $_SERVER['REQUEST_METHOD']) && (!defined('WP_CLI') || !WP_CLI)) {
 	// There is no good way to work out if the cron event is likely to be called under the ALTERNATE_WP_CRON system, other than re-running the calculation
 	// If ALTERNATE_WP_CRON is not active (and a few other things), then we are done
 	if (!defined('ALTERNATE_WP_CRON') || !ALTERNATE_WP_CRON || !empty($_POST) || defined('DOING_AJAX') || isset($_GET['doing_wp_cron'])) return;
@@ -139,15 +166,15 @@ if (is_dir(UPDRAFTPLUS_DIR.'/addons') && $dir_handle = opendir(UPDRAFTPLUS_DIR.'
 			$phpinclude = preg_match("/IncludePHP: (\S+)/", $header, $matches) ? $matches[1] : false;
 			if (false === $phprequires || version_compare(PHP_VERSION, $phprequires, '>=')) {
 				$updraftplus_have_addons++;
-				if ($phpinclude) include_once(UPDRAFTPLUS_DIR.'/'.$phpinclude);
-				include_once(UPDRAFTPLUS_DIR.'/addons/'.$e);
+				if ($phpinclude) updraft_try_include_file(''.$phpinclude, 'include_once');
+				updraft_try_include_file('addons/'.$e, 'include_once');
 			}
 		}
 	}
 	@closedir($dir_handle);// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 }
 
-if (is_file(UPDRAFTPLUS_DIR.'/udaddons/updraftplus-addons.php')) require_once(UPDRAFTPLUS_DIR.'/udaddons/updraftplus-addons.php');
+if (is_file(UPDRAFTPLUS_DIR.'/udaddons/updraftplus-addons.php')) updraft_try_include_file('udaddons/updraftplus-addons.php', 'require_once');
 
 if (!file_exists(UPDRAFTPLUS_DIR.'/class-updraftplus.php') || !file_exists(UPDRAFTPLUS_DIR.'/options.php')) {
 	/**
@@ -159,7 +186,7 @@ if (!file_exists(UPDRAFTPLUS_DIR.'/class-updraftplus.php') || !file_exists(UPDRA
 	add_action('all_admin_notices', 'updraftplus_incomplete_install_warning');
 } else {
 
-	include_once(UPDRAFTPLUS_DIR.'/class-updraftplus.php');
+	updraft_try_include_file('class-updraftplus.php', 'include_once');
 	$updraftplus = new UpdraftPlus();
 	$GLOBALS['updraftplus'] = $updraftplus;
 	$updraftplus->have_addons = $updraftplus_have_addons;
@@ -187,7 +214,7 @@ if (!function_exists('gzopen') && function_exists('gzopen64')) {
 }
 
 /**
- * For finding mysqldump. Added to include Windows locations
+ * For finding mysqldump. Added to include Windows locations.
  */
 function updraftplus_build_mysqldump_list() {
 	if ('win' == strtolower(substr(PHP_OS, 0, 3)) && function_exists('glob')) {
@@ -215,4 +242,4 @@ function updraftplus_build_mysqldump_list() {
 }
 
 // Do this even if the missing files detection above fired, as the "missing files" detection above has a greater chance of showing the user useful info
-if (!class_exists('UpdraftPlus_Options')) require_once(UPDRAFTPLUS_DIR.'/options.php');
+if (!class_exists('UpdraftPlus_Options')) updraft_try_include_file('options.php', 'require_once');

@@ -5,6 +5,9 @@
  * @package WPSEO\Admin
  */
 
+use Yoast\WP\SEO\Helpers\Score_Icon_Helper;
+use Yoast\WP\SEO\Repositories\Indexable_Repository;
+
 /**
  * This class adds columns to the taxonomy table.
  */
@@ -32,6 +35,20 @@ class WPSEO_Taxonomy_Columns {
 	private $taxonomy;
 
 	/**
+	 * Holds the Indexable_Repository.
+	 *
+	 * @var Indexable_Repository
+	 */
+	protected $indexable_repository;
+
+	/**
+	 * Holds the Score_Icon_Helper.
+	 *
+	 * @var Score_Icon_Helper
+	 */
+	protected $score_icon_helper;
+
+	/**
 	 * WPSEO_Taxonomy_Columns constructor.
 	 */
 	public function __construct() {
@@ -45,6 +62,8 @@ class WPSEO_Taxonomy_Columns {
 
 		$this->analysis_seo         = new WPSEO_Metabox_Analysis_SEO();
 		$this->analysis_readability = new WPSEO_Metabox_Analysis_Readability();
+		$this->indexable_repository = YoastSEO()->classes->get( Indexable_Repository::class );
+		$this->score_icon_helper    = YoastSEO()->helpers->score_icon;
 	}
 
 	/**
@@ -79,9 +98,9 @@ class WPSEO_Taxonomy_Columns {
 	/**
 	 * Parses the column.
 	 *
-	 * @param string  $content     The current content of the column.
-	 * @param string  $column_name The name of the column.
-	 * @param integer $term_id     ID of requested taxonomy.
+	 * @param string $content     The current content of the column.
+	 * @param string $column_name The name of the column.
+	 * @param int    $term_id     ID of requested taxonomy.
 	 *
 	 * @return string
 	 */
@@ -123,27 +142,14 @@ class WPSEO_Taxonomy_Columns {
 	/**
 	 * Parses the value for the score column.
 	 *
-	 * @param integer $term_id ID of requested term.
+	 * @param int $term_id ID of requested term.
 	 *
 	 * @return string
 	 */
 	private function get_score_value( $term_id ) {
-		$term = get_term( $term_id, $this->taxonomy );
+		$indexable = $this->indexable_repository->find_by_id_and_type( (int) $term_id, 'term' );
 
-		// When the term isn't indexable.
-		if ( ! $this->is_indexable( $term ) ) {
-			return $this->create_score_icon(
-				new WPSEO_Rank( WPSEO_Rank::NO_INDEX ),
-				__( 'Term is set to noindex.', 'wordpress-seo' )
-			);
-		}
-
-		// When there is a focus key word.
-		$focus_keyword = $this->get_focus_keyword( $term );
-		$score         = (int) WPSEO_Taxonomy_Meta::get_term_meta( $term_id, $this->taxonomy, 'linkdex' );
-		$rank          = WPSEO_Rank::from_numeric_score( $score );
-
-		return $this->create_score_icon( $rank, $rank->get_label() );
+		return $this->score_icon_helper->for_seo( $indexable, '', __( 'Term is set to noindex.', 'wordpress-seo' ) );
 	}
 
 	/**
@@ -155,25 +161,8 @@ class WPSEO_Taxonomy_Columns {
 	 */
 	private function get_score_readability_value( $term_id ) {
 		$score = (int) WPSEO_Taxonomy_Meta::get_term_meta( $term_id, $this->taxonomy, 'content_score' );
-		$rank  = WPSEO_Rank::from_numeric_score( $score );
 
-		return $this->create_score_icon( $rank );
-	}
-
-	/**
-	 * Creates an icon by the given values.
-	 *
-	 * @param WPSEO_Rank $rank  The ranking object.
-	 * @param string     $title Optional. The title to show. Defaults to the rank label.
-	 *
-	 * @return string The HTML for a score icon.
-	 */
-	private function create_score_icon( WPSEO_Rank $rank, $title = '' ) {
-		if ( empty( $title ) ) {
-			$title = $rank->get_label();
-		}
-
-		return '<div aria-hidden="true" title="' . esc_attr( $title ) . '" class="wpseo-score-icon ' . esc_attr( $rank->get_css_class() ) . '"></div><span class="screen-reader-text wpseo-score-text">' . $title . '</span>';
+		return $this->score_icon_helper->for_readability( $score );
 	}
 
 	/**
@@ -203,22 +192,6 @@ class WPSEO_Taxonomy_Columns {
 	}
 
 	/**
-	 * Returns the focus keyword if this is set, otherwise it will give the term name.
-	 *
-	 * @param stdClass|WP_Term $term The current term.
-	 *
-	 * @return string
-	 */
-	private function get_focus_keyword( $term ) {
-		$focus_keyword = WPSEO_Taxonomy_Meta::get_term_meta( 'focuskw', $term->term_id, $term->taxonomy );
-		if ( $focus_keyword !== false ) {
-			return $focus_keyword;
-		}
-
-		return $term->name;
-	}
-
-	/**
 	 * Checks if a taxonomy is being added via a POST method. If not, it defaults to a GET request.
 	 *
 	 * @return int
@@ -237,7 +210,7 @@ class WPSEO_Taxonomy_Columns {
 	 *
 	 * @since 7.0
 	 *
-	 * @param string $taxonomy Optional. The taxonomy to test, defaults to the current taxonomy.
+	 * @param string|null $taxonomy Optional. The taxonomy to test, defaults to the current taxonomy.
 	 *
 	 * @return bool Whether or not the meta box (and associated columns etc) should be hidden.
 	 */

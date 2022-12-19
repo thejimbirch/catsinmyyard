@@ -16,7 +16,7 @@
  */
 if (!defined('UPDRAFTPLUS_DIR')) die('No direct access allowed.');
 
-if (!class_exists('UpdraftPlus_BackupModule')) require_once(UPDRAFTPLUS_DIR.'/methods/backup-module.php');
+if (!class_exists('UpdraftPlus_BackupModule')) updraft_try_include_file('methods/backup-module.php', 'require_once');
 
 class UpdraftPlus_BackupModule_template extends UpdraftPlus_BackupModule {
 
@@ -73,7 +73,9 @@ class UpdraftPlus_BackupModule_template extends UpdraftPlus_BackupModule {
 	 * download method: takes a file name (base name), and brings it back from the cloud storage into Updraft's directory
 	 * You can register errors with $updraftplus->log("my error message", 'error')
 	 *
-	 * @param string $file The specific file to be downloaded from the Cloud Storage
+	 * @param String $file The specific file to be downloaded from the Cloud Storage
+	 *
+	 * @return Boolean - success or failure state
 	 */
 	public function download($file) {// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- This is a template file and can be ignored
 

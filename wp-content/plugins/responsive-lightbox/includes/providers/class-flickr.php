@@ -5,12 +5,15 @@ if ( ! defined( 'ABSPATH' ) )
 /**
  * Responsive Lightbox Remote Library Flickr class.
  *
+ * Library: https://www.flickr.com
+ * API: https://www.flickr.com/services/developer/api/
+ *
  * @class Responsive_Lightbox_Remote_Library_Flickr
  */
 class Responsive_Lightbox_Remote_Library_Flickr extends Responsive_Lightbox_Remote_Library_API {
 
 	/**
-	 * Constructor.
+	 * Class constructor.
 	 *
 	 * @return void
 	 */
@@ -22,18 +25,18 @@ class Responsive_Lightbox_Remote_Library_Flickr extends Responsive_Lightbox_Remo
 		$this->name = __( 'Flickr', 'responsive-lightbox' );
 
 		// default values
-		$this->defaults = array(
+		$this->defaults = [
 			'active'	=> false,
 			'api_key'	=> ''
-		);
+		];
 
 		// setting fields
-		$this->fields = array(
+		$this->fields = [
 			'title'		=> $this->name,
 			'section'	=> 'responsive_lightbox_remote_library_providers',
 			'type'		=> 'custom',
-			'callback'	=> array( $this, 'render_field' )
-		);
+			'callback'	=> [ $this, 'render_field' ]
+		];
 
 		// add provider
 		parent::add_provider( $this );
@@ -46,10 +49,10 @@ class Responsive_Lightbox_Remote_Library_Flickr extends Responsive_Lightbox_Remo
 	 */
 	public function render_field() {
 		echo '
-		<p><label class="cb-checkbox"><input id="rl_flickr_active" class="rl-media-provider-expandable" type="checkbox" name="responsive_lightbox_remote_library[flickr][active]" value="1" ' . checked( $this->rl->options['remote_library']['flickr']['active'], true, false ) . ' />' . __( 'Enable Flickr.', 'responsive-lightbox' ) . '</label></p>
+		<p><label><input id="rl_flickr_active" class="rl-media-provider-expandable" type="checkbox" name="responsive_lightbox_remote_library[flickr][active]" value="1" ' . checked( $this->rl->options['remote_library']['flickr']['active'], true, false ) . ' />' . esc_html__( 'Enable Flickr.', 'responsive-lightbox' ) . '</label></p>
 		<div class="rl-media-provider-options"' . ( $this->rl->options['remote_library']['flickr']['active'] ? '' : ' style="display: none;"' ) . '>
-			<p><input id="rl_flickr_api_key" class="large-text" placeholder="' . __( 'API key', 'responsive-lightbox' ) . '" type="text" value="' . $this->rl->options['remote_library']['flickr']['api_key'] . '" name="responsive_lightbox_remote_library[flickr][api_key]"></p>
-			<p class="description">' . sprintf( __( 'Provide your <a href="%s">Flickr API key</a>.', 'responsive-lightbox' ), 'https://www.flickr.com/services/apps/create/' ) . '</p>
+			<p><input id="rl_flickr_api_key" class="large-text" placeholder="' . esc_attr__( 'API key', 'responsive-lightbox' ) . '" type="text" value="' . esc_attr( $this->rl->options['remote_library']['flickr']['api_key'] ) . '" name="responsive_lightbox_remote_library[flickr][api_key]"></p>
+			<p class="description">' . sprintf( esc_html__( 'Provide your %s key.', 'responsive-lightbox' ), '<a href="https://www.flickr.com/services/apps/create/">Flickr API</a>' ) . '</p>
 		</div>';
 	}
 
@@ -57,7 +60,7 @@ class Responsive_Lightbox_Remote_Library_Flickr extends Responsive_Lightbox_Remo
 	 * Validate settings.
 	 *
 	 * @param array $input POST data
-	 * @return array Validated settings
+	 * @return array
 	 */
 	public function validate_settings( $input ) {
 		if ( ! isset( $_POST['responsive_lightbox_remote_library'] ) )
@@ -67,7 +70,12 @@ class Responsive_Lightbox_Remote_Library_Flickr extends Responsive_Lightbox_Remo
 			$input['flickr']['active'] = isset( $_POST['responsive_lightbox_remote_library']['flickr']['active'] );
 
 			// api key
-			$input['flickr']['api_key'] = preg_replace( '/[^0-9a-zA-Z\-.]/', '', $_POST['responsive_lightbox_remote_library']['flickr']['api_key'] );
+			if ( isset( $_POST['responsive_lightbox_remote_library']['flickr']['api_key'] ) )
+				$api_key = preg_replace( '/[^0-9a-zA-Z\-.]/', '', $_POST['responsive_lightbox_remote_library']['flickr']['api_key'] );
+			else
+				$api_key = '';
+
+			$input['flickr']['api_key'] = $api_key;
 		}
 
 		return $input;
@@ -80,7 +88,7 @@ class Responsive_Lightbox_Remote_Library_Flickr extends Responsive_Lightbox_Remo
 	 * @param array $args Provider arguments
 	 * @return void
 	 */
-	public function prepare_query( $search_phrase, $args = array() ) {
+	public function prepare_query( $search_phrase, $args = [] ) {
 		// check page parameter
 		if ( isset( $args['preview_page'] ) )
 			$args['preview_page'] = (int) $args['preview_page'];
@@ -90,26 +98,31 @@ class Responsive_Lightbox_Remote_Library_Flickr extends Responsive_Lightbox_Remo
 		if ( $args['preview_page'] < 1 )
 			$args['preview_page'] = 1;
 
-		// check per page parameter
-		if ( isset( $args['preview_per_page'] ) )
-			$args['preview_per_page'] = (int) $args['preview_per_page'];
-		else
-			$args['preview_per_page'] = 20;
+		// check limit
+		if ( isset( $args['limit'] ) && ( $limit = (int) $args['limit'] ) > 0 )
+			$args['preview_per_page'] = $limit;
+		else {
+			// check per page parameter
+			if ( isset( $args['preview_per_page'] ) )
+				$args['preview_per_page'] = (int) $args['preview_per_page'];
+			else
+				$args['preview_per_page'] = 20;
 
-		if ( $args['preview_per_page'] < 5 || $args['preview_per_page'] > 500 )
-			$args['preview_per_page'] = 20;
+			if ( $args['preview_per_page'] < 5 || $args['preview_per_page'] > 500 )
+				$args['preview_per_page'] = 20;
+		}
 
 		// set query arguments
 		$this->query_args = $args;
 
-		$query_args = array(
+		$query_args = [
 			'api_key'	=> $this->rl->options['remote_library']['flickr']['api_key'],
 			'extras'	=> 'owner_name,url_sq,url_t,url_s,url_q,url_m,url_n,url_z,url_c,url_l,url_o,description,tags',
 			'per_page'	=> $args['preview_per_page'],
 			'page'		=> $args['preview_page'],
 			'method'	=> 'flickr.photos.getRecent',
 			'format'	=> 'json'
-		);
+		];
 
 		if ( $search_phrase !== '' ) {
 			$query_args['content_type'] = 1;
@@ -122,12 +135,12 @@ class Responsive_Lightbox_Remote_Library_Flickr extends Responsive_Lightbox_Remo
 		$this->query = add_query_arg( $query_args, 'https://api.flickr.com/services/rest/' );
 
 		// set query remote arguments
-		$this->query_remote_args = array(
+		$this->query_remote_args = [
 			'timeout'	=> 30,
-			'headers'	=> array(
+			'headers'	=> [
 				'User-Agent' => __( 'Responsive Lightbox', 'responsive-lightbox' ) . ' ' . $this->rl->defaults['version']
-			)
-		);
+			]
+		];
 	}
 
 	/**
@@ -135,10 +148,10 @@ class Responsive_Lightbox_Remote_Library_Flickr extends Responsive_Lightbox_Remo
 	 *
 	 * @param mixed $response Remote response
 	 * @param array $args Query arguments
-	 * @return array Valid images or WP_Error
+	 * @return array|WP_Error
 	 */
-	public function get_query_results( $response, $args = array() ) {
-		$results = array();
+	public function get_query_results( $response, $args = [] ) {
+		$results = [];
 		$error = new WP_Error( 'rl_remote_library_flickr_get_query_results', __( 'Parsing request error', 'responsive-lightbox' ) );
 
 		// retrieve body
@@ -156,10 +169,13 @@ class Responsive_Lightbox_Remote_Library_Flickr extends Responsive_Lightbox_Remo
 			if ( $response_json === null || ( isset( $response_json['stat'] ) && $response_json['stat'] === 'fail' ) )
 				$results = $error;
 			else {
-				// get results
-				$results = isset( $response_json['photos'] ) && is_array( $response_json['photos'] ) && isset( $response_json['photos']['photo'] ) && is_array( $response_json['photos']['photo'] ) ? $response_json['photos']['photo'] : array();
+				// set response data
+				$this->response_data = $response_json;
 
-				// sanitize results
+				// get results
+				$results = isset( $response_json['photos'] ) && is_array( $response_json['photos'] ) && isset( $response_json['photos']['photo'] ) && is_array( $response_json['photos']['photo'] ) ? $response_json['photos']['photo'] : [];
+
+				// sanitize images
 				$results = $this->sanitize_results( $results );
 			}
 		} else
@@ -172,75 +188,84 @@ class Responsive_Lightbox_Remote_Library_Flickr extends Responsive_Lightbox_Remo
 	 * Sanitize single result.
 	 *
 	 * @param array $result Single result
-	 * @return mixed Array on success, otherwise false
+	 * @return array|false
 	 */
 	public function sanitize_result( $result ) {
 		// original size exists?
 		if ( isset( $result['url_o'] ) )
-			$large = array( $result['url_o'], $result['width_o'], $result['height_o'] );
+			$large = [ $result['url_o'], $result['width_o'], $result['height_o'] ];
 		// large 2048 size exists?
 		elseif ( isset( $result['url_k'] ) )
-			$large = array( $result['url_k'], $result['width_k'], $result['height_k'] );
+			$large = [ $result['url_k'], $result['width_k'], $result['height_k'] ];
 		// large 1600 size exists?
 		elseif ( isset( $result['url_h'] ) )
-			$large = array( $result['url_h'], $result['width_h'], $result['height_h'] );
+			$large = [ $result['url_h'], $result['width_h'], $result['height_h'] ];
 		// large 1024 size exists?
 		elseif ( isset( $result['url_l'] ) )
-			$large = array( $result['url_l'], $result['width_l'], $result['height_l'] );
+			$large = [ $result['url_l'], $result['width_l'], $result['height_l'] ];
 		// medium 800 size exists?
 		elseif ( isset( $result['url_c'] ) )
-			$large = array( $result['url_c'], $result['width_c'], $result['height_c'] );
+			$large = [ $result['url_c'], $result['width_c'], $result['height_c'] ];
 		// medium 640 size exists?
 		elseif ( isset( $result['url_z'] ) )
-			$large = array( $result['url_z'], $result['width_z'], $result['height_z'] );
+			$large = [ $result['url_z'], $result['width_z'], $result['height_z'] ];
 		// medium 500 size exists?
 		elseif ( isset( $result['url_m'] ) )
-			$large = array( $result['url_m'], $result['width_m'], $result['height_m'] );
+			$large = [ $result['url_m'], $result['width_m'], $result['height_m'] ];
 		// small 320 size exists?
 		elseif ( isset( $result['url_n'] ) )
-			$large = array( $result['url_n'], $result['width_n'], $result['height_n'] );
+			$large = [ $result['url_n'], $result['width_n'], $result['height_n'] ];
 		// small 240 size exists?
 		elseif ( isset( $result['url_s'] ) )
-			$large = array( $result['url_s'], $result['width_s'], $result['height_s'] );
+			$large = [ $result['url_s'], $result['width_s'], $result['height_s'] ];
 		// thumbnail size exists?
 		elseif ( isset( $result['url_t'] ) )
-			$large = array( $result['url_t'], $result['width_t'], $result['height_t'] );
+			$large = [ $result['url_t'], $result['width_t'], $result['height_t'] ];
 		// skip this photo
 		else
 			return false;
 
 		// large square size exists?
 		if ( isset( $result['url_q'] ) )
-			$small = array( $result['url_q'], $result['width_q'], $result['height_q'] );
-		// square size exists?
-		elseif ( isset( $result['url_sq'] ) )
-			$small = array( $result['url_sq'], $result['width_sq'], $result['height_sq'] );
+			$small = [ $result['url_q'], $result['width_q'], $result['height_q'] ];
+		// medium 500 size exists?
+		elseif ( isset( $result['url_m'] ) )
+			$small = [ $result['url_m'], $result['width_m'], $result['height_m'] ];
+		// small 320 size exists?
+		elseif ( isset( $result['url_n'] ) )
+			$small = [ $result['url_n'], $result['width_n'], $result['height_n'] ];
+		// small 240 size exists?
+		elseif ( isset( $result['url_s'] ) )
+			$small = [ $result['url_s'], $result['width_s'], $result['height_s'] ];
 		// skip this photo
 		else
 			return false;
 
 		$source = 'https://www.flickr.com/photos/' . $result['owner'] . '/' . $result['id'];
 
-		$imagedata = array(
-			'id'				=> 0,
-			'link'				=> '',
-			'source'			=> $source,
-			'title'				=> $result['title'],
-			'caption'			=> $this->get_attribution( 'Flickr', $source, $result['ownername'], 'https://www.flickr.com/photos/' . $result['owner'] ),
-			'description'		=> $result['description']['_content'],
-			'alt'				=> $result['tags'],
-			'url'				=> $large[0],
-			'width'				=> $large[1],
-			'height'			=> $large[2],
-			'thumbnail_url'		=> $small[0],
-			'thumbnail_width'	=> $small[1],
-			'thumbnail_height'	=> $small[2],
-			'media_provider'	=> 'flickr',
-			'filename'			=> basename( $large[0] ),
-			'dimensions'		=> $large[1] . ' x ' . $large[2]
-		);
+		$imagedata = [
+			'id'					=> 0,
+			'link'					=> '',
+			'source'				=> esc_url_raw( $source ),
+			'title'					=> sanitize_text_field( $result['title'] ),
+			'caption'				=> $this->get_attribution( 'Flickr', $source, $result['ownername'], 'https://www.flickr.com/photos/' . $result['owner'] ),
+			'description'			=> ! empty( $result['description']['_content'] ) ? sanitize_text_field( $result['description']['_content'] ) : '',
+			'alt'					=> sanitize_text_field( $result['tags'] ),
+			'url'					=> esc_url_raw( $large[0] ),
+			'width'					=> (int) $large[1],
+			'height'				=> (int) $large[2],
+			'orientation'			=> (int) $large[2] > (int) $large[1] ? 'portrait' : 'landscape',
+			'thumbnail_url'			=> esc_url_raw( $small[0] ),
+			'thumbnail_width'		=> (int) $small[1],
+			'thumbnail_height'		=> (int) $small[2],
+			'thumbnail_orientation'	=> (int) $small[2] > (int) $small[1] ? 'portrait' : 'landscape',
+			'media_provider'		=> 'flickr',
+			'filename'				=> basename( sanitize_file_name( $large[0] ) ),
+			'dimensions'			=> (int) $large[1] . ' x ' . (int) $large[2],
+			'type'					=> 'image'
+		];
 
-		// thumbnail link does not exist?
+		// create thumbnail link
 		$imagedata['thumbnail_link'] = $this->rl->galleries->get_gallery_image_link( $imagedata, 'thumbnail' );
 
 		return $imagedata;

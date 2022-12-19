@@ -33,12 +33,19 @@ function schema_wp_admin_bar_menu_items( $admin_bar ) {
 	// If user can't publish posts, then get out
 	if ( ! current_user_can( 'publish_posts' ) ) return;
 	
+	// Get language to be used in url
+	// Example hl=en-US
+	// @since 1.7.9.5
+	//
+	$lang = get_bloginfo( 'language' );
+	$hl = 'hl=' . $lang . '&';
+
 	$admin_bar->add_menu( array(
 		'id'	=> 'schema-test-item',
 		'title'	=> __('', 'schema-wp'),
-		'href'	=> 'https://developers.google.com/structured-data/testing-tool/?url='.$url,
+		'href' => 'https://validator.schema.org/?' . $hl . 'url=' . $url,
 		'meta'	=> array(
-			'title'		=> __('Structured Data Testing Tool', 'schema-wp'),
+			'title'		=> __('Schema Markup Validator', 'schema-wp'),
 			'class'		=> 'schema_google_developers',
 			'target'	=> __('_blank')
 		),

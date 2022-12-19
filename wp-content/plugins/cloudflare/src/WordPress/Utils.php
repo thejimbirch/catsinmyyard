@@ -4,15 +4,21 @@ namespace CF\WordPress;
 
 class Utils
 {
+    const COMPOSER_CONFIG_PATH = '/../../composer.json';
+
     /**
      * @param $haystack
      * @param $needle
      *
      * @return bool
      */
-    public static function endsWith($haystack, $needle)
+    public static function strEndsWith($haystack, $needle)
     {
-        return $needle === '' || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
+        if (empty($haystack) || empty($needle)) {
+            return false;
+        }
+        $needle_len = strlen($needle);
+        return ($needle_len === 0 || 0 === substr_compare($haystack, $needle, -$needle_len));
     }
 
     public static function isSubdomainOf($subDomainName, $domainName)
@@ -27,9 +33,9 @@ class Utils
             return false;
         }
 
-        return self::endsWith($subDomainName, $domainName) &&
-                $subDomainName !== $domainName &&
-                $subDomainName[$dotPosition] == '.';
+        return self::strEndsWith($subDomainName, $domainName) &&
+            $subDomainName !== $domainName &&
+            $subDomainName[$dotPosition] == '.';
     }
 
     public static function getRegistrableDomain($domainName)
@@ -40,5 +46,13 @@ class Utils
         // does not work with multiple subdomain
         // sub1.sub2.domain.com -> sub2.domain.com
         return preg_replace('/^[^.]*.\s*/', '', $domainName);
+    }
+
+    public static function getComposerJson(): array
+    {
+        if (!file_exists(dirname(__FILE__) . self::COMPOSER_CONFIG_PATH)) {
+            return [];
+        }
+        return json_decode(file_get_contents(dirname(__FILE__) . self::COMPOSER_CONFIG_PATH), true);
     }
 }

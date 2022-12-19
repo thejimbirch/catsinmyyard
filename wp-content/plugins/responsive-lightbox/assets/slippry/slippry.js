@@ -158,7 +158,7 @@
 				newelement.attr( 'id', id );
 			}
 			if ( className.length ) {
-				newelement.attr( 'class', $.trim( className ) );
+				newelement.attr( 'class', className.trim() );
 			}
 			return newelement;
 		};
@@ -298,14 +298,14 @@
 					}, slip.settings.pause );
 				}, slip.vars.autodelay ? slip.settings.autoHoverDelay : slip.settings.autoDelay );
 				if ( slip.settings.autoHover ) {
-					slip.vars.slideWrapper.unbind( 'mouseenter' ).unbind( 'mouseleave' ).bind( 'mouseenter', function () {
+					slip.vars.slideWrapper.off( 'mouseenter' ).off( 'mouseleave' ).on( 'mouseenter', function () {
 						if ( slip.vars.timer !== undefined ) {
 							slip.vars.hoverStop = true;
 							el.stopAuto();
 						} else {
 							slip.vars.hoverStop = false;
 						}
-					} ).bind( 'mouseleave', function () {
+					} ).on( 'mouseleave', function () {
 						if ( slip.vars.hoverStop ) {
 							slip.vars.autodelay = true;
 							el.startAuto();
@@ -543,7 +543,7 @@
 					pager.append( $( '<li />' ).append( $( '<a href="#' + loop + '">' + loop + '</a>' ) ) );
 				}
 				slip.vars.slippryWrapper.append( pager );
-				$( '.' + slip.settings.pagerClass + ' a', slip.vars.slippryWrapper ).click( function () {
+				$( '.' + slip.settings.pagerClass + ' a', slip.vars.slippryWrapper ).on( 'click', function () {
 					slip.vars.trigger = 'pager';
 					openSlide( parseInt( this.hash.split( '#' )[1], 10 ) );
 					return false;
@@ -559,7 +559,7 @@
 					.append( '<li class="' + slip.settings.prevClass + '"><a href="#prev">' + slip.settings.prevText + '</a></li>' )
 					.append( '<li class="' + slip.settings.nextClass + '"><a href="#next">' + slip.settings.nextText + '</a></li>' )
 					);
-				$( '.' + slip.settings.controlClass + ' a', slip.vars.slippryWrapper ).click( function () {
+				$( '.' + slip.settings.controlClass + ' a', slip.vars.slippryWrapper ).on( 'click', function () {
 					slip.vars.trigger = 'controls';
 					openSlide( this.hash.split( '#' )[1] );
 					return false;

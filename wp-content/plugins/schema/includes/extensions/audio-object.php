@@ -84,7 +84,7 @@ function schema_wp_audio_object_post_meta() {
 	global $post;
 	
 	$prefix = '_schema_audio_object_';
-
+	
 	/**
 	* Create meta box on active post types edit screens
 	*/
@@ -274,12 +274,12 @@ function schema_wp_audio_object_output( $schema ) {
 	
 	if ( $type != 'none' ) {
 		
-		require_once( ABSPATH . WPINC . '/class-oembed.php' );
+		require_once( ABSPATH . WPINC . '/class-wp-oembed.php' );
 	
 		// Get content
 		$post_object = get_post( $post->ID );
 		$content = $post_object->post_content;
-		
+		 
 		// Replace line breaks from all HTML elements with placeholders.
 		//$content = wp_replace_in_html_tags( $content, array( "\n" => '<!-- wp-line-break -->' ) );
 		

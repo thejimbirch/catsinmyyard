@@ -1,13 +1,12 @@
-( function ( $ ) {
+( function( $ ) {
 
-    /**
-     * Hook into doResponsiveLightbox event
-     */
-    $( document ).on( 'doResponsiveLightbox', function () {
-
+	/**
+	 * Hook into doResponsiveLightbox event
+	 */
+	$( document ).on( 'doResponsiveLightbox', function() {
 		$( '.rl-basicslider-gallery' ).each( function( index ) {
 			var gallery = $( this ),
-				options = JSON.parse( window['rlArgsBasicSliderGallery' + ( gallery.data( 'gallery_no' ) + 1 )] );
+				options = window['rlArgsBasicSliderGallery' + ( gallery.data( 'gallery_no' ) + 1 )].data;
 
 			if ( typeof options !== 'undefined' && typeof options !== false ) {
 				gallery.slippry( {
@@ -32,11 +31,10 @@
 					autoHover: options.slideshow_hover,
 					autoHoverDelay: options.slideshow_hover_delay,
 					autoDelay: options.slideshow_delay,
-					pause: options.slideshow_pause,
+					pause: options.slideshow_pause
 				} );
 			}
 		} );
-
-    } );
+	} );
 
 } )( jQuery );

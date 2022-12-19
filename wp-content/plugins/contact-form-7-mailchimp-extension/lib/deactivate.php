@@ -1,5 +1,5 @@
 <?php
-/*  Copyright 2013-2019 Renzo Johnson (email: renzojohnson at gmail.com)
+/*  Copyright 2010-2022 Renzo Johnson (email: renzo.johnson at gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+
 
 
 function mce_detect_plugin_deactivation() {

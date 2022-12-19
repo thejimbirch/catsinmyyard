@@ -45,7 +45,7 @@ jQuery(document).ready(function ($) {
             <span class="sucuriscan-monospace">%%SUCURI.Firewall.APIKey%%</span>
             <form action="%%SUCURI.URL.Firewall%%" method="post">
                 <input type="hidden" name="sucuriscan_page_nonce" value="%%SUCURI.PageNonce%%" />
-                <button type="submit" name="sucuriscan_delete_wafkey" class="button button-primary">{{Delete}}</button>
+                <button type="submit" name="sucuriscan_delete_wafkey" data-cy="sucuriscan-delete-wafkey" class="button button-primary">{{Delete}}</button>
             </form>
         </div>
 
@@ -54,7 +54,7 @@ jQuery(document).ready(function ($) {
             <fieldset class="sucuriscan-clearfix">
                 <label>{{Firewall API Key:}}</label>
                 <input type="text" name="sucuriscan_cloudproxy_apikey" />
-                <button type="submit" class="button button-primary">{{Save}}</button>
+                <button type="submit" class="button button-primary" data-cy="sucuriscan-save-wafkey">{{Save}}</button>
             </fieldset>
             <br>
         </form>
@@ -72,6 +72,6 @@ jQuery(document).ready(function ($) {
             </tbody>
         </table>
 
-        <p>{{<em>[1]</em> More information about the <a href="https://sucuri.net/website-firewall/" target="_blank" rel="noopener">Sucuri Firewall</a>, features and pricing.<br><em>[2]</em> Instructions and videos in the official <a href="https://kb.sucuri.net/firewall" target="_blank" rel="noopener">Knowledge Base</a> site.<br><em>[3]</em> <a href="https://login.sucuri.net/signup2/create?CloudProxy" target="_blank" rel="noopener">Sign up</a> for a new account and start protecting your site.}}</p>
+        <p>{{<em>[1]</em> More information about the <a href="https://sucuri.net/website-firewall/" target="_blank" rel="noopener">Sucuri Firewall</a>, features and pricing.<br><em>[2]</em> Instructions and videos in the official <a href="https://kb.sucuri.net/firewall" target="_blank" rel="noopener">Knowledge Base</a> site.<br><em>[3]</em> <a href="https://sucuri.net/website-security-platform/signup/" target="_blank" rel="noopener">Sign up</a> for a new account and start protecting your site.}}</p>
     </div>
 </div>

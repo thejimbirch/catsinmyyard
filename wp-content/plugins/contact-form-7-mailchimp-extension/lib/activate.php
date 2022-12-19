@@ -1,5 +1,5 @@
 <?php
-/*  Copyright 2013-2019 Renzo Johnson (email: renzojohnson at gmail.com)
+/*  Copyright 2010-2022 Renzo Johnson (email: renzo.johnson at gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+
 
 
 function mce_error() {
@@ -248,8 +249,8 @@ function mce_news_notices () {
   $tittle = '' ;
   //$message = mce_get_postnotice ($check,$tittle ) ;
 
-    $Defaulttittle = 'ChimpMatic Lite is now 0.5!' ;
-    $Defaultpanel = '<p class="about-description">Easier setup to get you up and running in no time. Please <a href="https://renzojohnson.com/contact" target="_blank" rel="noopener noreferrer">lets us know</a> what kind of features you would like to see added <a href="https://renzojohnson.com/contact" target="_blank" rel="noopener noreferrer">HERE</a></p>
+    $Defaulttittle = 'Chimpmatic Lite is now 0.5.61!' ;
+    $Defaultpanel = '<p class="about-description">Easier setup to get you up and running in no time. Please <a href="https://chimpmatic.com/contact" target="_blank" rel="noopener noreferrer">lets us know</a> what kind of features you would like to see added <a href="https://chimpmatic.com/contact" target="_blank" rel="noopener noreferrer">HERE</a></p>
 <div class="welcome-panel-column-container">
 <div class="welcome-panel-column">
 <h3>Get Started</h3>
@@ -337,7 +338,7 @@ if (  (  get_site_option('mce_show_update_news') == null )  or get_site_option('
 function mce_get_postnotice (&$check,&$tittle) {
 
     $check = 0 ;
-    $response = wp_remote_get( 'https://renzojohnson.com/wp-json/wp/v2/posts?categories=15&orderby=modified&order=desc' );
+    $response = wp_remote_get( 'https://ping.chimpmatic.com/wp-json/wp/v2/posts?categories=1&orderby=modified&order=desc' );
 
     if ( is_wp_error( $response ) ) {
       $check = -1;

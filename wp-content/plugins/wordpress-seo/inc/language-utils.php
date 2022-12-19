@@ -15,7 +15,7 @@ class WPSEO_Language_Utils {
 	/**
 	 * Returns the language part of a given locale, defaults to english when the $locale is empty.
 	 *
-	 * @param string $locale The locale to get the language of.
+	 * @param string|null $locale The locale to get the language of.
 	 *
 	 * @return string The language part of the locale.
 	 */
@@ -44,14 +44,14 @@ class WPSEO_Language_Utils {
 	 * Can be removed when support for WordPress 4.6 will be dropped, in favor
 	 * of WordPress get_user_locale() that already fallbacks to the site's locale.
 	 *
+	 * @deprecated 15.6
+	 * @codeCoverageIgnore
+	 *
 	 * @return string The locale.
 	 */
 	public static function get_user_locale() {
-		if ( function_exists( 'get_user_locale' ) ) {
-			return get_user_locale();
-		}
-
-		return get_locale();
+		_deprecated_function( __METHOD__, 'WPSEO 15.5', 'get_user_locale' );
+		return get_user_locale();
 	}
 
 	/**
@@ -79,7 +79,7 @@ class WPSEO_Language_Utils {
 			'URL'     => esc_url( WPSEO_Shortlinker::get( 'https://yoa.st/3r3' ) ),
 			/* translators: 1: expands to a link opening tag; 2: expands to a link closing tag */
 			'message' => esc_html__(
-				'A company name and logo need to be set for structured data to work properly. %1$sLearn more about the importance of structured data.%2$s',
+				'A company name and logo need to be set for structured data to work properly. Since you haven’t set these yet, we are using the site name and logo as default values. %1$sLearn more about the importance of structured data.%2$s',
 				'wordpress-seo'
 			),
 		];

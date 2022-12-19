@@ -1,6 +1,10 @@
-( function ( $ ) {
+( function( $ ) {
 
-	$( document ).on( 'ready', function() {
+	// ready event
+	$( function() {
+		if ( $.isEmptyObject( wp.media.view ) )
+			return;
+
 		var gutenberg_active = typeof rlBlockEditor !== 'undefined';
 
 		if ( gutenberg_active ) {
@@ -81,7 +85,8 @@
 			RLWPMediaViewMediaFramePost = wp.media.view.MediaFrame.Post,
 			attachment_defaults = {
 				width: 0,
-				height: 0
+				height: 0,
+				url: ''
 			};
 
 		// add new attributes
@@ -131,9 +136,11 @@
 						if ( props.size === 'thumbnail' ) {
 							RLWPMediaViewMediaFramePost.currentAttachment.width = attachment.thumbnail_width;
 							RLWPMediaViewMediaFramePost.currentAttachment.height = attachment.thumbnail_height;
+							RLWPMediaViewMediaFramePost.currentAttachment.url = attachment.thumbnail_url;
 						} else {
 							RLWPMediaViewMediaFramePost.currentAttachment.width = attachment.width;
 							RLWPMediaViewMediaFramePost.currentAttachment.height = attachment.height;
+							RLWPMediaViewMediaFramePost.currentAttachment.url = attachment.url;
 						}
 					}
 
@@ -167,6 +174,9 @@
 
 						// restore defaulkt behavior
 						RLWPMediaViewMediaFramePost.remoteLibraryImage = false;
+
+						if ( typeof data.attachment.url === 'undefined' )
+							data.attachment.rl_url = RLWPMediaViewMediaFramePost.currentAttachment.url;
 					}
 
 					// return original function

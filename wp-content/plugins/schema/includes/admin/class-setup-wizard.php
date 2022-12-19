@@ -255,7 +255,9 @@ class Schema_WP_Setup_Wizard {
                 <a class="wc-return-to-dashboard" href="<?php echo esc_url( admin_url() ); ?>"><?php _e( 'Return to the WordPress Dashboard', 'schema-wp' ); ?></a>
             <?php endif; ?>
             </body>
-            <?php do_action( 'admin_footer' ); ?>
+            <?php   // Commented this since it through a Fatal error with Divi
+                    // @since 1.7.9.5
+                    //do_action( 'admin_footer' ); ?>
 			<?php do_action( 'admin_print_footer_scripts' ); ?>
             <?php //wp_footer(); ?>
         </html>

@@ -3,10 +3,10 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: wpcf7, contact form 7, contact forms, accessibility, wcag, a11y, wpcf7
 Requires at least: 4.2
-Tested up to: 5.2
+Tested up to: 5.9
 License: GPLv2 or later
 Text Domain: accessible-contact-form-7
-Stable tag: 1.1.5
+Stable tag: 1.1.7
 
 Replaces the default Contact Form 7 form with an accessible equivalent and provides a suite of selectable base forms. 
 
@@ -24,12 +24,20 @@ The plug-in doesn't change anything about forms that have already been built wit
 
 Contact Form 7 is actually a very accessible plug-in. It has an accessible back-end, and if you create the right template, the front-end form will have great accessibility. 
 
-But the default form is not accessible. Not at all, in fact - it's missing some of the most basic elements of accessibility: form labels. This plug-in supplies a new default form that includes everything you need to make your default form accessible. 
+Since version 4.5, Contact Form 7 has included the label element; but the usage of them is limited, and isn't the best possible method. This plug-in supplies a new default form that includes everything you need to make your default form accessible. 
 
-For more information about making Contact Form 7 accessible, read [how to set up an accessible form using contact form 7](http://blog.rrwd.nl/2014/03/01/how-to-set-up-an-accessible-form-using-contact-form-7-in-wordpress/), by Rian Rietveld.
-
+For more information about making Contact Form 7 accessible, read [how to set up an accessible form using contact form 7](https://rianrietveld.com/2014/03/how-to-set-up-an-accessible-form-using-contact-form-7-in-wordpress/), by Rian Rietveld.
 
 == Changelog ==
+
+= 1.1.7 =
+
+* Misc. code quality changes. Minor.
+
+= 1.1.6 =
+
+* Test with WordPress 5.4 & Contact Form 7 5.1.6
+* Update to docs.
 
 = 1.1.5 =
 

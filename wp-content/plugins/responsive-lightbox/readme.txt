@@ -1,11 +1,11 @@
 === Responsive Lightbox & Gallery ===
 Contributors: dfactory
 Donate link: http://www.dfactory.eu/
-Tags: responsive gallery plugin, lightbox, photo gallery, masonry, video gallery, gallery builder, image gallery
-Requires at least: 4.0
-Tested up to: 5.3
-Stable tag: 2.2.2
-Requires PHP: 5.2.4
+Tags: gallery, galleries, image, images, responsive, lightbox, photo, photography, masonry, video, builder
+Requires at least: 5.0
+Tested up to: 6.1.1
+Stable tag: 2.4.3
+Requires PHP: 5.4
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -67,6 +67,7 @@ Responsive Lightbox and Gallery plugin can be extended with our <a href="?utm_so
 > [Lightgallery Lightbox](https://www.dfactory.eu/products/lightgallery-lightbox/)
 > [Strip Lightbox](https://www.dfactory.eu/products/strip-lightbox/)
 > [Fancybox Pro](https://www.dfactory.eu/products/fancybox-pro/)
+> [Lightbox Comments](https://dfactory.co/products/lightbox-comments/)
 
 = Full Feature List =
 
@@ -138,6 +139,73 @@ Responsive Lightbox and Gallery plugin comes with many styles and effects alread
 2. screenshot-2.jpg
 
 == Changelog ==
+
+= 2.4.3 =
+* Fix: General sanitization and validation overhaul
+* Fix: Displaying legacy gallery and image widgets
+* Fix: Getting colors for media folders
+* Fix: Assigning terms to media folders
+
+= 2.4.2 =
+* Fix: Potential XSS vulnerabilities related to settings validation
+* Fix: Missing image alt attribute
+* Fix: Undefined array key "type"
+* Fix: Possible invalid data passed to attachment_url_to_postid function
+
+= 2.4.1 =
+* Fix: WooCommerce product gallery
+* Fix: WooCommerce gallery lightbox
+
+= 2.4.0 =
+* New: WordPress 6.0 compatibility
+* New: HTML5 Media Library videos support (with Lightgallery, Fancybox Pro and Lightcase lightboxes)
+* New: Embed Youtube & Vimeo videos support (with Lightgallery, Fancybox Pro and Lightcase lightboxes)
+* New: [Lightbox Comments](https://dfactory.co/products/lightbox-comments/) extension
+* New: WP Gallery block support
+* New: WP Image block support
+
+= 2.3.5 =
+* Fix: Insert gallery double preview
+* Tweak: Display of horizontal / vertical igallery images 
+* Tweak: Improved gallery images loading performance
+* Tweak: Add gallery number of images displayed
+
+= 2.3.4 =
+* New: WordPress 5.9 compatibility
+* Fix: Adding new images to existing galleries
+* Fix: Ajax gallery pagination
+* Fix: Infinite scroll issues with Masonry gallery
+* Fix: Edge case PHP Fatal error
+* Fix: WP Media grid view folders not updating
+* Fix: Gallery shortcode not selecting
+* Fix: Deprecated events: DOMNodeInserted, DOMNodeRemoved in front.js
+* Fix: Deprecated event: DOMNodeInserted in admin-galleries.js
+* Fix: Uncaught Error: Call to undefined method Responsive_Lightbox_Galleries::get_active_providers()
+
+= 2.3.3 =
+* Fix: Invalid argument in upgrader process
+* Fix: Widgets warning in WordPress 5.8
+* Fix: Warning in wp_localize_script usage
+
+= 2.3.2 =
+* Fix: Add option to enable/disable advanced capability management
+* Fix: Insert gallery into post not working in Gutenberg editor
+* Fix: Remove "ready" deprecated event from front.js
+* Fix: array_combine() function error class-folders.php
+* FIx: $.uniqueSort is not a function error
+
+= 2.3.1 =
+* Fix: Plugin capabilities not granted properly
+
+= 2.3.0 =
+* New: WordPress 5.6 compatibility
+* New: Capabilities management
+* New: Admin breadcrumb navigation
+
+= 2.2.3 =
+* Fix: Media Folders js and CSS issues in Media Library
+* Fix: Empty src attribute in Remote Library inserted images
+* Tweak: Remove featured image thumbnail from Media Library access
 
 = 2.2.2 =
 * Fix: Add Media button not working for custom post types
@@ -440,5 +508,5 @@ Initial release
 
 == Upgrade Notice ==
 
-= 2.2.2 =
-* Fix: Multiple bug fixes release
+= 2.4.3 =
+* Fix: General sanitization and validation overhaul

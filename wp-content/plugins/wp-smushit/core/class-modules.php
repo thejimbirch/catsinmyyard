@@ -71,18 +71,46 @@ class Modules {
 	public $lazy;
 
 	/**
+	 * Cache background optimization controller - Bulk_Smush_Controller
+	 *
+	 * @var Modules\Bulk\Background_Bulk_Smush
+	 */
+	public $bg_optimization;
+
+	/**
+	 * @var Modules\Product_Analytics
+	 */
+	public $product_analytics;
+
+	/**
 	 * Modules constructor.
 	 */
 	public function __construct() {
-		$this->dir     = new Modules\Dir();
+		new Deprecated_Hooks();// Handle deprecated hooks.
+
+		new Api\Hub(); // Init hub endpoints.
+
+		new Modules\Resize_Detection();
+		new Rest();
+
+		if ( is_admin() ) {
+			$this->dir = new Modules\Dir();
+		}
+
 		$this->smush   = new Modules\Smush();
 		$this->backup  = new Modules\Backup();
 		$this->png2jpg = new Modules\Png2jpg();
 		$this->resize  = new Modules\Resize();
 
 		$page_parser = new Modules\Helpers\Parser();
-		$this->cdn   = new Modules\CDN( $page_parser );
-		$this->lazy  = new Modules\Lazy( $page_parser );
+		$page_parser->init();
+
+		$this->cdn  = new Modules\CDN( $page_parser );
+		$this->webp = new Modules\WebP();
+		$this->lazy = new Modules\Lazy( $page_parser );
+		$this->product_analytics = new Modules\Product_Analytics();
+
+		$this->bg_optimization = new Modules\Bulk\Background_Bulk_Smush();
 	}
 
 }

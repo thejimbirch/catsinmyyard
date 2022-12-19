@@ -59,6 +59,26 @@ body.upload-php #posts-filter {
     position: relative;
     z-index: 1;
 }
+.rl-media-tag-select2 {
+	display: none;
+}
 .rl-media-tag-select2-dropdown {
 	z-index: 999999;
+}
+.compat-field-rl_media_tag {
+	min-height: 48px;
+}
+.compat-item .compat-field-rl_media_folder select {
+	max-width: 100%;
+	margin-left: 0;
+}
+@media only screen and (min-width: 782px) {
+	.compat-field-rl_media_folder .label {
+		max-width: 30%;
+	}
+	.compat-field-rl_media_folder .label span {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
 }

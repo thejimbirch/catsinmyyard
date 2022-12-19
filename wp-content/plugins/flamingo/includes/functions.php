@@ -1,15 +1,22 @@
 <?php
 
+/**
+ * Retrieves a URL of a file under the Flamingo plugin directory.
+ */
 function flamingo_plugin_url( $path = '' ) {
 	$url = plugins_url( $path, FLAMINGO_PLUGIN );
 
-	if ( is_ssl() && 'http:' == substr( $url, 0, 5 ) ) {
+	if ( is_ssl() and 'http:' == substr( $url, 0, 5 ) ) {
 		$url = 'https:' . substr( $url, 5 );
 	}
 
 	return $url;
 }
 
+
+/**
+ * Converts a multidimensional array to a flat array.
+ */
 function flamingo_array_flatten( $input ) {
 	if ( ! is_array( $input ) ) {
 		return array( $input );
@@ -24,13 +31,11 @@ function flamingo_array_flatten( $input ) {
 	return $output;
 }
 
+
 /**
- * Move a spam to the Trash
+ * Moves a spam to the Trash.
  *
  * @since 2.1
- *
- * @see wp_trash_post()
- *
  */
 function flamingo_schedule_move_trash() {
 
@@ -52,7 +57,7 @@ function flamingo_schedule_move_trash() {
 		if ( $post->trash() ) {
 
 			// delete spam meta time to stop trashing in cron job
-			delete_post_meta( $post->id, '_spam_meta_time' );
+			delete_post_meta( $post->id(), '_spam_meta_time' );
 		}
 
 	}

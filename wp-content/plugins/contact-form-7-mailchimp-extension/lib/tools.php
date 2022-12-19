@@ -1,5 +1,5 @@
 <?php
-/*  Copyright 2013-2019 Renzo Johnson (email: renzojohnson at gmail.com)
+/*  Copyright 2010-2022 Renzo Johnson (email: renzo.johnson at gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,12 +20,12 @@
 
 function mce_author() {
 
-	$author_pre = 'Contact form 7 Mailchimp extension by ';
-	$author_name = 'Renzo Johnson';
-	$author_url = '//renzojohnson.com';
-	$author_title = 'Renzo Johnson - Web Developer';
+  $author_pre = 'Contact form 7 Mailchimp extension by ';
+  $author_name = 'Renzo Johnson';
+  $author_url = '//renzojohnson.com';
+  $author_title = 'Renzo Johnson - Web Developer';
 
-	$mce_author = '<p style="display: none !important">';
+  $mce_author = '<p style="display: none !important">';
   $mce_author .= $author_pre;
   $mce_author .= '<a href="'.$author_url.'" ';
   $mce_author .= 'title="'.$author_title.'" ';
@@ -43,23 +43,26 @@ function mce_referer() {
 
   // $mce_referer_url = $THE_REFER=strval(isset($_SERVER['HTTP_REFERER']));
 
-  if(isset($_SERVER['HTTP_REFERER'])) {
+  if( isset( $_SERVER['HTTP_REFERER'] ) ) {
 
-    $mce_referer_url = $_SERVER['HTTP_REFERER'];
+    $mce_referer_url = esc_url( $_SERVER['HTTP_REFERER'] );
 
   } else {
 
-    $mce_referer_url = 'direct visit';
+    // $mce_referer_url = 'Direct Visit';
+    $mce_referer_url = esc_url( 'Direct Visit' );
 
   }
 
-	$mce_referer = '<p style="display: none !important"><span class="wpcf7-form-control-wrap referer-page">';
+  $mce_referer = '<p style="display: none !important"><span class="wpcf7-form-control-wrap referer-page">';
   $mce_referer .= '<input type="hidden" name="referer-page" ';
   $mce_referer .= 'value="'.$mce_referer_url.'" ';
+  $mce_referer .= 'data-value="'.$mce_referer_url.'" ';
   $mce_referer .= 'class="wpcf7-form-control wpcf7-text referer-page" aria-invalid="false">';
   $mce_referer .= '</span></p>'. "\n";
 
   return $mce_referer;
+
 }
 
 
@@ -68,7 +71,7 @@ function mce_getRefererPage( $form_tag ) {
 
   if ( $form_tag['name'] == 'referer-page' ) {
 
-    $form_tag['values'][] = $_SERVER['HTTP_REFERER'];
+    $form_tag['values'][] = esc_url( $_SERVER['HTTP_REFERER'] );
 
   }
 
@@ -77,24 +80,30 @@ function mce_getRefererPage( $form_tag ) {
 }
 
 
-
 if ( !is_admin() ) {
 
   add_filter( 'wpcf7_form_tag', 'mce_getRefererPage' );
 
 }
 
-add_action( 'init', 'mce_init_constants' );
+
+
 function mce_init_constants(){
 
-  define( 'MCE_URL', '//renzojohnson.com/contributions/contact-form-7-mailchimp-extension' );
+  define( 'MCE_URL', '//chimpmatic.com/help' );
+  define( 'MC_URL', '//chimpmatic.com/help' );
   define( 'MCE_AUTH', '//renzojohnson.com' );
-  define( 'MCE_AUTH_COMM', '<!-- campaignmonitor extension by Renzo Johnson -->' );
+  define( 'MCE_AUTH_COMM', '<!-- Chimpmatic -->' );
   define( 'MCE_NAME', 'MailChimp Contact Form 7 Extension' );
   define( 'MCE_SETT', admin_url( 'admin.php?page=wpcf7' ) );
   define( 'MCE_DON', 'https://www.paypal.me/renzojohnson' );
 
+  define( 'CHIMPL_URL', '//chimpmatic.com' );
+  define( 'CHIMPHELP_URL', '//chimpmatic.com/help' );
+
 }
+add_action( 'init', 'mce_init_constants' );
+
 
 
 function mc_get_latest_item(){
@@ -115,6 +124,7 @@ function mc_get_latest_item(){
     if (!empty($form)) {
         $out .= $form;
     }
+
     return $out;
 }
 
@@ -190,6 +200,7 @@ if (!function_exists('chimpmatic_tags')) {
 add_filter( 'wpcf7_special_mail_tags', 'chimpmatic_tags', 10, 3 );
 
 
+
 if (!function_exists('chimpmatic_add_form_tag_posts')) {
   function chimpmatic_add_form_tag_posts() {
 
@@ -199,6 +210,7 @@ if (!function_exists('chimpmatic_add_form_tag_posts')) {
   }
 }
 add_action('wpcf7_init', 'chimpmatic_add_form_tag_posts', 11);
+
 
 
 if (!function_exists('chimpmatic_domain')) {

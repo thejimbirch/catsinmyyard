@@ -1,16 +1,22 @@
 <?php
-/**
- * Programmatically install and activate wordpress plugins
- *
- * Usage:
- * 1. Edit the $pluginSlugs array at the beginning of this file to include the slugs of all the
- * plugins you want to install and activate
- * 2. Upload this file to the wordpress root directory (the same directory that contains the
- * 'wp-admin' directory).
- * 3. Navigate to <your-domain-wordpress-root>/install-wp-plugins.php (If wordpress is installed
- * in its own sub-directory, <your-domain-wordpress-root> is that sub-directory, not the root
- * domain of the site, e.g., example.com/wordpress/install-wp-plugins.php)
- */
+/*  Copyright 2010-2022 Renzo Johnson (email: renzo.johnson at gmail.com)
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+
 
 require_once(ABSPATH . '/wp-load.php') ;
 require_once(ABSPATH . 'wp-admin/includes/plugin-install.php');
@@ -67,7 +73,7 @@ function sswInstallActivatePlugin($slug)
         // Replace with new QuietSkin for no output
         $skin = new QuietSkin(array('api' => $api));
         // $skin = new QuietSkin(array('api' => $api));
-   
+
 
         $upgrader = new Plugin_Upgrader($skin);
         //$upgrader = new QuietSkin($skin);
@@ -91,7 +97,7 @@ function sswInstallActivatePlugin($slug)
     if (file_exists($pluginPath)) {
 
         activate_plugin($pluginPath);  //finish activated
-    
+
     } else {
         echo 'Error: Plugin file not activated (' . $slug . '). This probably means the main '
             . 'file\'s name does not match the slug. Check the plugins listing in wp-admin.<br>'

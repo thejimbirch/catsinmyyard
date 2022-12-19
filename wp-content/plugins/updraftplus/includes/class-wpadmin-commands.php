@@ -6,7 +6,7 @@ if (!defined('UPDRAFTPLUS_DIR')) die('No access.');
 	See class-commands.php for explanation about how these classes work.
 */
 
-if (!class_exists('UpdraftPlus_Commands')) require_once(UPDRAFTPLUS_DIR.'/includes/class-commands.php');
+if (!class_exists('UpdraftPlus_Commands')) updraft_try_include_file('includes/class-commands.php', 'require_once');
 
 /**
  * An extension, because commands available via wp-admin are a super-set of those which are available through all mechanisms
@@ -77,30 +77,28 @@ class UpdraftPlus_WPAdmin_Commands extends UpdraftPlus_Commands {
 	}
 	
 	public function updraftcentral_delete_key($params) {
-	
-		global $updraftplus_updraftcentral_main;
-		if (!is_a($updraftplus_updraftcentral_main, 'UpdraftPlus_UpdraftCentral_Main')) {
-			return array('error' => 'UpdraftPlus_UpdraftCentral_Main object not found');
+		global $updraftcentral_main;
+		if (!is_a($updraftcentral_main, 'UpdraftCentral_Main')) {
+			return array('error' => 'UpdraftCentral_Main object not found');
 		}
 		
-		return $updraftplus_updraftcentral_main->delete_key($params['key_id']);
-	
+		return $updraftcentral_main->delete_key($params['key_id']);
 	}
 	
 	public function updraftcentral_get_log($params) {
-		global $updraftplus_updraftcentral_main;
-		if (!is_a($updraftplus_updraftcentral_main, 'UpdraftPlus_UpdraftCentral_Main')) {
-			return array('error' => 'UpdraftPlus_UpdraftCentral_Main object not found');
+		global $updraftcentral_main;
+		if (!is_a($updraftcentral_main, 'UpdraftCentral_Main')) {
+			return array('error' => 'UpdraftCentral_Main object not found');
 		}
-		return call_user_func(array($updraftplus_updraftcentral_main, 'get_log'), $params);
+		return call_user_func(array($updraftcentral_main, 'get_log'), $params);
 	}
 
 	 public function updraftcentral_create_key($params) {
-		global $updraftplus_updraftcentral_main;
-		if (!is_a($updraftplus_updraftcentral_main, 'UpdraftPlus_UpdraftCentral_Main')) {
-			return array('error' => 'UpdraftPlus_UpdraftCentral_Main object not found');
+		global $updraftcentral_main;
+		if (!is_a($updraftcentral_main, 'UpdraftCentral_Main')) {
+			return array('error' => 'UpdraftCentral_Main object not found');
 		}
-		return call_user_func(array($updraftplus_updraftcentral_main, 'create_key'), $params);
+		return call_user_func(array($updraftcentral_main, 'create_key'), $params);
 	 }
 		
 	public function restore_alldownloaded($params) {
@@ -125,7 +123,7 @@ class UpdraftPlus_WPAdmin_Commands extends UpdraftPlus_Commands {
 			$warn = array();
 			$err = array();
 
-			@set_time_limit(UPDRAFTPLUS_SET_TIME_LIMIT);// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+			if (function_exists('set_time_limit')) @set_time_limit(UPDRAFTPLUS_SET_TIME_LIMIT);// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 			$max_execution_time = (int) @ini_get('max_execution_time');// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 
 			if ($max_execution_time>0 && $max_execution_time<61) {
@@ -218,10 +216,10 @@ class UpdraftPlus_WPAdmin_Commands extends UpdraftPlus_Commands {
 					$incremental_sets = array_reverse($incremental_sets);
 					$first_timestamp = $incremental_sets[0];
 					
-					foreach ($incremental_sets as $timestamp) {
-						$pretty_date = get_date_from_gmt(gmdate('Y-m-d H:i:s', (int) $timestamp), 'M d, Y G:i');
+					foreach ($incremental_sets as $set_timestamp) {
+						$pretty_date = get_date_from_gmt(gmdate('Y-m-d H:i:s', (int) $set_timestamp), 'M d, Y G:i');
 						$esc_pretty_date = esc_attr($pretty_date);
-						$incremental_select_html .= '<option value="'.$timestamp.'" '.selected($timestamp, $first_timestamp, false).'>'.$esc_pretty_date.'</option>';
+						$incremental_select_html .= '<option value="'.$set_timestamp.'" '.selected($set_timestamp, $first_timestamp, false).'>'.$esc_pretty_date.'</option>';
 					}
 
 					$incremental_select_html .= '</select>';
@@ -305,6 +303,22 @@ class UpdraftPlus_WPAdmin_Commands extends UpdraftPlus_Commands {
 	}
 
 	/**
+	 * This function is called via ajax and will update the review notice dismiss time
+	 *
+	 * @param array $data - an array that contains the dismiss notice for time
+	 *
+	 * @return array - an empty array
+	 */
+	public function dismiss_review_notice($data) {
+		if (empty($data['dismiss_forever'])) {
+			UpdraftPlus_Options::update_updraft_option('dismissed_review_notice', time() + 84*86400);
+		} else {
+			UpdraftPlus_Options::update_updraft_option('dismissed_review_notice', 100 * (365.25 * 86400));
+		}
+		return array();
+	}
+
+	/**
 	 * This function is called via ajax and will update the season notice dismiss time
 	 *
 	 * @return array - an empty array
@@ -322,6 +336,16 @@ class UpdraftPlus_WPAdmin_Commands extends UpdraftPlus_Commands {
 	public function dismiss_clone_php_notice() {
 		UpdraftPlus_Options::update_updraft_option('dismissed_clone_php_notices_until', time() + 180 * 86400);
 		return array();
+	}
+
+	/**
+	 * Update and set dismiss_phpseclib_notice option name to true
+	 *
+	 * @return array - an associative array containing a key named 'success' with 1 value which indicates the successful of updating the option
+	 */
+	public function dismiss_phpseclib_notice() {
+		UpdraftPlus_Options::update_updraft_option('updraft_dismiss_phpseclib_notice', true);
+		return array('success' => 1);
 	}
 
 	/**
@@ -366,7 +390,7 @@ class UpdraftPlus_WPAdmin_Commands extends UpdraftPlus_Commands {
 	
 		ob_start();
 	
-		phpinfo(INFO_ALL ^ (INFO_CREDITS | INFO_LICENSE));
+		if (function_exists('phpinfo')) phpinfo(INFO_ALL ^ (INFO_CREDITS | INFO_LICENSE));
 
 		echo '<h3 id="ud-debuginfo-constants">'.__('Constants', 'updraftplus').'</h3>';
 		$opts = @get_defined_constants();// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
@@ -374,7 +398,7 @@ class UpdraftPlus_WPAdmin_Commands extends UpdraftPlus_Commands {
 		echo '<table><thead></thead><tbody>';
 		foreach ($opts as $key => $opt) {
 			// Administrators can already read these in other ways, but we err on the side of caution
-			if (false !== stripos($opt, 'api_key')) $opt = '***';
+			if (is_string($opt) && false !== stripos($opt, 'api_key')) $opt = '***';
 			echo '<tr><td>'.htmlspecialchars($key).'</td><td>'.htmlspecialchars(print_r($opt, true)).'</td>';
 		}
 		echo '</tbody></table>';
@@ -540,7 +564,7 @@ class UpdraftPlus_WPAdmin_Commands extends UpdraftPlus_Commands {
 							'id' => UpdraftPlus_Manipulation_Functions::wp_normalize_path($path . DIRECTORY_SEPARATOR . $value),
 							'icon' => 'jstree-folder'
 						);
-					} elseif ('restore' != $page && is_file($path . DIRECTORY_SEPARATOR . $value)) {
+					} elseif (empty($params['directories_only']) && 'restore' != $page && is_file($path . DIRECTORY_SEPARATOR . $value)) {
 						$node_array[] = array(
 							'text' => $value,
 							'children' => false,
@@ -551,6 +575,8 @@ class UpdraftPlus_WPAdmin_Commands extends UpdraftPlus_Commands {
 					}
 				}
 			}
+		} else {
+			$node_array['error'] = sprintf(__('Failed to open directory: %s. This is normally caused by file permissions.', 'updraftplus'), $path);
 		}
 
 		return $node_array;

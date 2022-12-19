@@ -1,10 +1,10 @@
 === Sucuri Security - Auditing, Malware Scanner and Security Hardening ===
-Contributors: dd@sucuri.net
+Contributors: wordpress@sucuri.net
 Donate Link: https://sucuri.net/
-Tags: malware, security, firewall, scan, spam, virus, sucuri, protection, blacklist, detection, hardening, file integrity
+Tags: malware, security, firewall, scan, spam, virus, sucuri, protection, blocklist, detection, hardening, file integrity
 Requires at least: 3.6
-Tested up to: 5.3.2
-Stable tag: 1.8.24
+Tested up to: 6.0
+Stable tag: 1.8.36
 
 The Sucuri WordPress Security plugin is a security toolset for security integrity monitoring, malware detection and security hardening.
 
@@ -12,12 +12,13 @@ The Sucuri WordPress Security plugin is a security toolset for security integrit
 
 Sucuri Inc. is a globally recognized authority in all matters related to website security, with specialization in WordPress Security.
 
-The Sucuri Security WordPress plugin is free to all WordPress users. It is a security suite meant to complement your existing security posture. It offers its users a set of security features for their website, each designed to have a positive effect on their security posture:
+The Sucuri Security WordPress plugin is free to all WordPress users. It is a security suite meant to complement your existing security posture. Currently the ownership of this plugin was transferred to GoDaddy.
+It offers its users a set of security features for their website, each designed to have a positive effect on their security posture:
 
 * Security Activity Auditing
 * File Integrity Monitoring
 * Remote Malware Scanning
-* Blacklist Monitoring
+* Blocklist Monitoring
 * Effective Security Hardening
 * Post-Hack Security Actions
 * Security Notifications
@@ -62,9 +63,9 @@ It will create a known good the minute the plugin is installed. This will be of 
 
 This feature is powered by our scanning engine, found on our free security scanner - [SiteCheck](https://sitecheck.sucuri.net/). It’s important to take some time to [understand how this scanner works](https://blog.sucuri.net/2012/10/ask-sucuri-how-does-sitecheck-work.html). There are limitations with the way this scanner works, you can find more information in the FAQ section.
 
-= What is the blacklist monitoring? =
+= What is the blocklist monitoring? =
 
-Another very interesting feature of the Security Malware Scanner is that it checks various blacklist engines, including the following:
+Another very interesting feature of the Security Malware Scanner is that it checks various blocklist engines, including the following:
 
 * Sucuri Labs
 * Google Safe Browsing
@@ -77,7 +78,7 @@ Another very interesting feature of the Security Malware Scanner is that it chec
 * SpamHaus
 * Bitdefender
 
-These are some of the largest blacklisting entities, each having the ability to directly impact your brand's online reputation. By synchronizing with their environments we’re able to tell you, upon scan, whether any of them are negatively flagging your website with a security related issue. If they do, then via our website security product, we’re able to help you get off of the security blacklist.
+These are some of the largest blocklisting entities, each having the ability to directly impact your brand's online reputation. By synchronizing with their environments we’re able to tell you, upon scan, whether any of them are negatively flagging your website with a security related issue. If they do, then via our website security product, we’re able to help you get off of the security blocklist.
 
 = What is effective security hardening =
 
@@ -177,7 +178,7 @@ We take your privacy seriously. For free plugin users without an API key, no inf
 1. WordPress Integrity Tool - Detects added, modified, and removed files.
 2. Integrity Diff Utility - Shows differences in the core WordPress files.
 3. Audit Logs and Malware Scanner - Reports suspicious events and malicious code.
-4. Sucuri Firewall - Settings visibility, audit logs, IP blacklisting, and cache.
+4. Sucuri Firewall - Settings visibility, audit logs, IP blocklisting, and cache.
 5. Website Hardening - Offers multiple options to increase the security of the website.
 6. Failed Logins - Shows failed login attempts, successful logins and online users.
 7. Post Hack Tools - Offers multiple tools to react after the suspiciousness of a hack.
@@ -188,7 +189,51 @@ We take your privacy seriously. For free plugin users without an API key, no inf
 = 1.8.19 =
 This version adds an option to refresh the malware scan results on demand, as well as several small bug fixes and improvements.
 
+== Contributors & Maintenance Notice ==
+
+= 1.8.30 =
+Daniel is no longer maintaining the Sucuri plugin at GoDaddy. We have transferred it to a dedicated team to maintain and improve it.
+
 == Changelog ==
+= 1.8.36 =
+* Changed Branding fonts, colors and images to match the current Sucuri brand
+
+= 1.8.35 =
+* Fixed "Early referer checks on admin hooks"
+
+= 1.8.34 =
+* Added referer check on admin hooks
+
+= 1.8.33 = 
+* Fixed "Added option to clear cache by path"
+
+= 1.8.32 = 
+* Fixed "Empty wp-config file after automatic secret key updates"
+
+= 1.8.31 =
+* Fixed "Path cannot be empty" error
+
+= 1.8.30 =
+* Bump version
+
+= 1.8.29 =
+* Changed ownership
+
+= 1.8.28 =
+* Silence fopen warning
+
+= 1.8.27 =
+* Add support for PHP 8
+* Reduce memory requirements when reading a log file
+* Fix DISALLOW_FILE_EDIT related notice
+
+= 1.8.26 =
+* Replace the word "blacklist" with "blocklist" in the codebase
+* Replace the word "whitelist" with "allowlist" in the codebase
+
+= 1.8.25 =
+* Fix notice about MONTH_IN_SECONDS in WP < 4.4
+* Update reset password workflow
 
 = 1.8.24 =
 * Fix warning caused by humanTime function
@@ -227,7 +272,7 @@ This version adds an option to refresh the malware scan results on demand, as we
 * Remove block button from failed logins page
 
 = 1.8.20 =
-* Add dynamic core directories in the hardening whitelist options
+* Add dynamic core directories in the hardening allowlist options
 * Modify scheduled tasks panel to load the table via Ajax
 * Allow hosting details display to be filterable
 * Preparation for translations
@@ -320,7 +365,7 @@ This version adds an option to refresh the malware scan results on demand, as we
 * Modify timing for the dashboard alerts after an update
 * Modify firewall clear cache button to execute via Ajax
 * Modify firewall settings page to load data via Ajax
-* Add option to blacklist IP addresses with the Firewall API
+* Add option to blocklist IP addresses with the Firewall API
 * Fix order of the audit logs when the queue is merged
 * Add more directories to ignore during the scans
 * Add option to customize the URL for the malware scans
@@ -452,7 +497,7 @@ This version adds an option to refresh the malware scan results on demand, as we
 * Fixed core files marked as broken in a Windows server
 * Fixed pagination links in last and failed logins page
 * Fixed password with ampersands in email alert
-* Fixed whitelist hardening using the authz_core module
+* Fixed allowlist hardening using the authz_core module
 * Removed unnecessary emails to reduce spam
 * Added constant to stop execution of admin init hooks
 * Added explanation for invalid emails and no MX records

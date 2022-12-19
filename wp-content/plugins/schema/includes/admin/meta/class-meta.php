@@ -402,7 +402,6 @@ function schema_wp_custom_meta_box_field( $field, $meta = null, $repeatable = nu
 		
 }
 
-
 /**
  * Finds any item in any level of an array
  *
@@ -439,7 +438,6 @@ function schema_wp_meta_box_find_field_type($keySearch, $array) {
     return false;
 }
 
-
 /**
  * Find repeatable
  *
@@ -454,7 +452,11 @@ function schema_wp_meta_box_find_field_type($keySearch, $array) {
  *
  * @return	bool				whether or not the type is in the provided array
  */
-function schema_wp_meta_box_find_repeatable( $needle = 'repeatable', $haystack ) {
+function schema_wp_meta_box_find_repeatable( $needle = 'repeatable', $haystack = array() ) {
+	
+	if ( empty($haystack) ) 
+		return false;
+
 	foreach ( $haystack as $h )
 		if ( isset( $h['type'] ) && $h['type'] == $needle )
 			return true;
@@ -475,7 +477,11 @@ function schema_wp_meta_box_find_repeatable( $needle = 'repeatable', $haystack )
  *
  * @return	bool				whether or not the type is in the provided array
  */
-function schema_wp_meta_box_find_repeatable_row( $needle = 'repeatable_row', $haystack ) {
+function schema_wp_meta_box_find_repeatable_row( $needle = 'repeatable_row', $haystack = array() ) {
+	
+	if ( empty($haystack) ) 
+		return false;
+
 	foreach ( $haystack as $h )
 		if ( isset( $h['type'] ) && $h['type'] == $needle )
 			return true;
@@ -620,7 +626,7 @@ class Schema_Custom_Add_Meta_Box {
 		if ( in_array( $pagenow, array( 'post-new.php', 'post.php' ) ) && in_array( get_post_type(), $this->page ) ) {
 			
 			// debug
-			//echo'<pre>';print_r($this->fields);echo'</pre>';
+			//echo'<pre>';print_r($this->fields);echo'</pre>';exit;
 			
 			// js
 			$deps = array( 'jquery' ); 
@@ -655,12 +661,21 @@ class Schema_Custom_Add_Meta_Box {
 				schema_wp_meta_box_find_field_type( 'file', $this->fields )
 			) ) )
 				wp_enqueue_script( 'meta_box', SCHEMA_CUSTOM_METABOXES_DIR . 'js/scripts.js', $deps );
-				
+			
+			// @since 1.7.9.5 
+			// Changed this check...
+			/*	
 			if ( in_array( true, array( 
 				schema_wp_meta_box_find_field_type( 'select', $this->fields )
 			) ) )
 				wp_enqueue_script( 'schema_meta_box', SCHEMA_CUSTOM_METABOXES_DIR . 'js/schema.js', $deps );
-			
+			*/
+			// To this check:
+			//
+			if ( array_key_exists( 'schema_types',  $this->fields ) ) {
+				wp_enqueue_script( 'schema_meta_box', SCHEMA_CUSTOM_METABOXES_DIR . 'js/schema.js', $deps );
+			}
+
 			// Load media uploader required scripts
 			if ( in_array( true, array( 
 				schema_wp_meta_box_find_field_type( 'image', $this->fields )

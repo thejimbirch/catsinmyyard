@@ -1,13 +1,13 @@
-<?php // Block Bad Queries - Settings
+<?php // BBQ - Settings
 
 if (!defined('ABSPATH')) exit;
 
 function bbq_languages() {
 	
-	load_plugin_textdomain('block-bad-queries', false, BBQ_DIR .'languages/');
+	load_plugin_textdomain('block-bad-queries', false, dirname(plugin_basename(__FILE__)) .'/languages/');
 	
 }
-add_action('plugins_loaded', 'bbq_languages');
+add_action('init', 'bbq_languages');
 
 function bbq_options() {
 	
@@ -43,6 +43,29 @@ function bbq_check_plugin() {
 }
 add_action('admin_init', 'bbq_check_plugin');
 
+function bbq_admin_footer_text($text) {
+	
+	if (!function_exists('get_current_screen')) require_once ABSPATH .'/wp-admin/includes/screen.php';
+	
+	$screen = get_current_screen();
+	
+	$ids = array('settings_page_bbq_settings');
+	
+	if (isset($screen->id) && apply_filters('bbq_admin_footer_text', in_array($screen->id, $ids))) {
+		
+		$text = __('Like BBQ? Give it a', 'block-bad-queries');
+		
+		$text .= ' <a target="_blank" rel="noopener noreferrer" href="https://wordpress.org/support/plugin/block-bad-queries/reviews/?rate=5#new-post">';
+		
+		$text .= __('★★★★★ rating&nbsp;&raquo;', 'block-bad-queries') .'</a>';
+		
+	}
+	
+	return $text;
+	
+}
+add_filter('admin_footer_text', 'bbq_admin_footer_text', 10, 1);
+		
 function bbq_register_settings() {
 	
 	// register_setting( $option_group, $option_name, $sanitize_callback );
@@ -70,7 +93,7 @@ function bbq_validate_options($input) {
 function bbq_settings_section_general() {
 	
 	echo '<p>'. esc_html__('Thanks for using the free version of ', 'block-bad-queries');
-	echo '<a target="_blank" rel="noopener noreferrer" href="https://wordpress.org/plugins/block-bad-queries/">'. esc_html__('Block Bad Queries (BBQ)', 'block-bad-queries') .'</a>.</p>';
+	echo '<a target="_blank" rel="noopener noreferrer" href="https://wordpress.org/plugins/block-bad-queries/">'. esc_html__('BBQ Firewall', 'block-bad-queries') .'</a>.</p>';
 	echo '<p>'. esc_html__('The free version is completely plug-&amp;-play, protecting your site automatically with no settings required.', 'block-bad-queries') .'</p>';
 	
 }
@@ -175,7 +198,7 @@ add_action('admin_menu', 'bbq_menu_page');
 function bbq_display_settings() { ?>
 	
 	<div class="wrap">
-		<h1><?php esc_html_e('Block Bad Queries', 'block-bad-queries'); ?></h1>
+		<h1><?php esc_html_e('BBQ Firewall', 'block-bad-queries'); ?></h1>
 		<form method="post" action="options.php">
 			<?php 
 				settings_fields('bbq_options_free');

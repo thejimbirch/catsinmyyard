@@ -1,29 +1,16 @@
 ( function( $ ) {
 
-	var rl_folder_id = 0,
-		rl_ps = null,
-		grid_frame = null,
-		active_mode = '',
-		move_node_failed = false,
-		disable_redirect = false,
-		attachments_browser = null,
-		last_priority = 2,
-		event_data = {},
-		allow_modal_media_tag_saving = false;
+	var rl_folder_id = 0;
+	var rl_ps = null;
+	var grid_frame = null;
+	var active_mode = '';
+	var move_node_failed = false;
+	var disable_redirect = false;
+	var attachments_browser = null;
+	var last_priority = 2;
+	var event_data = {};
 
-	if ( typeof wp.Uploader !== 'undefined' ) {
-		// extend uploader to apply dynamic folder ID
-		$.extend( wp.Uploader.prototype, {
-			init: function() {
-				this.uploader.bind( 'BeforeUpload', function( file ) {
-					file.settings.multipart_params.rl_folders_upload_files_term_id = rl_folder_id;
-				} );
-			}
-		} );
-	}
-
-	// are we ready?
-	$( document ).ready( function() {
+	function initFolders() {
 		var RLWPMediaViewMediaFramePost = wp.media.view.MediaFrame.Post;
 
 		// extend media frame
@@ -84,8 +71,8 @@
 				if ( rlFoldersArgs.terms !== '' && terms.length > 0 ) {
 					filters[0] = root;
 
-					$( $.parseHTML( rlFoldersArgs.terms ) ).find('option').each( function( i, option ) {
-						term_id = parseInt( $(option).val() );
+					$( $.parseHTML( rlFoldersArgs.terms ) ).find( 'option' ).each( function( i, option ) {
+						term_id = parseInt( $( option ).val() );
 						term_id = ( term_id === 0 ? 'all' : term_id );
 						last_priority = i + 2;
 
@@ -147,57 +134,77 @@
 			}
 		} );
 
-		// extend AttachmentCompat 
-		var RLAttachmentCompat = {
-			save: wp.media.view.AttachmentCompat.prototype.save,
-			postSave: wp.media.view.AttachmentCompat.prototype.postSave
-		};
+		// extend AttachmentCompat
+		var RLAttachmentCompat = wp.media.view.AttachmentCompat;
 
-		$.extend( wp.media.view.AttachmentCompat.prototype, {
-			save: function( event ) {
-				if ( ! allow_modal_media_tag_saving ) {
-					// RLAttachmentCompat.save.apply( this, arguments );
-					// this.$el.closest( '.attachment-details' ).removeClass( 'save-ready' ).addClass( 'save-waiting' );
+		wp.media.view.AttachmentCompat = wp.media.view.AttachmentCompat.extend( {
+			initialize: function() {
+				// call original function
+				RLAttachmentCompat.prototype.initialize.call( this );
 
-					return;
-				}
+				var oldSaveCompat = this.model.saveCompat;
 
-				var select = $( '.rl-media-tag-select2' ),
-					selected = select.select2( 'data' ),
-					tags = [],
-					data = {};
+				// update saveCompat to save additional data
+				this.model.saveCompat = function( data, options ) {
+					var select = $( '.rl-media-tag-select2' );
+					var selected = select.select2( 'data' );
+					var tags = [];
 
-				for ( i = 0; i < selected.length; i++ ) {
-					tags.push( selected[i].id );
-				}
+					for ( i = 0; i < selected.length; i++ ) {
+						tags.push( selected[i].id );
+					}
 
-				if ( event )
-					event.preventDefault();
+					// update tags
+					data[select.attr( 'name' )] = tags.join( ',' );
 
-				// get serialized data
-				_.each( this.$el.serializeArray(), function( pair ) {
-					data[ pair.name ] = pair.value;
-				} );
-
-				// update rl media tag
-				data[select.attr( 'name' )] = tags.join( ',' );
-
-				this.controller.trigger( 'attachment:compat:waiting', ['waiting'] );
-				this.model.saveCompat( data ).always( _.bind( this.postSave, this ) );
-
-				// display spinner
-				this.$el.closest( '.attachment-details' ).removeClass( 'save-ready' ).addClass( 'save-waiting' );
+					// call original function
+					return oldSaveCompat.call( this, data, options );
+				};
 			},
-			postSave: function() {
-				RLAttachmentCompat.postSave.apply( this, arguments );
+			render: function() {
+				// call original function
+				RLAttachmentCompat.prototype.render.call( this );
 
-				// hide spinner
-				this.$el.closest( '.attachment-details' ).addClass( 'save-ready' ).removeClass( 'save-waiting' );
+				// remove select2-dropdown--below
+				$( '.select2-container--open' ).remove();
+
+				// refresh select2
+				setTimeout( initSelect2, 5 );
+			},
+			save: function( event ) {
+				// skip select2 textarea
+				if ( $( event.target ).hasClass( 'select2-search__field' ) )
+					return;
+
+				// call original function
+				RLAttachmentCompat.prototype.save.call( this, event );
 			}
 		} );
+	}
+
+	// ready event
+	$( function() {
+		// wpuploader
+		if ( typeof wp.Uploader !== 'undefined' ) {
+			// extend uploader to apply dynamic folder ID
+			$.extend( wp.Uploader.prototype, {
+				init: function() {
+					this.uploader.bind( 'BeforeUpload', function( file ) {
+						file.settings.multipart_params.rl_folders_upload_files_term_id = rl_folder_id;
+					} );
+				}
+			} );
+		// plupload
+		} else if ( typeof uploader !== 'undefined' ) {
+			uploader.bind( 'BeforeUpload', function( file ) {
+				uploader.settings.multipart_params.rl_folders_upload_files_term_id = rl_folder_id;
+			} );
+		}
 
 		// do nothing for wp_enqueue_media
 		if ( rlFoldersArgs.page === 'media' ) {
+			initFolders();
+
 			// folder change
 			$( document ).on( 'change', '#media-attachment-rl-folders-filters', function() {
 				$( '#rl_folders_upload_files' ).val( $( this ).val() );
@@ -223,6 +230,8 @@
 			} else {
 				// add tree
 				$( '#wp-media-grid .error' ).after( rlFoldersArgs.template );
+
+				initFolders();
 			}
 
 			// activate wholerow plugin if needed
@@ -312,9 +321,9 @@
 					link.hide().after( '<span id="' + parent_node + '_span">' + content + '<input id="rl-folders-enter-new-folder" type="text" value="' + rlFoldersArgs.new_folder + '" placeholder="" data-term_id="' + parseInt( link.data( 'term_id' ) ) + '" data-nof="0" /></span>' );
 
 					// select text inside input
-					$( '#rl-folders-enter-new-folder' ).select();
+					$( '#rl-folders-enter-new-folder' ).trigger( 'select' );
 
-					$( '#rl-folders-enter-new-folder' ).keyup( function( e ) {
+					$( '#rl-folders-enter-new-folder' ).on( 'keyup', function( e ) {
 						// enter button
 						if ( e.which === 13 ) {
 							save_node( true, parseInt( $( '#' + parent_node + '_anchor' ).data( 'term_id' ) ) );
@@ -368,9 +377,9 @@
 				link.hide().after( '<span id="' + node_id + '_span">' + content[1] + '<input id="rl-folders-enter-folder" type="text" value="' + name + '" placeholder="' + name + '" data-term_id="' + parseInt( term_id ) + '" data-nof="' + nof + '" /></span>' );
 
 				// select text inside input
-				$( '#rl-folders-enter-folder' ).select();
+				$( '#rl-folders-enter-folder' ).trigger( 'select' );
 
-				$( '#rl-folders-enter-folder' ).keyup( function( e ) {
+				$( '#rl-folders-enter-folder' ).on( 'keyup', function( e ) {
 					// enter button
 					if ( e.which === 13 ) {
 						save_node( false, 0 );
@@ -453,7 +462,7 @@
 								$( '#rl-folders-tree' ).jstree( 'select_node', parent );
 
 								// force to update view
-								$( '#media-attachment-rl-folders-filters' ).val( $( '#' + parent + '_anchor' ).data( 'term_id' ) ).change();
+								$( '#media-attachment-rl-folders-filters' ).val( $( '#' + parent + '_anchor' ).data( 'term_id' ) ).trigger( 'change' );
 
 								refresh_scrollbars();
 							} else {
@@ -519,7 +528,10 @@
 				$( '#rl_folders_upload_files' ).val( term_id === 'all' ? 0 : term_id );
 
 				// update term_id in uploader parameters
-				rl_folder_id = parseInt( term_id ) || 0;
+				rl_folder_id = parseInt( term_id );
+
+				if ( isNaN( rl_folder_id ) )
+					rl_folder_id = 0;
 
 				// enable/disable icons for folders
 				if ( term_id === 'all' )
@@ -567,7 +579,7 @@
 
 				// replace edit function to prevent using F2 key natively by jstree
 				$.jstree.core.prototype.edit = function( obj, default_text, callback ) {
-					$( '.rl-folders-rename-folder' ).click();
+					$( '.rl-folders-rename-folder' ).trigger( 'click' );
 				};
 
 				// update mode links
@@ -622,9 +634,6 @@
 						// store grid frame
 						grid_frame = wp.media.frame.content.get();
 
-						// bind edit attachment event to initialize select2 on rl media tag
-						grid_frame.controller.on( 'edit:attachment', init_select2 );
-
 						// set root as main folder for uploads
 						rl_folder_id = 0;
 					}
@@ -633,9 +642,8 @@
 
 			// folder change
 			$( document ).on( 'change', '#media-attachment-rl-folders-filters', function() {
-				if ( active_mode === 'list' ) {
+				if ( active_mode === 'list' )
 					return;
-				}
 
 				var node_id = $( '#rl-folders-tree' ).jstree().get_selected().toString();
 
@@ -709,54 +717,49 @@
 		// change uploading folder
 		$( document ).on( 'change', '#rl_folders_upload_files', function() {
 			// update term_id in uploader parameters
-			rl_folder_id = parseInt( $( this ).val() ) || 0;
+			rl_folder_id = parseInt( $( this ).val() );
+
+			if ( isNaN( rl_folder_id ) )
+				rl_folder_id = 0;
 		} );
 
-		// 
-		$( document ).on( 'ajaxComplete', function() {
-			init_select2();
-		} );
+		if ( rlFoldersArgs.page !== 'media' ) {
+			// press modal compat attachment left, right or escape key
+			$( document ).on( 'keydown', function( e ) {
+				if ( ( 'INPUT' === e.target.nodeName || 'TEXTAREA' === e.target.nodeName ) && ! ( e.target.readOnly || e.target.disabled ) )
+					return;
 
-		// click modal compat attachment left and right arrows
-		$( document ).on( 'click', '.left, .right', function() {
-			init_select2();
-		} );
-
-		// press modal compat attachment left, right or escape key
-		$( document ).on( 'keydown', function( e ) {
-			if ( ( 'INPUT' === e.target.nodeName || 'TEXTAREA' === e.target.nodeName ) && ! ( e.target.readOnly || e.target.disabled ) )
-				return;
-
-			// escape key
-			if ( e.keyCode === 27 )
-				$( '.media-modal-close' ).click();
-
-			// right arrow key
-			if ( e.keyCode === 39 )
-				$( '.edit-media-header .right' ).click();
-
-			// left arrow key
-			if ( e.keyCode === 37 )
-				$( '.edit-media-header .left' ).click();
-		} );
+				// escape key
+				if ( e.keyCode === 27 )
+					$( '.media-modal-close' ).trigger( 'click' );
+			} );
+		}
 	} );
 
 	// initialize select2 and it's events
-	function init_select2() {
+	function initSelect2() {
 		var select = $( '.rl-media-tag-select2' );
 
+		// skip initialization of select2
 		if ( select.length === 0 || select.hasClass( 'select2-hidden-accessible' ) )
 			return;
+
+		// turn off scrolling events
+		$( 'div.attachment-info' ).off( 'scroll' );
+		$( 'div.media-sidebar' ).off( 'scroll' );
 
 		// init select2
 		select.select2( {
 			closeOnSelect: true,
+			scrollAfterSelect: false,
+			allowClear: false,
+			debug: false,
 			multiple: true,
 			width: '100%',
 			minimumInputLength: 2,
 			dropdownCssClass: 'rl-media-tag-select2-dropdown',
 			ajax: {
-				delay: 250,
+				delay: 200,
 				url: ajaxurl,
 				data: function( params ) {
 					return {
@@ -782,21 +785,6 @@
 				}
 			}
 		} );
-
-		// change select
-		select.on( 'change', function( e ) {
-			allow_modal_media_tag_saving = true;
-		} );
-
-		// select item
-		select.on( 'select2:select', function( e ) {
-			allow_modal_media_tag_saving = false;
-		} );
-
-		// unselect item
-		select.on( 'select2:unselect', function( e ) {
-			allow_modal_media_tag_saving = false;
-		} );
 	}
 
 	// update mode link (grid or list)
@@ -815,26 +803,24 @@
 
 		if ( mode === 'list' ) {
 			// 'all' on grid is 0 on list
-			if ( term === 'all' ) {
+			if ( term === 'all' )
 				term = 0;
 			// -1 on list is 0 on grid
-			} else if ( term === 0 ) {
+			else if ( term === 0 )
 				term = -1;
-			}
 		}
 
 		// no 'taxonomy=term_id' in query?
-		if ( string === '' ) {
+		if ( string === '' )
 			selector.prop( 'href', link + '&' + rlFoldersArgs.taxonomy + '=' + term );
 		// found pair so replace term_id with new one just in case it's invalid
-		} else {
+		else
 			selector.prop( 'href', link.replace( new RegExp( rlFoldersArgs.taxonomy + '=' + '(-?[0-9]+|all)', 'g' ), rlFoldersArgs.taxonomy + '=' + term ) );
-		}
 	}
 
 	// refresh perfect scrollbar
 	function refresh_scrollbars() {
-	setTimeout( function() {
+		setTimeout( function() {
 			rl_ps.update();
 		}, 200 );
 	}
@@ -849,9 +835,8 @@
 			var wholerow = $( 'div.jstree-wholerow.jstree-wholerow-clicked' );
 
 			// destroy only selected droppable node first if needed
-			if ( typeof wholerow.droppable( 'instance' ) !== 'undefined' ) {
+			if ( typeof wholerow.droppable( 'instance' ) !== 'undefined' )
 				wholerow.droppable( 'destroy' );
-			}
 
 			// droppable nodes selector, skip 'all files' and current folder
 			selector = $( '#rl-folders-tree .jstree-wholerow:not(:eq(0))' ).not( '#' + node_id + ' .jstree-wholerow-clicked' );
@@ -859,9 +844,8 @@
 			var anchor = $( '#' + node_id + '_anchor' );
 
 			// destroy only selected droppable node first if needed
-			if ( typeof anchor.droppable( 'instance' ) !== 'undefined' ) {
+			if ( typeof anchor.droppable( 'instance' ) !== 'undefined' )
 				anchor.droppable( 'destroy' );
-			}
 
 			// droppable nodes selector, skip 'all files' and current folder
 			selector = $( '#rl-folders-tree li a.jstree-anchor:not(:eq(0),#' + node_id + '_anchor)' );
@@ -877,16 +861,23 @@
 				drop: function( event, ui ) {
 					var node = $( event.target ).closest( 'li' ).find( 'a.jstree-anchor' ),
 						old_node = $( '#' + $( '#rl-folders-tree' ).jstree().get_selected().toString() + '_anchor' ),
-						old_term_id = parseInt( old_node.data( 'term_id' ) ) || -1,
 						attachments = [],
-						ids = $( '#the-list .check-column input[type="checkbox"]:checked' );
+						ids = $( '#the-list .check-column input[type="checkbox"]:checked' ),
+						old_term_id = parseInt( old_node.data( 'term_id' ) ),
+						new_term_id = parseInt( node.data( 'term_id' ) );
+
+					if ( isNaN( old_term_id ) )
+						old_term_id = -1;
+
+					if ( isNaN( new_term_id ) )
+						new_term_id = -1;
 
 					toggle_spinner( true );
 
 					// dropped single unchecked attachment?
-					if ( ids.length === 0 ) {
+					if ( ids.length === 0 )
 						attachments.push( ui.draggable.find( '.check-column input[type="checkbox"]' ).val() );
-					} else {
+					else {
 						ids.each( function( i, item ) {
 							attachments.push( parseInt( $( item ).val() ) );
 						} );
@@ -896,7 +887,7 @@
 						action: 'rl-folders-move-attachments',
 						attachment_ids: attachments,
 						old_term_id: old_term_id,
-						new_term_id: parseInt( node.data( 'term_id' ) ) || -1,
+						new_term_id: new_term_id,
 						nonce: rlFoldersArgs.nonce
 					} ).done( function( response ) {
 						try {
@@ -909,12 +900,11 @@
 											$( this ).remove();
 
 											// display 'no media' text
-											if ( $( '#the-list tr' ).length === 0 ) {
+											if ( $( '#the-list tr' ).length === 0 )
 												$( '#the-list' ).append( rlFoldersArgs.no_media_items );
-											}
 										} );
 									}
- 
+
 									// update old node number
 									update_node_number( old_node, response.data, false );
 								}
@@ -923,7 +913,6 @@
 								update_node_number( node, response.data, true );
 							}
 						} catch( e ) {
-							
 						}
 
 						// hide spinner
@@ -951,10 +940,10 @@
 					toggle_spinner( true );
 
 					// single attachment
-					if ( $( '.media-frame' ).hasClass( 'mode-edit' ) ) {
+					if ( $( '.media-frame' ).hasClass( 'mode-edit' ) )
 						attachments.push( parseInt( ui.draggable.data( 'id' ) ) );
 					// selection of attachments
-					} else {
+					else {
 						$( 'ul.attachments > li.selected' ).each( function( i, item ) {
 							attachments.push( parseInt( $( item ).data( 'id' ) ) );
 						} );
@@ -977,9 +966,8 @@
 											$( this ).remove();
 
 											// display 'no media' text
-											if ( $( 'ul.attachments li' ).length === 0 ) {
+											if ( $( 'ul.attachments li' ).length === 0 )
 												$( '.no-media' ).removeClass( 'hidden' );
-											}
 										} );
 									}
 
@@ -994,7 +982,6 @@
 								grid_frame.controller.deactivateMode( 'select' ).activateMode( 'edit' );
 							}
 						} catch( e ) {
-							
 						}
 
 						// hide spinner
@@ -1054,9 +1041,8 @@
 					var attachments = $( '#the-list .check-column input[type="checkbox"]:checked' ).length;
 
 					// dragging unchecked single attachment?
-					if ( attachments === 0 ) {
+					if ( attachments === 0 )
 						attachments = 1;
-					}
 
 					return '<div class="rl-folders-dragged-item"><div class="dashicons dashicons-media-default"></div><span>' + attachments + '</span></div>';
 				},
@@ -1082,17 +1068,15 @@
 	// toggle spinner
 	function toggle_spinner( show ) {
 		if ( show ) {
-			if ( active_mode === 'list' ) {
+			if ( active_mode === 'list' )
 				$( '.filter-items .actions' ).find( '.spinner' ).addClass( 'is-active' );
-			} else {
+			else
 				$( '.media-toolbar-secondary' ).find( '.spinner' ).addClass( 'is-active' );
-			}
 		} else {
-			if ( active_mode === 'list' ) {
+			if ( active_mode === 'list' )
 				$( '.filter-items .actions' ).find( '.spinner' ).removeClass( 'is-active' );
-			} else {
+			else
 				$( '.media-toolbar-secondary' ).find( '.spinner' ).removeClass( 'is-active' );
-			}
 		}
 	}
 
@@ -1126,18 +1110,16 @@
 			// delete node
 			$( '#rl-folders-tree' ).jstree( 'delete_node', node_id );
 
-			if ( active_mode === 'list' ) {
-				// disable redirect in select_node
+			// disable redirect in select_node
+			if ( active_mode === 'list' )
 				disable_redirect = true;
-			}
 
 			// select parent node
 			$( '#rl-folders-tree' ).jstree( 'select_node', parent );
 		} else {
 			// enable icons for non-empty nodes
-			if ( ! $( '#rl-folders-tree' ).jstree( 'is_leaf', node_id ) ) {
+			if ( ! $( '#rl-folders-tree' ).jstree( 'is_leaf', node_id ) )
 				$( '.rl-folders-expand-folder, .rl-folders-collapse-folder' ).removeClass( 'disabled-link' );
-			}
 
 			// restore folder
 			$( node_id + '_span' ).remove();
@@ -1160,7 +1142,7 @@
 	function save_node( new_node, parent_id ) {
 		var input = $( new_node ? '#rl-folders-enter-new-folder' : '#rl-folders-enter-folder' );
 			node_id = $( '#rl-folders-tree' ).jstree().get_selected().toString(),
-			name = $.trim( input.val() ),
+			name = input.val().trim(),
 			nof = input.data( 'nof' );
 
 		if ( ! new_node ) {
@@ -1209,7 +1191,6 @@
 								}
 							};
 						}
-
 					} else {
 						// rename node
 						$( '#media-attachment-rl-folders-filters option[value="' + term_id + '"]' ).text( response.data.name );
@@ -1233,7 +1214,10 @@
 						$( '#' + node_id + '_anchor' ).attr( 'data-term_id', response.data.term_id ).attr( 'href', response.data.url );
 
 						// force to update view
-						$( '#media-attachment-rl-folders-filters' ).val( response.data.term_id ).change();
+						$( '#media-attachment-rl-folders-filters' ).val( response.data.term_id ).trigger( 'change' );
+
+						if ( active_mode === 'list' )
+							window.location.replace( response.data.url );
 					}
 
 					// update upload select
@@ -1262,7 +1246,7 @@
 
 	// click node handler
 	function click_node() {
-		$( '#media-attachment-rl-folders-filters' ).val( $( this ).data( 'term_id' ) ).change();
+		$( '#media-attachment-rl-folders-filters' ).val( $( this ).data( 'term_id' ) ).trigger( 'change' );
 	}
 
 	// parse query string

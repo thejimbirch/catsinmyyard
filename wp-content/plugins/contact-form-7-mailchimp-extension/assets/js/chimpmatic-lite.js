@@ -9,8 +9,8 @@ jQuery(document).on('click', '#mce_activalist', function(event){ // use jQuery n
       data: {
 
         action : 'wpcf7_mce_loadlistas',
-        mce_idformxx : jQuery("#mce_txtcomodin").attr("value"),
-        mceapi: jQuery("#wpcf7-mailchimp-api").attr("value"),
+        mce_idformxx : jQuery("#mce_txtcomodin").val(),
+        mceapi: jQuery("#wpcf7-mailchimp-api").val(),
 
       },
 
@@ -28,7 +28,7 @@ jQuery(document).on('click', '#mce_activalist', function(event){ // use jQuery n
         jQuery(".mce-custom-fields .spinner").css('visibility', 'hidden');
         jQuery('#mce_panel_listamail').html( response );
 
-        var valor = jQuery("#mce_txcomodin2").attr("value");
+        var valor = jQuery("#mce_txcomodin2").val();
         // var chm_valid ='';
         var attrclass ='';
 
@@ -73,6 +73,7 @@ jQuery(document).on('click', '#mce_activalist', function(event){ // use jQuery n
 });
 
 
+
 jQuery(document).on('click', '#log_reset', function(event){
 
   event.preventDefault(); // stop post action
@@ -84,8 +85,8 @@ jQuery(document).on('click', '#log_reset', function(event){
       data: {
 
         action : 'chimpmatic_logreset',
-        mce_idformxx : jQuery("#mce_txtcomodin").attr("value"),
-        mceapi: jQuery("#wpcf7-mailchimp-api").attr("value"),
+        mce_idformxx : jQuery("#mce_txtcomodin").val(),
+        mceapi: jQuery("#wpcf7-mailchimp-api").val(),
 
       },
       // error: function(e) {
@@ -112,6 +113,38 @@ jQuery(document).on('click', '#log_reset', function(event){
 
   });
 
+});
+
+
+
+jQuery(document).on('change', '#chimpmatic-update', function(event){ // Aug 7, 2020 now
+
+      event.preventDefault(); // stop post action
+
+      var xchk = 0 ;
+
+      if ( jQuery(this).prop('checked') )
+         xchk = 1 ;
+
+      jQuery.ajax({
+          type: "POST",
+          url: ajaxurl, // or '<?php echo admin_url('admin-ajax.php'); ?>'
+          data: {
+              action : 'wpcf7_mch_set_autoupdate',
+              valcheck : xchk  ,
+                },
+
+          success: function( response ){ // response,data, textStatus, jqXHR,
+
+            //jQuery( '#gg-select'+ itag ).html( response );
+
+          },
+          error: function(data, textStatus, jqXHR){
+
+              alert(textStatus);
+
+          },
+      });
 });
 
 
@@ -222,6 +255,13 @@ jQuery(".cme-trigger-log").click(function() {
 });
 
 
+jQuery(".cme-trigger-php").click(function() {
+
+  jQuery( "#eventlog-sys" ).slideToggle(250);
+
+});
+
+
 
 jQuery(document).on('click', '.cme-trigger-log', function(event){
 
@@ -234,8 +274,8 @@ jQuery(document).on('click', '.cme-trigger-log', function(event){
       data: {
 
         action : 'chimpmatic_logload',
-        mce_idformxx : jQuery("#mce_txtcomodin").attr("value"),
-        mceapi: jQuery("#wpcf7-mailchimp-api").attr("value"),
+        mce_idformxx : jQuery("#mce_txtcomodin").val(),
+        mceapi: jQuery("#wpcf7-mailchimp-api").val(),
 
       },
       // error: function(e) {

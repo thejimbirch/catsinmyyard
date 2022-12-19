@@ -5,6 +5,7 @@ namespace CF\WordPress;
 use CF\API\APIInterface;
 use CF\API\Request;
 use CF\Integration\DefaultIntegration;
+use Symfony\Polyfill\Tests\Intl\Idn;
 
 class ClientActions
 {
@@ -40,6 +41,15 @@ class ClientActions
         // Call GET /zones
         $response = $this->api->callAPI($this->request);
 
+        // We tried to fetch a zone but it's possible we're using an API token,
+        // So try again with a zone name filtered API call
+        if (!$this->api->responseOk($response)) {
+            $zoneRequest = new Request('GET', 'zones/', array('name' => idn_to_ascii($this->wordpressAPI->getOriginalDomain(), IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46), array()));
+            $zoneResponse = $this->api->callAPI($zoneRequest);
+
+            return $zoneResponse;
+        }
+
         // Cache the domain for subdomains
         $this->cacheDomainName($response);
 
@@ -59,7 +69,7 @@ class ClientActions
         if ($this->api->responseOk($cfZonesList)) {
             $found = false;
             foreach ($cfZonesList['result'] as $zone) {
-                if ($zone['name'] === $wpDomain) {
+                if (idn_to_ascii($zone['name'], IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46) === idn_to_ascii($wpDomain, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46)) {
                     $found = true;
                     array_push($domainList, $zone);
                 }
@@ -81,10 +91,10 @@ class ClientActions
 
     public function cacheDomainName($response)
     {
-        // Check if domain name needs to cached
+        // Check if domain name needs to be cached
         $wpDomain = $this->wordpressAPI->getOriginalDomain();
         $cachedDomainList = $this->wordpressAPI->getDomainList();
-        $cachedDomain = $cachedDomainList[0];
+        $cachedDomain = isset($cachedDomainList[0]) ? $cachedDomainList[0] : '';
 
         if (Utils::getRegistrableDomain($wpDomain) !== $cachedDomain) {
             // If it's not a subdomain cache the current domain

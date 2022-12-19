@@ -1,4 +1,4 @@
-<?php // Block Bad Queries - Uninstall Remove Options
+<?php // BBQ - Uninstall Remove Options
 
 if (!defined('ABSPATH') && !defined('WP_UNINSTALL_PLUGIN')) exit();
 

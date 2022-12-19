@@ -1,6 +1,13 @@
 <?php
+/**
+ * API endpoints to interact with WordPress.com
+ * to get info from the Mailchimp API for use with the Mailchimp block.
+ *
+ * @package automattic/jetpack
+ */
 
 use Automattic\Jetpack\Connection\Client;
+use Automattic\Jetpack\Redirect;
 
 /**
  * Mailchimp: Get Mailchimp Status.
@@ -10,6 +17,9 @@ use Automattic\Jetpack\Connection\Client;
  * @since 7.1
  */
 class WPCOM_REST_API_V2_Endpoint_Mailchimp extends WP_REST_Controller {
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
 		$this->namespace                    = 'wpcom/v2';
 		$this->rest_base                    = 'mailchimp';
@@ -28,8 +38,9 @@ class WPCOM_REST_API_V2_Endpoint_Mailchimp extends WP_REST_Controller {
 			$this->rest_base,
 			array(
 				array(
-					'methods'  => WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get_mailchimp_status' ),
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_mailchimp_status' ),
+					'permission_callback' => '__return_true',
 				),
 			)
 		);
@@ -38,8 +49,9 @@ class WPCOM_REST_API_V2_Endpoint_Mailchimp extends WP_REST_Controller {
 			$this->rest_base . '/groups',
 			array(
 				array(
-					'methods'  => WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get_mailchimp_groups' ),
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_mailchimp_groups' ),
+					'permission_callback' => '__return_true',
 				),
 			)
 		);
@@ -80,7 +92,13 @@ class WPCOM_REST_API_V2_Endpoint_Mailchimp extends WP_REST_Controller {
 				403
 			);
 		}
-		$connect_url = sprintf( 'https://wordpress.com/marketing/connections/%s?mailchimp', rawurlencode( $site_id ) );
+		$connect_url = Redirect::get_url(
+			'calypso-marketing-connections',
+			array(
+				'site'  => rawurlencode( $site_id ),
+				'query' => 'mailchimp',
+			)
+		);
 		return array(
 			'code'        => $this->is_connected() ? 'connected' : 'not_connected',
 			'connect_url' => $connect_url,

@@ -116,18 +116,23 @@ class UpdraftPlus_Backup_History {
 	 * Get the HTML for the table of existing backups
 	 *
 	 * @param Array|Boolean $backup_history - a list of backups to use, or false to get the current list from the database
+	 * @param Boolean       $backup_count   - the amount of backups currently displayed in the existing backups table
 	 *
 	 * @uses UpdraftPlus_Admin::include_template()
 	 *
 	 * @return String - HTML for the table
 	 */
-	public static function existing_backup_table($backup_history = false) {
+	public static function existing_backup_table($backup_history = false, $backup_count = 0) {
 
 		global $updraftplus, $updraftplus_admin;
 
 		if (false === $backup_history) $backup_history = self::get_history();
 		
-		if (!is_array($backup_history) || empty($backup_history)) return '<div class="postbox"><p class="updraft-no-backups-msg"><em>'.__('You have not yet made any backups.', 'updraftplus').'</em></p></div>';
+		if (!is_array($backup_history) || empty($backup_history)) return '<div class="postbox"><p class="updraft-no-backups-msg">'.__('You have not yet made any backups.', 'updraftplus').'</p> <p class="updraft-no-backups-msg">'.__('If you have an existing backup that you wish to upload and restore from, then please use the "Upload backup files" link above.', 'updraftplus').' '.__('Or, if they are in remote storage, you can connect that remote storage (in the "Settings" tab), save your settings, and use the "Rescan remote storage" link.', 'updraftplus').'</p></div>';
+
+		if (empty($backup_count)) {
+			$backup_count = defined('UPDRAFTPLUS_EXISTING_BACKUPS_LIMIT') ? UPDRAFTPLUS_EXISTING_BACKUPS_LIMIT : 100;
+		}
 
 		// Reverse date sort - i.e. most recent first
 		krsort($backup_history);
@@ -135,7 +140,9 @@ class UpdraftPlus_Backup_History {
 		$pass_values = array(
 			'backup_history' => self::add_jobdata($backup_history),
 			'updraft_dir' => $updraftplus->backups_dir_location(),
-			'backupable_entities' => $updraftplus->get_backupable_file_entities(true, true)
+			'backupable_entities' => $updraftplus->get_backupable_file_entities(true, true),
+			'backup_count' => $backup_count,
+			'show_paging_actions' => false,
 		);
 		
 		return $updraftplus_admin->include_template('wp-admin/settings/existing-backups-table.php', true, $pass_values);
@@ -211,15 +218,40 @@ class UpdraftPlus_Backup_History {
 	 */
 	public static function save_history($backup_history, $use_cache = true) {
 		
-		global $updraftplus;
+		global $updraftplus, $wpdb;
 
 		// This data is constructed at run-time from the other keys; we do not wish to save redundant data
 		foreach ($backup_history as $btime => $bdata) {
 			unset($backup_history[$btime]['incremental_sets']);
 		}
-		
+
+		$wpdb_previous_last_error = $wpdb->last_error;
+
 		// Explicitly set autoload to 'no', as the backup history can get quite big.
 		$changed = UpdraftPlus_Options::update_updraft_option('updraft_backup_history', $backup_history, $use_cache, 'no');
+
+		if (!$changed && '' !== $wpdb->last_error && $wpdb_previous_last_error != $wpdb->last_error) {
+			// if an error occured, there is a possibility if this error is caused by invalid characters found in 'label'
+			foreach ($backup_history as $btime => $bdata) {
+				if (isset($bdata['label'])) {
+					// try removing invalid characters from 'label'
+					if (method_exists($wpdb, 'strip_invalid_text_for_column')) {
+						$backup_history[$btime]['label'] = $wpdb->strip_invalid_text_for_column($wpdb->options, 'option_value', $backup_history[$btime]['label']);
+					} else {
+
+						// This replacement, may of course, drop parts of the label. This is judged to be better than dropping it all - and WPDB::strip_invalid_text_for_column() exists on WP 4.2+.
+						$backup_history[$btime]['label'] = preg_replace('/[^a-z0-9-_ ]/i', '', $backup_history[$btime]['label']);
+					}
+
+					if ('' === $backup_history[$btime]['label']) {
+						unset($backup_history[$btime]['label']);
+					}
+				}
+			}
+
+			// try to save it again
+			$changed = UpdraftPlus_Options::update_updraft_option('updraft_backup_history', $backup_history, $use_cache, 'no');
+		}
 
 		if (!$changed) {
 		
@@ -247,10 +279,9 @@ class UpdraftPlus_Backup_History {
 	/**
 	 * Used by self::always_get_from_db()
 	 *
-	 * @param  String $v - ignored
 	 * @return Mixed - the database option
 	 */
-	public static function filter_updraft_backup_history($v) {// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Filter use
+	public static function filter_updraft_backup_history() {
 		global $wpdb;
 		$row = $wpdb->get_row($wpdb->prepare("SELECT option_value FROM $wpdb->options WHERE option_name = %s LIMIT 1", 'updraft_backup_history'));
 		if (is_object($row)) return maybe_unserialize($row->option_value);
@@ -273,7 +304,7 @@ class UpdraftPlus_Backup_History {
 	 * @param Array|String $only_add_this_file - if set to an array (with keys 'file' and (optionally) 'label'), then a file will only be taken notice of if the filename matches the 'file' key (and the label will be associated with the backup set)
 	 * @param Boolean	   $debug			   - include debugging messages. These will be keyed with keys beginning 'debug-' so that they can be distinguished.
 	 *
-	 * @return Array - an array of messages which the caller may wish to display to the user. N.B. Messages are not necessarily just strings.
+	 * @return Array - an array of messages which the caller may wish to display to the user. N.B. Messages are not necessarily just strings, but may be.
 	 */
 	public static function rebuild($remote_scan = false, $only_add_this_file = false, $debug = false) {
 
@@ -302,7 +333,9 @@ class UpdraftPlus_Backup_History {
 		foreach ($backup_history as $btime => $bdata) {
 			$found_file = false;
 			foreach ($bdata as $key => $values) {
-				if ('db' != $key && !isset($backupable_entities[$key])) continue;
+				// make sure we also handle multiple databases, which has a different array structure compared to other entities (e.g. plugins, themes, etc.)
+				// we don't do strict comparison using identical operator (===) here because we want to catch boolean false or a non-boolean value which evaluates to false, hence we use equal operator (==)
+				if (false == preg_match('/^db[0-9]*$/i', $key) && !isset($backupable_entities[$key])) continue;
 				// Record which set this file is found in
 				if (!is_array($values)) $values = array($values);
 				foreach ($values as $filename) {
@@ -503,7 +536,7 @@ class UpdraftPlus_Backup_History {
 					'code' => 'possibleforeign_'.md5($entry),
 					'desc' => $entry,
 					'method' => '',
-					'message' => __('This file does not appear to be an UpdraftPlus backup archive (such files are .zip or .gz files which have a name like: backup_(time)_(site name)_(code)_(type).(zip|gz)).', 'updraftplus').' <a href="https://updraftplus.com/shop/updraftplus-premium/" target="_blank">'.__('If this is a backup created by a different backup plugin, then UpdraftPlus Premium may be able to help you.', 'updraftplus').'</a>'
+					'message' => __('This file does not appear to be an UpdraftPlus backup archive (such files are .zip or .gz files which have a name like: backup_(time)_(site name)_(code)_(type).(zip|gz)).', 'updraftplus').' <a href="'.$updraftplus->get_url('premium').'" target="_blank">'.__('If this is a backup created by a different backup plugin, then UpdraftPlus Premium may be able to help you.', 'updraftplus').'</a>'
 				);
 				$messages[$potmessage['code']] = $potmessage;
 				continue;
@@ -556,6 +589,7 @@ class UpdraftPlus_Backup_History {
 					if (isset($only_add_this_file['label'])) $backup_history[$btime]['label'] = $only_add_this_file['label'];
 					$backup_history[$btime]['native'] = false;
 				} elseif ('db' == $type && !$accepted_foreign) {
+					// we now that multiple databases will add its index number after the 'db' (e.g. 'db1'), however, the $type == 'db' here has nothing to do with our multiple databases addon because this block of code inside the 'if (!isset($backup_nonces_by_filename[$entry]))' will never be executed if multiple databases is found to be in the backup history and that our backup file pattern matches with them, so this is not the place where we should check for our multiple databases backup file, this is instead the place for handling foreign databases (e.g. Backup Buddy and our other competitors). The $type were previously set to 'db' when its file was found to be a foreign database
 					list ($mess, $warn, $err, $info) = $updraftplus->analyse_db_file(false, array(), $updraft_dir.'/'.$entry, true);// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 					if (!empty($info['label'])) {
 						$backup_history[$btime]['label'] = $info['label'];
@@ -587,11 +621,9 @@ class UpdraftPlus_Backup_History {
 					$backup_history[$btime]['service'] = array_unique(array_merge($current_services, $remote_files[$entry]));
 				}
 				// Get the right size (our local copy may be too small)
-				foreach ($remote_files[$entry] as $remote_file) {
-					if (!empty($remote_file['size']) && $remote_file['size'] > $file_size) {
-						$file_size = $remote_file['size'];
-						$changes = true;
-					}
+				if (!empty($remote_sizes[$entry]) && $remote_sizes[$entry] > $file_size) {
+					$file_size = $remote_sizes[$entry];
+					$changes = true;
 				}
 				// Remove from $remote_files, so that we can later see what was left over (i.e. $remote_files will exclude files which are present locally).
 				unset($remote_files[$entry]);
@@ -610,8 +642,20 @@ class UpdraftPlus_Backup_History {
 				}
 			}
 
-			$backup_history[$btime][$type][$index] = $entry;
-			if ($file_size > 0) $backup_history[$btime][$type.$itext.'-size'] = $file_size;
+			if (preg_match('/^db[0-9]*$/i', $type)) { // make sure we also handle multiple databases, which has a bit different array structure
+				$backup_history[$btime][$type] = $entry; // $backup_history[$btime][$type] is in string type not array
+			} else {
+				$backup_history[$btime][$type][$index] = $entry;
+			}
+			
+			if (!empty($backup_history[$btime][$type.$itext.'-size']) && $backup_history[$btime][$type.$itext.'-size'] < $file_size) {
+				$backup_history[$btime][$type.$itext.'-size'] = $file_size;
+				$changes = true;
+			} elseif (empty($backup_history[$btime][$type.$itext.'-size']) && $file_size > 0) {
+				$backup_history[$btime][$type.$itext.'-size'] = $file_size;
+				$changes = true;
+			}
+			
 			$backup_history[$btime]['nonce'] = $nonce;
 			if (!empty($accepted_foreign)) $backup_history[$btime]['meta_foreign'] = $accepted_foreign;
 		}
@@ -658,16 +702,24 @@ class UpdraftPlus_Backup_History {
 					$backup_history[$btime]['nonce'] = $nonce;
 				}
 				
-				if (!isset($backup_history[$btime][$type][$index])) {
+				if (!isset($backup_history[$btime][$type]) || (!preg_match('/^db[0-9]*$/i', $type) && !isset($backup_history[$btime][$type][$index]))) {
 					$changes = true;
-					$backup_history[$btime][$type][$index] = $file;
+					if (preg_match('/^db[0-9]*$/i', $type)) {
+						$backup_history[$btime][$type] = $file;
+					} else {
+						$backup_history[$btime][$type][$index] = $file;
+					}
 					$backup_history[$btime]['nonce'] = $nonce;
 					if (!empty($remote_sizes[$file])) $backup_history[$btime][$type.$itext.'-size'] = $remote_sizes[$file];
 				}
 			} else {
 				$changes = true;
 				$backup_history[$btime]['service'] = $services;
-				$backup_history[$btime][$type][$index] = $file;
+				if (preg_match('/^db[0-9]*$/i', $type)) {
+					$backup_history[$btime][$type] = $file;
+				} else {
+					$backup_history[$btime][$type][$index] = $file;
+				}
 				$backup_history[$btime]['nonce'] = $nonce;
 				if (!empty($remote_sizes[$file])) $backup_history[$btime][$type.$itext.'-size'] = $remote_sizes[$file];
 				$backup_history[$btime]['native'] = false;
@@ -754,10 +806,13 @@ class UpdraftPlus_Backup_History {
 
 		$backup_history = self::get_history();
 
-		foreach ($backup_history as $key => $backup) {
+		foreach ($backup_history as $backup) {
 
 			$remote_sent = !empty($backup['service']) && ((is_array($backup['service']) && in_array('remotesend', $backup['service'])) || 'remotesend' === $backup['service']);
 			if ($remote_sent) continue;
+
+			// We don't want to add an increment to a backup of another site
+			if (isset($backup['native']) && false == $backup['native']) continue;
 
 			foreach ($entities as $type) {
 				if (!isset($backup[$type])) continue 2;
